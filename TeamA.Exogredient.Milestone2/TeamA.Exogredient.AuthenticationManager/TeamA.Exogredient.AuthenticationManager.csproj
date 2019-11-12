@@ -4,4 +4,10 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TeamA.Exogredient.AuthenticationService\TeamA.Exogredient.AuthenticationService.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.CheckUserExiststenceService\TeamA.Exogredient.CheckUserExiststenceService.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.CheckUserLockService\TeamA.Exogredient.CheckUserLockService.csproj" />
+  </ItemGroup>
+
 </Project>
