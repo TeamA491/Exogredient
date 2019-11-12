@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace TeamA.Exogredient.FlatFileLoggingDAO
+﻿namespace TeamA.Exogredient.FlatFileLoggingDAO
 {
+    using System;
+
     public class FlatFileLoggingDAO
     {
         public FlatFileLoggingDAO() { }

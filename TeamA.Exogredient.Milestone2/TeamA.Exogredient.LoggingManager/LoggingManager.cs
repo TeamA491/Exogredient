@@ -1,8 +1,9 @@
-﻿using System;
-
-namespace TeamA.Exogredient.LoggingManager
+﻿namespace TeamA.Exogredient.LoggingManager
 {
+    using System;
     using TeamA.Exogredient.FlatFileLoggingService;
+    using TeamA.Exogredient.DataStoreLoggingService;
+
     public class LoggingManager
     {
         public LoggingManager() { }

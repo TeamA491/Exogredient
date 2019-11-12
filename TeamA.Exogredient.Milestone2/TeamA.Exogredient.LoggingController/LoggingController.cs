@@ -2,13 +2,14 @@
 {
     using System;
     using TeamA.Exogredient.LoggingManager;
-    class Program
+
+    class LoggingController
     {
         static void Main(string[] args)
         {
-            LoggingManager test = new LoggingManager();
+            LoggingManager manager = new LoggingManager();
 
-            test.Log(null, new DateTime(), null, null, null, null);
+            manager.Log(null, new DateTime(), null, null, null, null);
         }
     }
 }
