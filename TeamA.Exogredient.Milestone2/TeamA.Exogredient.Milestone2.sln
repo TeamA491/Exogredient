@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.LoggingManager", "TeamA.Exogredient.LoggingManager\TeamA.Exogredient.LoggingManager.csproj", "{878DE014-1126-472A-B3FD-AFA0D39C35B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.LoggingManager", "TeamA.Exogredient.LoggingManager\TeamA.Exogredient.LoggingManager.csproj", "{878DE014-1126-472A-B3FD-AFA0D39C35B4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controllers", "Controllers", "{D44CE01E-6359-4BAE-A800-065E77FFB1E2}"
 EndProject
@@ -13,33 +13,41 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{93
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{E76EAC48-38CC-437C-9E47-4E773630CCCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.FlatFileLoggingService", "TeamA.Exogredient.FlatFileLoggingService\TeamA.Exogredient.FlatFileLoggingService.csproj", "{5C961229-F717-4CC2-8B33-F2BD27474109}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.FlatFileLoggingService", "TeamA.Exogredient.FlatFileLoggingService\TeamA.Exogredient.FlatFileLoggingService.csproj", "{5C961229-F717-4CC2-8B33-F2BD27474109}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.DataStoreLoggingService", "TeamA.Exogredient.DataStoreLoggingService\TeamA.Exogredient.DataStoreLoggingService.csproj", "{6C2B3B03-250A-45E0-BE7F-E3EB84227688}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DataStoreLoggingService", "TeamA.Exogredient.DataStoreLoggingService\TeamA.Exogredient.DataStoreLoggingService.csproj", "{6C2B3B03-250A-45E0-BE7F-E3EB84227688}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.FlatFileLoggingDAO", "TeamA.Exogredient.FlatFileLoggingDAO\TeamA.Exogredient.FlatFileLoggingDAO.csproj", "{B062846F-E118-44B1-A90B-F065272407BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.FlatFileLoggingDAO", "TeamA.Exogredient.FlatFileLoggingDAO\TeamA.Exogredient.FlatFileLoggingDAO.csproj", "{B062846F-E118-44B1-A90B-F065272407BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.LoggingController", "TeamA.Exogredient.LoggingController\TeamA.Exogredient.LoggingController.csproj", "{1464BB59-2B7C-47A9-ACAA-ACC0AE3D2349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.LoggingController", "TeamA.Exogredient.LoggingController\TeamA.Exogredient.LoggingController.csproj", "{1464BB59-2B7C-47A9-ACAA-ACC0AE3D2349}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.DataStoreLoggingDAO", "TeamA.Exogredient.DataStoreLoggingDAO\TeamA.Exogredient.DataStoreLoggingDAO.csproj", "{82C4C894-3B6B-4B86-97CC-396EFCE1B6E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DataStoreLoggingDAO", "TeamA.Exogredient.DataStoreLoggingDAO\TeamA.Exogredient.DataStoreLoggingDAO.csproj", "{82C4C894-3B6B-4B86-97CC-396EFCE1B6E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.ArchivingManager", "TeamA.Exogredient.ArchivingManager\TeamA.Exogredient.ArchivingManager.csproj", "{1F8B58C9-9744-46AA-981D-B4FD0043858C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.ArchivingManager", "TeamA.Exogredient.ArchivingManager\TeamA.Exogredient.ArchivingManager.csproj", "{1F8B58C9-9744-46AA-981D-B4FD0043858C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.ArchivingService", "TeamA.Exogredient.ArchivingService\TeamA.Exogredient.ArchivingService.csproj", "{B08D8A28-559F-4D08-B907-74B2C1ED8661}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.ArchivingService", "TeamA.Exogredient.ArchivingService\TeamA.Exogredient.ArchivingService.csproj", "{B08D8A28-559F-4D08-B907-74B2C1ED8661}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.FlatFileArchivingDAO", "TeamA.Exogredient.FlatFileArchivingDAO\TeamA.Exogredient.FlatFileArchivingDAO.csproj", "{B7C87E08-3D9A-4AAB-B296-BA80E97C0C93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.FlatFileArchivingDAO", "TeamA.Exogredient.FlatFileArchivingDAO\TeamA.Exogredient.FlatFileArchivingDAO.csproj", "{B7C87E08-3D9A-4AAB-B296-BA80E97C0C93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.AuthenticationController", "TeamA.Exogredient.AuthenticationController\TeamA.Exogredient.AuthenticationController.csproj", "{15D019E8-80E8-4CB1-9928-5503AE87E01C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.AuthenticationController", "TeamA.Exogredient.AuthenticationController\TeamA.Exogredient.AuthenticationController.csproj", "{15D019E8-80E8-4CB1-9928-5503AE87E01C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.AuthenticationManager", "TeamA.Exogredient.AuthenticationManager\TeamA.Exogredient.AuthenticationManager.csproj", "{65AC2BCE-D3E3-4442-A15E-833CB57E6F67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.AuthenticationManager", "TeamA.Exogredient.AuthenticationManager\TeamA.Exogredient.AuthenticationManager.csproj", "{65AC2BCE-D3E3-4442-A15E-833CB57E6F67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.CheckUserExiststenceService", "TeamA.Exogredient.CheckUserExiststenceService\TeamA.Exogredient.CheckUserExiststenceService.csproj", "{0FC25AA1-8945-4199-8440-C03D83D21882}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.CheckUserExiststenceService", "TeamA.Exogredient.CheckUserExiststenceService\TeamA.Exogredient.CheckUserExiststenceService.csproj", "{0FC25AA1-8945-4199-8440-C03D83D21882}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.CheckUserLockService", "TeamA.Exogredient.CheckUserLockService\TeamA.Exogredient.CheckUserLockService.csproj", "{1B4EF338-4592-4FC8-BCE9-4BA4B22F72F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.CheckUserLockService", "TeamA.Exogredient.CheckUserLockService\TeamA.Exogredient.CheckUserLockService.csproj", "{1B4EF338-4592-4FC8-BCE9-4BA4B22F72F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.AuthenticationService", "TeamA.Exogredient.AuthenticationService\TeamA.Exogredient.AuthenticationService.csproj", "{6F413BA0-9849-4A3A-AB28-1C35A1B54E50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.AuthenticationService", "TeamA.Exogredient.AuthenticationService\TeamA.Exogredient.AuthenticationService.csproj", "{6F413BA0-9849-4A3A-AB28-1C35A1B54E50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.UserDAO", "TeamA.Exogredient.UserDAO\TeamA.Exogredient.UserDAO.csproj", "{10452309-194A-4CFE-90C7-43C4ABCF1419}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.UserDAO", "TeamA.Exogredient.UserDAO\TeamA.Exogredient.UserDAO.csproj", "{10452309-194A-4CFE-90C7-43C4ABCF1419}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Tests", "_Tests", "{ABA97013-760C-4F3A-9BF3-3AE4744A5095}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.LoggingTests", "TeamA.Exogredient.LoggingTests\TeamA.Exogredient.LoggingTests.csproj", "{B831A518-3368-4A98-B9D1-97782656F261}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.AuthenticationTests", "TeamA.Exogredient.AuthenticationTests\TeamA.Exogredient.AuthenticationTests.csproj", "{190B51F5-2EF6-4C67-87C6-FFC8FBEFEA9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.ArchivingTests", "TeamA.Exogredient.ArchivingTests\TeamA.Exogredient.ArchivingTests.csproj", "{FE92AFD9-C58D-4FB1-895F-C575E1EC489D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +115,18 @@ Global
 		{10452309-194A-4CFE-90C7-43C4ABCF1419}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10452309-194A-4CFE-90C7-43C4ABCF1419}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10452309-194A-4CFE-90C7-43C4ABCF1419}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B831A518-3368-4A98-B9D1-97782656F261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B831A518-3368-4A98-B9D1-97782656F261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B831A518-3368-4A98-B9D1-97782656F261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B831A518-3368-4A98-B9D1-97782656F261}.Release|Any CPU.Build.0 = Release|Any CPU
+		{190B51F5-2EF6-4C67-87C6-FFC8FBEFEA9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{190B51F5-2EF6-4C67-87C6-FFC8FBEFEA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{190B51F5-2EF6-4C67-87C6-FFC8FBEFEA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{190B51F5-2EF6-4C67-87C6-FFC8FBEFEA9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE92AFD9-C58D-4FB1-895F-C575E1EC489D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE92AFD9-C58D-4FB1-895F-C575E1EC489D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE92AFD9-C58D-4FB1-895F-C575E1EC489D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE92AFD9-C58D-4FB1-895F-C575E1EC489D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +147,9 @@ Global
 		{1B4EF338-4592-4FC8-BCE9-4BA4B22F72F0} = {E76EAC48-38CC-437C-9E47-4E773630CCCB}
 		{6F413BA0-9849-4A3A-AB28-1C35A1B54E50} = {E76EAC48-38CC-437C-9E47-4E773630CCCB}
 		{10452309-194A-4CFE-90C7-43C4ABCF1419} = {4CBA3E1C-71AA-414C-98A9-3C010A7FEF80}
+		{B831A518-3368-4A98-B9D1-97782656F261} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
+		{190B51F5-2EF6-4C67-87C6-FFC8FBEFEA9E} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
+		{FE92AFD9-C58D-4FB1-895F-C575E1EC489D} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A67D26EE-42F3-4231-8991-BDE591B4C5CD}
