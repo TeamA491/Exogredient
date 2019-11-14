@@ -1,12 +1,10 @@
-﻿namespace TeamA.Exogredient.DataStoreLoggingService
+﻿using System;
+using TeamA.Exogredient.DataStoreLoggingDAO;
+
+namespace TeamA.Exogredient.DataStoreLoggingService
 {
-    using System;
-    using TeamA.Exogredient.DataStoreLoggingDAO;
-
-    public class DataStoreLoggingService
+    public class DataStoreLoggingServiceObject
     {
-        public DataStoreLoggingService() { }
-
         public bool Execute(string operation, DateTime timestamp, string userType, string username,
                             string IPAddress, string errorType)
         {
