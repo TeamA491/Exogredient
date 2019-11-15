@@ -8,6 +8,7 @@ namespace TeamA.Exogredient.Logging.Tests
         [TestMethod]
         public void TestMethod()
         {
+            Assert.Fail();
         }
     }
 }

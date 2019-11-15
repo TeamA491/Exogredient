@@ -8,6 +8,7 @@ namespace TeamA.Exogredient.Authentication.Tests
         [TestMethod]
         public void TestMethod()
         {
+            Assert.Fail();
         }
     }
 }

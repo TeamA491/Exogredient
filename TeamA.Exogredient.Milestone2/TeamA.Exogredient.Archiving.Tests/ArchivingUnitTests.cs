@@ -8,6 +8,7 @@ namespace TeamA.Exogredient.Archiving.Tests
         [TestMethod]
         public void TestMethod()
         {
+            Assert.Fail();
         }
     }
 }
