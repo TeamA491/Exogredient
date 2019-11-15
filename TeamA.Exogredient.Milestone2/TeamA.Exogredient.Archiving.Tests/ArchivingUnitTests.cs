@@ -1,9 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TeamA.Exogredient.AuthenticationTests
+namespace TeamA.Exogredient.Archiving.Tests
 {
     [TestClass]
-    public class AuthenticationUnitTests
+    public class ArchivingUnitTests
     {
         [TestMethod]
         public void TestMethod()

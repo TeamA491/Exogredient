@@ -1,9 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TeamA.Exogredient.ArchivingTests
+namespace TeamA.Exogredient.Logging.Tests
 {
     [TestClass]
-    public class ArchivingUnitTests
+    public class LoggingUnitTests
     {
         [TestMethod]
         public void TestMethod()
