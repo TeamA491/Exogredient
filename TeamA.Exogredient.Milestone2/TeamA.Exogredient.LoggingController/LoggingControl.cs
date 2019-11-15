@@ -7,7 +7,7 @@ namespace LoggingController
     {
         static void Main(string[] args)
         {
-            LoggingManagerObject manager = new LoggingManagerObject();
+            LoggingManager manager = new LoggingManager();
 
             manager.Log(null, new DateTime(), null, null, null, null);
         }

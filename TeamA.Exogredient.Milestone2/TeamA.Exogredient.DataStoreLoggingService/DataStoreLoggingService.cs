@@ -1,14 +1,13 @@
 ﻿using System;
-using TeamA.Exogredient.FlatFileLoggingDAO;
+using TeamA.Exogredient.DataStoreLoggingDAO;
 
-namespace TeamA.Exogredient.FlatFileLoggingService
+namespace TeamA.Exogredient.DataStoreLoggingService
 {
-    public class FlatFileLoggingServiceObject
+    public class DataStoreLoggingService
     {
         public bool Execute(string operation, DateTime timestamp, string userType, string username,
                             string IPAddress, string errorType)
         {
-            FFLoggingDAObject ffDAO = new FFLoggingDAObject();
             return false;
         }
     }

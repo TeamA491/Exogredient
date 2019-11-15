@@ -3,7 +3,7 @@ using TeamA.Exogredient.FlatFileArchivingDAO;
 
 namespace TeamA.Exogredient.ArchivingService
 {
-    public class ArchivingServiceObject
+    public class ArchivingService
     {
     }
 }

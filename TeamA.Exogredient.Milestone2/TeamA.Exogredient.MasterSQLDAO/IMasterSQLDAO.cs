@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TeamA.Exogredient.MasterSQLDAO
 {
-    public interface IMasterSQLDAObject<T>
+    public interface IMasterSQLDAO<T>
     {
         public static readonly string _connectionString = "sdf";
 

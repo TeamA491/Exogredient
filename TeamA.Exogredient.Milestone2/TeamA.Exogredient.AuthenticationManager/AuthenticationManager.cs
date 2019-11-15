@@ -5,7 +5,7 @@ using TeamA.Exogredient.CheckUserLockService;
 
 namespace TeamA.Exogredient.AuthenticationManager
 {
-    public class AuthenticationManagerObject
+    public class AuthenticationManager
     {
     }
 }

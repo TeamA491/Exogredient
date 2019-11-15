@@ -2,7 +2,7 @@
 
 namespace TeamA.Exogredient.FlatFileLoggingDAO
 {
-    public class FFLoggingDAObject
+    public class FFLoggingDAO
     {
     }
 }

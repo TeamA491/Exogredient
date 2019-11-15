@@ -3,7 +3,7 @@ using TeamA.Exogredient.ArchivingService;
 
 namespace TeamA.Exogredient.ArchivingManager
 {
-    public class ArchivingManagerObject
+    public class ArchivingManager
     {
     }
 }

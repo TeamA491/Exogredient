@@ -2,7 +2,7 @@
 
 namespace TeamA.Exogredient.UserDAO
 {
-    public class UserDAObject
+    public class UserDAO
     {
     }
 }

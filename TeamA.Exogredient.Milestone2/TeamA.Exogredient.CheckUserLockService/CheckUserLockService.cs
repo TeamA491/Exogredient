@@ -3,7 +3,7 @@ using TeamA.Exogredient.UserDAO;
 
 namespace TeamA.Exogredient.CheckUserLockService
 {
-    public class CheckUserLockServiceObject
+    public class CheckUserLockService
     {
     }
 }

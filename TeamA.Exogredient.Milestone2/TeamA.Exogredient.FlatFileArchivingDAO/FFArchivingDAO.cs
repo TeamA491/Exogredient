@@ -2,7 +2,7 @@
 
 namespace TeamA.Exogredient.FlatFileArchivingDAO
 {
-    public class FFArchivingDAObject
+    public class FFArchivingDAO
     {
     }
 }

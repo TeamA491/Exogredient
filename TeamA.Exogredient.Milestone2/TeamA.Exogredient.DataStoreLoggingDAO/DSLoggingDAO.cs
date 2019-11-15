@@ -2,7 +2,7 @@
 
 namespace TeamA.Exogredient.DataStoreLoggingDAO
 {
-    public class DSLoggingDAObject
+    public class DSLoggingDAO
     {
     }
 }
