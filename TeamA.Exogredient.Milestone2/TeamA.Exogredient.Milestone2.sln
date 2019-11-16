@@ -57,8 +57,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestRecor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.MasterSQLDAO", "TeamA.Exogredient.MasterSQLDAO\TeamA.Exogredient.MasterSQLDAO.csproj", "{DBE32954-12A1-4CE3-860B-26E081CE68EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NosqlTestController", "NosqlTestController\NosqlTestController.csproj", "{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
