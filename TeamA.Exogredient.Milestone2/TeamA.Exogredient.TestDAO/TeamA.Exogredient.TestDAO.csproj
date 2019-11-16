@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamA.Exogredient.IMasterSQLDAO\TeamA.Exogredient.IMasterSQLDAO.csproj" />
+    <PackageReference Include="MySql.Data" Version="8.0.18" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TeamA.Exogredient.MasterSQLDAO\TeamA.Exogredient.MasterSQLDAO.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.TestRecord\TeamA.Exogredient.TestRecord.csproj" />
   </ItemGroup>
 
 </Project>

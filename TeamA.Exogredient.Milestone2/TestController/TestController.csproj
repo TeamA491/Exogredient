@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.TestDAO\TeamA.Exogredient.TestDAO.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.TestRecord\TeamA.Exogredient.TestRecord.csproj" />
   </ItemGroup>
 
 </Project>
