@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TeamA.Exogredient.TestDAO;
 using TeamA.Exogredient.TestRecord;
 
@@ -12,9 +13,13 @@ namespace TestController
 
             TestDAO td = new TestDAO();
 
-            TestRecord tr = new TestRecord(tc: "test2");
+            TestRecord tr = new TestRecord(tc: "test3");
 
-            td.Create(tr);
+            //td.Create(tr);
+
+            //td.DeleteByIDs(new List<int>() { 1 });
+
+            Console.WriteLine(string.Join("||",(td.ReadByIDs(new List<int>() { 2,3 })).ToArray()));
         }
     }
 }

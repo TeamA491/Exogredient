@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Data;
 using System.Collections.Generic;
 using TeamA.Exogredient.MasterSQLDAO;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using System.Collections;
 //using TeamA.Exogredient.TestRecord;
 
 namespace TeamA.Exogredient.TestDAO
@@ -11,21 +13,24 @@ namespace TeamA.Exogredient.TestDAO
     public class TestDAO : MasterSQLDAO<int>
     {
         private string _tableName = "test_table";
+
+        // Columns:
+        private string _id = "idtest_table";
         private string _testColumn = "testColumn";
 
-        public override bool Create(Object record)
+        public override void Create(Object record)
         {
             if (record.GetType() == typeof(TestRecord.TestRecord))
             {
-                MySqlConnection conn = new MySqlConnection(ConnectionString);
+                MySqlConnection connection = new MySqlConnection(ConnectionString);
 
                 try
                 {
-                    conn.Open();
+                    connection.Open();
 
-                    string sql = $"INSERT INTO {_tableName}({_testColumn}) VALUES ('{((TestRecord.TestRecord)record).TestColumn}')";
-                    MySqlCommand cmd = new MySqlCommand(sql, conn);
-                    cmd.ExecuteNonQuery();
+                    string sqlString = $"INSERT INTO {_tableName}({_testColumn}) VALUES ('{((TestRecord.TestRecord)record).TestColumn}');";
+                    MySqlCommand command = new MySqlCommand(sqlString, connection);
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
@@ -38,21 +43,74 @@ namespace TeamA.Exogredient.TestDAO
             {
                 throw new ArgumentException("Record must be of class TestRecord");
             }
-
-            return false;
         }
 
-        public override bool DeleteByIDs(List<int> idsOfRows)
+        public override void DeleteByIDs(List<int> idsOfRows)
         {
-            throw new NotImplementedException();
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                connection.Open();
+
+                for (int i = 0; i < idsOfRows.Count; i++)
+                {
+                    string sqlString = $"DELETE FROM {_tableName} WHERE {_id} = {idsOfRows[i]};";
+                    MySqlCommand command = new MySqlCommand(sqlString, connection);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+
+                // TODO: throw a proper execption e.g. DBException
+                throw e;
+            }
         }
 
-        public override List<object> ReadByIDs(List<int> idsOfRows)
+        public override List<string> ReadByIDs(List<int> idsOfRows)
         {
-            throw new NotImplementedException();
+            //List<TestRecord.TestRecord> result = new List<TestRecord.TestRecord>();
+            List<string> result = new List<string>();
+
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+
+            try
+            {
+                connection.Open();
+
+                for (int i = 0; i < idsOfRows.Count; i++)
+                {
+                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_id} = {idsOfRows[i]};";
+                    MySqlCommand command = new MySqlCommand(sqlString, connection);
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    // HACK
+                    string stringResult = "";
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        stringResult += row[_id].ToString() + "," + row[_testColumn];
+                    }
+
+                    result.Add(stringResult);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+
+                // TODO: throw a proper execption e.g. DBException
+                throw e;
+            }
+
+            return result;
         }
 
-        public override bool Update(int id, object record)
+        public override void Update(int id, Object record)
         {
             throw new NotImplementedException();
         }
