@@ -13,13 +13,17 @@ namespace TestController
 
             TestDAO td = new TestDAO();
 
-            TestRecord tr = new TestRecord(tc: "test3");
+            TestRecord tr = new TestRecord(id: 32, tc: null);
+
+            // THIS IS HOW YOU USE A DATA ACCESS OBJECT WITH A RECORD OBJECT
 
             //td.Create(tr);
 
             //td.DeleteByIDs(new List<int>() { 1 });
 
-            Console.WriteLine(string.Join("||",(td.ReadByIDs(new List<int>() { 2,3 })).ToArray()));
+            //Console.WriteLine(string.Join("||",(td.ReadByIDs(new List<int>() { 2,3 })).ToArray()));
+
+            td.Update(42, tr);
         }
     }
 }

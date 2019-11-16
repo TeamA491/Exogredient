@@ -88,7 +88,6 @@ namespace TeamA.Exogredient.TestDAO
                     DataTable dataTable = new DataTable();
                     dataTable.Load(reader);
 
-                    // HACK
                     string stringResult = "";
 
                     foreach (DataRow row in dataTable.Rows)
@@ -112,7 +111,59 @@ namespace TeamA.Exogredient.TestDAO
 
         public override void Update(int id, Object record)
         {
-            throw new NotImplementedException();
+            if (record.GetType() == typeof(TestRecord.TestRecord))
+            {
+                MySqlConnection connection = new MySqlConnection(ConnectionString);
+
+                try
+                {
+                    connection.Open();
+
+                    TestRecord.TestRecord testRecord = (TestRecord.TestRecord)record;
+
+                    bool updating = false;
+                    bool needComma = false;
+                    string sqlString = $"UPDATE {_tableName} SET ";
+
+                    if (testRecord.Id != -1)
+                    {
+                        updating = true;
+                        sqlString += $"{_id} = {testRecord.Id}";
+                        needComma = true;
+                    }
+                    if (!testRecord.TestColumn.Equals(""))
+                    {
+                        updating = true;
+                        
+                        if (needComma)
+                        {
+                            sqlString += ", ";
+                        }
+
+                        sqlString += $"{_testColumn} = '{testRecord.TestColumn}'";
+
+                        needComma = true;
+                    }
+
+                    if (updating)
+                    {
+                        sqlString += $" WHERE {_id} = {id};";
+                        MySqlCommand command = new MySqlCommand(sqlString, connection);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+
+                    // TODO: throw a proper execption e.g. DBException
+                    throw e;
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Record must be of class TestRecord");
+            }
         }
     }
 }
