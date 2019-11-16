@@ -53,9 +53,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestDAO",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestController", "TestController\TestController.csproj", "{F1492FF0-9513-4C3A-B6D0-EABA7F5F3D20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.TestRecord", "TeamA.Exogredient.TestRecord\TeamA.Exogredient.TestRecord.csproj", "{465693E7-16EF-4E63-ADBA-4B6BD1B00945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestRecord", "TeamA.Exogredient.TestRecord\TeamA.Exogredient.TestRecord.csproj", "{465693E7-16EF-4E63-ADBA-4B6BD1B00945}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.MasterSQLDAO", "TeamA.Exogredient.MasterSQLDAO\TeamA.Exogredient.MasterSQLDAO.csproj", "{DBE32954-12A1-4CE3-860B-26E081CE68EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.MasterSQLDAO", "TeamA.Exogredient.MasterSQLDAO\TeamA.Exogredient.MasterSQLDAO.csproj", "{DBE32954-12A1-4CE3-860B-26E081CE68EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NosqlTestController", "NosqlTestController\NosqlTestController.csproj", "{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +153,10 @@ Global
 		{DBE32954-12A1-4CE3-860B-26E081CE68EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBE32954-12A1-4CE3-860B-26E081CE68EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBE32954-12A1-4CE3-860B-26E081CE68EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -178,6 +184,7 @@ Global
 		{F1492FF0-9513-4C3A-B6D0-EABA7F5F3D20} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 		{465693E7-16EF-4E63-ADBA-4B6BD1B00945} = {4CBA3E1C-71AA-414C-98A9-3C010A7FEF80}
 		{DBE32954-12A1-4CE3-860B-26E081CE68EA} = {4CBA3E1C-71AA-414C-98A9-3C010A7FEF80}
+		{0A92E9F9-1AC3-4EC4-9126-BD03BB98A312} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A67D26EE-42F3-4231-8991-BDE591B4C5CD}
