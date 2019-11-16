@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TeamA.Exogredient.MasterSQLDAO
+namespace TeamA.Exogredient.IMasterSQLDAO
 {
     public interface IMasterSQLDAO<T>
     {
-        public static readonly string _connectionString = "sdf";
+        public static readonly string _connectionString = "server=localhost;user=root;database=exogredient;port=3306;password=password";
 
         // Create a record in the data store based on the model argument.
         public bool Create(Object record);

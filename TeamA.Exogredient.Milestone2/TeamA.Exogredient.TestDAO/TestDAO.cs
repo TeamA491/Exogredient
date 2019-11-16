@@ -2,7 +2,9 @@
 
 namespace TeamA.Exogredient.TestDAO
 {
-    public class TestDAO
+    using TeamA.Exogredient.IMasterSQLDAO;
+
+    public class TestDAO : IMasterSQLDAO
     {
     }
 }
