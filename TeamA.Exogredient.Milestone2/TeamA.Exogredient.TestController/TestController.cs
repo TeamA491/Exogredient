@@ -11,7 +11,12 @@ namespace TeamA.Exogredient.TestController
 
             TestDAO td = new TestDAO();
 
-            TestRecord tr = new TestRecord(id: 32, tc: null);
+            TestRecord tr = new TestRecord(tc: "changed 51");
+
+            DataStoreLoggingDAO logginDao = new DataStoreLoggingDAO();
+            LogRecord record = new LogRecord(DateTime.UtcNow, "test operation", "eli", "localhost");
+
+            logginDao.Create(record);
 
             // THIS IS HOW YOU USE A DATA ACCESS OBJECT WITH A RECORD OBJECT
 
@@ -21,7 +26,7 @@ namespace TeamA.Exogredient.TestController
 
             //Console.WriteLine(string.Join("||",(td.ReadByIDs(new List<int>() { 2,3 })).ToArray()));
 
-            td.Update(42, tr);
+            //td.Update(51, tr);
 
         }
     }

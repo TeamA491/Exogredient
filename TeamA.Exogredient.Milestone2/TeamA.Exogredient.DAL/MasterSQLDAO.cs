@@ -6,11 +6,11 @@ namespace TeamA.Exogredient.DAL
 {
     public abstract class MasterSQLDAO<T>
     {
-        // TODO: Change this to your specific password
-        protected static readonly string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=poop1234";
+        // HACK: Change this to your specific password
+        protected static readonly string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=*****";
 
         // Create a record in the data store based on the model argument.
-        public abstract void Create(Object record);
+        public abstract void Create(object record);
 
         // Deletes all rows based on each primary key id in the argument list.
         public abstract void DeleteByIDs(List<T> idsOfRows);
@@ -23,6 +23,6 @@ namespace TeamA.Exogredient.DAL
         // the user passes named values to each column they wish to update.
         // Example: record = User(lastName : "Example")
         //          Update("jason1234", record)
-        public abstract void Update(T id, Object record);
+        public abstract void Update(T id, object record);
     }
 }

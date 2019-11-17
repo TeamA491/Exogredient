@@ -4,9 +4,12 @@ namespace TeamA.Exogredient.DAL
 {
     public abstract class MasterNOSQLDAO<T>
     {
-        protected static readonly string ConnectionString = "mysqlx://root:****@localhost:3306";
+        // HACK: Change this to your specific password
+        protected static readonly string ConnectionString = "mysqlx://root:*****@localhost:33060";
 
-        public abstract void Create(string json);
+        protected static readonly string Schema = "exogredient_logs";
+
+        public abstract void Create(object record);
 
         public abstract void Read(T uniqueID);
 
