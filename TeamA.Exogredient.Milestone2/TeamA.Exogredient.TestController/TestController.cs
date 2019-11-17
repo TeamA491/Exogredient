@@ -13,10 +13,18 @@ namespace TeamA.Exogredient.TestController
 
             TestRecord tr = new TestRecord(tc: "changed 51");
 
-            DataStoreLoggingDAO logginDao = new DataStoreLoggingDAO();
+            DataStoreLoggingDAO loggingDao = new DataStoreLoggingDAO();
             LogRecord record = new LogRecord(DateTime.UtcNow, "test operation", "eli", "localhost");
 
-            logginDao.Create(record);
+            //loggingDao.Create(record);
+
+            //loggingDao.Delete("00005dce61b30000000000000003");
+
+            // '{\"ip\": \"localhost\", \"_id\": \"00005dce61b30000000000000007\", \"errorType\": null, \"operation\": \"test operation\", \"timestamp\": \"11/17/2019 7:26:00 AM\", \"identifier\": \"eli\"}', ?
+
+
+            string res = loggingDao.ReadById("00005dce61b30000000000000007");
+            Console.WriteLine(res);
 
             // THIS IS HOW YOU USE A DATA ACCESS OBJECT WITH A RECORD OBJECT
 

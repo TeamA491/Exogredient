@@ -7,6 +7,9 @@ namespace TeamA.Exogredient.DAL
 {
     public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
     {
+        private string _collection = "logs";
+        private string _id = "_id";
+
         public override void Create(object record)
         {
             if (record.GetType() == typeof(LogRecord))
@@ -16,11 +19,9 @@ namespace TeamA.Exogredient.DAL
 
                 Schema schema = session.GetSchema(Schema);
 
-                var collection = schema.GetCollection("logs");
+                var collection = schema.GetCollection(_collection);
 
-                //string document = JsonConvert.SerializeObject(record);
-
-                // Test anon types
+                // Created anon type to represent json in document store.
                 var document = new { timestamp = logRecord.Timestamp,
                                      operation = logRecord.Operation,
                                      identifier = logRecord.Identifier,
@@ -28,9 +29,8 @@ namespace TeamA.Exogredient.DAL
                                      errorType = logRecord.ErrorType};
 
 
-                Result r = collection.Add(document).Execute();
-                Console.WriteLine("result: " + r);
-
+                collection.Add(document).Execute();
+                session.Close();
             }
             else
             {
@@ -40,12 +40,38 @@ namespace TeamA.Exogredient.DAL
 
         public override void Delete(string uniqueID)
         {
-            throw new NotImplementedException();
+            Session session = MySQLX.GetSession(ConnectionString);
+
+            Schema schema = session.GetSchema(Schema);
+
+            var collection = schema.GetCollection(_collection);
+
+            collection.Remove($"{_id} = :id").Bind("id", uniqueID).Execute();
+
+            session.Close();
         }
 
-        public override void Read(string uniqueID)
+        public override string ReadById(string uniqueID)
         {
-            throw new NotImplementedException();
+
+            Session session = MySQLX.GetSession(ConnectionString);
+
+            Schema schema = session.GetSchema(Schema);
+
+            var collection = schema.GetCollection(_collection);
+
+            DocResult result = collection.Find($"{_id} = :id").Bind("id", uniqueID).Execute();
+
+            // Prepare string to be returned
+            string resultString = ""; 
+            while(result.Next())
+            {
+                // TODO: flesh out columns. make columns into fields.
+                resultString += result.Current["_id"] + " ";
+                resultString += result.Current["operation"];
+
+            }
+            return resultString;
         }
     }
 }
