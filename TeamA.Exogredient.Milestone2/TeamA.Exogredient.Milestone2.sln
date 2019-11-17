@@ -13,17 +13,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Logging.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Authentication.Tests", "TeamA.Exogredient.Authentication.Tests\TeamA.Exogredient.Authentication.Tests.csproj", "{C47EC9F9-13CD-4A32-889C-6BBAEFE6902B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.Managers", "TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj", "{9E9DC6D9-E054-426F-BE96-44F44ACB47A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Managers", "TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj", "{9E9DC6D9-E054-426F-BE96-44F44ACB47A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.Services", "TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj", "{970F6DAD-D91F-4E18-8FA9-6CF44D91FEC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Services", "TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj", "{970F6DAD-D91F-4E18-8FA9-6CF44D91FEC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.DAL", "TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj", "{74C9A72A-1B1F-4A0C-9C6F-CDDE82481D70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DAL", "TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj", "{74C9A72A-1B1F-4A0C-9C6F-CDDE82481D70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.TestController", "TeamA.Exogredient.TestController\TeamA.Exogredient.TestController.csproj", "{CA4BA115-6992-446F-B7F5-734951BF99F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestController", "TeamA.Exogredient.TestController\TeamA.Exogredient.TestController.csproj", "{CA4BA115-6992-446F-B7F5-734951BF99F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.LoggingController", "TeamA.Exogredient.LoggingController\TeamA.Exogredient.LoggingController.csproj", "{06840AE1-EFFD-46E5-89D5-391A84D3E0C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.LoggingController", "TeamA.Exogredient.LoggingController\TeamA.Exogredient.LoggingController.csproj", "{06840AE1-EFFD-46E5-89D5-391A84D3E0C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.AuthenticationController", "TeamA.Exogredient.AuthenticationController\TeamA.Exogredient.AuthenticationController.csproj", "{A4C17EDA-83BB-4D07-977B-66DC550906FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.AuthenticationController", "TeamA.Exogredient.AuthenticationController\TeamA.Exogredient.AuthenticationController.csproj", "{A4C17EDA-83BB-4D07-977B-66DC550906FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DAL", "DAL", "{4A2FF568-6425-437D-B3A9-59A1AD81BF50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{28611C63-BE9A-4A35-AE66-C79EB3B10F3C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{448E6539-B3AC-46CA-8E06-952D4D6C25F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +81,9 @@ Global
 		{48CC3F4C-B066-4DDF-8D59-09CA340DED5A} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
 		{3F6F0304-A1A2-43AA-A2CE-12EC14F53F72} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
 		{C47EC9F9-13CD-4A32-889C-6BBAEFE6902B} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
+		{9E9DC6D9-E054-426F-BE96-44F44ACB47A1} = {28611C63-BE9A-4A35-AE66-C79EB3B10F3C}
+		{970F6DAD-D91F-4E18-8FA9-6CF44D91FEC2} = {448E6539-B3AC-46CA-8E06-952D4D6C25F4}
+		{74C9A72A-1B1F-4A0C-9C6F-CDDE82481D70} = {4A2FF568-6425-437D-B3A9-59A1AD81BF50}
 		{CA4BA115-6992-446F-B7F5-734951BF99F6} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 		{06840AE1-EFFD-46E5-89D5-391A84D3E0C7} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 		{A4C17EDA-83BB-4D07-977B-66DC550906FA} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
