@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />
   </ItemGroup>
 
 </Project>

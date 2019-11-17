@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />
   </ItemGroup>
 
 </Project>
