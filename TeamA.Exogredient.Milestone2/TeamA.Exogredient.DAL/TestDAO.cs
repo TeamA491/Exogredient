@@ -35,6 +35,10 @@ namespace TeamA.Exogredient.DAL
                     Console.WriteLine(e.ToString());
                     throw e;
                 }
+                finally
+                {
+                    connection.Close();
+                }
             }
             else
             {
@@ -62,6 +66,10 @@ namespace TeamA.Exogredient.DAL
 
                 // TODO: throw a proper execption e.g. DBException
                 throw e;
+            }
+            finally
+            {
+                connection.Close();
             }
         }
 
@@ -101,6 +109,10 @@ namespace TeamA.Exogredient.DAL
 
                 // TODO: throw a proper execption e.g. DBException
                 throw e;
+            }
+            finally
+            {
+                connection.Close();
             }
 
             return result;
@@ -155,6 +167,10 @@ namespace TeamA.Exogredient.DAL
 
                     // TODO: throw a proper execption e.g. DBException
                     throw e;
+                }
+                finally
+                {
+                    connection.Close();
                 }
             }
             else

@@ -77,6 +77,9 @@ namespace TeamA.Exogredient.DAL
                 resultstring = (string)result.Current["_id"];
 
             }
+
+            session.Close();
+
             return resultstring;
         }
     }
