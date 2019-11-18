@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override void Delete(string uniqueID, string collectionName)
+        public override void Delete(string uniqueId, string collectionName)
         {
             Session session = MySQLX.GetSession(ConnectionString);
 
@@ -50,37 +50,45 @@ namespace TeamA.Exogredient.DAL
 
             var collection = schema.GetCollection(collectionName);
 
-            collection.Remove($"{_id} = :id").Bind("id", uniqueID).Execute();
+            collection.Remove($"{_id} = :id").Bind("id", uniqueId).Execute();
 
             session.Close();
         }
 
         // TODO: Can't find id by identifier and timestamp... need operation
-        public string FindID(string timestampArgument, string operationArgument, string identifierArgument,
-                             string ipArgument, string collectionName)
+        public override string FindIdField(object record, string collectionName)
         {
-            Session session = MySQLX.GetSession(ConnectionString);
-
-            Schema schema = session.GetSchema(Schema);
-
-            var collection = schema.GetCollection(collectionName);
-
-            var documentParams = new DbDoc(new { timestamp = timestampArgument, operation = operationArgument, identifier = identifierArgument, ip = ipArgument });
-
-            DocResult result = collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).Execute();
-
-            // Prepare string to be returned
-            string resultstring = "";
-            while (result.Next())
+            if (record.GetType() == typeof(LogRecord))
             {
-                // TODO: flesh out columns. make columns into fields.
-                resultstring = (string)result.Current["_id"];
+                LogRecord logRecord = (LogRecord)record;
 
+                Session session = MySQLX.GetSession(ConnectionString);
+
+                Schema schema = session.GetSchema(Schema);
+
+                var collection = schema.GetCollection(collectionName);
+
+                var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
+
+                DocResult result = collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).Execute();
+
+                // Prepare string to be returned
+                string resultstring = "";
+                while (result.Next())
+                {
+                    // TODO: flesh out columns. make columns into fields.
+                    resultstring = (string)result.Current["_id"];
+
+                }
+
+                session.Close();
+
+                return resultstring;
             }
-
-            session.Close();
-
-            return resultstring;
+            else
+            {
+                throw new ArgumentException("Record must be of class LogRecord");
+            }
         }
     }
 }

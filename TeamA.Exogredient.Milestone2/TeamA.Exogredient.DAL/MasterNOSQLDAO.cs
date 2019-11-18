@@ -11,6 +11,8 @@ namespace TeamA.Exogredient.DAL
 
         public abstract void Create(object record, string collectionname);
 
-        public abstract void Delete(T uniqueID, string collectionName);
+        public abstract void Delete(T uniqueId, string collectionName);
+
+        public abstract string FindIdField(object record, string collectionName);
     }
 }

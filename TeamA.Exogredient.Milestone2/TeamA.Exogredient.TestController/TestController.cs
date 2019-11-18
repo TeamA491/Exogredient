@@ -17,22 +17,24 @@ namespace TeamA.Exogredient.TestController
 
             DataStoreLoggingDAO loggingDao = new DataStoreLoggingDAO();
 
-            //string id = loggingDao.FindID("20:34:23:53 UTC", "DELETE THIS", "1111", "localhost", "logs_20191118");
-
-            //loggingDao.Delete(id, "logs_20191118");
-
             //TODO: learn what this does
-            //string timestampOriginal = DateTime.UtcNow.ToString("HH:mm:ss:ff UTC&yyyyMMdd", CultureInfo.InvariantCulture);
-            //string[] splitResult = timestampOriginal.Split('&');
-            //string timestamp = splitResult[0];
-            //string collectionName = "logs_" + splitResult[1];
-            //Console.WriteLine(collectionName);
+            string timestampOriginal = DateTime.UtcNow.ToString("HH:mm:ss:ff UTC&yyyyMMdd", CultureInfo.InvariantCulture);
+            string[] splitResult = timestampOriginal.Split('&');
+            string timestamp = splitResult[0];
+            string collectionName = "logs_" + splitResult[1];
+            Console.WriteLine(collectionName);
 
-            //timestamp = timestamp.Replace("-", "/");
+            timestamp = timestamp.Replace("-", "/");
 
-            //LogRecord record = new LogRecord(timestamp, "DELETE THIS", "1111", "localhost");
+            LogRecord record = new LogRecord(timestamp, "DELETE THIS", "1111", "localhost");
 
-            //loggingDao.Create(record, collectionName);
+            loggingDao.Create(record, collectionName);
+
+            string id = loggingDao.FindIdField(record, collectionName);
+
+            Console.WriteLine(id);
+
+            //loggingDao.Delete(id, collectionName);
 
             //THIS IS HOW YOU USE A DATA ACCESS OBJECT WITH A RECORD OBJECT
 
