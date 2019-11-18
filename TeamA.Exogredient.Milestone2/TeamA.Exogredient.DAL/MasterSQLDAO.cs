@@ -7,7 +7,7 @@ namespace TeamA.Exogredient.DAL
     public abstract class MasterSQLDAO<T>
     {
         // HACK: Change this to your specific password
-        protected static readonly string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=***";
+        protected static readonly string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=****";
 
         // Create a record in the data store based on the model argument.
         public abstract void Create(object record);

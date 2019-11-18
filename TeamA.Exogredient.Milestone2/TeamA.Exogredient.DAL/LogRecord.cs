@@ -6,7 +6,7 @@ namespace TeamA.Exogredient.DAL
 {
     public class LogRecord
     {
-        public DateTime Timestamp { get; }
+        public string Timestamp { get; }
 
         public string Operation { get; }
 
@@ -16,7 +16,7 @@ namespace TeamA.Exogredient.DAL
 
         public string ErrorType { get; }
 
-        public LogRecord(DateTime timestamp, string operation,
+        public LogRecord(string timestamp, string operation,
                          string identifier, string ipAddress, string errorType = null)
         {
             Timestamp = timestamp;
