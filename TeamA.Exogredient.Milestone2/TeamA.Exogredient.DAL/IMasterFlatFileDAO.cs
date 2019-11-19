@@ -8,6 +8,6 @@ namespace TeamA.Exogredient.DAL
     {
         void Create(object record, string folderName, string fileName);
 
-        //void Delete()
+        void Delete(object record, string folderName, string fileName);
     }
 }

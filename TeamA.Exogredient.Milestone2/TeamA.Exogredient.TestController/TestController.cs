@@ -15,28 +15,43 @@ namespace TeamA.Exogredient.TestController
 
             TestRecord tr = new TestRecord(tc: "changed 51");
 
-            DataStoreLoggingDAO loggingDao = new DataStoreLoggingDAO();
+            DataStoreLoggingDAO dsLoggingDao = new DataStoreLoggingDAO();
+
+            FlatFileLoggingDAO ffLoggingDao = new FlatFileLoggingDAO();
+
+
 
             //TODO: learn what this does
             string timestampOriginal = DateTime.UtcNow.ToString("HH:mm:ss:ff UTC&yyyyMMdd", CultureInfo.InvariantCulture);
             string[] splitResult = timestampOriginal.Split('&');
             string timestamp = splitResult[0];
             string collectionName = "logs_" + splitResult[1];
-            Console.WriteLine(collectionName);
+            string fileName = splitResult[1] + ".CSV";
+            string folderName = splitResult[1].Substring(0, 6) + "01";
 
             timestamp = timestamp.Replace("-", "/");
 
             LogRecord record = new LogRecord(timestamp, "DELETE THIS", "1111", "localhost");
 
-            loggingDao.Create(record, collectionName);
+            Console.WriteLine(folderName);
 
-            string id = loggingDao.FindIdField(record, collectionName);
+            // FLAT FILE LOGGING
+            ffLoggingDao.Create(record, folderName, fileName);
 
-            Console.WriteLine(id);
 
-            //loggingDao.Delete(id, collectionName);
 
-            //THIS IS HOW YOU USE A DATA ACCESS OBJECT WITH A RECORD OBJECT
+            // DATA STORE LOGGING
+            //dsLoggingDao.Create(record, collectionName);
+
+            //string id = dsLoggingDao.FindIdField(record, collectionName);
+
+            //Console.WriteLine(id);
+
+            //dsLoggingDao.Delete(id, collectionName);
+
+
+
+            // SQL TESTING
 
             //td.Create(tr);
 

@@ -9,11 +9,11 @@ namespace TeamA.Exogredient.DAL
 {
     public class TestDAO : MasterSQLDAO<int>
     {
-        private string _tableName = "test_table";
+        private readonly string _tableName = "test_table";
 
         // Columns:
-        private string _id = "idtest_table";
-        private string _testColumn = "testColumn";
+        private readonly string _id = "idtest_table";
+        private readonly string _testColumn = "testColumn";
 
         public override void Create(Object record)
         {
@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                throw new ArgumentException("Record must be of class TestRecord");
+                throw new ArgumentException("Record must be of type TestRecord");
             }
         }
 
@@ -175,7 +175,7 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                throw new ArgumentException("Record must be of class TestRecord");
+                throw new ArgumentException("Record must be of type TestRecord");
             }
         }
     }

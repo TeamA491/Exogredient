@@ -10,7 +10,7 @@ namespace TeamA.Exogredient.DAL
     public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
     {
         // ID field name.
-        private string _id = "_id";
+        private readonly string _id = "_id";
 
         public override void Create(object record, string collectionName)
         {
@@ -38,7 +38,7 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                throw new ArgumentException("Record must be of class LogRecord");
+                throw new ArgumentException("Record must be of type LogRecord");
             }
         }
 
@@ -87,7 +87,7 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                throw new ArgumentException("Record must be of class LogRecord");
+                throw new ArgumentException("Record must be of type LogRecord");
             }
         }
     }
