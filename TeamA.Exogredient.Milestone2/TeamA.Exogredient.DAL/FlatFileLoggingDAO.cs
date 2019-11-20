@@ -35,25 +35,15 @@ namespace TeamA.Exogredient.DAL
 
                 string path = directory + "/" + fileName;
 
-                var item = new
+                using (StreamWriter writer = File.AppendText(path))
+                using (CsvWriter csv = new CsvWriter(writer))
                 {
-                    timestamp = logRecord.Timestamp,
-                    operation = logRecord.Operation,
-                    identifier = logRecord.Identifier,
-                    ip = logRecord.IPAddress,
-                    errorType = logRecord.ErrorType
-                };
-
-                //using (StreamWriter writer = File.AppendText(path))
-                //{
-                //    writer.WriteLine($"{logRecord.Timestamp}{logRecord.Operation}{logRecord.Identifier}{logRecord.IPAddress}{logRecord.ErrorType}");
-                //}
-
-                //using (StreamWriter writer = File.AppendText(path))
-                //using (CsvWriter csv = new CsvWriter(writer))
-                //{
-                //    csv.WriteRecord(item);
-                //}
+                    for (int i = 0; i < logRecord.Fields.Count; i++)
+                    {
+                        csv.WriteField(logRecord.Fields[i]);
+                    }
+                    csv.NextRecord();
+                }
             }
             else
             {

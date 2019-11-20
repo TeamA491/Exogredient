@@ -16,14 +16,27 @@ namespace TeamA.Exogredient.DAL
 
         public string ErrorType { get; }
 
+        public List<string> Fields { get; }
+
         public LogRecord(string timestamp, string operation,
-                         string identifier, string ipAddress, string errorType = null)
+                         string identifier, string ipAddress, string errorType = "null")
         {
+            Fields = new List<string>();
+
             Timestamp = timestamp;
+            Fields.Add(timestamp);
+
             Operation = operation;
+            Fields.Add(operation);
+
             Identifier = identifier;
+            Fields.Add(identifier);
+
             IPAddress = ipAddress;
+            Fields.Add(ipAddress);
+
             ErrorType = errorType;
+            Fields.Add(errorType);
         }
     }
 }

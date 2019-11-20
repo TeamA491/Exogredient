@@ -31,16 +31,18 @@ namespace TeamA.Exogredient.TestController
 
             timestamp = timestamp.Replace("-", "/");
 
-            LogRecord record = new LogRecord(timestamp, "DELETE THIS", "1111", "localhost");
+            LogRecord record = new LogRecord(timestamp, "SAME", "1111", "localhost");
 
             Console.WriteLine(folderName);
 
+
             // FLAT FILE LOGGING
+
             ffLoggingDao.Create(record, folderName, fileName);
 
 
+            //DATA STORE LOGGING
 
-            // DATA STORE LOGGING
             //dsLoggingDao.Create(record, collectionName);
 
             //string id = dsLoggingDao.FindIdField(record, collectionName);
@@ -48,7 +50,6 @@ namespace TeamA.Exogredient.TestController
             //Console.WriteLine(id);
 
             //dsLoggingDao.Delete(id, collectionName);
-
 
 
             // SQL TESTING
