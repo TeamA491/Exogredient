@@ -2,7 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using CsvHelper;
 
 namespace TeamA.Exogredient.DAL
 {
@@ -37,22 +36,27 @@ namespace TeamA.Exogredient.DAL
 
                 // TODO: See what write field does and emulate
                 using (StreamWriter writer = File.AppendText(path))
-                using (CsvWriter csv = new CsvWriter(writer))
                 {
+                    string result = "";
+
                     for (int i = 0; i < logRecord.Fields.Count; i++)
                     {
                         string field = logRecord.Fields[i];
 
                         if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
                         {
-                            csv.WriteField(@"\t" + field);
+                            result += (@"\t" + field + ",");
                         }
                         else
                         {
-                            csv.WriteField(field);
+                            result += (field + ",");
                         }
                     }
-                    csv.NextRecord();
+
+                    // Get rid of last comma.
+                    result = result.Substring(0, result.Length - 1);
+
+                    writer.WriteLine(result);
                 }
             }
             else

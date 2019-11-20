@@ -32,13 +32,13 @@ namespace TeamA.Exogredient.TestController
 
             timestamp = timestamp.Replace("-", "/");
 
-            LogRecord record = new LogRecord("19:32:40:33 UTC", "DELETED", "=username", "localhost");
+            LogRecord record = new LogRecord("20:20:47:71 UTC", "DELETED", "=username", "localhost");
 
 
             // FLAT FILE LOGGING
 
-            //ffLoggingDao.Create(record, folderName, fileName);
-            ffLoggingDao.Delete(record, folderName, fileName);
+            ffLoggingDao.Create(record, folderName, fileName);
+            //ffLoggingDao.Delete(record, folderName, fileName);
 
 
             //DATA STORE LOGGING
