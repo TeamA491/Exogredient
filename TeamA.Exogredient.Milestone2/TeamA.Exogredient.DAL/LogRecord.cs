@@ -16,6 +16,7 @@ namespace TeamA.Exogredient.DAL
 
         public string ErrorType { get; }
 
+        // All fields in the order you want them to be in, both in the database and flat file
         public List<string> Fields { get; }
 
         public LogRecord(string timestamp, string operation,

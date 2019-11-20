@@ -41,7 +41,16 @@ namespace TeamA.Exogredient.DAL
                 {
                     for (int i = 0; i < logRecord.Fields.Count; i++)
                     {
-                        csv.WriteField(logRecord.Fields[i]);
+                        string field = logRecord.Fields[i];
+
+                        if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                        {
+                            csv.WriteField(@"\t" + field);
+                        }
+                        else
+                        {
+                            csv.WriteField(field);
+                        }
                     }
                     csv.NextRecord();
                 }
@@ -64,23 +73,41 @@ namespace TeamA.Exogredient.DAL
                 string path = directory + "/" + fileName;
 
                 // NOTE: For very large files
+                // HACK: better way, start at end
                 using (StreamReader reader = new StreamReader(path))
                 using (StreamWriter writer = new StreamWriter(tempFile))
                 {
-                    string line;
+                    string lineInput = "";
+                    string lineToDelete = "";
 
-                    while ((line = reader.ReadLine()) != null)
+                    for (int i = 0; i < logRecord.Fields.Count; i++)
                     {
-                        Console.WriteLine(line);
-                        //if (line != "removeme")
-                        //{
-                        //    writer.WriteLine(line);
-                        //}
+                        string field = logRecord.Fields[i];
+
+                        if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                        {
+                            lineToDelete += $@"\t{field},";
+                        }
+                        else
+                        {
+                            lineToDelete += $"{field},";
+                        }
+                    }
+
+                    // Get rid of last comma.
+                    lineToDelete = lineToDelete.Substring(0, lineToDelete.Length - 1);
+
+                    while ((lineInput = reader.ReadLine()) != null)
+                    {
+                        if (lineInput != lineToDelete)
+                        {
+                            writer.WriteLine(lineInput);
+                        }
                     }
                 }
 
-                File.Delete("file.txt");
-                File.Move(tempFile, "file.txt");
+                File.Delete(path);
+                File.Move(tempFile, path);
             }
             else
             {

@@ -21,7 +21,8 @@ namespace TeamA.Exogredient.TestController
 
 
 
-            //TODO: learn what this does
+            // TODO: learn what this does
+            // HACK: don't need invariantculture, diff lanugage support
             string timestampOriginal = DateTime.UtcNow.ToString("HH:mm:ss:ff UTC&yyyyMMdd", CultureInfo.InvariantCulture);
             string[] splitResult = timestampOriginal.Split('&');
             string timestamp = splitResult[0];
@@ -31,14 +32,13 @@ namespace TeamA.Exogredient.TestController
 
             timestamp = timestamp.Replace("-", "/");
 
-            LogRecord record = new LogRecord(timestamp, "SAME", "1111", "localhost");
-
-            Console.WriteLine(folderName);
+            LogRecord record = new LogRecord("19:32:40:33 UTC", "DELETED", "=username", "localhost");
 
 
             // FLAT FILE LOGGING
 
-            ffLoggingDao.Create(record, folderName, fileName);
+            //ffLoggingDao.Create(record, folderName, fileName);
+            ffLoggingDao.Delete(record, folderName, fileName);
 
 
             //DATA STORE LOGGING
