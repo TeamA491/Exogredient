@@ -35,6 +35,7 @@ namespace TeamA.Exogredient.DAL
 
                 string path = directory + "/" + fileName;
 
+                // TODO: See what write field does and emulate
                 using (StreamWriter writer = File.AppendText(path))
                 using (CsvWriter csv = new CsvWriter(writer))
                 {
@@ -56,6 +57,30 @@ namespace TeamA.Exogredient.DAL
             if (record.GetType() == typeof(LogRecord))
             {
                 LogRecord logRecord = (LogRecord)record;
+
+                string tempFile = Path.GetTempFileName();
+
+                string directory = _logFolder + $"/{folderName}";
+                string path = directory + "/" + fileName;
+
+                // NOTE: For very large files
+                using (StreamReader reader = new StreamReader(path))
+                using (StreamWriter writer = new StreamWriter(tempFile))
+                {
+                    string line;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        Console.WriteLine(line);
+                        //if (line != "removeme")
+                        //{
+                        //    writer.WriteLine(line);
+                        //}
+                    }
+                }
+
+                File.Delete("file.txt");
+                File.Move(tempFile, "file.txt");
             }
             else
             {
