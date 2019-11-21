@@ -22,6 +22,7 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        // Change delte folder name
         public void Create(object record, string folderName, string fileName)
         {
             if (record.GetType() == typeof(LogRecord))
@@ -34,28 +35,29 @@ namespace TeamA.Exogredient.DAL
 
                 string path = directory + "/" + fileName;
 
+                string result = "";
+
+                // Preparing string log to protect against csv injection.
+                for (int i = 0; i < logRecord.Fields.Count; i++)
+                {
+                    string field = logRecord.Fields[i];
+
+                    if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                    {
+                        result += (@"\t" + field + ",");
+                    }
+                    else
+                    {
+                        result += (field + ",");
+                    }
+                }
+
+                // Get rid of last comma.
+                result = result.Substring(0, result.Length - 1);
+
                 // TODO: See what write field does and emulate
                 using (StreamWriter writer = File.AppendText(path))
                 {
-                    string result = "";
-
-                    for (int i = 0; i < logRecord.Fields.Count; i++)
-                    {
-                        string field = logRecord.Fields[i];
-
-                        if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
-                        {
-                            result += (@"\t" + field + ",");
-                        }
-                        else
-                        {
-                            result += (field + ",");
-                        }
-                    }
-
-                    // Get rid of last comma.
-                    result = result.Substring(0, result.Length - 1);
-
                     writer.WriteLine(result);
                 }
             }
