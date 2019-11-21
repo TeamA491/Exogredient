@@ -10,6 +10,7 @@ namespace TeamA.Exogredient.DAL
 
         public string Operation { get; }
 
+        // Restrict users from creating account with name of machine.
         public string Identifier { get; }
 
         public string IPAddress { get; }
