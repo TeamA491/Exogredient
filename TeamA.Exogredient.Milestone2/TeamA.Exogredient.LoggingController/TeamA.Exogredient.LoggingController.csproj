@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamA.Exogredient.LoggingManager\TeamA.Exogredient.LoggingManager.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj" />
   </ItemGroup>
 
 </Project>
