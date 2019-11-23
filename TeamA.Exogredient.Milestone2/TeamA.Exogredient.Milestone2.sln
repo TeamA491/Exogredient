@@ -22,6 +22,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DAL", "DAL", "{4A2FF568-6425-437D-B3A9-59A1AD81BF50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{28611C63-BE9A-4A35-AE66-C79EB3B10F3C}"
+	ProjectSection(SolutionItems) = preProject
+		TeamA.Exogredient.Managers\AuthorizationManager.cs = TeamA.Exogredient.Managers\AuthorizationManager.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{448E6539-B3AC-46CA-8E06-952D4D6C25F4}"
 EndProject
