@@ -41,23 +41,29 @@ namespace TeamA.Exogredient.Managers
             }
             else
             {
-                // Rollback
-                // TODO: what to do if failure?
-
-                bool rollbackSuccess = false;
-
-                if (ffLoggingResult)
-                {
-                    rollbackSuccess = await ffLogger.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
-                }
-                if (dsLoggingResult)
-                {
-                    rollbackSuccess = await dsLogger.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
-                }
-
                 AdminFunctionalityService adminService = new AdminFunctionalityService();
 
-                await adminService.NotifySystemAdminAsync($"Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}");
+                if (!ffLoggingResult && !dsLoggingResult)
+                {
+                    await adminService.NotifySystemAdminAsync($"Data Store and Flat File Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}");
+                }
+                else
+                {
+                    // Rollback
+
+                    bool rollbackSuccess = false;
+
+                    if (ffLoggingResult)
+                    {
+                        rollbackSuccess = await ffLogger.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                    }
+                    if (dsLoggingResult)
+                    {
+                        rollbackSuccess = await dsLogger.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
+                    }
+
+                    await adminService.NotifySystemAdminAsync($"{(ffLoggingResult ? "Flat File" : "Data Store")} Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}");
+                }
 
                 return false;
             }
