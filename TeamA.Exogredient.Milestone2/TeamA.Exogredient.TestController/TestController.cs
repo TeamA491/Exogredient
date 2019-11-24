@@ -17,30 +17,6 @@ namespace TeamA.Exogredient.TestController
 
             DataStoreLoggingDAO dsLoggingDao = new DataStoreLoggingDAO();
 
-            FlatFileLoggingDAO ffLoggingDao = new FlatFileLoggingDAO();
-
-
-
-            // TODO: learn what this does
-            // HACK: don't need invariantculture, diff lanugage support
-            string timestampOriginal = DateTime.UtcNow.ToString("HH:mm:ss:ff UTC&yyyyMMdd", CultureInfo.InvariantCulture);
-            string[] splitResult = timestampOriginal.Split('&');
-            string timestamp = splitResult[0];
-            string collectionName = "logs_" + splitResult[1];
-            string fileName = splitResult[1] + ".CSV";
-            string folderName = splitResult[1].Substring(0, 6) + "01";
-
-            timestamp = timestamp.Replace("-", "/");
-
-            LogRecord record = new LogRecord("20:20:47:71 UTC", "DELETED", "=username", "localhost");
-
-
-            // FLAT FILE LOGGING
-
-            ffLoggingDao.Create(record, folderName, fileName);
-            //ffLoggingDao.Delete(record, folderName, fileName);
-
-
             //DATA STORE LOGGING
 
             //dsLoggingDao.Create(record, collectionName);

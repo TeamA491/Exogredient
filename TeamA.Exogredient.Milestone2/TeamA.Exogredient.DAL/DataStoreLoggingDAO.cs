@@ -12,7 +12,7 @@ namespace TeamA.Exogredient.DAL
         // ID field name.
         private readonly string _id = "_id";
 
-        private readonly string _collectionPrefix;
+        private readonly string _collectionPrefix = "logs_";
 
         public async override Task<bool> CreateAsync(object record, string yyyymmdd)
         {

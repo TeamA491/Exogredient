@@ -60,11 +60,6 @@ namespace TeamA.Exogredient.Services
 
                 return true;
             }
-            catch (ArgumentException ae)
-            {
-                // Jason... error handling
-                throw ae;
-            }
             catch
             {
                 return false;
@@ -129,11 +124,6 @@ namespace TeamA.Exogredient.Services
                 File.Move(tempFile, path);
 
                 return true;
-            }
-            catch (ArgumentException ae)
-            {
-                // Jason... error handling
-                throw ae;
             }
             catch
             {
