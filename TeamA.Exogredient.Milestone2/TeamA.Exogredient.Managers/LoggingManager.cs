@@ -55,7 +55,9 @@ namespace TeamA.Exogredient.Managers
                     rollbackSuccess = await dsLogger.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
                 }
 
-                // Notify system admin, including rollback success
+                AdminFunctionalityService adminService = new AdminFunctionalityService();
+
+                await adminService.NotifySystemAdminAsync($"Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}");
 
                 return false;
             }

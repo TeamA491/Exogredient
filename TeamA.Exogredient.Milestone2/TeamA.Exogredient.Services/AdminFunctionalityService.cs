@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace TeamA.Exogredient.Services
 
         /// <summary>
         /// Uses gmail smtp to send mail from a known email address to any other address.
+        /// Email subject is the current day in UTC.
         /// </summary>
         /// <param name="message">The message you want to send.</param>
         /// <returns>A bool representing whether the process succeeded.</returns>
@@ -27,9 +29,12 @@ namespace TeamA.Exogredient.Services
                 MailMessage mail = new MailMessage();
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
 
+                // TODO: learn invariant culture: https://stackoverflow.com/questions/10348952/how-i-can-convert-datetime-now-in-c-sharp-to-yyyy-mm-dd-hhmmss-sssssss
+                string title = DateTime.UtcNow.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
+
                 mail.From = new MailAddress(_sendingEmail);
                 mail.To.Add(_receivingEmail);
-                mail.Subject = "Test Mail";
+                mail.Subject = title;
                 mail.Body = $"{message}";
 
                 SmtpServer.Port = 587;
