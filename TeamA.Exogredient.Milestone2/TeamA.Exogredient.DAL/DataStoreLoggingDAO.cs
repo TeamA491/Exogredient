@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.Common;
 using MySqlX.XDevAPI.CRUD;
-//HACK: to use MySQL.Data nuget, install Connector/NET here: https://dev.mysql.com/downloads/connector/net/
 
 namespace TeamA.Exogredient.DAL
 {
@@ -12,16 +12,18 @@ namespace TeamA.Exogredient.DAL
         // ID field name.
         private readonly string _id = "_id";
 
-        public override void Create(object record, string collectionName)
+        private readonly string _collectionPrefix;
+
+        public async override Task<bool> CreateAsync(object record, string yyyymmdd)
         {
-            if (record.GetType() == typeof(LogRecord))
+            try
             {
                 LogRecord logRecord = (LogRecord)record;
                 Session session = MySQLX.GetSession(ConnectionString);
 
                 Schema schema = session.GetSchema(Schema);
 
-                var collection = schema.CreateCollection(collectionName, ReuseExistingObject: true);
+                var collection = schema.CreateCollection(_collectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
                 // Created anon type to represent json in document store.
                 var document = new
@@ -33,32 +35,44 @@ namespace TeamA.Exogredient.DAL
                     errorType = logRecord.ErrorType
                 };
 
-                collection.Add(document).Execute();
+                await collection.Add(document).ExecuteAsync();
                 session.Close();
+
+                return true;
             }
-            else
+            catch
             {
-                throw new ArgumentException("Record must be of type LogRecord");
+                return false;
             }
+            
         }
 
-        public override void Delete(string uniqueId, string collectionName)
+        public async override Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
         {
-            Session session = MySQLX.GetSession(ConnectionString);
+            try
+            {
+                Session session = MySQLX.GetSession(ConnectionString);
 
-            Schema schema = session.GetSchema(Schema);
+                Schema schema = session.GetSchema(Schema);
 
-            var collection = schema.GetCollection(collectionName);
+                var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
 
-            collection.Remove($"{_id} = :id").Bind("id", uniqueId).Execute();
+                await collection.Remove($"{_id} = :id").Bind("id", uniqueId).ExecuteAsync();
 
-            session.Close();
+                session.Close();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         // TODO: Can't find id by identifier and timestamp... need operation
-        public override string FindIdField(object record, string collectionName)
+        public async override Task<string> FindIdFieldAsync(object record, string yyyymmdd)
         {
-            if (record.GetType() == typeof(LogRecord))
+            try
             {
                 LogRecord logRecord = (LogRecord)record;
 
@@ -66,11 +80,11 @@ namespace TeamA.Exogredient.DAL
 
                 Schema schema = session.GetSchema(Schema);
 
-                var collection = schema.GetCollection(collectionName);
+                var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
 
                 var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
 
-                DocResult result = collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).Execute();
+                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync();
 
                 // Prepare string to be returned
                 string resultstring = "";
@@ -85,9 +99,10 @@ namespace TeamA.Exogredient.DAL
 
                 return resultstring;
             }
-            else
+            catch (Exception e)
             {
-                throw new ArgumentException("Record must be of type LogRecord");
+                // HACK !!!!
+                throw e;
             }
         }
     }

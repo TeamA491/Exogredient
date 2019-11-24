@@ -2,31 +2,50 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
     public class DataStoreLoggingService
     {
+        private readonly DataStoreLoggingDAO _dsLoggingDAO;
 
-        // change string
-        public void LogToDataStore(string operation, string timestamp, string username,
-                        string ipAddress, string errorType)
+        public DataStoreLoggingService()
         {
-            // TODO: change timestamp to string instead of DateTime
+            _dsLoggingDAO = new DataStoreLoggingDAO();
+        }
 
-            // Create record to represent log that is inserted into datastore and flatfile.
-            // timestamp is in format of "HH:mm:ss:ff UTC&yyyyMMdd", CultureInfo.InvariantCulture);
+        public async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
+                                                    string ipAddress, string errorType)
+        {
+            string[] splitResult = timestamp.Split(' ');
 
-            string[] timeResult = timestamp.Split('&');
-            LogRecord record = new LogRecord(timeResult[0], operation, username, ipAddress, errorType);
+            LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-            DataStoreLoggingDAO dsLoggingDao = new DataStoreLoggingDAO();
+            return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]);
+        }
 
-            // Extract collection name from timestamp
-            string collectionName = "logs_" + timeResult[1];
+        public async Task<bool> DeleteLogFromDataStoreAsync(string timestamp, string operation, string identifier,
+                                                            string ipAddress, string errorType)
+        {
+            try
+            {
+                string[] splitResult = timestamp.Split(' ');
 
-            dsLoggingDao.Create(record, collectionName);
+                LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
+
+                string id = await _dsLoggingDAO.FindIdFieldAsync(logRecord, splitResult[2]);
+
+                await _dsLoggingDAO.DeleteAsync(id, splitResult[2]);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            
         }
 
     }

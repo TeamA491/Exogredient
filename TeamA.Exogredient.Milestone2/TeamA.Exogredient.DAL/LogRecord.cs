@@ -20,16 +20,16 @@ namespace TeamA.Exogredient.DAL
         // All fields in the order you want them to be in, both in the database and flat file
         public List<string> Fields { get; }
 
-        public LogRecord(string timestamp, string operation,
-                         string identifier, string ipAddress, string errorType = "null")
+        public LogRecord(string timestamp, string operation, 
+                         string identifier, string ipAddress, string errorType)
         {
             Fields = new List<string>();
 
-            Timestamp = timestamp;
-            Fields.Add(timestamp);
-
             Operation = operation;
             Fields.Add(operation);
+
+            Timestamp = timestamp;
+            Fields.Add(timestamp);
 
             Identifier = identifier;
             Fields.Add(identifier);

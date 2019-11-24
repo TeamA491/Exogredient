@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.DAL
 {
@@ -9,10 +10,10 @@ namespace TeamA.Exogredient.DAL
 
         protected static readonly string Schema = "exogredient_logs";
 
-        public abstract void Create(object record, string collectionname);
+        public abstract Task<bool> CreateAsync(object record, string yyyymmdd);
 
-        public abstract void Delete(T uniqueId, string collectionName);
+        public abstract Task<bool> DeleteAsync(T uniqueId, string yyyymmdd);
 
-        public abstract string FindIdField(object record, string collectionName);
+        public abstract Task<string> FindIdFieldAsync(object record, string yyyymmdd);
     }
 }
