@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.TestController
 {
     class TestController
     {
-        static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
@@ -16,6 +18,10 @@ namespace TeamA.Exogredient.TestController
             TestRecord tr = new TestRecord(tc: "changed 51");
 
             DataStoreLoggingDAO dsLoggingDao = new DataStoreLoggingDAO();
+
+            AdminFunctionalityService a = new AdminFunctionalityService();
+
+            await a.NotifySystemAdminAsync("log fail");
 
             //DATA STORE LOGGING
 
