@@ -13,10 +13,6 @@ namespace TeamA.Exogredient.TestController
         {
             Console.WriteLine("Hello World!");
 
-            TestDAO td = new TestDAO();
-
-            TestRecord tr = new TestRecord(tc: "changed 51");
-
             DataStoreLoggingDAO dsLoggingDao = new DataStoreLoggingDAO();
 
             AdminFunctionalityService a = new AdminFunctionalityService();
@@ -25,7 +21,7 @@ namespace TeamA.Exogredient.TestController
 
             RegistrationService r = new RegistrationService();
 
-            //await r.CheckPasswordSecurityAsync("test");
+            await r.CheckPasswordSecurityAsync("aaabbb567");
 
             // READ CORRUPTED PASSWORDS
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 
@@ -14,6 +15,7 @@ namespace TeamA.Exogredient.Services
     {
         private UserDAO _userDAO;
         private CorruptedPasswordsDAO _corruptedPasswordsDAO;
+        private SecurityService _securityService;
 
         // No < or > to protect from SQL injections.
         private List<char> _alphaNumericSpecialCharacters = new List<char>()
@@ -37,6 +39,7 @@ namespace TeamA.Exogredient.Services
         {
             _userDAO = new UserDAO();
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
+            _securityService = new SecurityService();
         }
 
         /// <summary>
@@ -218,20 +221,49 @@ namespace TeamA.Exogredient.Services
 
         public async Task<bool> CheckPasswordSecurityAsync(string plaintextPassword)
         {
-            string lineInput = "";
+            //string lineInput = "";
 
-            using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
+            //using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
+            //{
+            //    while ((lineInput = await reader.ReadLineAsync()) != null)
+            //    {
+            //        if (plaintextPassword.Contains(lineInput))
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //}
+
+            //List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
+            //string passwordSha1 = _securityService.HashWithSHA1(plaintextPassword);
+
+            //foreach (string hash in passwordHashes)
+            //{
+            //    if (passwordSha1.Equals(hash))
+            //    {
+            //        return false;
+            //    }
+            //}
+
+
+            // TEST: parentheses and curly braces and double quote and single quotes
+            string pattern = @"(a{4,}|b{4,}|c{4,}|d{4,}|e{4,}|f{4,}|g{4,}|h{4,}|i{4,}|j{4,}|k{4,}" +
+                             @"|l{4,}|m{4,}|n{4,}|o{4,}|p{4,}|q{4,}|r{4,}|s{4,}|t{4,}|u{4,}|v{4,}" +
+                             @"|w{4,}|x{4,}|y{4,}|z{4,}|1{4,}|2{4,}|3{4,}|4{4,}|5{4,}|6{4,}|7{4,}" +
+                             @"|8{4,}|9{4,}|0{4,}|~{4,}|`{4,}|@{4,}|#{4,}|\${4,}|%{4,}|\^{4,}|&{4,}" +
+                             @"|!{4,}|\*{4,}|\({4,}|\){4,}|_{4,}|-{4,}|\+{4,}|={4,}|{{4,}|\[{4,}|}{4,}" +
+                             @"|]{4,}|\|{4,}|\\{4,}|""{4,}|'{4,}|:{4,}|;{4,}|\?{4,}|\/{4,}|\.{4,}|,{4,}";
+
+            Regex rgx = new Regex(pattern);
+
+            if (rgx.IsMatch(plaintextPassword))
             {
-                while ((lineInput = await reader.ReadLineAsync()) != null)
-                {
-                    if (plaintextPassword.Contains(lineInput))
-                    {
-                        return false;
-                    }
-                }
+                Console.WriteLine($"hit: {plaintextPassword}");
             }
-
-            List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
+            else
+            {
+                Console.WriteLine("fail");
+            }
 
             return false;
         }
