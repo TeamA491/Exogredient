@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 // TODO: DECIDE HOW TO HOLD EXPIRATION DATES
 // TODO: FUNCTION TO CHECK WHETHER WE CAN REFRESH A TOKEN OR NOT
-// TODO: SPLIT THIS FUNCTIONALITY FROM THE TokenIsExpired FUNCTION
-// TODO: MAAAYBE OVERLOAD FUNCTIONS TO TAKE A JWS TOO. DECIDE WHAT FUNCTIONS GET TO DO THAT.
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -20,7 +19,7 @@ namespace TeamA.Exogredient.Services
         // TODO: LOAD RSA PRIVATE KEY FROM OS ENVIRONMENT
         private const string SIGNING_ALGORITHM = "RS512";
         private static readonly string PRIVATE_KEY = "TESTING_PRIVATE_RSA_KEY";
-
+        
         /// <summary>
         /// Generates a JWS with RSA512 using a private key loaded from the environment.
         /// </summary>
@@ -44,10 +43,26 @@ namespace TeamA.Exogredient.Services
             string encodedHeader = DictionaryToString(joseHeader).ToBase64();
             string encodedPayload = DictionaryToString(payload).ToBase64();
 
+            // The signature will be the hash of the header and payload
+            string stringToSign = encodedHeader + '.' + encodedPayload;
+
+            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+            RSA.FromXmlString(PRIVATE_KEY);
+
+            // This object will let us create a signature
+            RSAPKCS1SignatureFormatter RSAFormatter = new RSAPKCS1SignatureFormatter(RSA);
+            RSAFormatter.SetHashAlgorithm("SHA1");  // We care more about speed here, so we use SHA1
+            SHA1Managed SHhash = new SHA1Managed();
+
             // Hash the encoded values using RSA512
+            byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(stringToSign));
+            // Sign the hash with the private key
+            string signature = RSAFormatter.CreateSignature(hashedString).ToBase64();
 
+            // Release resources
+            SHhash.Dispose();
 
-            return "";
+            return string.Format("{0}.{1}.{2}", encodedHeader, encodedPayload, signature);
         }
 
         /// <summary>
@@ -58,16 +73,58 @@ namespace TeamA.Exogredient.Services
         /// <returns>The contents inside the decrypted token.</returns>
         public static Dictionary<string, string> DecryptJWS(string token, string publicKey)
         {
-            // NOTE: MAKE SURE TO CHECK PERIODS
-            // NOTE: CHECK TO MAKE SURE IN BASE64
-            // NOTE: CHECK HEADER ALGORITHM, DENY EVERYTHING OTHER THAN `SIGNING_ALGORITHM`
+            string[] segments = token.Split('.');
 
-            // NOTE:
-            // There were two ways to attack a standards-compliant JWS library to achieve trivial token forgery:
-            // 1. Send a header that specifies the "none" algorithm be used
-            // 2. Send a header that specifies the "HS256" algorithm when the application normally signs messages with an RSA public key.
+            // Make sure we have the proper JWS format of 3 tokens delimited by periods
+            if (segments.Length != 3)
+                throw new ArgumentException("JWS must have 3 segments separated by periods.");
 
-            return new Dictionary<string, string>();
+            string encodedHeader = segments[0];
+            string encodedPayload = segments[1];
+            string encodedSignature = segments[2];
+
+            // Convert header back to dictionary format
+            string decodedHeader = segments[0].FromBase64();
+            Dictionary<string, string> headerJSON = StringToDictionary(decodedHeader);
+
+            // Convert payload back to dictionary format
+            string decodedPayload = segments[1].FromBase64();
+            Dictionary<string, string> payloadJSON = StringToDictionary(decodedPayload);
+
+            // Make sure that the token is still valid
+            if (TokenIsExpired(payloadJSON))
+                // TODO THROW PROPER EXCEPTION, THEN REFRESH THE TOKEN WHEN CAUGHT
+                throw new ArgumentException("JWS is expired!");
+
+            // Make sure that we are using the correct encryption algorithm in the header
+            if (headerJSON["alg"] != SIGNING_ALGORITHM)
+                throw new ArgumentException("Incorrect encryption algorithm.");
+
+            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+            RSA.FromXmlString(publicKey);
+
+            // Create this object in order to verify that the JWS was untampered with
+            RSAPKCS1SignatureDeformatter RSADeformatter = new RSAPKCS1SignatureDeformatter(RSA);
+            RSADeformatter.SetHashAlgorithm("SHA1");
+            SHA1Managed SHhash = new SHA1Managed();
+
+            // Sign the hash with the private key
+            string strToVerify = encodedHeader + '.' + encodedPayload;
+            // Hash the encoded values using RSA512
+            byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(strToVerify));
+
+            // Release resources
+            SHhash.Dispose();
+
+            // Verify that the JWS is correct and untampered with
+            if (RSADeformatter.VerifySignature(hashedString, System.Convert.FromBase64String(encodedSignature)))
+            {
+                return payloadJSON;
+            }
+            else
+            {
+                throw new ArgumentException("JWS could not be verified!");
+            }
         }
 
         /// <summary>
@@ -268,10 +325,31 @@ namespace TeamA.Exogredient.Services
         /// Extension function to convert a string to a Base64 encoding.
         /// </summary>
         /// <param name="str">The string to be converted.</param>
-        /// <returns>A Base64 representation of the string</returns>
+        /// <returns>A Base64 representation of the string.</returns>
         private static string ToBase64(this string str)
         {
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+        }
+
+        /// <summary>
+        /// Extension function to convert a bytes array to a Base64 encoding.
+        /// </summary>
+        /// <param name="bytes">The bytes array to be converted.</param>
+        /// <returns>A Base64 representation of the bytes array.</returns>
+        private static string ToBase64(this byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes);
+        }
+
+        /// <summary>
+        /// Converts a Base64 encoded string back to it's original format.
+        /// </summary>
+        /// <param name="str">The string to decode.</param>
+        /// <returns>The original representation of the string.</returns>
+        private static string FromBase64(this string str)
+        {
+            byte[] bytes = Convert.FromBase64String(str);
+            return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
     }
 }
