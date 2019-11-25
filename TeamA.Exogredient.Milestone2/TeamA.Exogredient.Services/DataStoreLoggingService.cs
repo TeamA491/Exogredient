@@ -19,11 +19,23 @@ namespace TeamA.Exogredient.Services
         public async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
                                                     string ipAddress, string errorType)
         {
-            string[] splitResult = timestamp.Split(' ');
+            try
+            {
+                string[] splitResult = timestamp.Split(' ');
 
-            LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
+                if (splitResult.Length != 3)
+                {
+                    throw new ArgumentException("Timestamp Format Incorrect");
+                }
 
-            return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]);
+                LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
+
+                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<bool> DeleteLogFromDataStoreAsync(string timestamp, string operation, string identifier,
@@ -32,6 +44,11 @@ namespace TeamA.Exogredient.Services
             try
             {
                 string[] splitResult = timestamp.Split(' ');
+
+                if (splitResult.Length != 3)
+                {
+                    throw new ArgumentException("Timestamp Format Incorrect");
+                }
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
