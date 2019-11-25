@@ -17,13 +17,13 @@ namespace TeamA.Exogredient.Managers
             _failureCounter = new Dictionary<string, int>();
         }
 
-        public bool InitAuthentication(string userName, string password)
+        public bool InitAuthentication(string userName, byte[] encryptedPassword, byte[]encryptedAESKey, byte[] aesIV)
         {
             try
             {
                 if (!_failureCounter.ContainsKey(userName))
                 {
-                    if (_authenticationService.Authenticate(userName, password) == false)
+                    if (_authenticationService.Authenticate(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
                     {
                         _failureCounter.Add(userName, 1);
                         return false;
@@ -36,7 +36,7 @@ namespace TeamA.Exogredient.Managers
 
                 if (_failureCounter[userName] < _maxAttempts)
                 {
-                    if (_authenticationService.Authenticate(userName, password) == false)
+                    if (_authenticationService.Authenticate(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
                     {
                         _failureCounter[userName] += 1;
                         if (_failureCounter[userName] == _maxAttempts)

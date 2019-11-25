@@ -20,6 +20,7 @@ namespace TeamA.Exogredient.DAL
         private const string _password = "password";            //VARCHAR(2000)
         private const string _disabled = "disabled";            //VARCHAR(5)
         private const string _userType = "user_type";           //VARCHAR(11)
+        private const string _salt = "salt";                    //VARCHAR(200)
 
         //connection string(for testing)
         new string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
@@ -81,10 +82,9 @@ namespace TeamA.Exogredient.DAL
         }
 
         //Get the password of the username
-        public string GetPassword(string userName)
+        public void GetStoredPasswordAndSalt(string userName, out string storedPassword, out string salt)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
-            string password;
             try
             {
                 connection.Open();
@@ -92,12 +92,13 @@ namespace TeamA.Exogredient.DAL
                 {
                     throw new Exception("Invalid user name or password");
                 }
-                string sqlString = $"SELECT {_password} FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_userName} = '{userName}';";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     MySqlDataReader reader = command.ExecuteReader();
                     reader.Read();
-                    password = reader.GetString(0);
+                    storedPassword = reader.GetString(0);
+                    salt = reader.GetString(1);
                     reader.Close();
                 }
             }
@@ -109,9 +110,6 @@ namespace TeamA.Exogredient.DAL
             {
                 connection.Close();
             }
-
-
-            return password;
         }
 
         public override void Create(object record)
@@ -136,7 +134,7 @@ namespace TeamA.Exogredient.DAL
                         sqlString += $"{pair.Key},";
                     }
 
-                    sqlString.Remove(sqlString.Length - 1);
+                    sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += ") VALUES (";
 
                     foreach (KeyValuePair<string, string> pair in recordData)
@@ -144,7 +142,7 @@ namespace TeamA.Exogredient.DAL
                         sqlString += $"'{pair.Value}',";
                     }
 
-                    sqlString.Remove(sqlString.Length - 1);
+                    sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += ");";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     command.ExecuteNonQuery();
@@ -201,14 +199,14 @@ namespace TeamA.Exogredient.DAL
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     MySqlDataReader reader = command.ExecuteReader();
 
-                    DataTable dataTable = new DataTable();
-                    dataTable.Load(reader);
-                    DataRow row = dataTable.Rows[0];
-                    string stringResult = row.ToString();
+                    using (DataTable dataTable = new DataTable())
+                    {
+                        dataTable.Load(reader);
+                        DataRow row = dataTable.Rows[0];
+                        string stringResult = row.ToString();
+                        result.Add(stringResult);
+                    }
                     //stringResult += row[_id].ToString() + "," + row[_testColumn];
-
-                    result.Add(stringResult);
-
                 }
             }
             catch (Exception e)
@@ -245,8 +243,8 @@ namespace TeamA.Exogredient.DAL
                         }
 
                     }
-                    sqlString.Remove(sqlString.Length - 1);
-                    sqlString += $"WHERE {_userName} = '{recordData[_userName]}';";
+                    sqlString = sqlString.Remove(sqlString.Length - 1);
+                    sqlString += $" WHERE {_userName} = '{recordData[_userName]}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     command.ExecuteNonQuery();
                 }
