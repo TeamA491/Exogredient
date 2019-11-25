@@ -23,6 +23,6 @@ namespace TeamA.Exogredient.DAL
         // the user passes named values to each column they wish to update.
         // Example: record = User(lastName : "Example")
         //          Update("jason1234", record)
-        public abstract void Update(T id, object record);
+        public abstract void Update(object record);
     }
 }
