@@ -38,6 +38,8 @@ namespace TeamA.Exogredient.Services
                 { "alg", SIGNING_ALGORITHM }  // Signing algorithm type
             };
 
+            // TODO ADD EXPIRATION DATES
+
             // Base64 encode the header and payload
             string encodedHeader = DictionaryToString(joseHeader).ToBase64();
             string encodedPayload = DictionaryToString(payload).ToBase64();
@@ -138,7 +140,7 @@ namespace TeamA.Exogredient.Services
             // Check for condition (1)
             if (dictStr.Length < 2 || dictStr[0] != '{' || dictStr[dictStr.Length - 1] != '}')
             {
-                // TODO THROW EXCEPTION HERE
+                throw new ArgumentException("Dictionary doesn't have proper surrounding brackets.");
             }
             else
             {
@@ -165,7 +167,7 @@ namespace TeamA.Exogredient.Services
             // NOTE: If a comma or colon appears in the key or value, then it violates condition (4)
             if (colonCount - 1 != commaCount)
             {
-                // TODO THROW EXCEPTION HERE
+                throw new ArgumentException("Invalid comma and / or colon formatting.");
             }
 
             // Determine key/value pairs and their correctness
@@ -178,7 +180,7 @@ namespace TeamA.Exogredient.Services
                 // If we don't have a key and value pair, then it's not correct
                 if (p.Length != 2)
                 {
-                    // TODO THROW EXCEPTION 
+                    throw new ArgumentException("Invalid key/value pair.");
                 }
 
                 string key = p[0];
@@ -191,13 +193,13 @@ namespace TeamA.Exogredient.Services
 
                 if (!keyHasQuotes || !valHasQuotes)
                 {
-                    // TODO THROW EXCEPTION
+                    throw new ArgumentException("Key or value isn't surrounded by double quotes.");
                 }
 
                 // Check for condition (4)
                 if (!p[0].IsAlphaNumeric() || !p[1].IsAlphaNumeric())
                 {
-                    // TODO THROW EXCEPTION
+                    throw new ArgumentException("Key or value is not alpha-numeric (excluding white-space).");
                 }
 
                 dict.Add(key, val);
