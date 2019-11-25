@@ -21,9 +21,26 @@ namespace TeamA.Exogredient.TestController
 
             AdminFunctionalityService a = new AdminFunctionalityService();
 
-            await a.NotifySystemAdminAsync("log fail");
+            CorruptedPasswordsDAO c = new CorruptedPasswordsDAO();
 
-            //DATA STORE LOGGING
+            RegistrationService r = new RegistrationService();
+
+            //await r.CheckPasswordSecurityAsync("test");
+
+            // READ CORRUPTED PASSWORDS
+
+            //List<string> result = await c.ReadAsync();
+
+            //foreach (string s in result)
+            //{
+            //    Console.WriteLine(s);
+            //}
+
+            // NOTIFY SYSTEM ADMIN
+
+            //await a.NotifySystemAdminAsync("log fail");
+
+            // DATA STORE LOGGING
 
             //dsLoggingDao.Create(record, collectionName);
 

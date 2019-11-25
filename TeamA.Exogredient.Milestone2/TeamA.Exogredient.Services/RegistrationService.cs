@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
@@ -11,7 +12,8 @@ namespace TeamA.Exogredient.Services
     /// </summary>
     public class RegistrationService
     {
-        private readonly UserDAO _userDAO;
+        private UserDAO _userDAO;
+        private CorruptedPasswordsDAO _corruptedPasswordsDAO;
 
         // No < or > to protect from SQL injections.
         private List<char> _alphaNumericSpecialCharacters = new List<char>()
@@ -34,6 +36,7 @@ namespace TeamA.Exogredient.Services
         public RegistrationService()
         {
             _userDAO = new UserDAO();
+            _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
         }
 
         /// <summary>
@@ -141,7 +144,7 @@ namespace TeamA.Exogredient.Services
         /// and the domain.
         /// First we convert to lowercase.
         /// Then we check if the domain is "gmail.com".
-        /// If it is, then the local-part is checked for "+[anything]" and ".", 
+        /// If it is, then the local-part is checked for "+[anything]", ".", and """", 
         /// and they are then removed.
         /// Finally all double quotes are removed
         /// </summary>
@@ -213,9 +216,23 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
-        public bool CheckPasswordSecurity(string plaintextPassword)
+        public async Task<bool> CheckPasswordSecurityAsync(string plaintextPassword)
         {
-            //return password not insecurePasswords[]
+            string lineInput = "";
+
+            using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
+            {
+                while ((lineInput = await reader.ReadLineAsync()) != null)
+                {
+                    if (plaintextPassword.Contains(lineInput))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
+
             return false;
         }
 

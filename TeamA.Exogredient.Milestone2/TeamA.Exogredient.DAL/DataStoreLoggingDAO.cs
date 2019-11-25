@@ -14,6 +14,8 @@ namespace TeamA.Exogredient.DAL
 
         private readonly string _collectionPrefix = "logs_";
 
+        private readonly string _schema = "exogredient_logs";
+
         public async override Task<bool> CreateAsync(object record, string yyyymmdd)
         {
             try
@@ -21,7 +23,7 @@ namespace TeamA.Exogredient.DAL
                 LogRecord logRecord = (LogRecord)record;
                 Session session = MySQLX.GetSession(ConnectionString);
 
-                Schema schema = session.GetSchema(Schema);
+                Schema schema = session.GetSchema(_schema);
 
                 var collection = schema.CreateCollection(_collectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
@@ -53,7 +55,7 @@ namespace TeamA.Exogredient.DAL
             {
                 Session session = MySQLX.GetSession(ConnectionString);
 
-                Schema schema = session.GetSchema(Schema);
+                Schema schema = session.GetSchema(_schema);
 
                 var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
 
@@ -78,7 +80,7 @@ namespace TeamA.Exogredient.DAL
 
                 Session session = MySQLX.GetSession(ConnectionString);
 
-                Schema schema = session.GetSchema(Schema);
+                Schema schema = session.GetSchema(_schema);
 
                 var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
 

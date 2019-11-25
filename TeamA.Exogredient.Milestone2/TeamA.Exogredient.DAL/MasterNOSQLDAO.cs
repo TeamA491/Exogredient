@@ -8,8 +8,6 @@ namespace TeamA.Exogredient.DAL
         // HACK: Change this to your specific password
         protected static readonly string ConnectionString = "mysqlx://root:****@localhost:33060";
 
-        protected static readonly string Schema = "exogredient_logs";
-
         public abstract Task<bool> CreateAsync(object record, string yyyymmdd);
 
         public abstract Task<bool> DeleteAsync(T uniqueId, string yyyymmdd);
