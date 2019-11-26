@@ -41,7 +41,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026", "password")]
-        public void Authenticate_IncorrectInputs_ReturnFalse(string userName, string password)
+        public void Authenticate_IncorrectPassword_ReturnFalse(string userName, string password)
         {
             //Arrange
             if (userDAO.IsUserNameDisabled(userName))
@@ -56,7 +56,26 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = authenticationService.Authenticate("charles971026", encryptedPassword, encryptedKey, IV);
+            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
+
+            //Assert
+            Assert.IsFalse(result);
+        }
+
+        [DataTestMethod]
+        [DataRow("charles9710", "password")]
+        public void Authenticate_IncorrectUserName_ReturnFalse(string userName, string password)
+        {
+            //Arrange
+            string hexPassword = ss.ToHexString(password);
+            RSAParameters publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = ss.GenerateAESKey();
+            byte[] IV = ss.GenerateAESIV();
+            byte[] encryptedKey = ss.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
+
+            //Act
+            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);
@@ -66,7 +85,6 @@ namespace TeamA.Exogredient.Authentication.Tests
         [DataRow("charles971026")]
         public void DisableUserName_ValidUserName_UserNameDisabled(string userName)
         {
-
             //Arrange
             bool result;
 
@@ -76,15 +94,35 @@ namespace TeamA.Exogredient.Authentication.Tests
                 authenticationService.DisableUserName(userName);
                 result = userDAO.IsUserNameDisabled(userName);
             }
-            catch(Exception e)
+            catch
             {
                 result = userDAO.IsUserNameDisabled(userName);
             }
 
             //Assert
             Assert.IsTrue(result);
-
         }
 
+        [DataTestMethod]
+        [DataRow("charles971026")]
+        public void EnableUserName_ValidUserName_UserNameEnabled(string userName)
+        {
+            //Arrange
+            bool result;
+
+            //Act
+            try
+            {
+                authenticationService.EnableUserName(userName);
+                result = userDAO.IsUserNameDisabled(userName);
+            }
+            catch
+            {
+                result = userDAO.IsUserNameDisabled(userName);
+            }
+
+            //Assert
+            Assert.IsFalse(result);
+        }
     }
 }

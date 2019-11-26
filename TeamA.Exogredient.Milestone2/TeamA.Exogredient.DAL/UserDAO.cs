@@ -25,13 +25,21 @@ namespace TeamA.Exogredient.DAL
         //connection string(for testing)
         new string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
 
-        //check if the username is disabled
+        /// <summary>
+        /// check if the username is disabled.
+        /// </summary>
+        /// <param name="userName"> username to be checked </param>
+        /// <returns>true if username is disabled, false otherwise </returns>
         public bool IsUserNameDisabled(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             bool isDisabled;
             try
             {
+                if (!UserNameExists(userName))
+                {
+                    throw new Exception("The username doesn't exist!");
+                }
                 connection.Open();
                 string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_userName} = '{userName}'";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -52,7 +60,11 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        //Check if the username exists
+        /// <summary>
+        /// Check if the username exists.
+        /// </summary>
+        /// <param name="userName"> username to be checked </param>
+        /// <returns> true if username exists, otherwise false </returns>
         public bool UserNameExists(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
