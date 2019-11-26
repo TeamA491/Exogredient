@@ -221,51 +221,72 @@ namespace TeamA.Exogredient.Services
 
         public async Task<bool> CheckPasswordSecurityAsync(string plaintextPassword)
         {
-            //string lineInput = "";
+            // Test if the whole password is a sequence of alphabetical or numeric characters.
 
-            //using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
-            //{
-            //    while ((lineInput = await reader.ReadLineAsync()) != null)
-            //    {
-            //        if (plaintextPassword.Contains(lineInput))
-            //        {
-            //            return false;
-            //        }
-            //    }
-            //}
+            // Done second because it it second fastest.
 
-            //List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
-            //string passwordSha1 = _securityService.HashWithSHA1(plaintextPassword);
+            // Check if password contains an english word, upper or lowercase, among the top 9000 most popular
+            // words that are over 3 characters in length. Done 3rd because fastest IO test.
 
-            //foreach (string hash in passwordHashes)
-            //{
-            //    if (passwordSha1.Equals(hash))
-            //    {
-            //        return false;
-            //    }
-            //}
+            string lineInput = "";
 
+            using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
+            {
+                while ((lineInput = await reader.ReadLineAsync()) != null)
+                {
+                    if (plaintextPassword.Contains(lineInput))
+                    {
+                        return false;
+                    }
+                }
+            }
 
-            // TEST: parentheses and curly braces and double quote and single quotes
-            string pattern = @"(a{4,}|b{4,}|c{4,}|d{4,}|e{4,}|f{4,}|g{4,}|h{4,}|i{4,}|j{4,}|k{4,}" +
-                             @"|l{4,}|m{4,}|n{4,}|o{4,}|p{4,}|q{4,}|r{4,}|s{4,}|t{4,}|u{4,}|v{4,}" +
-                             @"|w{4,}|x{4,}|y{4,}|z{4,}|1{4,}|2{4,}|3{4,}|4{4,}|5{4,}|6{4,}|7{4,}" +
-                             @"|8{4,}|9{4,}|0{4,}|~{4,}|`{4,}|@{4,}|#{4,}|\${4,}|%{4,}|\^{4,}|&{4,}" +
-                             @"|!{4,}|\*{4,}|\({4,}|\){4,}|_{4,}|-{4,}|\+{4,}|={4,}|{{4,}|\[{4,}|}{4,}" +
-                             @"|]{4,}|\|{4,}|\\{4,}|""{4,}|'{4,}|:{4,}|;{4,}|\?{4,}|\/{4,}|\.{4,}|,{4,}";
+            // Check if password has been corrupted in previous breaches. Done second to last because
+            // it is the slowest IO check.
 
-            Regex rgx = new Regex(pattern);
+            List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
+            string passwordSha1 = _securityService.HashWithSHA1(plaintextPassword);
 
-            if (rgx.IsMatch(plaintextPassword))
+            foreach (string hash in passwordHashes)
+            {
+                if (passwordSha1.Equals(hash))
+                {
+                    return false;
+                }
+            }
+
+            // Check password for repeated consecutive alphanumeric and special characters, 4 or more.
+            string pattern = @"(a{3,}|b{3,}|c{3,}|d{3,}|e{3,}|f{3,}|g{3,}|h{3,}|i{3,}|j{3,}|k{3,}" +
+                             @"|l{3,}|m{3,}|n{3,}|o{3,}|p{3,}|q{3,}|r{3,}|s{3,}|t{3,}|u{3,}|v{3,}" +
+                             @"|w{3,}|x{3,}|y{3,}|z{3,}|1{3,}|2{3,}|3{3,}|4{3,}|5{3,}|6{3,}|7{3,}" +
+                             @"|8{3,}|9{3,}|0{3,}|~{3,}|`{3,}|@{3,}|#{3,}|\${3,}|%{3,}|\^{3,}|&{3,}" +
+                             @"|!{3,}|\*{3,}|\({3,}|\){3,}|_{3,}|-{3,}|\+{3,}|={3,}|{{3,}|\[{3,}|}{3,}" +
+                             @"|]{3,}|\|{3,}|\\{3,}|""{3,}|'{3,}|:{3,}|;{3,}|\?{3,}|\/{3,}|\.{3,}|,{3,}" +
+                             @"|A{3,}|B{3,}|C{3,}|D{3,}|E{3,}|F{3,}|G{3,}|H{3,}|I{3,}|J{3,}|K{3,}" +
+                             @"|L{3,}|M{3,}|N{3,}|O{3,}|P{3,}|Q{3,}|R{3,}|S{3,}|T{3,}|U{3,}|V{3,}" +
+                             @"|W{3,}|X{3,}|Y{3,}|Z{3,})";
+
+            //(123|1234|12345|1234567)
+            string sequences = @"(123|234|345|456|567|678|789|890|901|012|987|876|765|654|543|432|321|210|109|098" +
+                               @"|zyx|yxw|xwv|wvu|vut|uts|tsr|srq|rqp|qpo|pon|onm|nml|mlk|lkj|kji|jih" +
+                               @"|ihg|hgf|gfe|fed|edc|dcb|cba|baz|azy|abc|bcd|cde|def|efg|fgh|ghi|hij" +
+                               @"|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|yza|zab)";
+
+            // Last check as it's the slowest check.
+
+            Regex regexPattern = new Regex(pattern);
+            Regex regexSequence = new Regex(sequences);
+
+            if (regexPattern.IsMatch(plaintextPassword) || regexSequence.IsMatch(plaintextPassword))
             {
                 Console.WriteLine($"hit: {plaintextPassword}");
             }
             else
             {
-                Console.WriteLine("fail");
+                Console.WriteLine($"fail: {plaintextPassword}");
             }
 
-            return false;
+            return true;
         }
 
         public string GenerateSalt()

@@ -21,7 +21,47 @@ namespace TeamA.Exogredient.TestController
 
             RegistrationService r = new RegistrationService();
 
-            await r.CheckPasswordSecurityAsync("aaabbb567");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("abcdefg"));
+
+            await r.CheckPasswordSecurityAsync("aaa");
+            await r.CheckPasswordSecurityAsync("AAA");
+            await r.CheckPasswordSecurityAsync("111");
+            await r.CheckPasswordSecurityAsync("~~~");
+            await r.CheckPasswordSecurityAsync("```");
+            await r.CheckPasswordSecurityAsync("!!!");
+            await r.CheckPasswordSecurityAsync("@@@");
+            await r.CheckPasswordSecurityAsync("###");
+            await r.CheckPasswordSecurityAsync("$$$");
+            await r.CheckPasswordSecurityAsync("%%%");
+            await r.CheckPasswordSecurityAsync("^^^");
+            await r.CheckPasswordSecurityAsync("&&&");
+            await r.CheckPasswordSecurityAsync("***");
+            await r.CheckPasswordSecurityAsync("(((");
+            await r.CheckPasswordSecurityAsync(")))");
+            await r.CheckPasswordSecurityAsync("___");
+            await r.CheckPasswordSecurityAsync("---");
+            await r.CheckPasswordSecurityAsync("+++");
+            await r.CheckPasswordSecurityAsync("===");
+            await r.CheckPasswordSecurityAsync("{{{{");
+            await r.CheckPasswordSecurityAsync("[[[[");
+            await r.CheckPasswordSecurityAsync("}}}}");
+            await r.CheckPasswordSecurityAsync("]]]]");
+            await r.CheckPasswordSecurityAsync("||||");
+            await r.CheckPasswordSecurityAsync("\\\\\\\\");
+            await r.CheckPasswordSecurityAsync("::::");
+            await r.CheckPasswordSecurityAsync(";;;;");
+            await r.CheckPasswordSecurityAsync("''''");
+            await r.CheckPasswordSecurityAsync("\"\"\"\"");
+            await r.CheckPasswordSecurityAsync("????");
+            await r.CheckPasswordSecurityAsync("////");
+            await r.CheckPasswordSecurityAsync("????");
+            await r.CheckPasswordSecurityAsync("....");
+            await r.CheckPasswordSecurityAsync(",,,,");
+            await r.CheckPasswordSecurityAsync("1234567");
+            await r.CheckPasswordSecurityAsync("lasdkfjlafdsjabcdef");
+            await r.CheckPasswordSecurityAsync("123");
+            await r.CheckPasswordSecurityAsync("7890123");
+            await r.CheckPasswordSecurityAsync("zyx");
 
             // READ CORRUPTED PASSWORDS
 
