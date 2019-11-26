@@ -8,10 +8,10 @@ namespace TeamA.Exogredient.DAL
 {
     public class UserDAO : MasterSQLDAO<string>
     {
-        //Table name
+        // Table name.
         private const string _tableName = "User";
 
-        //Column names
+        // Column names.
         private const string _firstName = "first_name";         //VARCHAR(200)
         private const string _lastName = "last_name";           //VARCHAR(200)
         private const string _email = "email";                  //VARCHAR(200)
@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.DAL
         private const string _userType = "user_type";           //VARCHAR(11)
         private const string _salt = "salt";                    //VARCHAR(200)
 
-        //connection string(for testing)
+        // Connection string(for testing).
         new string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
 
         /// <summary>
@@ -36,11 +36,14 @@ namespace TeamA.Exogredient.DAL
             bool isDisabled;
             try
             {
+                // Check if the username exists.
                 if (!UserNameExists(userName))
                 {
                     throw new Exception("The username doesn't exist!");
                 }
+                // Connect to the database. 
                 connection.Open();
+                // Get the value in disabled column of the username. 
                 string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_userName} = '{userName}'";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -71,7 +74,9 @@ namespace TeamA.Exogredient.DAL
             bool exist;
             try
             {
+                // Connect to the database.
                 connection.Open();
+                // Check if the username exists in the table.
                 string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_userName} = '{userName}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -93,17 +98,25 @@ namespace TeamA.Exogredient.DAL
             return exist;
         }
 
-        //Get the password of the username
+        /// <summary>
+        /// Get the password and the salt stored in the database corresponding to the username.
+        /// </summary>
+        /// <param name="userName"> the username of the password and salt </param>
+        /// <param name="storedPassword"> string variable where the stored password is assigned to </param>
+        /// <param name="salt"> string variable where the stored salt is assigned to </param>
         public void GetStoredPasswordAndSalt(string userName, out string storedPassword, out string salt)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
             {
+                // Connect to the database.
                 connection.Open();
+                // Check if the username exists.
                 if (!UserNameExists(userName))
                 {
                     throw new Exception("Invalid user name or password");
                 }
+                // Get the stored password and salt of the username.
                 string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_userName} = '{userName}';";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -113,6 +126,45 @@ namespace TeamA.Exogredient.DAL
                     salt = reader.GetString(1);
                     reader.Close();
                 }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Get the user type of the username.
+        /// </summary>
+        /// <param name="userName"> username whose user type is returned </param>
+        /// <returns> the user type of the username </returns>
+        public string GetUserType(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                // Connect to the database. 
+                connection.Open();
+                // Check if the username exists.
+                if (!UserNameExists(userName))
+                {
+                    throw new Exception("Invalid user name or password");
+                }
+                // Get the user type of the username 
+                string sqlString = $"SELECT {_userType} FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string userType;
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    MySqlDataReader reader = command.ExecuteReader();
+                    reader.Read();
+                    userType = reader.GetString(0);
+                    reader.Close();
+                }
+                return userType;
             }
             catch (Exception e)
             {

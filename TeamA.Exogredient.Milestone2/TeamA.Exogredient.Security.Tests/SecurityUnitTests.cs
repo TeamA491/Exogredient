@@ -9,8 +9,6 @@ namespace TeamA.Exogredient.Security.Tests
     [TestClass]
     public class SecurityUnitTests
     {
-        SecurityService ss = new SecurityService();
-
         [DataTestMethod]
         [DataRow(new byte[] { 104, 101, 108, 108, 111 }, "68656C6C6F")]
         public void BytesToHexString_GivenBytes_EqualsExpected(byte[] bytes, string expected)
@@ -18,7 +16,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
 
             //Act
-            string actual = ss.BytesToHexString(bytes);
+            string actual = SecurityService.BytesToHexString(bytes);
 
             //Assert
             Assert.IsTrue(actual.Equals(expected));
@@ -30,12 +28,12 @@ namespace TeamA.Exogredient.Security.Tests
         public void EncryptDecryptAES_GivenString_EqualsDecryptedOutput(string plainData)
         {
             //Arrange
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
 
             //Act
-            byte[] encryptedData = ss.EncryptAES(plainData, key, IV);
-            string decryptedData = ss.DecryptAES(encryptedData, key, IV);
+            byte[] encryptedData = SecurityService.EncryptAES(plainData, key, IV);
+            string decryptedData = SecurityService.DecryptAES(encryptedData, key, IV);
 
             //Assert
             Assert.IsTrue(plainData.Equals(decryptedData));
@@ -46,13 +44,12 @@ namespace TeamA.Exogredient.Security.Tests
         public void EncryptDecryptRSA_GivenBytes_EqualsDecryptedOutput(byte[] plainData)
         {
             //Arrange
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            RSAParameters publicKey = rsa.ExportParameters(false);
-            RSAParameters privateKey = rsa.ExportParameters(true);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] privateKey = SecurityService.GetRSAPrivateKey();
 
             //Act
-            byte[] encryptedData = ss.EncryptRSA(plainData, publicKey);
-            byte[] decryptedData = ss.DecryptRSA(encryptedData, privateKey);
+            byte[] encryptedData = SecurityService.EncryptRSA(plainData, publicKey);
+            byte[] decryptedData = SecurityService.DecryptRSA(encryptedData, privateKey);
 
             //Assert
             Assert.IsTrue(plainData.SequenceEqual(decryptedData));
@@ -65,7 +62,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
 
             //Act
-            string actual = ss.ToHexString(original);
+            string actual = SecurityService.ToHexString(original);
 
             //Assert
             Assert.IsTrue(expected.Equals(actual));
@@ -76,13 +73,13 @@ namespace TeamA.Exogredient.Security.Tests
         public void HashPassword_HashSameStringTwoSeparateTimes_HashcodesMatch(string password)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
+            byte[] salt = SecurityService.GenerateSalt(32);
             int iterations = 100;
             int hashBytesLength = 256;
 
             //Act
-            string a = ss.HashPassword(password, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt, iterations, hashBytesLength);
+            string a = SecurityService.HashPassword(password, salt, iterations, hashBytesLength);
+            string b = SecurityService.HashPassword(password, salt, iterations, hashBytesLength);
 
             //Assert
             Assert.IsTrue(a.Equals(b));
@@ -93,13 +90,13 @@ namespace TeamA.Exogredient.Security.Tests
         public void HashPassword_HashTwoDifferentStrings_HashCodesNotMatch(string password1, string password2)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
+            byte[] salt = SecurityService.GenerateSalt(32);
             int iterations = 100;
             int hashBytesLength = 256;
 
             //Act
-            string a = ss.HashPassword(password1, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password2, salt, iterations, hashBytesLength);
+            string a = SecurityService.HashPassword(password1, salt, iterations, hashBytesLength);
+            string b = SecurityService.HashPassword(password2, salt, iterations, hashBytesLength);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -110,14 +107,14 @@ namespace TeamA.Exogredient.Security.Tests
         public void HashPassword_HashSameStringTwoSeparateTimesWithDifferentSalt_HashCodesNotMatch(string password)
         {
             //Arrange
-            byte[] salt1 = ss.GenerateSalt(32);
-            byte[] salt2 = ss.GenerateSalt(32);
+            byte[] salt1 = SecurityService.GenerateSalt(32);
+            byte[] salt2 = SecurityService.GenerateSalt(32);
             int iterations = 100;
             int hashBytesLength = 256;
 
             //Act
-            string a = ss.HashPassword(password, salt1, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt2, iterations, hashBytesLength);
+            string a = SecurityService.HashPassword(password, salt1, iterations, hashBytesLength);
+            string b = SecurityService.HashPassword(password, salt2, iterations, hashBytesLength);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -128,13 +125,13 @@ namespace TeamA.Exogredient.Security.Tests
         public void HashPassword_HashSameStringTwoSeparateTimesWithDifferentIterations_HashCodesNotMatch(string password)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
+            byte[] salt = SecurityService.GenerateSalt(32);
             int iterations = 100;
             int hashBytesLength = 256;
 
             //Act
-            string a = ss.HashPassword(password, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt, iterations + 10, hashBytesLength);
+            string a = SecurityService.HashPassword(password, salt, iterations, hashBytesLength);
+            string b = SecurityService.HashPassword(password, salt, iterations + 10, hashBytesLength);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -145,13 +142,13 @@ namespace TeamA.Exogredient.Security.Tests
         public void HashPassword_HashSameStringTwoSeparateTimesWithDifferentHashLength_HashCodesNotMatch(string password)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
+            byte[] salt = SecurityService.GenerateSalt(32);
             int iterations = 100;
             int hashBytesLength = 256;
 
             //Act
-            string a = ss.HashPassword(password, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt, iterations, hashBytesLength-128);
+            string a = SecurityService.HashPassword(password, salt, iterations, hashBytesLength);
+            string b = SecurityService.HashPassword(password, salt, iterations, hashBytesLength-128);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -164,7 +161,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
 
             //Act
-            byte[] actual = ss.HexStringToBytes(hexString);
+            byte[] actual = SecurityService.HexStringToBytes(hexString);
 
             //Assert
             Assert.IsTrue(expected.SequenceEqual(actual));

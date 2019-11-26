@@ -10,7 +10,6 @@ namespace TeamA.Exogredient.Authentication.Tests
     public class AuthenticationUnitTests
     {
         AuthenticationService authenticationService = new AuthenticationService();
-        SecurityService ss = new SecurityService();
         UserDAO userDAO = new UserDAO();
 
 
@@ -24,13 +23,12 @@ namespace TeamA.Exogredient.Authentication.Tests
                 authenticationService.EnableUserName(userName);
             }
 
-            string hexPassword = ss.ToHexString(password);
-            RSAParameters publicKey = SecurityService.GetRSAPublicKey();
-            RSAParameters privateKey = SecurityService.GetRSAPrivateKey();
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
-            byte[] encryptedKey = ss.EncryptRSA(key, publicKey);
-            byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
+            string hexPassword = SecurityService.ToHexString(password);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
+            byte[] encryptedKey = SecurityService.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
             bool result = authenticationService.Authenticate("charles971026", encryptedPassword, encryptedKey, IV);
@@ -48,12 +46,12 @@ namespace TeamA.Exogredient.Authentication.Tests
             {
                 authenticationService.EnableUserName(userName);
             }
-            string hexPassword = ss.ToHexString(password);
-            RSAParameters publicKey = SecurityService.GetRSAPublicKey();
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
-            byte[] encryptedKey = ss.EncryptRSA(key, publicKey);
-            byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
+            string hexPassword = SecurityService.ToHexString(password);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
+            byte[] encryptedKey = SecurityService.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
             bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
@@ -67,12 +65,12 @@ namespace TeamA.Exogredient.Authentication.Tests
         public void Authenticate_IncorrectUserName_ReturnFalse(string userName, string password)
         {
             //Arrange
-            string hexPassword = ss.ToHexString(password);
-            RSAParameters publicKey = SecurityService.GetRSAPublicKey();
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
-            byte[] encryptedKey = ss.EncryptRSA(key, publicKey);
-            byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
+            string hexPassword = SecurityService.ToHexString(password);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
+            byte[] encryptedKey = SecurityService.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
             bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
