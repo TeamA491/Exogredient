@@ -156,7 +156,6 @@ namespace TeamA.Exogredient.Services
         /// canonicalized email.</returns>
         public string CanonicalizingEmail(string email)
         {
-            //TODO
             string[] splitResult = email.Split('@');
             string username = splitResult[0].ToLower();
             string domain = splitResult[1].ToLower();

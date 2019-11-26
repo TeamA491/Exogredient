@@ -6,44 +6,77 @@ namespace TeamA.Exogredient.Registration.Tests
     [TestClass]
     public class RegistrationUnitTests
     {
-        [TestMethod]
-        public void TestMethod5()
-        {
-            RegistrationService rs = new RegistrationService();
+        private RegistrationService _registrationService;
 
-            Assert.IsTrue(rs.CheckScope(true));
+        [TestInitialize]
+        public void Init()
+        {
+            _registrationService = new RegistrationService();
+        }
+        
+
+        [DataTestMethod]
+        [DataRow(true)]
+        public void RegistrationService_CheckScope_WithinScopeSuccess(bool answer)
+        {
+            bool result = _registrationService.CheckScope(answer);
+            Assert.IsTrue(result);
         }
 
-        [TestMethod]
-        public void TestMethod4()
+        [DataTestMethod]
+        [DataRow("Jason", 5, -1)]
+        [DataRow("David", 2000, 1)]
+        public void RegistrationService_CheckLength_WithinLengthSuccess(string name, int length, int min)
         {
-            RegistrationService rs = new RegistrationService();
-
-            Assert.IsTrue(rs.CheckLength("Jason", 5));
+            bool result = _registrationService.CheckLength(name, length, min);
+            Assert.IsTrue(result);
         }
 
-        [TestMethod]
-        public void TestMethod3()
+        [DataTestMethod]
+        [DataRow("asdsa12312#!@#")]
+        [DataRow("...fas313ads[];'{}312")]
+        public void RegistrationService_CheckIfANSCharacters_OnlyANSCharactersSuccess(string name)
         {
-            RegistrationService rs = new RegistrationService();
-
-            Assert.IsTrue(rs.CheckIfANSCharacters("asdsa12312#!@#"));
+            bool result = _registrationService.CheckIfANSCharacters(name);
+            Assert.IsTrue(result);
         }
 
-        [TestMethod]
-        public void TestMethod2()
+        [DataTestMethod]
+        [DataRow("123123123")]
+        public void RegistrationService_CheckIfNumericCharacters_OnlyNumericCharactersSuccess(string name)
         {
-            RegistrationService rs = new RegistrationService();
-
-            Assert.IsTrue(rs.CheckIfNumericCharacters("12312312"));
+            bool result = _registrationService.CheckIfNumericCharacters(name);
+            Assert.IsTrue(result);
         }
 
-        [TestMethod]
-        public void TestMethod1()
+        [DataTestMethod]
+        [DataRow("a@A")]
+        [DataRow("lmao123sda@gmail.com")]
+        [DataRow("dasda.dsa#!@yahoo.com")]
+        public void RegistrationService_EmailFormatValidityCheck_ValidEmailFormatSuccess(string email)
         {
-            RegistrationService rs = new RegistrationService();
+            bool result = _registrationService.EmailFormatValidityCheck(email);
+            Assert.IsTrue(result);
+        }
 
-            Assert.IsTrue(rs.EmailFormatValidityCheck("a@"));
+        [DataTestMethod]
+        [DataRow("a@A")]
+        [DataRow("lmao123sda@gmail.com")]
+        [DataRow("dasda.dsa#!@yahoo.com")]
+        [DataRow("LoveThisClass123+lmaojk@gmail.com")]
+        public void RegistrationService_CanonicalizingEmail_CanonicalizingEmailSuccess(string email)
+        {
+            string canonicalizedEmail = _registrationService.CanonicalizingEmail(email);
+
+            bool result = false;
+
+            if (canonicalizedEmail.Equals("a@a") || canonicalizedEmail.Equals("lmao123sda@gmail.com") ||
+                canonicalizedEmail.Equals("dasda.dsa#!@yahoo.com") || canonicalizedEmail.Equals("lovethisclass123@gmail.com"))
+            {
+                result = true;
+            }
+
+            Assert.IsTrue(result);
         }
     }
 }
