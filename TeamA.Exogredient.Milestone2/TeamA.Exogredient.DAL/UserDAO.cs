@@ -263,5 +263,33 @@ namespace TeamA.Exogredient.DAL
                 throw new ArgumentException("Record must be of class TestRecord");
             }
         }
+
+        public bool CheckEmailUniquenessAsync(string phonenumber)
+        {
+
+            return false;
+        }
+
+        public bool CheckUsernameUniquenessAsync(string username)
+        {
+            return false;
+        }
+
+        public bool GenerateTempUser(string username)
+        {
+            return false;
+        }
+
+        public bool DeleteTempUser(string username)
+        {
+            return false;
+        }
+
+        public bool MakeTempUserPerm(string username)
+        {
+            return false;
+        }
+
+
     }
 }
