@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.Managers
@@ -17,13 +18,13 @@ namespace TeamA.Exogredient.Managers
             _failureCounter = new Dictionary<string, int>();
         }
 
-        public bool InitAuthentication(string userName, byte[] encryptedPassword, byte[]encryptedAESKey, byte[] aesIV)
+        public async Task<bool> InitAuthentication(string userName, byte[] encryptedPassword, byte[]encryptedAESKey, byte[] aesIV)
         {
             try
             {
                 if (!_failureCounter.ContainsKey(userName))
                 {
-                    if (_authenticationService.Authenticate(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
+                    if (await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
                     {
                         _failureCounter.Add(userName, 1);
                         return false;
@@ -36,12 +37,12 @@ namespace TeamA.Exogredient.Managers
 
                 if (_failureCounter[userName] < _maxAttempts)
                 {
-                    if (_authenticationService.Authenticate(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
+                    if (await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
                     {
                         _failureCounter[userName] += 1;
                         if (_failureCounter[userName] == _maxAttempts)
                         {
-                            _authenticationService.DisableUserName(userName);
+                            await _authenticationService.DisableUserNameAsync(userName);
                         }
                         return false;
                     }

@@ -220,12 +220,16 @@ namespace TeamA.Exogredient.Services
 
         public async Task<bool> CheckPasswordSecurityAsync(string plaintextPassword)
         {
-            // Test if the whole password is a sequence of alphabetical or numeric characters.
+            // Test if password contains context specific words.
 
-            // Done second because it it second fastest.
+            if (plaintextPassword.ToLower().Contains("exogredient"))
+            {
+                return false;
+            }
+
 
             // Check if password contains an english word, upper or lowercase, among the top 9000 most popular
-            // words that are over 3 characters in length. Done 3rd because fastest IO test.
+            // words that are over 3 characters in length. Done 2nd because fastest IO test.
 
             string lineInput = "";
 
@@ -265,7 +269,7 @@ namespace TeamA.Exogredient.Services
                              @"|L{3,}|M{3,}|N{3,}|O{3,}|P{3,}|Q{3,}|R{3,}|S{3,}|T{3,}|U{3,}|V{3,}" +
                              @"|W{3,}|X{3,}|Y{3,}|Z{3,})";
 
-            //(123|1234|12345|1234567)
+            // Check password for sequential sequences of numbers or letters in both forward and reverse order.
             string sequences = @"(123|234|345|456|567|678|789|890|901|012|987|876|765|654|543|432|321|210|109|098" +
                                @"|zyx|yxw|xwv|wvu|vut|uts|tsr|srq|rqp|qpo|pon|onm|nml|mlk|lkj|kji|jih" +
                                @"|ihg|hgf|gfe|fed|edc|dcb|cba|baz|azy|abc|bcd|cde|def|efg|fgh|ghi|hij" +
@@ -278,26 +282,10 @@ namespace TeamA.Exogredient.Services
 
             if (regexPattern.IsMatch(plaintextPassword) || regexSequence.IsMatch(plaintextPassword))
             {
-                Console.WriteLine($"hit: {plaintextPassword}");
-            }
-            else
-            {
-                Console.WriteLine($"fail: {plaintextPassword}");
+                return false;
             }
 
             return true;
-        }
-
-        public string GenerateSalt()
-        {
-            //return execute random generator
-            return "";
-        }
-
-        public string GenerateDigest(string salt, string plaintextPassword)
-        {
-            //return sha2(salt, plaintextPassword);
-            return "";
         }
 
         bool GenerateTempUser(string firstName, string lastName, string phoneNumber,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 namespace TeamA.Exogredient.DAL
@@ -22,11 +23,8 @@ namespace TeamA.Exogredient.DAL
         private const string _userType = "user_type";           //VARCHAR(11)
         private const string _salt = "salt";                    //VARCHAR(200)
 
-        //connection string(for testing)
-        new string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
-
         //check if the username is disabled
-        public bool IsUserNameDisabled(string userName)
+        public async Task<bool> IsUserNameDisabledAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             bool isDisabled;
@@ -36,8 +34,8 @@ namespace TeamA.Exogredient.DAL
                 string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_userName} = '{userName}'";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
-                    MySqlDataReader reader = command.ExecuteReader();
-                    reader.Read();
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
                     isDisabled = reader.GetBoolean(0);
                     return isDisabled;
                 }
@@ -53,7 +51,7 @@ namespace TeamA.Exogredient.DAL
         }
 
         //Check if the username exists
-        public bool UserNameExists(string userName)
+        public async Task<bool> UserNameExistsAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             bool exist;
@@ -63,8 +61,8 @@ namespace TeamA.Exogredient.DAL
                 string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_userName} = '{userName}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
-                    MySqlDataReader reader = command.ExecuteReader();
-                    reader.Read();
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
                     exist = reader.GetBoolean(0);
                 }
             }
@@ -82,25 +80,32 @@ namespace TeamA.Exogredient.DAL
         }
 
         //Get the password of the username
-        public void GetStoredPasswordAndSalt(string userName, out string storedPassword, out string salt)
+        public async Task<Tuple<string, string>> GetStoredPasswordAndSaltAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
             {
                 connection.Open();
-                if (!UserNameExists(userName))
+
+                if (!(await UserNameExistsAsync(userName)))
                 {
                     throw new Exception("Invalid user name or password");
                 }
+
                 string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string storedPassword = "";
+                string salt = "";
+
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
-                    MySqlDataReader reader = command.ExecuteReader();
-                    reader.Read();
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
                     storedPassword = reader.GetString(0);
                     salt = reader.GetString(1);
                     reader.Close();
                 }
+
+                return Tuple.Create(storedPassword, salt);
             }
             catch (Exception e)
             {
@@ -112,7 +117,7 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override void Create(object record)
+        public override async Task<bool> CreateAsync(object record)
         {
             if (record.GetType() == typeof(UserRecord))
             {
@@ -145,11 +150,13 @@ namespace TeamA.Exogredient.DAL
                     sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += ");";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
+
+                    return true;
                 }
                 catch (Exception e)
                 {
-                    throw e;
+                    return false;
                 }
                 finally
                 {
@@ -158,11 +165,11 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                throw new ArgumentException("Record must be of class UserRecord");
+                return false;
             }
         }
 
-        public override void DeleteByIDs(List<string> idsOfRows)
+        public override async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
@@ -172,13 +179,14 @@ namespace TeamA.Exogredient.DAL
                 {
                     string sqlString = $"DELETE {_tableName} WHERE {_userName} = '{userName}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
+
+                return true;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
-                throw e;
+                return false;
             }
             finally
             {
@@ -186,9 +194,10 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override List<string> ReadByIDs(List<string> idsOfRows)
+        public override async Task<List<string>> ReadByIdsAsync(List<string> idsOfRows)
         {
             List<string> result = new List<string>();
+
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
             {
@@ -197,7 +206,7 @@ namespace TeamA.Exogredient.DAL
                 {
                     string sqlString = $"SELECT * FROM {_tableName} WHERE {_userName} = '{userName}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
-                    MySqlDataReader reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
 
                     using (DataTable dataTable = new DataTable())
                     {
@@ -222,7 +231,7 @@ namespace TeamA.Exogredient.DAL
             return result;
         }
 
-        public override void Update(object record)
+        public override async Task<bool> UpdateAsync(object record)
         {
             if (record.GetType() == typeof(UserRecord))
             {
@@ -246,12 +255,13 @@ namespace TeamA.Exogredient.DAL
                     sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += $" WHERE {_userName} = '{recordData[_userName]}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
+
+                    return true;
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.WriteLine(e.ToString());
-                    throw e;
+                    return false;
                 }
                 finally
                 {
@@ -260,7 +270,7 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                throw new ArgumentException("Record must be of class TestRecord");
+                return false;
             }
         }
 
