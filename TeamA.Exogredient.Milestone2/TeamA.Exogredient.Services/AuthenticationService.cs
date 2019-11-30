@@ -27,66 +27,7 @@ namespace TeamA.Exogredient.Services
             _userDao = new UserDAO();
         }
 
-        /// <summary>
-        /// Disable a username from logging in.
-        /// </summary>
-        /// <param name="userName"> username to disable </param>
-        public async Task<bool> DisableUserNameAsync(string userName)
-        {
-            try
-            {
-                // If the username doesn't exist, throw an exception.
-                if (! (await _userDao.UserNameExistsAsync(userName)))
-                {
-                    return false;
-                }
-                if (await _userDao.IsUserNameDisabledAsync(userName))
-                {
-                    return false;
-                    //throw new Exception("The username is already disabled!");
-                }
-
-                UserRecord disabledUser = new UserRecord(userName, disabled: "1");
-                await _userDao.UpdateAsync(disabledUser);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-                //throw e;
-            }
-        }
-
-        /// <summary>
-        /// Enable a username to log in.
-        /// </summary>
-        /// <param name="userName"> username to enable </param>
-        public async Task<bool> EnableUserNameAsync(string userName)
-        {
-            try
-            {
-                if (! (await _userDao.UserNameExistsAsync(userName)))
-                {
-                    return false;
-                }
-                if (! (await _userDao.IsUserNameDisabledAsync(userName)))
-                {
-                    return false;
-                    //throw new Exception("The username is already enabled!");
-                }
-                // Enable the username.
-                UserRecord disabledUser = new UserRecord(userName, disabled: "0");
-                await _userDao.UpdateAsync(disabledUser);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-                //throw e;
-            }
-        }
+       
 
         /// <summary>
         /// Create a token for a logged-in user.
@@ -165,36 +106,6 @@ namespace TeamA.Exogredient.Services
                 return false;
                 //throw e;
             }
-        }
-
-
-        public async Task ChangePasswordAsync(string userName, string password)
-        {
-            try
-            {
-                // Check if the username exists.
-                if (! (await _userDao.UserNameExistsAsync(userName)))
-                {
-                    // TODO Create Custom Exception: For System
-                    throw new Exception("The username doesn't exsit.");
-                }
-                // Check if the username is disabled.
-                if (await _userDao.IsUserNameDisabledAsync(userName))
-                {
-                    // TODO Create Custom Exception: For User
-                    throw new Exception("This username is locked! To enable, contact the admin");
-                }
-                byte[] saltBytes = SecurityService.GenerateSalt();
-                string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
-                string saltString = SecurityService.BytesToHexString(saltBytes);
-                UserRecord newPasswordUser = new UserRecord(userName, password:hashedPassword, salt:saltString);
-                await _userDao.UpdateAsync(newPasswordUser);
-            }
-            catch(Exception e)
-            {
-                throw e;
-            }
-
         }
 
         public async Task<bool> SendCallVerificationAsync(string phoneNumber)

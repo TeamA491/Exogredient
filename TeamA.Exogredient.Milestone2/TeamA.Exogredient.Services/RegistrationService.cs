@@ -235,42 +235,6 @@ namespace TeamA.Exogredient.Services
             return transposedUsername + "@" + domain;
         }
 
-        /// <summary>
-        /// Checks if a canonicalized email exists in the database.
-        /// </summary>
-        /// <param name="canonEmail">Email that already has been canonicalized.</param>
-        /// <returns>Returns the value of bool to represent whether
-        /// an canonicalized email is unique.</returns>
-        public async Task<bool> CheckEmailUniquenessAsync(string canonEmail)
-        {
-            //return await _userDAO.CheckEmailUniquenessAsync(canonEmail);
-            return false;
-        }
-
-        /// <summary>
-        /// Checks if a phone number already exists in the database.
-        /// </summary>
-        /// <param name="phoneNumber">The phone number we are checking.</param>
-        /// <returns>Returns the value of bool to represent whether
-        /// a phone number is unique.</returns>
-        public async Task<bool> CheckPhoneUniquenessAsync(string phoneNumber)
-        {
-            //return await _userDAO.CheckPhoneUniquenessAsync(phoneNumber);
-            return false;
-        }
-
-        /// <summary>
-        /// Checks if a username already exists in the database.
-        /// </summary>
-        /// <param name="username">The username we are checking.</param>
-        /// <returns>Returns the value of bool to represent whether
-        /// an username is unique.</returns>
-        public async Task<bool> CheckUsernameUniquenessAsync(string username)
-        {
-            //return await _userDAO.CheckUsernameUniquenessAsync(username);
-            return false;
-        }
-
         public async Task<bool> CheckPasswordSecurityAsync(string plaintextPassword)
         {
             // Test if password contains context specific words.
@@ -632,23 +596,5 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
-        bool GenerateTempUser(string firstName, string lastName, string phoneNumber,
-            string username, string email, string digestPlusSalt)
-        {
-            //return async bool _UserDAO.GenerateTempUser(string username);
-            return false;
-        }
-
-        bool DeleteTempUser(string username)
-        {
-            //return async bool _UserDAO.DeleteTempUser(string username)
-            return false;
-        }
-
-        bool MakeTempUserPerm(string username)
-        {
-            //return async bool _UserDAO.MakeTempUserPerm(string username)
-            return false;
-        }
     }
 }

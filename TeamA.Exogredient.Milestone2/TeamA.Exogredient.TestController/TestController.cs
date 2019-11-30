@@ -17,7 +17,7 @@ namespace TeamA.Exogredient.TestController
 
             DataStoreLoggingDAO dsLoggingDao = new DataStoreLoggingDAO();
 
-            AdminFunctionalityService a = new AdminFunctionalityService();
+            UserManagementService a = new UserManagementService();
 
             CorruptedPasswordsDAO c = new CorruptedPasswordsDAO();
 

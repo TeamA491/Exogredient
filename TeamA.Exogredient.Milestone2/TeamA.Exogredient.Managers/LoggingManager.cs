@@ -12,14 +12,22 @@ namespace TeamA.Exogredient.Managers
 
         private readonly int _loggingRetriesAmount = 3;
 
+        private UserManagementService _userManagementService;
+        private FlatFileLoggingService _flatFileLoggingService;
+        private DataStoreLoggingService _dataStoreLoggingService;
+
+        public LoggingManager()
+        {
+            _userManagementService = new UserManagementService();
+            _flatFileLoggingService = new FlatFileLoggingService();
+            _dataStoreLoggingService = new DataStoreLoggingService();
+        }
+
         public async Task<bool> LogAsync(string timestamp, string operation, string identifier,
                                          string ipAddress, string errorType = "null")
         {
-            FlatFileLoggingService ffLogger = new FlatFileLoggingService();
-            DataStoreLoggingService dsLogger = new DataStoreLoggingService();
-
-            bool ffLoggingResult = await ffLogger.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
-            bool dsLoggingResult = await dsLogger.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
+            bool ffLoggingResult = await _flatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+            bool dsLoggingResult = await _dataStoreLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
 
             int count = 0;
 
@@ -27,11 +35,11 @@ namespace TeamA.Exogredient.Managers
             {
                 if (!ffLoggingResult)
                 {
-                    ffLoggingResult = await ffLogger.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                    ffLoggingResult = await _flatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
                 }
                 if (!dsLoggingResult)
                 {
-                    dsLoggingResult = await dsLogger.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
+                    dsLoggingResult = await _dataStoreLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
                 }
             }
 
@@ -41,11 +49,9 @@ namespace TeamA.Exogredient.Managers
             }
             else
             {
-                AdminFunctionalityService adminService = new AdminFunctionalityService();
-
                 if (!ffLoggingResult && !dsLoggingResult)
                 {
-                    await adminService.NotifySystemAdminAsync($"Data Store and Flat File Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}");
+                    await _userManagementService.NotifySystemAdminAsync($"Data Store and Flat File Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}");
                 }
                 else
                 {
@@ -55,14 +61,14 @@ namespace TeamA.Exogredient.Managers
 
                     if (ffLoggingResult)
                     {
-                        rollbackSuccess = await ffLogger.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                        rollbackSuccess = await _flatFileLoggingService.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
                     }
                     if (dsLoggingResult)
                     {
-                        rollbackSuccess = await dsLogger.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
+                        rollbackSuccess = await _dataStoreLoggingService.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
                     }
 
-                    await adminService.NotifySystemAdminAsync($"{(ffLoggingResult ? "Flat File" : "Data Store")} Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}");
+                    await _userManagementService.NotifySystemAdminAsync($"{(ffLoggingResult ? "Flat File" : "Data Store")} Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}");
                 }
 
                 return false;

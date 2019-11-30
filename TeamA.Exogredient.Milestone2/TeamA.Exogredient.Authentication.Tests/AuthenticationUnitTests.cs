@@ -10,7 +10,9 @@ namespace TeamA.Exogredient.Authentication.Tests
     [TestClass]
     public class AuthenticationUnitTests
     {
-        AuthenticationService authenticationService = new AuthenticationService();
+        private AuthenticationService _authenticationService = new AuthenticationService();
+        private UserManagementService _userManagementService = new UserManagementService();
+
         UserDAO userDAO = new UserDAO();
 
 
@@ -21,7 +23,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             //Arrange
             if (await userDAO.IsUserNameDisabledAsync(userName))
             {
-                await authenticationService.EnableUserNameAsync(userName);
+                await _userManagementService.EnableUserNameAsync(userName);
             }
 
             string hexPassword = SecurityService.ToHexString(password);
@@ -32,7 +34,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsTrue(result);
@@ -45,7 +47,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             //Arrange
             if (await userDAO.IsUserNameDisabledAsync(userName))
             {
-                await authenticationService.EnableUserNameAsync(userName);
+                await _userManagementService.EnableUserNameAsync(userName);
             }
             string hexPassword = SecurityService.ToHexString(password);
             byte[] publicKey = SecurityService.GetRSAPublicKey();
@@ -55,7 +57,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);
@@ -74,7 +76,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);
@@ -90,7 +92,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             //Act
             try
             {
-                await authenticationService.DisableUserNameAsync(userName);
+                await _userManagementService.DisableUserNameAsync(userName);
                 result = await userDAO.IsUserNameDisabledAsync(userName);
             }
             catch
@@ -112,7 +114,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             //Act
             try
             {
-                await authenticationService.EnableUserNameAsync(userName);
+                await _userManagementService.EnableUserNameAsync(userName);
                 result = await userDAO.IsUserNameDisabledAsync(userName);
             }
             catch
@@ -132,7 +134,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             
 
             //Act=
-            await authenticationService.ChangePasswordAsync(userName, password);
+            await _userManagementService.ChangePasswordAsync(userName, password);
             Tuple<string, string> result = await userDAO.GetStoredPasswordAndSaltAsync(userName);
 
             string storedPassword = result.Item1;

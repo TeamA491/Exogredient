@@ -8,13 +8,16 @@ namespace TeamA.Exogredient.Managers
 {
     public class AuthenticationManager
     {
-        IDictionary<string, int> _failureCounter;
-        AuthenticationService _authenticationService;
-        int _maxAttempts = 3;
+        private IDictionary<string, int> _failureCounter;
+        private AuthenticationService _authenticationService;
+        private UserManagementService _userManagementService;
+
+        private readonly int _maxAttempts = 3;
 
         public AuthenticationManager()
         {
             _authenticationService = new AuthenticationService();
+            _userManagementService = new UserManagementService();
             _failureCounter = new Dictionary<string, int>();
         }
 
@@ -42,7 +45,7 @@ namespace TeamA.Exogredient.Managers
                         _failureCounter[userName] += 1;
                         if (_failureCounter[userName] == _maxAttempts)
                         {
-                            await _authenticationService.DisableUserNameAsync(userName);
+                            await _userManagementService.DisableUserNameAsync(userName);
                         }
                         return false;
                     }
