@@ -25,11 +25,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{28
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{448E6539-B3AC-46CA-8E06-952D4D6C25F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.DAL", "TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj", "{79A9AEED-F013-4AF2-8A3B-57986E6AE05A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DAL", "TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj", "{79A9AEED-F013-4AF2-8A3B-57986E6AE05A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.Managers", "TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj", "{D3DC1144-3EA2-48BD-AC8D-C5C3FC84FD8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Managers", "TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj", "{D3DC1144-3EA2-48BD-AC8D-C5C3FC84FD8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.Services", "TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj", "{05D64C89-E08F-4AE6-98B1-5FD193587F8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Services", "TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj", "{05D64C89-E08F-4AE6-98B1-5FD193587F8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.ErrorHandling", "TeamA.Exogredient.ErrorHandling\TeamA.Exogredient.ErrorHandling.csproj", "{062939F6-2699-48E0-BBF2-E76D82A625F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{05D64C89-E08F-4AE6-98B1-5FD193587F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05D64C89-E08F-4AE6-98B1-5FD193587F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05D64C89-E08F-4AE6-98B1-5FD193587F8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
