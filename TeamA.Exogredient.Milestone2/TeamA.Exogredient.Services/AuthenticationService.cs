@@ -114,7 +114,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="userName"> the username used for login</param>
         /// <param name="encryptedPassword"> the password used for login encrypted </param>
         /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
-        /// <param name="aesIV"> AES Initialization Vector used for encryptinh the password </param>
+        /// <param name="aesIV"> AES Initialization Vector used for encrypting the password </param>
         /// <returns> true if the username and password are correct, false otherwise </returns>
         public async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
         {
@@ -196,14 +196,6 @@ namespace TeamA.Exogredient.Services
             }
 
         }
-
-
-        /*
-        public SendPhoneVerification(string phoneNumber)
-        {
-
-        }
-        */
 
         public async Task<bool> SendCallVerificationAsync(string phoneNumber)
         {
