@@ -14,7 +14,6 @@ namespace TeamA.Exogredient.Services
     public class AuthenticationService
     {
         UserDAO _userDao;
-        SecurityService _securityService;
 
         private readonly string _sendingEmail = "exogredient.system@gmail.com";
         private readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
@@ -25,13 +24,17 @@ namespace TeamA.Exogredient.Services
         public AuthenticationService()
         {
             _userDao = new UserDAO();
-            _securityService = new SecurityService();
         }
 
+        /// <summary>
+        /// Disable a username from logging in.
+        /// </summary>
+        /// <param name="userName"> username to disable </param>
         public async Task<bool> DisableUserNameAsync(string userName)
         {
             try
             {
+                // If the username doesn't exist, throw an exception.
                 if (! (await _userDao.UserNameExistsAsync(userName)))
                 {
                     return false;
@@ -41,7 +44,7 @@ namespace TeamA.Exogredient.Services
                     return false;
                     //throw new Exception("The username is already disabled!");
                 }
-                
+
                 UserRecord disabledUser = new UserRecord(userName, disabled: "1");
                 await _userDao.UpdateAsync(disabledUser);
 
@@ -54,6 +57,10 @@ namespace TeamA.Exogredient.Services
             }
         }
 
+        /// <summary>
+        /// Enable a username to log in.
+        /// </summary>
+        /// <param name="userName"> username to enable </param>
         public async Task<bool> EnableUserNameAsync(string userName)
         {
             try
@@ -67,6 +74,7 @@ namespace TeamA.Exogredient.Services
                     return false;
                     //throw new Exception("The username is already enabled!");
                 }
+                // Enable the username.
                 UserRecord disabledUser = new UserRecord(userName, disabled: "0");
                 await _userDao.UpdateAsync(disabledUser);
 
@@ -79,36 +87,68 @@ namespace TeamA.Exogredient.Services
             }
         }
 
+        /// <summary>
+        /// Create a token for a logged-in user.
+        /// </summary>
+        /// <param name="userName"> logged-in username </param>
+        /// <returns> string of token that represents the user type and unique ID of the username </returns>
+        private string CreateToken(string userName)
+        {
+            // Get the user type of the username.
+            string userType = _userDao.GetUserType(userName);
 
+            // Craete a dictionary that represents the user type and unique ID.
+            Dictionary<string, string> userInfo = new Dictionary<string, string>()
+            {
+                {"userType", userType},
+                {"id", userName }
+            };
+
+        /// <summary>
+        /// Check if the username and the password are correct.
+        /// </summary>
+        /// <param name="userName"> the username used for login</param>
+        /// <param name="encryptedPassword"> the password used for login encrypted </param>
+        /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
+        /// <param name="aesIV"> AES Initialization Vector used for encryptinh the password </param>
+        /// <returns> true if the username and password are correct, false otherwise </returns>
         public async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
         {
             try
             {
+                // Check if the username exists.
                 if (! (await _userDao.UserNameExistsAsync(userName)))
                 {
                     return false;
                 }
+                // Check if the username is disabled.
                 if (await _userDao.IsUserNameDisabledAsync(userName))
                 {
-                    // HACK make custom exception
+                    // TODO Create Custom Exception: For User
                     throw new Exception("This username is locked! To enable, contact the admin");
                 }
 
-                RSAParameters privateKey = SecurityService.GetRSAPrivateKey();
-                byte[] aesKey = _securityService.DecryptRSA(aesKeyEncrypted, privateKey);
-                string hexPassword = _securityService.DecryptAES(encryptedPassword, aesKey, aesIV);
-                
-                Tuple<string, string> saltAndPassword = await _userDao.GetStoredPasswordAndSaltAsync(userName);
+                byte[] privateKey = SecurityService.GetRSAPrivateKey();
+                byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted,privateKey);
+                // Decrypt the encrypted password.
+                string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
 
+                // Get the password and the salt stored corresponding to the username.
+                Tuple<string, string> saltAndPassword = await _userDao.GetStoredPasswordAndSaltAsync(userName);
                 string storedPassword = saltAndPassword.Item1;
                 string saltString = saltAndPassword.Item2;
 
-                byte[] saltBytes = _securityService.HexStringToBytes(saltString);
-                string hashedPassword = _securityService.HashPassword(hexPassword, saltBytes, 100, 32);
+                // Convert the salt to byte array.
+                byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
+                //Number of iterations for has && length of the hash in bytes.
+                // Hash the decrypted password with the byte array of salt.
+                string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
-
-                if (storedPassword.Equals(hashedPassword)) 
+                //Check if the stored password matches the hashed password
+                if (storedPassword.Equals(hashedPassword))
                 {
+                    // TODO Uncomment when GenerateJWS is implemented
+                    //string token = CreateToken(userName);
                     return true;
                 }
                 else
@@ -124,13 +164,38 @@ namespace TeamA.Exogredient.Services
         }
 
 
-        /*
-        public SendPhoneVerification(string phoneNumber)
+        public void ChangePassword(string userName, string password)
         {
+            try
+            {
+                // Check if the username exists.
+                if (!_userDao.UserNameExists(userName))
+                {
+                    // TODO Create Custom Exception: For System
+                    throw new Exception("The username doesn't exsit.");
+                }
+                // Check if the username is disabled.
+                if (_userDao.IsUserNameDisabled(userName))
+                {
+                    // TODO Create Custom Exception: For User
+                    throw new Exception("This username is locked! To enable, contact the admin");
+                }
+                byte[] saltBytes = SecurityService.GenerateSalt();
+                string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
+                string saltString = SecurityService.BytesToHexString(saltBytes);
+                UserRecord newPasswordUser = new UserRecord(userName, password:hashedPassword, salt:saltString);
+                _userDao.Update(newPasswordUser);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
 
         }
 
-        public generateJWT()
+
+        /*
+        public SendPhoneVerification(string phoneNumber)
         {
 
         }

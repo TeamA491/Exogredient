@@ -11,13 +11,12 @@ namespace TeamA.Exogredient.Authentication.Tests
     public class AuthenticationUnitTests
     {
         AuthenticationService authenticationService = new AuthenticationService();
-        SecurityService ss = new SecurityService();
         UserDAO userDAO = new UserDAO();
 
 
         [DataTestMethod]
-        [DataRow("charles971026", "password123")]
-        public async Task Authenticate_CorrectInputs_ReturnTrue(string userName, string password)
+        [DataRow("charles971026", "correctpassword")]
+        public void AuthenticationService_Authenticate_CorrectInputs(string userName, string password)
         {
             //Arrange
             if (await userDAO.IsUserNameDisabledAsync(userName))
@@ -25,39 +24,57 @@ namespace TeamA.Exogredient.Authentication.Tests
                 await authenticationService.EnableUserNameAsync(userName);
             }
 
-            string hexPassword = ss.ToHexString(password);
-            RSAParameters publicKey = SecurityService.GetRSAPublicKey();
-            RSAParameters privateKey = SecurityService.GetRSAPrivateKey();
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
-            byte[] encryptedKey = ss.EncryptRSA(key, publicKey);
-            byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
+            string hexPassword = SecurityService.ToHexString(password);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
+            byte[] encryptedKey = SecurityService.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await authenticationService.AuthenticateAsync("charles971026", encryptedPassword, encryptedKey, IV);
+            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsTrue(result);
         }
 
         [DataTestMethod]
-        [DataRow("charles971026", "password")]
-        public async Task Authenticate_IncorrectInputs_ReturnFalse(string userName, string password)
+        [DataRow("charles971026", "wrongpassword")]
+        public void AuthenticationService_Authenticate_IncorrectPassword(string userName, string password)
         {
             //Arrange
             if (await userDAO.IsUserNameDisabledAsync(userName))
             {
                 await authenticationService.EnableUserNameAsync(userName);
             }
-            string hexPassword = ss.ToHexString(password);
-            RSAParameters publicKey = SecurityService.GetRSAPublicKey();
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
-            byte[] encryptedKey = ss.EncryptRSA(key, publicKey);
-            byte[] encryptedPassword = ss.EncryptAES(hexPassword, key, IV);
+            string hexPassword = SecurityService.ToHexString(password);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
+            byte[] encryptedKey = SecurityService.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await authenticationService.AuthenticateAsync("charles971026", encryptedPassword, encryptedKey, IV);
+            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
+
+            //Assert
+            Assert.IsFalse(result);
+        }
+
+        [DataTestMethod]
+        [DataRow("charles9710", "correctpassword")]
+        public void AuthenticationService_Authenticate_IncorrectUserName(string userName, string password)
+        {
+            //Arrange
+            string hexPassword = SecurityService.ToHexString(password);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
+            byte[] encryptedKey = SecurityService.EncryptRSA(key, publicKey);
+            byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
+
+            //Act
+            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);
@@ -65,9 +82,8 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public async Task DisableUserName_ValidUserName_UserNameDisabled(string userName)
+        public void AuthenticationService_DisableUserName_ValidUserName(string userName)
         {
-
             //Arrange
             bool result;
 
@@ -77,14 +93,53 @@ namespace TeamA.Exogredient.Authentication.Tests
                 await authenticationService.DisableUserNameAsync(userName);
                 result = await userDAO.IsUserNameDisabledAsync(userName);
             }
-            catch(Exception e)
+            catch
             {
                 result = await userDAO.IsUserNameDisabledAsync(userName);
             }
 
             //Assert
             Assert.IsTrue(result);
+        }
 
+        [DataTestMethod]
+        [DataRow("charles971026")]
+        public void AuthenticationService_EnableUserName_ValidUserName(string userName)
+        {
+            //Arrange
+            bool result;
+
+            //Act
+            try
+            {
+                authenticationService.EnableUserName(userName);
+                result = userDAO.IsUserNameDisabled(userName);
+            }
+            catch
+            {
+                result = userDAO.IsUserNameDisabled(userName);
+            }
+
+            //Assert
+            Assert.IsFalse(result);
+        }
+
+        [DataTestMethod]
+        [DataRow("testuser","newpassword")]
+        public void AuthenticationService_ChangePassword_ValidUserName(string userName, string password)
+        {
+            //Arrange
+            string storedPassword;
+            string saltString;
+
+            //Act=
+            authenticationService.ChangePassword(userName, password);
+            userDAO.GetStoredPasswordAndSalt(userName, out storedPassword, out saltString);
+            byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
+            string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
+
+            //Assert
+            Assert.IsTrue(storedPassword.Equals(hashedPassword));
         }
 
     }

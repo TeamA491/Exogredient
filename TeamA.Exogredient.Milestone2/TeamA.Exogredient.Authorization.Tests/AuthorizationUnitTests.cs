@@ -1,9 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TeamA.Exogredient.Service.Test
+namespace TeamA.Exogredient.Authorization.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class AuthorizationUnitTests
     {
         [TestMethod]
         public void TestMethod1()

@@ -8,17 +8,15 @@ namespace TeamA.Exogredient.Security.Tests
 {
     [TestClass]
     public class SecurityUnitTests
-    {
-        SecurityService ss = new SecurityService();
-
+    { 
         [DataTestMethod]
         [DataRow(new byte[] { 104, 101, 108, 108, 111 }, "68656C6C6F")]
-        public void BytesToHexString_GivenBytes_EqualsExpected(byte[] bytes, string expected)
+        public void SecurityService_BytesToHexString_GenerateCorrectHexString(byte[] bytes, string expected)
         {
             //Arrange
 
             //Act
-            string actual = ss.BytesToHexString(bytes);
+            string actual = SecurityService.BytesToHexString(bytes);
 
             //Assert
             Assert.IsTrue(actual.Equals(expected));
@@ -27,15 +25,15 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("password")]
-        public void EncryptDecryptAES_GivenString_EqualsDecryptedOutput(string plainData)
+        public void SecurityService_EncryptAESDecryptAES_RevertBackToOriginalData(string plainData)
         {
             //Arrange
-            byte[] key = ss.GenerateAESKey();
-            byte[] IV = ss.GenerateAESIV();
+            byte[] key = SecurityService.GenerateAESKey();
+            byte[] IV = SecurityService.GenerateAESIV();
 
             //Act
-            byte[] encryptedData = ss.EncryptAES(plainData, key, IV);
-            string decryptedData = ss.DecryptAES(encryptedData, key, IV);
+            byte[] encryptedData = SecurityService.EncryptAES(plainData, key, IV);
+            string decryptedData = SecurityService.DecryptAES(encryptedData, key, IV);
 
             //Assert
             Assert.IsTrue(plainData.Equals(decryptedData));
@@ -43,16 +41,15 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow(new byte[] {90,127,65,9,255,0,1,23,44,77,200,163})]
-        public void EncryptDecryptRSA_GivenBytes_EqualsDecryptedOutput(byte[] plainData)
+        public void SecurityService_EncryptRSADecryptRSA_RevertBackToOriginalData(byte[] plainData)
         {
             //Arrange
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            RSAParameters publicKey = rsa.ExportParameters(false);
-            RSAParameters privateKey = rsa.ExportParameters(true);
+            byte[] publicKey = SecurityService.GetRSAPublicKey();
+            byte[] privateKey = SecurityService.GetRSAPrivateKey();
 
             //Act
-            byte[] encryptedData = ss.EncryptRSA(plainData, publicKey);
-            byte[] decryptedData = ss.DecryptRSA(encryptedData, privateKey);
+            byte[] encryptedData = SecurityService.EncryptRSA(plainData, publicKey);
+            byte[] decryptedData = SecurityService.DecryptRSA(encryptedData, privateKey);
 
             //Assert
             Assert.IsTrue(plainData.SequenceEqual(decryptedData));
@@ -60,12 +57,12 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("testing", "74657374696E67")]
-        public void ToHexString_GivenString_EqualsExpected(string original, string expected)
+        public void SecurityService_ToHexString_GenerateCorrectHexString(string original, string expected)
         {
             //Arrange
 
             //Act
-            string actual = ss.ToHexString(original);
+            string actual = SecurityService.ToHexString(original);
 
             //Assert
             Assert.IsTrue(expected.Equals(actual));
@@ -73,16 +70,17 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("string1")]
-        public void HashPassword_HashSameStringTwoSeparateTimes_HashcodesMatch(string password)
+        public void SecurityService_HashWithKDF_GenerateSameHashWithSameInputs(string password)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
-            int iterations = 100;
-            int hashBytesLength = 256;
+            byte[] salt = SecurityService.GenerateSalt();
+            string hexPassword = SecurityService.ToHexString(password);
 
             //Act
-            string a = ss.HashPassword(password, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt, iterations, hashBytesLength);
+            string a = SecurityService.HashWithKDF(hexPassword, salt);
+            string b = SecurityService.HashWithKDF(hexPassword, salt);
+            Console.WriteLine(a);
+            Console.WriteLine(b);
 
             //Assert
             Assert.IsTrue(a.Equals(b));
@@ -90,16 +88,16 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("string1", "string2")]
-        public void HashPassword_HashTwoDifferentStrings_HashCodesNotMatch(string password1, string password2)
+        public void SecurityService_HashWithKDF_GenerateDifferentHashesWithDifferentPasswords(string password1, string password2)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
-            int iterations = 100;
-            int hashBytesLength = 256;
+            byte[] salt = SecurityService.GenerateSalt();
+            string hexPassword1 = SecurityService.ToHexString(password1);
+            string hexPassword2 = SecurityService.ToHexString(password2);
 
             //Act
-            string a = ss.HashPassword(password1, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password2, salt, iterations, hashBytesLength);
+            string a = SecurityService.HashWithKDF(hexPassword1, salt);
+            string b = SecurityService.HashWithKDF(hexPassword2, salt);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -107,17 +105,16 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("string1")]
-        public void HashPassword_HashSameStringTwoSeparateTimesWithDifferentSalt_HashCodesNotMatch(string password)
+        public void SecurityService_HashWithKDF_GenerateDifferentHashesWithDifferentSalts(string password)
         {
             //Arrange
-            byte[] salt1 = ss.GenerateSalt(32);
-            byte[] salt2 = ss.GenerateSalt(32);
-            int iterations = 100;
-            int hashBytesLength = 256;
+            byte[] salt1 = SecurityService.GenerateSalt();
+            byte[] salt2 = SecurityService.GenerateSalt();
+            string hexPassword = SecurityService.ToHexString(password);
 
             //Act
-            string a = ss.HashPassword(password, salt1, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt2, iterations, hashBytesLength);
+            string a = SecurityService.HashWithKDF(hexPassword, salt1);
+            string b = SecurityService.HashWithKDF(hexPassword, salt2);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -125,33 +122,16 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("string1")]
-        public void HashPassword_HashSameStringTwoSeparateTimesWithDifferentIterations_HashCodesNotMatch(string password)
+        public void SecurityService_HashWithKDF_GenerateDifferentHashesWithDifferentHashLengths(string password)
         {
             //Arrange
-            byte[] salt = ss.GenerateSalt(32);
-            int iterations = 100;
-            int hashBytesLength = 256;
+            byte[] salt = SecurityService.GenerateSalt();
+            int hashBytesLength = 32;
+            string hexPassword = SecurityService.ToHexString(password);
 
             //Act
-            string a = ss.HashPassword(password, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt, iterations + 10, hashBytesLength);
-
-            //Assert
-            Assert.IsFalse(a.Equals(b));
-        }
-
-        [DataTestMethod]
-        [DataRow("string1")]
-        public void HashPassword_HashSameStringTwoSeparateTimesWithDifferentHashLength_HashCodesNotMatch(string password)
-        {
-            //Arrange
-            byte[] salt = ss.GenerateSalt(32);
-            int iterations = 100;
-            int hashBytesLength = 256;
-
-            //Act
-            string a = ss.HashPassword(password, salt, iterations, hashBytesLength);
-            string b = ss.HashPassword(password, salt, iterations, hashBytesLength-128);
+            string a = SecurityService.HashWithKDF(hexPassword, salt, hashBytesLength);
+            string b = SecurityService.HashWithKDF(hexPassword, salt, hashBytesLength-16);
 
             //Assert
             Assert.IsFalse(a.Equals(b));
@@ -159,12 +139,12 @@ namespace TeamA.Exogredient.Security.Tests
 
         [DataTestMethod]
         [DataRow("A3D1FF2CB29F5FDC",new byte[] {163, 209, 255, 44, 178, 159, 95, 220})]
-        public void HexStringToBytes_GivenString_MatchesExpected(string hexString, byte[] expected)
+        public void SecurityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
         {
             //Arrange
 
             //Act
-            byte[] actual = ss.HexStringToBytes(hexString);
+            byte[] actual = SecurityService.HexStringToBytes(hexString);
 
             //Assert
             Assert.IsTrue(expected.SequenceEqual(actual));
