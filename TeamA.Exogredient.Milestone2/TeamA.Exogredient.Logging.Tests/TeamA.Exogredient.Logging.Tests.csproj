@@ -16,4 +16,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
+  </ItemGroup>
+
 </Project>
