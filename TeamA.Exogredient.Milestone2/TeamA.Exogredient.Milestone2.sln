@@ -33,6 +33,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Registrat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Security.Tests", "TeamA.Exogredient.Security.Tests\TeamA.Exogredient.Security.Tests.csproj", "{05A12A0A-A4BB-40E2-9339-5763FB3E77DC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Managers", "TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj", "{D3DC1144-3EA2-48BD-AC8D-C5C3FC84FD8C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Services", "TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj", "{05D64C89-E08F-4AE6-98B1-5FD193587F8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.ErrorHandling", "TeamA.Exogredient.ErrorHandling\TeamA.Exogredient.ErrorHandling.csproj", "{062939F6-2699-48E0-BBF2-E76D82A625F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +85,10 @@ Global
 		{05A12A0A-A4BB-40E2-9339-5763FB3E77DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05A12A0A-A4BB-40E2-9339-5763FB3E77DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05A12A0A-A4BB-40E2-9339-5763FB3E77DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062939F6-2699-48E0-BBF2-E76D82A625F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
