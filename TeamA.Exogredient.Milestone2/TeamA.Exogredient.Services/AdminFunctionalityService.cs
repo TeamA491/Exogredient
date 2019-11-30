@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Net.Mail;
-using System.Text;
+﻿using MailKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using System;
 using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.Services
@@ -10,10 +10,7 @@ namespace TeamA.Exogredient.Services
     public class AdminFunctionalityService
     {
         private readonly string _sendingEmail = "exogredient.system@gmail.com";
-
-        // HACK: replace with actual password
-        private readonly string _sendingEmailPassword = "****";
-
+        private readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
         private readonly string _receivingEmail = "TEAMA.CS491@gmail.com";
 
         /// <summary>
@@ -22,28 +19,37 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="message">The message you want to send.</param>
         /// <returns>A bool representing whether the process succeeded.</returns>
-        public async Task<bool> NotifySystemAdminAsync(string message)
+        public async Task<bool> NotifySystemAdminAsync(string body)
         {
             try
             {
-                MailMessage mail = new MailMessage();
-                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+                string title = DateTime.UtcNow.ToString("MM-dd-yyyy");
 
-                // TODO: learn invariant culture: https://stackoverflow.com/questions/10348952/how-i-can-convert-datetime-now-in-c-sharp-to-yyyy-mm-dd-hhmmss-sssssss
-                string title = DateTime.UtcNow.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
+                var message = new MimeMessage();
+                var bodyBuilder = new BodyBuilder();
 
-                mail.From = new MailAddress(_sendingEmail);
-                mail.To.Add(_receivingEmail);
-                mail.Subject = title;
-                mail.Body = $"{message}";
+                message.From.Add(new MailboxAddress($"{_sendingEmail}"));
+                message.To.Add(new MailboxAddress($"{_receivingEmail}"));
 
-                SmtpServer.Port = 587;
-                SmtpServer.Credentials = new System.Net.NetworkCredential(_sendingEmail, _sendingEmailPassword);
-                SmtpServer.EnableSsl = true;
+                message.Subject = title;
 
-                await SmtpServer.SendMailAsync(mail);
+                Random generator = new Random();
+                string emailCode = generator.Next(100000, 1000000).ToString();
 
-                SmtpServer.Dispose();
+                bodyBuilder.HtmlBody = body;
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                var client = new SmtpClient
+                {
+                    ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
+                };
+
+                await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+                await client.AuthenticateAsync($"{_sendingEmail}", $"{_sendingEmailPassword}");
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+                client.Dispose();
 
                 return true;
             }

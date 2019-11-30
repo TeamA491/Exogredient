@@ -18,7 +18,7 @@ namespace TeamA.Exogredient.Services
         private SecurityService _securityService;
 
         // No < or > to protect from SQL injections.
-        private List<char> _alphaNumericSpecialCharacters = new List<char>()
+        private readonly List<char> _alphaNumericSpecialCharacters = new List<char>()
         {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -26,9 +26,64 @@ namespace TeamA.Exogredient.Services
             '[', '}', ']', '|', '\\', '"', '\'', ':', ';', '?', '/', '.', ','
         };
 
-        private List<char> _numericalCharacters = new List<char>()
+        private readonly List<char> _numericalCharacters = new List<char>()
         {
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+        };
+
+        // =================================================
+        // NIST CHECKING:
+        // =================================================
+
+        private readonly int _maxRepetitionOrSequence = 3;
+
+        private readonly List<char> _lettersLower = new List<char>()
+        {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        };
+
+        private readonly List<char> _lettersUpper = new List<char>()
+        {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        };
+
+        private readonly List<char> _numbers = new List<char>()
+        {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        };
+
+        private readonly IDictionary<char, int> _lettersLowerToPositions = new Dictionary<char, int>()
+        {
+            {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8},
+            {'i', 9}, {'j', 10}, {'k', 11}, {'l', 12}, {'m', 13}, {'n', 14}, {'o', 15}, {'p', 16},
+            {'q', 17}, {'r', 18}, {'s', 19}, {'t', 20}, {'u', 21}, {'v', 22}, {'w', 23}, {'x', 24},
+            {'y', 25}, {'z', 26}
+        };
+
+        private readonly IDictionary<char, int> _lettersUpperToPositions = new Dictionary<char, int>()
+        {
+            {'A', 1}, {'B', 2}, {'C', 3}, {'D', 4}, {'E', 5}, {'F', 6}, {'G', 7}, {'H', 8},
+            {'I', 9}, {'J', 10}, {'K', 11}, {'L', 12}, {'M', 13}, {'N', 14}, {'O', 15}, {'P', 16},
+            {'Q', 17}, {'R', 18}, {'S', 19}, {'T', 20}, {'U', 21}, {'V', 22}, {'W', 23}, {'X', 24},
+            {'Y', 25}, {'Z', 26}
+        };
+
+        private readonly IDictionary<int, char> _positionsToLettersLower = new Dictionary<int, char>()
+        {
+            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'}, {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
+            {9, 'i'}, {10, 'j'}, {11, 'k'}, {12, 'l'}, {13, 'm'}, {14, 'n'}, {15, 'o'}, {16, 'p'},
+            {17, 'q'}, {18, 'r'}, {19, 's'}, {20, 't'}, {21, 'u'}, {22, 'v'}, {23, 'w'}, {24, 'x'},
+            {25, 'y'}, {26, 'z'}
+        };
+
+        private readonly IDictionary<int, char> _positionsToLettersUpper = new Dictionary<int, char>()
+        {
+            {1, 'A'}, {2, 'B'}, {3, 'C'}, {4, 'D'}, {5, 'E'}, {6, 'F'}, {7, 'G'}, {8, 'H'},
+            {9, 'I'}, {10, 'J'}, {11, 'K'}, {12, 'L'}, {13, 'M'}, {14, 'N'}, {15, 'O'}, {16, 'P'},
+            {17, 'Q'}, {18, 'R'}, {19, 'S'}, {20, 'T'}, {21, 'U'}, {22, 'V'}, {23, 'W'}, {24, 'X'},
+            {25, 'Y'}, {26, 'Z'}
         };
 
         /// <summary>
@@ -258,31 +313,322 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            // Check password for repeated consecutive alphanumeric and special characters, 4 or more.
-            string pattern = @"(a{3,}|b{3,}|c{3,}|d{3,}|e{3,}|f{3,}|g{3,}|h{3,}|i{3,}|j{3,}|k{3,}" +
-                             @"|l{3,}|m{3,}|n{3,}|o{3,}|p{3,}|q{3,}|r{3,}|s{3,}|t{3,}|u{3,}|v{3,}" +
-                             @"|w{3,}|x{3,}|y{3,}|z{3,}|1{3,}|2{3,}|3{3,}|4{3,}|5{3,}|6{3,}|7{3,}" +
-                             @"|8{3,}|9{3,}|0{3,}|~{3,}|`{3,}|@{3,}|#{3,}|\${3,}|%{3,}|\^{3,}|&{3,}" +
-                             @"|!{3,}|\*{3,}|\({3,}|\){3,}|_{3,}|-{3,}|\+{3,}|={3,}|{{3,}|\[{3,}|}{3,}" +
-                             @"|]{3,}|\|{3,}|\\{3,}|""{3,}|'{3,}|:{3,}|;{3,}|\?{3,}|\/{3,}|\.{3,}|,{3,}" +
-                             @"|A{3,}|B{3,}|C{3,}|D{3,}|E{3,}|F{3,}|G{3,}|H{3,}|I{3,}|J{3,}|K{3,}" +
-                             @"|L{3,}|M{3,}|N{3,}|O{3,}|P{3,}|Q{3,}|R{3,}|S{3,}|T{3,}|U{3,}|V{3,}" +
-                             @"|W{3,}|X{3,}|Y{3,}|Z{3,})";
+            // Repetition and sequence checking.
+            int patternCount = 1;
 
-            // Check password for sequential sequences of numbers or letters in both forward and reverse order.
-            string sequences = @"(123|234|345|456|567|678|789|890|901|012|987|876|765|654|543|432|321|210|109|098" +
-                               @"|zyx|yxw|xwv|wvu|vut|uts|tsr|srq|rqp|qpo|pon|onm|nml|mlk|lkj|kji|jih" +
-                               @"|ihg|hgf|gfe|fed|edc|dcb|cba|baz|azy|abc|bcd|cde|def|efg|fgh|ghi|hij" +
-                               @"|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|yza|zab)";
+            bool repetition = false;
+            bool increasingSequence = false;
+            bool decreasingSequence = false;
 
-            // Last check as it's the slowest check.
+            char previousCharacter = '\b';
 
-            Regex regexPattern = new Regex(pattern);
-            Regex regexSequence = new Regex(sequences);
+            bool first = true;
 
-            if (regexPattern.IsMatch(plaintextPassword) || regexSequence.IsMatch(plaintextPassword))
+            foreach (char character in plaintextPassword)
             {
-                return false;
+                if (first)
+                {
+                    first = false;
+                    previousCharacter = character;
+                }
+                else
+                {
+                    // Continue flags, or stop them.
+                    if (repetition || increasingSequence || decreasingSequence)
+                    {
+                        if (repetition)
+                        {
+                            if (character == previousCharacter)
+                            {
+                                patternCount++;
+                            }
+                            else
+                            {
+                                repetition = false;
+                                patternCount = 1;
+                            }
+                        }
+                        else if (increasingSequence)
+                        {
+                            int previousPosition = 0;
+                            bool number = false;
+                            bool upperLetter = false;
+                            bool lowerLetter = false;
+
+                            if (_lettersLower.Contains(previousCharacter))
+                            {
+                                lowerLetter = true;
+                                previousPosition = _lettersLowerToPositions[previousCharacter];
+                            }
+                            else if (_lettersUpper.Contains(previousCharacter))
+                            {
+                                upperLetter = true;
+                                previousPosition = _lettersUpperToPositions[previousCharacter];
+                            }
+                            else if (_numbers.Contains(previousCharacter))
+                            {
+                                number = true;
+                                // Characters represented by sequential numbers in every utf-16
+                                previousPosition = previousCharacter - '0';
+                            }
+
+                            int nextPosition = previousPosition + 1;
+
+                            if (number)
+                            {
+                                if (nextPosition == 10)
+                                {
+                                    nextPosition = 1;
+                                }
+
+                                if (_numbers[nextPosition] == character)
+                                {
+                                    patternCount++;
+                                }
+                                else
+                                {
+                                    increasingSequence = false;
+                                    patternCount = 1;
+                                }
+                            }
+                            else if (upperLetter)
+                            {
+                                if (nextPosition == 27)
+                                {
+                                    nextPosition = 1;
+                                }
+
+                                if (_positionsToLettersUpper[nextPosition] == character)
+                                {
+                                    patternCount++;
+                                }
+                                else
+                                {
+                                    increasingSequence = false;
+                                    patternCount = 1;
+                                }
+                            }
+                            else if (lowerLetter)
+                            {
+                                if (nextPosition == 27)
+                                {
+                                    nextPosition = 1;
+                                }
+
+                                if (_positionsToLettersLower[nextPosition] == character)
+                                {
+                                    patternCount++;
+                                }
+                                else
+                                {
+                                    increasingSequence = false;
+                                    patternCount = 1;
+                                }
+                            }
+                        }
+                        else if (decreasingSequence)
+                        {
+                            int previousPosition = 0;
+                            bool number = false;
+                            bool upperLetter = false;
+                            bool lowerLetter = false;
+
+                            if (_lettersLower.Contains(previousCharacter))
+                            {
+                                lowerLetter = true;
+                                previousPosition = _lettersLowerToPositions[previousCharacter];
+                            }
+                            else if (_lettersUpper.Contains(previousCharacter))
+                            {
+                                upperLetter = true;
+                                previousPosition = _lettersUpperToPositions[previousCharacter];
+                            }
+                            else if (_numbers.Contains(previousCharacter))
+                            {
+                                number = true;
+                                // Characters represented by sequential numbers in every utf-16
+                                previousPosition = previousCharacter - '0';
+                            }
+
+                            int nextPosition = previousPosition - 1;
+
+                            if (number)
+                            {
+                                if (nextPosition == 0)
+                                {
+                                    nextPosition = 9;
+                                }
+
+                                if (_numbers[nextPosition] == character)
+                                {
+                                    patternCount++;
+                                }
+                                else
+                                {
+                                    decreasingSequence = false;
+                                    patternCount = 1;
+                                }
+                            }
+                            else if (upperLetter)
+                            {
+                                if (nextPosition == 0)
+                                {
+                                    nextPosition = 26;
+                                }
+
+                                if (_positionsToLettersUpper[nextPosition] == character)
+                                {
+                                    patternCount++;
+                                }
+                                else
+                                {
+                                    decreasingSequence = false;
+                                    patternCount = 1;
+                                }
+                            }
+                            else if (lowerLetter)
+                            {
+                                if (nextPosition == 0)
+                                {
+                                    nextPosition = 26;
+                                }
+
+                                if (_positionsToLettersLower[nextPosition] == character)
+                                {
+                                    patternCount++;
+                                }
+                                else
+                                {
+                                    decreasingSequence = false;
+                                    patternCount = 1;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Set flags for first instance of a pattern.
+                        if (previousCharacter == character)
+                        {
+                            patternCount++;
+                            repetition = true;
+                        }
+                        else
+                        {
+                            if (_lettersLower.Contains(character))
+                            {
+                                int previousPosition = 0;
+
+                                if (_lettersLower.Contains(previousCharacter))
+                                {
+                                    previousPosition = _lettersLowerToPositions[previousCharacter];
+
+                                    int nextPositionIncrease = previousPosition + 1;
+                                    int nextPositionDecrease = previousPosition - 1;
+
+                                    if (nextPositionIncrease == 27)
+                                    {
+                                        nextPositionIncrease = 1;
+                                    }
+
+                                    if (nextPositionDecrease == 0)
+                                    {
+                                        nextPositionDecrease = 26;
+                                    }
+
+                                    if (_positionsToLettersLower[nextPositionIncrease] == character)
+                                    {
+                                        patternCount++;
+                                        increasingSequence = true;
+                                    }
+
+                                    if (_positionsToLettersLower[nextPositionDecrease] == character)
+                                    {
+                                        patternCount++;
+                                        decreasingSequence = true;
+                                    }
+                                }
+                            }
+                            else if (_lettersUpper.Contains(character))
+                            {
+                                int previousPosition = 0;
+
+                                if (_lettersUpper.Contains(previousCharacter))
+                                {
+                                    previousPosition = _lettersUpperToPositions[previousCharacter];
+
+                                    int nextPositionIncrease = previousPosition + 1;
+                                    int nextPositionDecrease = previousPosition - 1;
+
+                                    if (nextPositionIncrease == 27)
+                                    {
+                                        nextPositionIncrease = 1;
+                                    }
+
+                                    if (nextPositionDecrease == 0)
+                                    {
+                                        nextPositionDecrease = 26;
+                                    }
+
+                                    if (_positionsToLettersUpper[nextPositionIncrease] == character)
+                                    {
+                                        patternCount++;
+                                        increasingSequence = true;
+                                    }
+
+                                    if (_positionsToLettersUpper[nextPositionDecrease] == character)
+                                    {
+                                        patternCount++;
+                                        decreasingSequence = true;
+                                    }
+                                }
+                            }
+                            else if (_numbers.Contains(character))
+                            {
+                                int previousPosition = 0;
+
+                                if (_numbers.Contains(previousCharacter))
+                                {
+                                    previousPosition = previousCharacter - '0';
+
+                                    int nextPositionIncrease = previousPosition + 1;
+                                    int nextPositionDecrease = previousPosition - 1;
+
+                                    if (nextPositionIncrease == 10)
+                                    {
+                                        nextPositionIncrease = 1;
+                                    }
+
+                                    if (nextPositionDecrease == 0)
+                                    {
+                                        nextPositionDecrease = 9;
+                                    }
+
+                                    if (_numbers[nextPositionIncrease] == character)
+                                    {
+                                        patternCount++;
+                                        increasingSequence = true;
+                                    }
+
+                                    if (_numbers[nextPositionDecrease] == character)
+                                    {
+                                        patternCount++;
+                                        decreasingSequence = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Constant check at end of each iteration to possibly return false from this function.
+                    if (patternCount == _maxRepetitionOrSequence)
+                    {
+                        return false;
+                    }
+
+                    // If here, we go to the next iteration.
+                    previousCharacter = character;
+                }
             }
 
             return true;

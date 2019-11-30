@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using MailKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using System;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Types;
+using Twilio.Rest.Preview.AccSecurity.Service;
 
 namespace TeamA.Exogredient.Services
 {
@@ -15,6 +15,12 @@ namespace TeamA.Exogredient.Services
     {
         UserDAO _userDao;
         SecurityService _securityService;
+
+        private readonly string _sendingEmail = "exogredient.system@gmail.com";
+        private readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
+        private readonly string _twilioAccountSID = "AC94d03adc3d2da651c16c82932c29b047";
+        private readonly string _twilioPathServiceSID = "VAa9682f046b6f511b9aa1807d4e2949e5";
+        private readonly string _twilioAuthorizationToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN", EnvironmentVariableTarget.User);
 
         public AuthenticationService()
         {
@@ -130,23 +136,19 @@ namespace TeamA.Exogredient.Services
         }
         */
 
-        public async Task<bool> SendSMSCodeAsync(string phoneNumber)
+        public async Task<bool> SendCallVerificationAsync(string phoneNumber)
         {
             try
             {
-                string accountSID = "AC94d03adc3d2da651c16c82932c29b047";
-                string authorizationToken = "e061e796230f25411e208aa5f3257361";
+                string accountSID = _twilioAccountSID;
+                string authorizationToken = _twilioAuthorizationToken;
 
                 TwilioClient.Init(accountSID, authorizationToken);
 
-                Random random = new Random();
-
-                int code = random.Next(100000, 1000000);
-
-                var message = await MessageResource.CreateAsync(
-                    body: $"Your Exogredient verification code is: {code}",
-                    from: new PhoneNumber("+18474533559"),
-                    to: new PhoneNumber("+19499815506")
+                var verification = await VerificationResource.CreateAsync(
+                    to: $"+1{phoneNumber}",
+                    channel: "call",
+                    pathServiceSid: _twilioPathServiceSID
                 );
 
                 return true;
@@ -158,5 +160,82 @@ namespace TeamA.Exogredient.Services
             }
 
         }
+
+        public async Task<bool> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
+        {
+            try
+            {
+                string accountSID = _twilioAccountSID;
+                string authorizationToken = _twilioAuthorizationToken;
+
+                TwilioClient.Init(accountSID, authorizationToken);
+
+
+                var verificationCheck = await VerificationCheckResource.CreateAsync(
+                    to: $"+1{phoneNumber}",
+                    code: $"{phoneCode}",
+                    pathServiceSid: _twilioPathServiceSID
+                );
+
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return false;
+            }
+
+        }
+
+        public async Task<bool> SendEmailVerificationAsync(string emailAddress)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                var bodyBuilder = new BodyBuilder();
+
+                message.From.Add(new MailboxAddress(_sendingEmail));
+                message.To.Add(new MailboxAddress($"{emailAddress}"));
+
+                message.Subject = "Exogredient Account Verification";
+
+                Random generator = new Random();
+                string emailCode = generator.Next(100000, 1000000).ToString();
+
+                bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
+                    @"<tr>" +
+                    @"</tr>" +
+                    @"<tr>" +
+                    @"<td height = ""15"" style = ""font-size:0px; line-height:0px; height:15px;"" > &nbsp;</td>" +
+                               @"</tr>" +
+                               @"<tr>" +
+                               $@"<td align = ""center"" valign = ""top"" style = ""font-family:'Open Sans', Arial, sans-serif; font-size:18px; line-height:22px; color:#fbeb59; letter-spacing:2px; padding-bottom:12px;"">YOUR EMAIL VERIFICATION CODE IS: {emailCode}</td>" +
+                    @"</tr>" +
+                    @"<tr>";
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                var client = new SmtpClient
+                {
+                    ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
+                };
+
+                await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+                await client.AuthenticateAsync(_sendingEmail, _sendingEmailPassword);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+                client.Dispose();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return false;
+            }
+
+        }
+
     }
 }

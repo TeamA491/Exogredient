@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.DAL
     public abstract class MasterNOSQLDAOReadOnly
     {
         // HACK: Change this to your specific password
-        protected static readonly string ConnectionString = "mysqlx://root:Lolitsme123@localhost:33060";
+        protected static readonly string ConnectionString = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
 
         public abstract Task<List<string>> ReadAsync();
     }

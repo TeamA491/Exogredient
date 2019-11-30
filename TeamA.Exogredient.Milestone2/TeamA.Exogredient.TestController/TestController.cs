@@ -23,49 +23,44 @@ namespace TeamA.Exogredient.TestController
 
             AuthenticationService authn = new AuthenticationService();
 
-            Console.WriteLine(authn.SendSMSCode("5622537764"));
+            //await a.NotifySystemAdminAsync("hi");
+
+            //await authn.SendCallVerificationAsync("5622537764");
+
+            //await authn.SendEmailVerificationAsync("jnguyen7539@gmail.com");
 
             //Console.WriteLine(await r.CheckPasswordSecurityAsync("abcdefg"));
 
-            //await r.CheckPasswordSecurityAsync("aaa");
-            //await r.CheckPasswordSecurityAsync("AAA");
-            //await r.CheckPasswordSecurityAsync("111");
-            //await r.CheckPasswordSecurityAsync("~~~");
-            //await r.CheckPasswordSecurityAsync("```");
-            //await r.CheckPasswordSecurityAsync("!!!");
-            //await r.CheckPasswordSecurityAsync("@@@");
-            //await r.CheckPasswordSecurityAsync("###");
-            //await r.CheckPasswordSecurityAsync("$$$");
-            //await r.CheckPasswordSecurityAsync("%%%");
-            //await r.CheckPasswordSecurityAsync("^^^");
-            //await r.CheckPasswordSecurityAsync("&&&");
-            //await r.CheckPasswordSecurityAsync("***");
-            //await r.CheckPasswordSecurityAsync("(((");
-            //await r.CheckPasswordSecurityAsync(")))");
-            //await r.CheckPasswordSecurityAsync("___");
-            //await r.CheckPasswordSecurityAsync("---");
-            //await r.CheckPasswordSecurityAsync("+++");
-            //await r.CheckPasswordSecurityAsync("===");
-            //await r.CheckPasswordSecurityAsync("{{{{");
-            //await r.CheckPasswordSecurityAsync("[[[[");
-            //await r.CheckPasswordSecurityAsync("}}}}");
-            //await r.CheckPasswordSecurityAsync("]]]]");
-            //await r.CheckPasswordSecurityAsync("||||");
-            //await r.CheckPasswordSecurityAsync("\\\\\\\\");
-            //await r.CheckPasswordSecurityAsync("::::");
-            //await r.CheckPasswordSecurityAsync(";;;;");
-            //await r.CheckPasswordSecurityAsync("''''");
-            //await r.CheckPasswordSecurityAsync("\"\"\"\"");
-            //await r.CheckPasswordSecurityAsync("????");
-            //await r.CheckPasswordSecurityAsync("////");
-            //await r.CheckPasswordSecurityAsync("????");
-            //await r.CheckPasswordSecurityAsync("....");
-            //await r.CheckPasswordSecurityAsync(",,,,");
-            //await r.CheckPasswordSecurityAsync("1234567");
-            //await r.CheckPasswordSecurityAsync("lasdkfjlafdsjabcdef");
-            //await r.CheckPasswordSecurityAsync("123");
-            //await r.CheckPasswordSecurityAsync("7890123");
-            //await r.CheckPasswordSecurityAsync("zyx");
+            //Console.WriteLine(",,,,");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync(",,,,"));
+            //Console.WriteLine();
+            //Console.WriteLine("1234567");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("1234567"));
+            //Console.WriteLine();
+            //Console.WriteLine("lasdkfjlafdsjabcdef");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("lasdkfjlafdsjabcdef"));
+            //Console.WriteLine();
+            //Console.WriteLine("123");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("123"));
+            //Console.WriteLine();
+            //Console.WriteLine("7890123");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("7890123"));
+            //Console.WriteLine();
+            //Console.WriteLine("zyx");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("zyx"));
+            //Console.WriteLine();
+            //Console.WriteLine("AGTY");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("AGTY"));
+            //Console.WriteLine();
+            //Console.WriteLine("dslfj;laf111111;lkdjflaj");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("dslfj;laf111111;lkdjflaj"));
+            //Console.WriteLine();
+            //Console.WriteLine("87baudjey");
+            //Console.WriteLine(await r.CheckPasswordSecurityAsync("87baudjey"));
+            //Console.WriteLine();
+
+            //Console.WriteLine(DateTime.Now.ToString("0:HH:mm:ss.ffff"));
+            //Console.WriteLine(DateTime.Now.ToString("0:HH:mm:ss.ffff"));
 
             // READ CORRUPTED PASSWORDS
 
