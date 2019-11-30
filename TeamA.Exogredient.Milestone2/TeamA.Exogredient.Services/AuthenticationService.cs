@@ -28,7 +28,7 @@ namespace TeamA.Exogredient.Services
                 if (!_userDao.UserNameExists(userName))
                 {
                     // TODO Create Custom Exception: For system
-                    throw new Exception("Since the username doesn't exist, it can't be disabled ");
+                    throw new Exception("Since the username doesn't exist, it can't be disabled.");
                 }
                 // If the username is already disabled, throw an exception. 
                 if (_userDao.IsUserNameDisabled(userName))
@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.Services
                 if (!_userDao.UserNameExists(userName))
                 {
                     // TODO Create Custom Exception: For system
-                    throw new Exception("Since the username doesn't exist, it can't be disabled ");
+                    throw new Exception("Since the username doesn't exist, it can't be enabled.");
                 }
                 // If the username is already enabled, throw an exception.
                 if (!_userDao.IsUserNameDisabled(userName))
@@ -89,8 +89,8 @@ namespace TeamA.Exogredient.Services
             // Craete a dictionary that represents the user type and unique ID.
             Dictionary<string, string> userInfo = new Dictionary<string, string>()
             {
-                {"userType", $"{userType}"},
-                {"id", $"{userName}" }
+                {"userType", userType},
+                {"id", userName }
             };
 
             // Generate a token with the dictionary.
@@ -122,7 +122,7 @@ namespace TeamA.Exogredient.Services
                 }
 
                 byte[] privateKey = SecurityService.GetRSAPrivateKey();
-                byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted, privateKey);
+                byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted,privateKey);
                 // Decrypt the encrypted password.
                 string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
                 string storedPassword;
@@ -132,10 +132,8 @@ namespace TeamA.Exogredient.Services
                 // Convert the salt to byte array.
                 byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
                 //Number of iterations for has && length of the hash in bytes.
-                int iterations = 100;
-                int hashLength = 32;
                 // Hash the decrypted password with the byte array of salt.
-                string hashedPassword = SecurityService.HashPassword(hexPassword, saltBytes, iterations, hashLength);
+                string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 //Check if the stored password matches the hashed password
                 if (storedPassword.Equals(hashedPassword)) 
@@ -154,15 +152,39 @@ namespace TeamA.Exogredient.Services
                 throw e;
             }
         }
+
+        public void ChangePassword(string userName, string password)
+        {
+            try
+            {
+                // Check if the username exists.
+                if (!_userDao.UserNameExists(userName))
+                {
+                    // TODO Create Custom Exception: For System
+                    throw new Exception("The username doesn't exsit.");
+                }
+                // Check if the username is disabled.
+                if (_userDao.IsUserNameDisabled(userName))
+                {
+                    // TODO Create Custom Exception: For User
+                    throw new Exception("This username is locked! To enable, contact the admin");
+                }
+                byte[] saltBytes = SecurityService.GenerateSalt();
+                string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
+                string saltString = SecurityService.BytesToHexString(saltBytes);
+                UserRecord newPasswordUser = new UserRecord(userName, password:hashedPassword, salt:saltString);
+                _userDao.Update(newPasswordUser);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+
+        }
         
 
         /*
         public SendPhoneVerification(string phoneNumber)
-        {
-
-        }
-
-        public generateJWT()
         {
 
         }

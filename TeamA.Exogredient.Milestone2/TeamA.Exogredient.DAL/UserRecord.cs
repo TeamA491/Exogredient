@@ -9,7 +9,8 @@ namespace TeamA.Exogredient.DAL
         IDictionary<string, string> data = new Dictionary<string, string>();
 
         public UserRecord(string userName, string firstName = null, string lastName = null, string email = null, 
-            string phoneNumber = null, string password = null, string disabled = null, string userType = null)
+            string phoneNumber = null, string password = null, string salt = null,
+            string disabled = null, string userType = null)
         {
             data.Add("username", userName);
             data.Add("first_name", firstName);
@@ -19,6 +20,7 @@ namespace TeamA.Exogredient.DAL
             data.Add("password", password);
             data.Add("disabled", disabled);
             data.Add("user_type", userType);
+            data.Add("salt", salt);
         }
 
         public IDictionary<string, string> GetData()

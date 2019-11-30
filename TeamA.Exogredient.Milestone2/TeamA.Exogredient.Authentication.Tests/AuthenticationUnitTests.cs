@@ -14,8 +14,8 @@ namespace TeamA.Exogredient.Authentication.Tests
 
 
         [DataTestMethod]
-        [DataRow("charles971026", "password123")]
-        public void Authenticate_CorrectInputs_ReturnTrue(string userName, string password)
+        [DataRow("charles971026", "correctpassword")]
+        public void AuthenticationService_Authenticate_CorrectInputs(string userName, string password)
         {
             //Arrange
             if (userDAO.IsUserNameDisabled(userName))
@@ -31,15 +31,15 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = authenticationService.Authenticate("charles971026", encryptedPassword, encryptedKey, IV);
+            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsTrue(result);
         }
 
         [DataTestMethod]
-        [DataRow("charles971026", "password")]
-        public void Authenticate_IncorrectPassword_ReturnFalse(string userName, string password)
+        [DataRow("charles971026", "wrongpassword")]
+        public void AuthenticationService_Authenticate_IncorrectPassword(string userName, string password)
         {
             //Arrange
             if (userDAO.IsUserNameDisabled(userName))
@@ -61,8 +61,8 @@ namespace TeamA.Exogredient.Authentication.Tests
         }
 
         [DataTestMethod]
-        [DataRow("charles9710", "password")]
-        public void Authenticate_IncorrectUserName_ReturnFalse(string userName, string password)
+        [DataRow("charles9710", "correctpassword")]
+        public void AuthenticationService_Authenticate_IncorrectUserName(string userName, string password)
         {
             //Arrange
             string hexPassword = SecurityService.ToHexString(password);
@@ -74,14 +74,14 @@ namespace TeamA.Exogredient.Authentication.Tests
 
             //Act
             bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
-
+            
             //Assert
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public void DisableUserName_ValidUserName_UserNameDisabled(string userName)
+        public void AuthenticationService_DisableUserName_ValidUserName(string userName)
         {
             //Arrange
             bool result;
@@ -103,7 +103,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public void EnableUserName_ValidUserName_UserNameEnabled(string userName)
+        public void AuthenticationService_EnableUserName_ValidUserName(string userName)
         {
             //Arrange
             bool result;
@@ -122,5 +122,24 @@ namespace TeamA.Exogredient.Authentication.Tests
             //Assert
             Assert.IsFalse(result);
         }
+
+        [DataTestMethod]
+        [DataRow("testuser","newpassword")]
+        public void AuthenticationService_ChangePassword_ValidUserName(string userName, string password)
+        {
+            //Arrange
+            string storedPassword;
+            string saltString;
+
+            //Act=
+            authenticationService.ChangePassword(userName, password);
+            userDAO.GetStoredPasswordAndSalt(userName, out storedPassword, out saltString);
+            byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
+            string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
+
+            //Assert
+            Assert.IsTrue(storedPassword.Equals(hashedPassword));
+        }
+
     }
 }

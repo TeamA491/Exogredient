@@ -2,17 +2,22 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace TeamA.Exogredient.Services
 {
     public static class SecurityService
     {
+        /*
         private readonly static RSACryptoServiceProvider FieldRSA = new RSACryptoServiceProvider();
         // Static RSA Public key.
         private readonly static byte[] _publicKey = FieldRSA.ExportCspBlob(false);
         // Static RSA Private key.
         private readonly static byte[] _privateKey = FieldRSA.ExportCspBlob(true);
-        
+        */
 
         /// <summary>
         /// Return the static public key for RSA
@@ -22,13 +27,13 @@ namespace TeamA.Exogredient.Services
         /// </returns>
         public static byte[] GetRSAPublicKey()
         {
-            return _publicKey;
+            return HexStringToBytes(Environment.GetEnvironmentVariable("PUBLICKEY",EnvironmentVariableTarget.User));
         }
 
         // RSA Private key getter
         public static byte[] GetRSAPrivateKey()
         {
-            return _privateKey;
+            return HexStringToBytes(Environment.GetEnvironmentVariable("PRIVATEKEY", EnvironmentVariableTarget.User));
         }
 
         // Reference:
@@ -52,9 +57,9 @@ namespace TeamA.Exogredient.Services
                     ICryptoTransform encryptor = aes.CreateEncryptor(key, IV);
                     MemoryStream ms = new MemoryStream();
 
-                    using(CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                     {
-                        using(StreamWriter sw = new StreamWriter(cs))
+                        using (StreamWriter sw = new StreamWriter(cs))
                         {
                             // Write data to be encrypted to the crypto stream.
                             sw.Write(plainData);
@@ -126,7 +131,7 @@ namespace TeamA.Exogredient.Services
             try
             {
                 byte[] decryptedData;
-                using(RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
                 {
                     // Pass the public key for encryption.
                     rsa.ImportCspBlob(publicKey);
@@ -135,7 +140,7 @@ namespace TeamA.Exogredient.Services
                 }
                 return decryptedData;
             }
-            catch(CryptographicException e)
+            catch (CryptographicException e)
             {
                 Console.WriteLine(e.Message);
                 throw e;
@@ -155,7 +160,6 @@ namespace TeamA.Exogredient.Services
             try
             {
                 byte[] decryptedData;
-
                 using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
                 {
                     // Pass the private key for decryption.
@@ -183,14 +187,36 @@ namespace TeamA.Exogredient.Services
         /// <param name="iterations"> number of iterations for hashing </param>
         /// <param name="hashLength"> the length of the output hashcode </param>
         /// <returns></returns>
-        public static string HashPassword(string password, byte[] salt, int iterations, int hashLength)
+
+
+        public static string HashWithHMACSHA256(string data)
         {
-            // Pass the password, salt, and the number of iterations.
-            Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(password, salt, iterations);
-            // Generate a hashcode in byte array that is hashLength bytes long 
-            byte[] hashBytes = rfc.GetBytes(hashLength);
-            // Convert the byte array to a hex string.
+            byte[] dataBytes = HexStringToBytes(data);
+            HMACSHA256 hmac = new HMACSHA256();
+            byte[] hashBytes = hmac.ComputeHash(dataBytes);
             return BytesToHexString(hashBytes);
+
+        }
+
+
+        public static string HashWithKDF(string password, byte[] salt, int hashLength = 32)
+        {
+            IDigest SHA256 = new Sha256Digest();
+            byte[] ikm = HexStringToBytes(password);
+            HkdfBytesGenerator hkdf = new HkdfBytesGenerator(SHA256);
+            hkdf.Init(new HkdfParameters(ikm, salt, null));
+            byte[] derivedBytes = new byte[hashLength];
+            hkdf.GenerateBytes(derivedBytes,0,hashLength);
+
+            return BytesToHexString(derivedBytes);
+
+            // Pass the password, salt, and the number of iterations.
+            //asswordDeriveBytes pdb = new PasswordDeriveBytes(password, salt, "SHA256", iterations);
+            //Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(password, salt, iterations);
+            // Generate a hashcode in byte array that is hashLength bytes long
+            //byte[] hashBytes = pdb.GetBytes(hashLength);
+            // Convert the byte array to a hex string.
+            //return BytesToHexString(hashBytes);
         }
 
         /// <summary>
@@ -232,12 +258,12 @@ namespace TeamA.Exogredient.Services
             char[] charArray = hexString.ToCharArray();
 
             // for index i in the byte array
-            for(int i = 0; i < bytes.Length; i++)
+            for (int i = 0; i < bytes.Length; i++)
             {
                 // Create a string of two characters at i*2 and i*2+1 index of hexString
-                string temp = "" + charArray[i*2] + charArray[i*2+1];
+                string temp = "" + charArray[i * 2] + charArray[i * 2 + 1];
                 // Convert the hex string to a byte and store at i index of the byte array
-                bytes[i] = Convert.ToByte(temp,16);
+                bytes[i] = Convert.ToByte(temp, 16);
             }
 
             return bytes;
@@ -261,7 +287,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="saltLength"> length of the salt in bytes </param>
         /// <returns> byte array of salt </returns>
-        public static byte[] GenerateSalt(int saltLength)
+        public static byte[] GenerateSalt(int saltLength = 8)
         {
             // Create a byte array for salt with the given salt length
             byte[] salt = new byte[saltLength];
@@ -273,10 +299,11 @@ namespace TeamA.Exogredient.Services
             return salt;
         }
 
+        /* FOR TESTING PURPOSE, NEED TO BE IMPLEMENTED ON THE FRONTEND */
         /// <summary>
         /// Generate a key for AES encryption and decryption
         /// </summary>
-        /// <returns> byte array of AES key </returns>
+        /// <returns> size 32 byte array of AES key </returns>
         public static byte[] GenerateAESKey()
         {
             AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
@@ -286,7 +313,7 @@ namespace TeamA.Exogredient.Services
         /// <summary>
         /// Generate a IV for AES encryption and decryption
         /// </summary>
-        /// <returns> byte array of IV </returns>
+        /// <returns> size 16 byte array of IV </returns>
         public static byte[] GenerateAESIV()
         {
             AesCryptoServiceProvider aes = new AesCryptoServiceProvider();

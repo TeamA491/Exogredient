@@ -22,14 +22,13 @@ namespace TeamA.Exogredient.DAL
         private const string _userType = "user_type";           //VARCHAR(11)
         private const string _salt = "salt";                    //VARCHAR(200)
 
-        // Connection string(for testing).
-        new string ConnectionString = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
-
         /// <summary>
         /// check if the username is disabled.
         /// </summary>
         /// <param name="userName"> username to be checked </param>
         /// <returns>true if username is disabled, false otherwise </returns>
+        ///
+        
         public bool IsUserNameDisabled(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
@@ -87,7 +86,6 @@ namespace TeamA.Exogredient.DAL
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
                 throw e;
             }
             finally
@@ -99,7 +97,7 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Get the password and the salt stored in the database corresponding to the username.
+        /// Get the hashed password and the salt stored in the database corresponding to the username.
         /// </summary>
         /// <param name="userName"> the username of the password and salt </param>
         /// <param name="storedPassword"> string variable where the stored password is assigned to </param>
