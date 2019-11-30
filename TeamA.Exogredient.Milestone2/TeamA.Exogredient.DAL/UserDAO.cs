@@ -37,7 +37,7 @@ namespace TeamA.Exogredient.DAL
             try
             {
                 // Check if the username exists.
-                if (!UserNameExists(userName))
+                if (! (await UserNameExistsAsync(userName)))
                 {
                     throw new Exception("The username doesn't exist!");
                 }
@@ -199,7 +199,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="userName"> username whose user type is returned </param>
         /// <returns> the user type of the username </returns>
-        public string GetUserType(string userName)
+        public async Task<string> GetUserTypeAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
@@ -207,7 +207,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
                 // Check if the username exists.
-                if (!UserNameExists(userName))
+                if (! (await UserNameExistsAsync(userName)))
                 {
                     throw new Exception("Invalid user name or password");
                 }
@@ -216,8 +216,8 @@ namespace TeamA.Exogredient.DAL
                 string userType;
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
-                    MySqlDataReader reader = command.ExecuteReader();
-                    reader.Read();
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
                     userType = reader.GetString(0);
                     reader.Close();
                 }

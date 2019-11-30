@@ -15,7 +15,6 @@ namespace TeamA.Exogredient.Services
     {
         private UserDAO _userDAO;
         private CorruptedPasswordsDAO _corruptedPasswordsDAO;
-        private SecurityService _securityService;
 
         // No < or > to protect from SQL injections.
         private readonly List<char> _alphaNumericSpecialCharacters = new List<char>()
@@ -94,7 +93,6 @@ namespace TeamA.Exogredient.Services
         {
             _userDAO = new UserDAO();
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
-            _securityService = new SecurityService();
         }
 
         /// <summary>
@@ -303,7 +301,7 @@ namespace TeamA.Exogredient.Services
             // it is the slowest IO check.
 
             List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
-            string passwordSha1 = _securityService.HashWithSHA1(plaintextPassword);
+            string passwordSha1 = SecurityService.HashWithSHA1(plaintextPassword);
 
             foreach (string hash in passwordHashes)
             {

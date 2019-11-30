@@ -16,7 +16,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026", "correctpassword")]
-        public void AuthenticationService_Authenticate_CorrectInputs(string userName, string password)
+        public async Task AuthenticationService_Authenticate_CorrectInputs(string userName, string password)
         {
             //Arrange
             if (await userDAO.IsUserNameDisabledAsync(userName))
@@ -32,7 +32,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsTrue(result);
@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026", "wrongpassword")]
-        public void AuthenticationService_Authenticate_IncorrectPassword(string userName, string password)
+        public async Task AuthenticationService_Authenticate_IncorrectPassword(string userName, string password)
         {
             //Arrange
             if (await userDAO.IsUserNameDisabledAsync(userName))
@@ -55,7 +55,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);
@@ -63,7 +63,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles9710", "correctpassword")]
-        public void AuthenticationService_Authenticate_IncorrectUserName(string userName, string password)
+        public async Task AuthenticationService_Authenticate_IncorrectUserName(string userName, string password)
         {
             //Arrange
             string hexPassword = SecurityService.ToHexString(password);
@@ -74,7 +74,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = authenticationService.Authenticate(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);
@@ -82,7 +82,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public void AuthenticationService_DisableUserName_ValidUserName(string userName)
+        public async Task AuthenticationService_DisableUserName_ValidUserName(string userName)
         {
             //Arrange
             bool result;
@@ -104,7 +104,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public void AuthenticationService_EnableUserName_ValidUserName(string userName)
+        public async Task AuthenticationService_EnableUserName_ValidUserName(string userName)
         {
             //Arrange
             bool result;
@@ -112,12 +112,12 @@ namespace TeamA.Exogredient.Authentication.Tests
             //Act
             try
             {
-                authenticationService.EnableUserName(userName);
-                result = userDAO.IsUserNameDisabled(userName);
+                await authenticationService.EnableUserNameAsync(userName);
+                result = await userDAO.IsUserNameDisabledAsync(userName);
             }
             catch
             {
-                result = userDAO.IsUserNameDisabled(userName);
+                result = await userDAO.IsUserNameDisabledAsync(userName);
             }
 
             //Assert
@@ -126,15 +126,17 @@ namespace TeamA.Exogredient.Authentication.Tests
 
         [DataTestMethod]
         [DataRow("testuser","newpassword")]
-        public void AuthenticationService_ChangePassword_ValidUserName(string userName, string password)
+        public async Task AuthenticationService_ChangePassword_ValidUserName(string userName, string password)
         {
             //Arrange
-            string storedPassword;
-            string saltString;
+            
 
             //Act=
-            authenticationService.ChangePassword(userName, password);
-            userDAO.GetStoredPasswordAndSalt(userName, out storedPassword, out saltString);
+            await authenticationService.ChangePasswordAsync(userName, password);
+            Tuple<string, string> result = await userDAO.GetStoredPasswordAndSaltAsync(userName);
+
+            string storedPassword = result.Item1;
+            string saltString = result.Item2;
             byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
             string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
 

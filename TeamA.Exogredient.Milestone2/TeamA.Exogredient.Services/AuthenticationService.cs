@@ -3,6 +3,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
@@ -92,10 +93,10 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="userName"> logged-in username </param>
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
-        private string CreateToken(string userName)
+        private async Task<string> CreateTokenAsync(string userName)
         {
             // Get the user type of the username.
-            string userType = _userDao.GetUserType(userName);
+            string userType = await _userDao.GetUserTypeAsync(userName);
 
             // Craete a dictionary that represents the user type and unique ID.
             Dictionary<string, string> userInfo = new Dictionary<string, string>()
@@ -103,6 +104,9 @@ namespace TeamA.Exogredient.Services
                 {"userType", userType},
                 {"id", userName }
             };
+
+            return AuthorizationService.GenerateJWS(userInfo);
+        }
 
         /// <summary>
         /// Check if the username and the password are correct.
@@ -164,18 +168,18 @@ namespace TeamA.Exogredient.Services
         }
 
 
-        public void ChangePassword(string userName, string password)
+        public async Task ChangePasswordAsync(string userName, string password)
         {
             try
             {
                 // Check if the username exists.
-                if (!_userDao.UserNameExists(userName))
+                if (! (await _userDao.UserNameExistsAsync(userName)))
                 {
                     // TODO Create Custom Exception: For System
                     throw new Exception("The username doesn't exsit.");
                 }
                 // Check if the username is disabled.
-                if (_userDao.IsUserNameDisabled(userName))
+                if (await _userDao.IsUserNameDisabledAsync(userName))
                 {
                     // TODO Create Custom Exception: For User
                     throw new Exception("This username is locked! To enable, contact the admin");
@@ -184,7 +188,7 @@ namespace TeamA.Exogredient.Services
                 string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
                 string saltString = SecurityService.BytesToHexString(saltBytes);
                 UserRecord newPasswordUser = new UserRecord(userName, password:hashedPassword, salt:saltString);
-                _userDao.Update(newPasswordUser);
+                await _userDao.UpdateAsync(newPasswordUser);
             }
             catch(Exception e)
             {
