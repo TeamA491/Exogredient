@@ -5,12 +5,12 @@ namespace TeamA.Exogredient.Services
 {
     public static class FTPService
     {
-        public static bool Send(string _ftpURL, string _ftpFolder, string _filePath, string _sourceDirectory, string _userName, string _password)
+        public static bool Send(string ftpURL, string ftpFolder, string filePath, string sourceDirectory, string userName, string password)
         {
             byte[] fileBytes = null;
 
             // File to send on local machine.
-            string archiveFilePath = _sourceDirectory + ".7z";
+            string archiveFilePath = sourceDirectory + ".7z";
             if (!File.Exists(archiveFilePath))
             {
                 return false;
@@ -21,11 +21,11 @@ namespace TeamA.Exogredient.Services
             try
             {
                 // Create the FTP request. Set the folder and file name.
-                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_ftpURL + _ftpFolder + Path.GetFileName(_filePath));
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpURL + ftpFolder + Path.GetFileName(filePath));
                 request.Method = WebRequestMethods.Ftp.UploadFile;
 
                 // Entering in FTP user credentials.
-                request.Credentials = new NetworkCredential(_userName, _password);
+                request.Credentials = new NetworkCredential(userName, password);
 
                 // Specify additional information about the FTP request.
                 request.ContentLength = fileBytes.Length;
