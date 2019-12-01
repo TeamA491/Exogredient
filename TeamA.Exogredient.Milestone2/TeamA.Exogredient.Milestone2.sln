@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Tests", "_Tests", "{ABA970
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestController", "TeamA.Exogredient.TestController\TeamA.Exogredient.TestController.csproj", "{CA4BA115-6992-446F-B7F5-734951BF99F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.AuthenticationController", "TeamA.Exogredient.AuthenticationController\TeamA.Exogredient.AuthenticationController.csproj", "{A4C17EDA-83BB-4D07-977B-66DC550906FA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DAL", "DAL", "{4A2FF568-6425-437D-B3A9-59A1AD81BF50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{28611C63-BE9A-4A35-AE66-C79EB3B10F3C}"
@@ -25,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Services"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Tests", "TeamA.Exogredient.Tests\TeamA.Exogredient.Tests.csproj", "{69100CF2-CDA4-4ABC-8671-8E4BDFEAFBDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.Scripts", "TeamA.Exogredient.Scripts\TeamA.Exogredient.Scripts.csproj", "{34F00117-7D47-48D8-861C-684B8C37B14B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Scripts", "TeamA.Exogredient.Scripts\TeamA.Exogredient.Scripts.csproj", "{34F00117-7D47-48D8-861C-684B8C37B14B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +35,6 @@ Global
 		{CA4BA115-6992-446F-B7F5-734951BF99F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA4BA115-6992-446F-B7F5-734951BF99F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA4BA115-6992-446F-B7F5-734951BF99F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A4C17EDA-83BB-4D07-977B-66DC550906FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A4C17EDA-83BB-4D07-977B-66DC550906FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A4C17EDA-83BB-4D07-977B-66DC550906FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A4C17EDA-83BB-4D07-977B-66DC550906FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79A9AEED-F013-4AF2-8A3B-57986E6AE05A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{79A9AEED-F013-4AF2-8A3B-57986E6AE05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79A9AEED-F013-4AF2-8A3B-57986E6AE05A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -67,7 +61,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CA4BA115-6992-446F-B7F5-734951BF99F6} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
-		{A4C17EDA-83BB-4D07-977B-66DC550906FA} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 		{79A9AEED-F013-4AF2-8A3B-57986E6AE05A} = {4A2FF568-6425-437D-B3A9-59A1AD81BF50}
 		{D3DC1144-3EA2-48BD-AC8D-C5C3FC84FD8C} = {28611C63-BE9A-4A35-AE66-C79EB3B10F3C}
 		{05D64C89-E08F-4AE6-98B1-5FD193587F8F} = {448E6539-B3AC-46CA-8E06-952D4D6C25F4}
