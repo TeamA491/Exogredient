@@ -10,8 +10,6 @@ namespace TeamA.Exogredient.Managers
         public void Register(bool answer, string firstName, string lastName, string email,
                              string phoneNumber, string aesKey, string aesCipher)
         {
-            RegistrationService registerUser = new RegistrationService();
-
             Console.WriteLine("Here in the manager.");
         }
     }

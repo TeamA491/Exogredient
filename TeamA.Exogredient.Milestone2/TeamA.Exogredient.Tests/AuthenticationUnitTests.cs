@@ -26,7 +26,7 @@ namespace TeamA.Exogredient.Authentication.Tests
                 await _userManagementService.EnableUserNameAsync(userName);
             }
 
-            string hexPassword = SecurityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
             byte[] publicKey = SecurityService.GetRSAPublicKey();
             byte[] key = SecurityService.GenerateAESKey();
             byte[] IV = SecurityService.GenerateAESIV();
@@ -49,7 +49,7 @@ namespace TeamA.Exogredient.Authentication.Tests
             {
                 await _userManagementService.EnableUserNameAsync(userName);
             }
-            string hexPassword = SecurityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
             byte[] publicKey = SecurityService.GetRSAPublicKey();
             byte[] key = SecurityService.GenerateAESKey();
             byte[] IV = SecurityService.GenerateAESIV();
@@ -68,7 +68,7 @@ namespace TeamA.Exogredient.Authentication.Tests
         public async Task AuthenticationService_Authenticate_IncorrectUserName(string userName, string password)
         {
             //Arrange
-            string hexPassword = SecurityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
             byte[] publicKey = SecurityService.GetRSAPublicKey();
             byte[] key = SecurityService.GenerateAESKey();
             byte[] IV = SecurityService.GenerateAESIV();
@@ -139,7 +139,7 @@ namespace TeamA.Exogredient.Authentication.Tests
 
             string storedPassword = result.Item1;
             string saltString = result.Item2;
-            byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
+            byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
             string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
 
             //Assert

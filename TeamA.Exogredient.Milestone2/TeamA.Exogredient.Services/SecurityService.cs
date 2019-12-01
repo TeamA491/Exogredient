@@ -27,13 +27,13 @@ namespace TeamA.Exogredient.Services
         /// </returns>
         public static byte[] GetRSAPublicKey()
         {
-            return HexStringToBytes(Environment.GetEnvironmentVariable("PUBLICKEY",EnvironmentVariableTarget.User));
+            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PUBLICKEY",EnvironmentVariableTarget.User));
         }
 
         // RSA Private key getter
         public static byte[] GetRSAPrivateKey()
         {
-            return HexStringToBytes(Environment.GetEnvironmentVariable("PRIVATEKEY", EnvironmentVariableTarget.User));
+            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PRIVATEKEY", EnvironmentVariableTarget.User));
         }
 
         // Reference:
@@ -187,28 +187,25 @@ namespace TeamA.Exogredient.Services
         /// <param name="iterations"> number of iterations for hashing </param>
         /// <param name="hashLength"> the length of the output hashcode </param>
         /// <returns></returns>
-
-
         public static string HashWithHMACSHA256(string data)
         {
-            byte[] dataBytes = HexStringToBytes(data);
+            byte[] dataBytes = StringUtilityService.HexStringToBytes(data);
             HMACSHA256 hmac = new HMACSHA256();
             byte[] hashBytes = hmac.ComputeHash(dataBytes);
-            return BytesToHexString(hashBytes);
+            return StringUtilityService.BytesToHexString(hashBytes);
 
         }
-
 
         public static string HashWithKDF(string password, byte[] salt, int hashLength = 32)
         {
             IDigest SHA256 = new Sha256Digest();
-            byte[] ikm = HexStringToBytes(password);
+            byte[] ikm = StringUtilityService.HexStringToBytes(password);
             HkdfBytesGenerator hkdf = new HkdfBytesGenerator(SHA256);
             hkdf.Init(new HkdfParameters(ikm, salt, null));
             byte[] derivedBytes = new byte[hashLength];
             hkdf.GenerateBytes(derivedBytes,0,hashLength);
 
-            return BytesToHexString(derivedBytes);
+            return StringUtilityService.BytesToHexString(derivedBytes);
 
             // Pass the password, salt, and the number of iterations.
             //asswordDeriveBytes pdb = new PasswordDeriveBytes(password, salt, "SHA256", iterations);
@@ -232,56 +229,9 @@ namespace TeamA.Exogredient.Services
             // Convert the password to ASCII byte array ->
             // Compute the hashcode in byte array with the ASCII byte array ->
             // Convert the hashcode byte array to a hex string
-            return BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(password)));
+            return StringUtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(password)));
         }
-
-        /// <summary>
-        /// Convert a byte array to a hex string.
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <returns> hex string of the byte array </returns>
-        public static string BytesToHexString(byte[] bytes)
-        {
-            // Convert the bytes to hex string without "-"
-            return BitConverter.ToString(bytes).Replace("-", "");
-        }
-
-        /// <summary>
-        /// Convert a hex string to a byte array
-        /// </summary>
-        /// <param name="hexString"> hex string to be converted </param>
-        /// <returns> byte array of the hex string </returns>
-        public static byte[] HexStringToBytes(string hexString)
-        {
-            // The length of the byte array of the hex string is hexString.Length / 2
-            byte[] bytes = new byte[hexString.Length / 2];
-            char[] charArray = hexString.ToCharArray();
-
-            // for index i in the byte array
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                // Create a string of two characters at i*2 and i*2+1 index of hexString
-                string temp = "" + charArray[i * 2] + charArray[i * 2 + 1];
-                // Convert the hex string to a byte and store at i index of the byte array
-                bytes[i] = Convert.ToByte(temp, 16);
-            }
-
-            return bytes;
-        }
-
-        /// <summary>
-        /// Convert a string to a hex string using ASCII encoding.
-        /// </summary>
-        /// <param name="s"> string to be converted </param>
-        /// <returns> hex string of the string </returns>
-        public static string ToHexString(string s)
-        {
-            // Convert the string into a ASCII byte array
-            byte[] bytes = Encoding.ASCII.GetBytes(s);
-            // Convert the byte array to hex string
-            return BytesToHexString(bytes);
-        }
-
+        
         /// <summary>
         /// Generate a salt.
         /// </summary>

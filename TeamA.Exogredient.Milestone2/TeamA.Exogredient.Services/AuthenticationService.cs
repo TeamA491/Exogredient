@@ -5,6 +5,7 @@ using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using Twilio;
@@ -25,28 +26,6 @@ namespace TeamA.Exogredient.Services
         public AuthenticationService()
         {
             _userDao = new UserDAO();
-        }
-
-       
-
-        /// <summary>
-        /// Create a token for a logged-in user.
-        /// </summary>
-        /// <param name="userName"> logged-in username </param>
-        /// <returns> string of token that represents the user type and unique ID of the username </returns>
-        private async Task<string> CreateTokenAsync(string userName)
-        {
-            // Get the user type of the username.
-            string userType = await _userDao.GetUserTypeAsync(userName);
-
-            // Craete a dictionary that represents the user type and unique ID.
-            Dictionary<string, string> userInfo = new Dictionary<string, string>()
-            {
-                {"userType", userType},
-                {"id", userName }
-            };
-
-            return AuthorizationService.GenerateJWS(userInfo);
         }
 
         /// <summary>
@@ -84,7 +63,7 @@ namespace TeamA.Exogredient.Services
                 string saltString = saltAndPassword.Item2;
 
                 // Convert the salt to byte array.
-                byte[] saltBytes = SecurityService.HexStringToBytes(saltString);
+                byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
                 //Number of iterations for has && length of the hash in bytes.
                 // Hash the decrypted password with the byte array of salt.
                 string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);

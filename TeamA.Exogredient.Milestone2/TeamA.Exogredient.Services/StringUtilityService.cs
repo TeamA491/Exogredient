@@ -2,22 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
-    /// <summary>
-    /// Class <c>RegistrationService</c> Provides functionality to allow for user registration.
-    /// </summary>
-    public class RegistrationService
+    public static class StringUtilityService
     {
-        private UserDAO _userDAO;
-        private CorruptedPasswordsDAO _corruptedPasswordsDAO;
-
         // No < or > to protect from SQL injections.
-        private readonly List<char> _alphaNumericSpecialCharacters = new List<char>()
+        private static readonly List<char> _alphaNumericSpecialCharacters = new List<char>()
         {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -25,7 +18,7 @@ namespace TeamA.Exogredient.Services
             '[', '}', ']', '|', '\\', '"', '\'', ':', ';', '?', '/', '.', ','
         };
 
-        private readonly List<char> _numericalCharacters = new List<char>()
+        private static readonly List<char> _numericalCharacters = new List<char>()
         {
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
         };
@@ -34,26 +27,31 @@ namespace TeamA.Exogredient.Services
         // NIST CHECKING:
         // =================================================
 
-        private readonly int _maxRepetitionOrSequence = 3;
+        private static readonly int _maxRepetitionOrSequence = 3;
 
-        private readonly List<char> _lettersLower = new List<char>()
+        private static readonly List<string> _contextSpecificWords = new List<string>()
+        {
+            "exogredient"
+        };
+
+        private static readonly List<char> _lettersLower = new List<char>()
         {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
         };
 
-        private readonly List<char> _lettersUpper = new List<char>()
+        private static readonly List<char> _lettersUpper = new List<char>()
         {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
             'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
         };
 
-        private readonly List<char> _numbers = new List<char>()
+        private static readonly List<char> _numbers = new List<char>()
         {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
         };
 
-        private readonly IDictionary<char, int> _lettersLowerToPositions = new Dictionary<char, int>()
+        private static readonly IDictionary<char, int> _lettersLowerToPositions = new Dictionary<char, int>()
         {
             {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8},
             {'i', 9}, {'j', 10}, {'k', 11}, {'l', 12}, {'m', 13}, {'n', 14}, {'o', 15}, {'p', 16},
@@ -61,7 +59,7 @@ namespace TeamA.Exogredient.Services
             {'y', 25}, {'z', 26}
         };
 
-        private readonly IDictionary<char, int> _lettersUpperToPositions = new Dictionary<char, int>()
+        private static readonly IDictionary<char, int> _lettersUpperToPositions = new Dictionary<char, int>()
         {
             {'A', 1}, {'B', 2}, {'C', 3}, {'D', 4}, {'E', 5}, {'F', 6}, {'G', 7}, {'H', 8},
             {'I', 9}, {'J', 10}, {'K', 11}, {'L', 12}, {'M', 13}, {'N', 14}, {'O', 15}, {'P', 16},
@@ -69,7 +67,7 @@ namespace TeamA.Exogredient.Services
             {'Y', 25}, {'Z', 26}
         };
 
-        private readonly IDictionary<int, char> _positionsToLettersLower = new Dictionary<int, char>()
+        private static readonly IDictionary<int, char> _positionsToLettersLower = new Dictionary<int, char>()
         {
             {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'}, {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
             {9, 'i'}, {10, 'j'}, {11, 'k'}, {12, 'l'}, {13, 'm'}, {14, 'n'}, {15, 'o'}, {16, 'p'},
@@ -77,7 +75,7 @@ namespace TeamA.Exogredient.Services
             {25, 'y'}, {26, 'z'}
         };
 
-        private readonly IDictionary<int, char> _positionsToLettersUpper = new Dictionary<int, char>()
+        private static readonly IDictionary<int, char> _positionsToLettersUpper = new Dictionary<int, char>()
         {
             {1, 'A'}, {2, 'B'}, {3, 'C'}, {4, 'D'}, {5, 'E'}, {6, 'F'}, {7, 'G'}, {8, 'H'},
             {9, 'I'}, {10, 'J'}, {11, 'K'}, {12, 'L'}, {13, 'M'}, {14, 'N'}, {15, 'O'}, {16, 'P'},
@@ -85,25 +83,62 @@ namespace TeamA.Exogredient.Services
             {25, 'Y'}, {26, 'Z'}
         };
 
+        private static readonly CorruptedPasswordsDAO _corruptedPasswordsDAO;
+
         /// <summary>
         /// Constructor initializes the UserDAO object to provide
         /// the interface with the usertable.
         /// </summary>
-        public RegistrationService()
+        static StringUtilityService()
         {
-            _userDAO = new UserDAO();
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
         }
 
         /// <summary>
-        /// Determines whether the user is within the project scope.
+        /// Convert a hex string to a byte array
         /// </summary>
-        /// <param name="answer">The user's selected scope answer.</param>
-        /// <returns>Returns the value of bool that determines whether the 
-        /// user is allowed to proceed.</returns>
-        public bool CheckScope(bool answer)
+        /// <param name="hexString"> hex string to be converted </param>
+        /// <returns> byte array of the hex string </returns>
+        public static byte[] HexStringToBytes(string hexString)
         {
-            return answer == true;
+            // The length of the byte array of the hex string is hexString.Length / 2
+            byte[] bytes = new byte[hexString.Length / 2];
+            char[] charArray = hexString.ToCharArray();
+
+            // for index i in the byte array
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                // Create a string of two characters at i*2 and i*2+1 index of hexString
+                string temp = "" + charArray[i * 2] + charArray[i * 2 + 1];
+                // Convert the hex string to a byte and store at i index of the byte array
+                bytes[i] = Convert.ToByte(temp, 16);
+            }
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// Convert a byte array to a hex string.
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns> hex string of the byte array </returns>
+        public static string BytesToHexString(byte[] bytes)
+        {
+            // Convert the bytes to hex string without "-"
+            return BitConverter.ToString(bytes).Replace("-", "");
+        }
+
+        /// <summary>
+        /// Convert a string to a hex string using ASCII encoding.
+        /// </summary>
+        /// <param name="s"> string to be converted </param>
+        /// <returns> hex string of the string </returns>
+        public static string ToHexString(string s)
+        {
+            // Convert the string into a ASCII byte array
+            byte[] bytes = Encoding.ASCII.GetBytes(s);
+            // Convert the byte array to hex string
+            return BytesToHexString(bytes);
         }
 
         /// <summary>
@@ -114,7 +149,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="min">A optional parameter. If this is set then, name's length can be a 
         /// range from min to length (inclusive).</param>
         /// <returns>Returns value of bool to represent whether the name met the required constraints.</returns>
-        public bool CheckLength(string name, int length, int min = -1)
+        public static bool CheckLength(string name, int length, int min = -1)
         {
             if (min == -1)
             {
@@ -132,7 +167,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="name">The string that we are checking.</param>
         /// <returns>Returns value of bool to represent whether all the characters
         /// in name meet the specification.</returns>
-        public bool CheckIfANSCharacters(string name)
+        public static bool CheckIfANSCharacters(string name)
         {
 
             bool result = true;
@@ -151,7 +186,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="name">The string that we are checking.</param>
         /// <returns>Returns value of bool to represent whether all the characters
         /// in name meet the specification.</returns>
-        public bool CheckIfNumericCharacters(string name)
+        public static bool CheckIfNumericCharacters(string name)
         {
             bool result = true;
 
@@ -170,7 +205,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="email">The email we are checking</param>
         /// <returns>Returns a bool representing whether the email satisfies
         /// the specifications.</returns>
-        public bool EmailFormatValidityCheck(string email)
+        public static bool EmailFormatValidityCheck(string email)
         {
             string[] splitResult = email.Split('@');
 
@@ -207,7 +242,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="email">The email we are checking.</param>
         /// <returns>Returns value of string to represent the 
         /// canonicalized email.</returns>
-        public string CanonicalizingEmail(string email)
+        public static string CanonicalizingEmail(string email)
         {
             string[] splitResult = email.Split('@');
             string username = splitResult[0].ToLower();
@@ -235,19 +270,26 @@ namespace TeamA.Exogredient.Services
             return transposedUsername + "@" + domain;
         }
 
-        public async Task<bool> CheckPasswordSecurityAsync(string plaintextPassword)
+        public static bool ContainsContextSpecificWords(string plaintextPassword)
         {
-            // Test if password contains context specific words.
+            string lowerPassword = plaintextPassword.ToLower();
 
-            if (plaintextPassword.ToLower().Contains("exogredient"))
+            foreach (string word in _contextSpecificWords)
             {
-                return false;
+                if (lowerPassword.Contains(word))
+                {
+                    return true;
+                }
             }
 
+            return false;
+        }
 
-            // Check if password contains an english word, upper or lowercase, among the top 9000 most popular
-            // words that are over 3 characters in length. Done 2nd because fastest IO test.
 
+        // Check if password contains an english word, upper or lowercase, among the top 9000 most popular
+        // words that are over 3 characters in length. Done 2nd because fastest IO test.
+        public static async Task<bool> ContainsDictionaryWordsAsync(string plaintextPassword)
+        {
             string lineInput = "";
 
             using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
@@ -256,14 +298,18 @@ namespace TeamA.Exogredient.Services
                 {
                     if (plaintextPassword.Contains(lineInput))
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
 
-            // Check if password has been corrupted in previous breaches. Done second to last because
-            // it is the slowest IO check.
+            return false;
+        }
 
+        // Check if password has been corrupted in previous breaches. Done second to last because
+        // it is the slowest IO check.
+        public static async Task<bool> IsCorruptedPassword(string plaintextPassword)
+        {
             List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
             string passwordSha1 = SecurityService.HashWithSHA1(plaintextPassword);
 
@@ -271,10 +317,15 @@ namespace TeamA.Exogredient.Services
             {
                 if (passwordSha1.Equals(hash))
                 {
-                    return false;
+                    return true;
                 }
             }
 
+            return false;
+        }
+
+        public static bool ContainsRepetitionOrSequence(string plaintextPassword)
+        {
             // Repetition and sequence checking.
             int patternCount = 1;
 
@@ -585,7 +636,7 @@ namespace TeamA.Exogredient.Services
                     // Constant check at end of each iteration to possibly return false from this function.
                     if (patternCount == _maxRepetitionOrSequence)
                     {
-                        return false;
+                        return true;
                     }
 
                     // If here, we go to the next iteration.
@@ -593,8 +644,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            return true;
+            return false;
         }
-
     }
 }

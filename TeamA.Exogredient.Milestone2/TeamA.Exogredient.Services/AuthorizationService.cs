@@ -2,6 +2,8 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
+using TeamA.Exogredient.DAL;
 
 // TODO: DECIDE HOW TO HOLD EXPIRATION DATES
 // TODO: FUNCTION TO CHECK WHETHER WE CAN REFRESH A TOKEN OR NOT
@@ -16,6 +18,13 @@ namespace TeamA.Exogredient.Services
     /// </summary>
     public static class AuthorizationService
     {
+        private static readonly UserDAO _userDAO;
+
+        static AuthorizationService()
+        {
+            _userDAO = new UserDAO();
+        }
+
         // TODO: LOAD RSA PRIVATE KEY FROM OS ENVIRONMENT
         private const string SIGNING_ALGORITHM = "RS512";
         private static readonly string PRIVATE_KEY = "TESTING_PRIVATE_RSA_KEY";
@@ -63,6 +72,26 @@ namespace TeamA.Exogredient.Services
             SHhash.Dispose();
 
             return string.Format("{0}.{1}.{2}", encodedHeader, encodedPayload, signature);
+        }
+
+        /// <summary>
+        /// Create a token for a logged-in user.
+        /// </summary>
+        /// <param name="userName"> logged-in username </param>
+        /// <returns> string of token that represents the user type and unique ID of the username </returns>
+        public static async Task<string> CreateTokenAsync(string userName)
+        {
+            // Get the user type of the username.
+            string userType = await _userDAO.GetUserTypeAsync(userName);
+
+            // Craete a dictionary that represents the user type and unique ID.
+            Dictionary<string, string> userInfo = new Dictionary<string, string>()
+            {
+                {"userType", userType},
+                {"id", userName }
+            };
+
+            return GenerateJWS(userInfo);
         }
 
         /// <summary>
@@ -350,6 +379,20 @@ namespace TeamA.Exogredient.Services
         {
             byte[] bytes = Convert.FromBase64String(str);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
+
+
+
+        // TODO: CHECK IP ADDRESSES
+        /// <summary>
+        /// Determines whether the user is within the project scope.
+        /// </summary>
+        /// <param name="answer">The user's selected scope answer.</param>
+        /// <returns>Returns the value of bool that determines whether the 
+        /// user is allowed to proceed.</returns>
+        public static bool CheckScope(bool answer)
+        {
+            return answer == true;
         }
     }
 }

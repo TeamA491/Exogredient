@@ -7,7 +7,7 @@ using TeamA.Exogredient.Services;
 namespace TeamA.Exogredient.Security.Tests
 {
     [TestClass]
-    public class SecurityUnitTests
+    public class SecurityServiceTests
     { 
         [DataTestMethod]
         [DataRow(new byte[] { 104, 101, 108, 108, 111 }, "68656C6C6F")]
@@ -16,7 +16,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
 
             //Act
-            string actual = SecurityService.BytesToHexString(bytes);
+            string actual = StringUtilityService.BytesToHexString(bytes);
 
             //Assert
             Assert.IsTrue(actual.Equals(expected));
@@ -62,7 +62,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
 
             //Act
-            string actual = SecurityService.ToHexString(original);
+            string actual = StringUtilityService.ToHexString(original);
 
             //Assert
             Assert.IsTrue(expected.Equals(actual));
@@ -74,7 +74,7 @@ namespace TeamA.Exogredient.Security.Tests
         {
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
-            string hexPassword = SecurityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt);
@@ -92,8 +92,8 @@ namespace TeamA.Exogredient.Security.Tests
         {
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
-            string hexPassword1 = SecurityService.ToHexString(password1);
-            string hexPassword2 = SecurityService.ToHexString(password2);
+            string hexPassword1 = StringUtilityService.ToHexString(password1);
+            string hexPassword2 = StringUtilityService.ToHexString(password2);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword1, salt);
@@ -110,7 +110,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
             byte[] salt1 = SecurityService.GenerateSalt();
             byte[] salt2 = SecurityService.GenerateSalt();
-            string hexPassword = SecurityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt1);
@@ -127,7 +127,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
             int hashBytesLength = 32;
-            string hexPassword = SecurityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt, hashBytesLength);
@@ -144,7 +144,7 @@ namespace TeamA.Exogredient.Security.Tests
             //Arrange
 
             //Act
-            byte[] actual = SecurityService.HexStringToBytes(hexString);
+            byte[] actual = StringUtilityService.HexStringToBytes(hexString);
 
             //Assert
             Assert.IsTrue(expected.SequenceEqual(actual));

@@ -156,7 +156,7 @@ namespace TeamA.Exogredient.Services
                 }
                 byte[] saltBytes = SecurityService.GenerateSalt();
                 string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
-                string saltString = SecurityService.BytesToHexString(saltBytes);
+                string saltString = StringUtilityService.BytesToHexString(saltBytes);
                 UserRecord newPasswordUser = new UserRecord(userName, password: hashedPassword, salt: saltString);
                 await _userDao.UpdateAsync(newPasswordUser);
             }
