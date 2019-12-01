@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.Services
         public static bool Compress(string sevenZipPath, string sourceDirectory, string targetDirectory)
         {
             // Check to make sure source Directory exists
-            if (!(Directory.Exists(sourceDirectory) || Directory.Exists(targetDirectory) || File.Exists(sevenZipPath)))
+            if (!(Directory.Exists(sourceDirectory) && Directory.Exists(targetDirectory) && File.Exists(sevenZipPath)))
             {
                 return false;
             }
