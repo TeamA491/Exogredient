@@ -2,7 +2,7 @@
 using System.IO;
 using TeamA.Exogredient.Services;
 
-namespace TeamA.Exogredient.Scripts
+namespace TeamA.Exogredient.ArchivingConsoleApp
 {
     class ArchivingScript
     {

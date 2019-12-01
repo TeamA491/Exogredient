@@ -8,4 +8,5 @@
   <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
   </ItemGroup>
+
 </Project>

@@ -5,7 +5,7 @@ using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace TeamA.Exogredient.Logging.Tests
+namespace TeamA.Exogredient.Tests
 {
     [TestClass]
     public class LoggingUnitTests

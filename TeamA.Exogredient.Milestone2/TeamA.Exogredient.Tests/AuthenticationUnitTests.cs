@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.Services;
 
-namespace TeamA.Exogredient.Authentication.Tests
+namespace TeamA.Exogredient.Tests
 {
     [TestClass]
     public class AuthenticationUnitTests
