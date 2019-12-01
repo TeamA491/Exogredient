@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 
-namespace TeamA.Exogredient.Security.Tests
+namespace TeamA.Exogredient.Tests
 {
     [TestClass]
     public class SecurityServiceTests

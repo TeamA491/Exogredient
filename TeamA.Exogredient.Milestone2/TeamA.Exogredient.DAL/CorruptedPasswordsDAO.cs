@@ -31,9 +31,8 @@ namespace TeamA.Exogredient.DAL
             {
                 // TODO: flesh out columns. make columns into fields.
                 string temp = (string)result.Current["password"];
-                string[] splitResult = temp.Split(':');
 
-                resultList.Add(splitResult[0]);
+                resultList.Add(temp);
 
             }
 
