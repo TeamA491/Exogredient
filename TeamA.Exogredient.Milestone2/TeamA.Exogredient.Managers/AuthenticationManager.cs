@@ -6,28 +6,24 @@ using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.Managers
 {
-    public class AuthenticationManager
+    public static class AuthenticationManager
     {
-        private IDictionary<string, int> _failureCounter;
-        private AuthenticationService _authenticationService;
-        private UserManagementService _userManagementService;
+        private static readonly IDictionary<string, int> _failureCounter;
 
-        private readonly int _maxAttempts = 3;
+        private static readonly int _maxAttempts = 3;
 
-        public AuthenticationManager()
+        static AuthenticationManager()
         {
-            _authenticationService = new AuthenticationService();
-            _userManagementService = new UserManagementService();
             _failureCounter = new Dictionary<string, int>();
         }
 
-        public async Task<bool> InitAuthentication(string userName, byte[] encryptedPassword, byte[]encryptedAESKey, byte[] aesIV)
+        public static async Task<bool> InitAuthentication(string userName, byte[] encryptedPassword, byte[]encryptedAESKey, byte[] aesIV)
         {
             try
             {
                 if (!_failureCounter.ContainsKey(userName))
                 {
-                    if (await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
+                    if (await AuthenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
                     {
                         _failureCounter.Add(userName, 1);
                         return false;
@@ -40,12 +36,12 @@ namespace TeamA.Exogredient.Managers
 
                 if (_failureCounter[userName] < _maxAttempts)
                 {
-                    if (await _authenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
+                    if (await AuthenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedAESKey, aesIV) == false)
                     {
                         _failureCounter[userName] += 1;
                         if (_failureCounter[userName] == _maxAttempts)
                         {
-                            await _userManagementService.DisableUserNameAsync(userName);
+                            await UserManagementService.DisableUserNameAsync(userName);
                         }
                         return false;
                     }

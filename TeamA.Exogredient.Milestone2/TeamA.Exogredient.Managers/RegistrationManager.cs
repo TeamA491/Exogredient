@@ -5,10 +5,10 @@ using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.Managers
 {
-    public class RegistrationManager
+    public static class RegistrationManager
     {
-        public void Register(bool answer, string firstName, string lastName, string email,
-                             string phoneNumber, string aesKey, string aesCipher)
+        public static void Register(bool answer, string firstName, string lastName, string email,
+                                    string phoneNumber, string aesKey, string aesCipher)
         {
             Console.WriteLine("Here in the manager.");
         }

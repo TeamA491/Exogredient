@@ -7,17 +7,17 @@ using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
-    public class DataStoreLoggingService
+    public static class DataStoreLoggingService
     {
-        private readonly DataStoreLoggingDAO _dsLoggingDAO;
+        private static readonly DataStoreLoggingDAO _dsLoggingDAO;
 
-        public DataStoreLoggingService()
+        static DataStoreLoggingService()
         {
             _dsLoggingDAO = new DataStoreLoggingDAO();
         }
 
-        public async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
-                                                    string ipAddress, string errorType)
+        public static async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
+                                                           string ipAddress, string errorType)
         {
             try
             {
@@ -38,8 +38,8 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task<bool> DeleteLogFromDataStoreAsync(string timestamp, string operation, string identifier,
-                                                            string ipAddress, string errorType)
+        public static async Task<bool> DeleteLogFromDataStoreAsync(string timestamp, string operation, string identifier,
+                                                                   string ipAddress, string errorType)
         {
             try
             {

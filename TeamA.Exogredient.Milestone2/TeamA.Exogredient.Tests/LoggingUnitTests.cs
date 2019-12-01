@@ -10,21 +10,12 @@ namespace TeamA.Exogredient.Logging.Tests
     [TestClass]
     public class LoggingUnitTests
     {
-        private LoggingManager _manager;
-        private FlatFileLoggingService _ffService;
-        private DataStoreLoggingService _dsService;
-        private DataStoreLoggingDAO _dsLoggingDAO;
-
         // Flat file log directory
         private readonly string _logDirectory = @"C:\Logs";
 
         [TestInitialize]
         public void init()
         {
-            _manager = new LoggingManager();
-            _ffService = new FlatFileLoggingService();
-            _dsService = new DataStoreLoggingService();
-            _dsLoggingDAO = new DataStoreLoggingDAO();
         }
 
         [DataTestMethod]
@@ -33,7 +24,7 @@ namespace TeamA.Exogredient.Logging.Tests
         public async Task FlatFileLoggingService_LogToFlatFileAsync_InvalidTimestampRejected(string timestamp, string operation, string identifier,
                                                                                              string ipAddress, string errorType)
         {
-            bool result = await _ffService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+            bool result = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
 
             Assert.IsFalse(result);
         }
@@ -55,7 +46,7 @@ namespace TeamA.Exogredient.Logging.Tests
 
             try
             {
-                await _ffService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
 
                 bool result = Directory.Exists(_logDirectory);
 
@@ -83,7 +74,7 @@ namespace TeamA.Exogredient.Logging.Tests
 
             try
             {
-                await _ffService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
 
                 bool result = File.Exists(_logDirectory + @"\20191125.CSV");
 
@@ -112,7 +103,7 @@ namespace TeamA.Exogredient.Logging.Tests
 
             try
             {
-                await _ffService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
 
                 bool result = false;
                 bool lineRead = false;

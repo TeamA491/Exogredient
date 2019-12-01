@@ -13,17 +13,19 @@ using Twilio.Rest.Preview.AccSecurity.Service;
 
 namespace TeamA.Exogredient.Services
 {
-    public class AuthenticationService
+    public static class AuthenticationService
     {
-        UserDAO _userDao;
+        
 
-        private readonly string _sendingEmail = "exogredient.system@gmail.com";
-        private readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
-        private readonly string _twilioAccountSID = "AC94d03adc3d2da651c16c82932c29b047";
-        private readonly string _twilioPathServiceSID = "VAa9682f046b6f511b9aa1807d4e2949e5";
-        private readonly string _twilioAuthorizationToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN", EnvironmentVariableTarget.User);
+        private static readonly string _sendingEmail = "exogredient.system@gmail.com";
+        private static readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
+        private static readonly string _twilioAccountSID = "AC94d03adc3d2da651c16c82932c29b047";
+        private static readonly string _twilioPathServiceSID = "VAa9682f046b6f511b9aa1807d4e2949e5";
+        private static readonly string _twilioAuthorizationToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN", EnvironmentVariableTarget.User);
 
-        public AuthenticationService()
+        private static readonly UserDAO _userDao;
+
+        static AuthenticationService()
         {
             _userDao = new UserDAO();
         }
@@ -36,7 +38,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
         /// <param name="aesIV"> AES Initialization Vector used for encrypting the password </param>
         /// <returns> true if the username and password are correct, false otherwise </returns>
-        public async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
+        public static async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
         {
             try
             {
@@ -87,7 +89,7 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task<bool> SendCallVerificationAsync(string phoneNumber)
+        public static async Task<bool> SendCallVerificationAsync(string phoneNumber)
         {
             try
             {
@@ -112,7 +114,7 @@ namespace TeamA.Exogredient.Services
 
         }
 
-        public async Task<bool> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
+        public static async Task<bool> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
         {
             try
             {
@@ -139,7 +141,7 @@ namespace TeamA.Exogredient.Services
 
         }
 
-        public async Task<bool> SendEmailVerificationAsync(string emailAddress)
+        public static async Task<bool> SendEmailVerificationAsync(string emailAddress)
         {
             try
             {

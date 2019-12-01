@@ -10,69 +10,68 @@ using MimeKit;
 
 namespace TeamA.Exogredient.Services
 {
-    public class UserManagementService
+    public static class UserManagementService
     {
+        private static readonly string _sendingEmail = "exogredient.system@gmail.com";
+        private static readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
+        private static readonly string _receivingEmail = "TEAMA.CS491@gmail.com";
 
-        UserDAO _userDao;
-        private readonly string _sendingEmail = "exogredient.system@gmail.com";
-        private readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
-        private readonly string _receivingEmail = "TEAMA.CS491@gmail.com";
+        private static readonly UserDAO _userDao;
 
-
-        public UserManagementService()
+        static UserManagementService()
         {
             _userDao = new UserDAO();
         }
 
 
         // TODO finish making checkuserexistence class 
-        public async Task<bool> CheckUserExistenceAsync(string username)
+        public static async Task<bool> CheckUserExistenceAsync(string username)
         {
             return false;
         }
 
         // TODO finish making phonenumberexistence
-        public async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
+        public static async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
         {
             return false;
         }
 
         // TODO finish making email exists
-        public async Task<bool> CheckEmailExistenceAsync(string email)
+        public static async Task<bool> CheckEmailExistenceAsync(string email)
         {
             return false;
         }
 
         // TODO finish making user disabled
-        public async Task<bool> CheckIfUserDisabledAsync(string username)
+        public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
             return false;
         }
         
-        public async Task<bool> CheckIPLockAsync(string IPAddress)
+        public static async Task<bool> CheckIPLockAsync(string IPAddress)
         {
             return false;
         }
 
-        public async Task<bool> LockIPAsync(string IPAddress)
+        public static async Task<bool> LockIPAsync(string IPAddress)
         {
             return false;
         }
 
-        public async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName,
-                                                    string email, string phoneNumber, string password, string disabled,
-                                                    string userType, string salt)
+        public static async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName,
+                                                       string email, string phoneNumber, string password, string disabled,
+                                                       string userType, string salt)
         {
 
             return false;
         }
 
-        public async Task<bool> DeleteUserAsync(string username)
+        public static async Task<bool> DeleteUserAsync(string username)
         {
             return false;
         }
 
-        public async Task<bool> MakeTempPerm(string username)
+        public static async Task<bool> MakeTempPerm(string username)
         {
             return false;
         }
@@ -81,7 +80,7 @@ namespace TeamA.Exogredient.Services
         /// Disable a username from logging in.
         /// </summary>
         /// <param name="userName"> username to disable </param>
-        public async Task<bool> DisableUserNameAsync(string userName)
+        public static async Task<bool> DisableUserNameAsync(string userName)
         {
             try
             {
@@ -112,7 +111,7 @@ namespace TeamA.Exogredient.Services
         /// Enable a username to log in.
         /// </summary>
         /// <param name="userName"> username to enable </param>
-        public async Task<bool> EnableUserNameAsync(string userName)
+        public static async Task<bool> EnableUserNameAsync(string userName)
         {
             try
             {
@@ -138,7 +137,7 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task ChangePasswordAsync(string userName, string password)
+        public static async Task ChangePasswordAsync(string userName, string password)
         {
             try
             {
@@ -173,7 +172,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="message">The message you want to send.</param>
         /// <returns>A bool representing whether the process succeeded.</returns>
-        public async Task<bool> NotifySystemAdminAsync(string body)
+        public static async Task<bool> NotifySystemAdminAsync(string body)
         {
             try
             {
@@ -221,7 +220,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="canonEmail">Email that already has been canonicalized.</param>
         /// <returns>Returns the value of bool to represent whether
         /// an canonicalized email is unique.</returns>
-        public async Task<bool> CheckEmailUniquenessAsync(string canonEmail)
+        public static async Task<bool> CheckEmailUniquenessAsync(string canonEmail)
         {
             //return await _userDAO.CheckEmailUniquenessAsync(canonEmail);
             return false;
@@ -233,7 +232,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="phoneNumber">The phone number we are checking.</param>
         /// <returns>Returns the value of bool to represent whether
         /// a phone number is unique.</returns>
-        public async Task<bool> CheckPhoneUniquenessAsync(string phoneNumber)
+        public static async Task<bool> CheckPhoneUniquenessAsync(string phoneNumber)
         {
             //return await _userDAO.CheckPhoneUniquenessAsync(phoneNumber);
             return false;
@@ -245,13 +244,13 @@ namespace TeamA.Exogredient.Services
         /// <param name="username">The username we are checking.</param>
         /// <returns>Returns the value of bool to represent whether
         /// an username is unique.</returns>
-        public async Task<bool> CheckUsernameUniquenessAsync(string username)
+        public static async Task<bool> CheckUsernameUniquenessAsync(string username)
         {
             //return await _userDAO.CheckUsernameUniquenessAsync(username);
             return false;
         }
 
-        bool MakeTempUserPerm(string username)
+        public static bool MakeTempUserPerm(string username)
         {
             //return async bool _UserDAO.MakeTempUserPerm(string username)
             return false;

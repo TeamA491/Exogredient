@@ -7,13 +7,13 @@ using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
-    public class FlatFileLoggingService
+    public static class FlatFileLoggingService
     {
-        private readonly string _logFolder = @"C:\Logs";
-        private readonly string _fileType = ".CSV";
+        private static readonly string _logFolder = @"C:\Logs";
+        private static readonly string _fileType = ".CSV";
 
-        public async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
-                                                   string ipAddress, string errorType)
+        public static async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
+                                                          string ipAddress, string errorType)
         {
             try
             {
@@ -66,8 +66,8 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task<bool> DeleteFromFlatFileAsync(string timestamp, string operation, string identifier,
-                                                        string ipAddress, string errorType)
+        public static async Task<bool> DeleteFromFlatFileAsync(string timestamp, string operation, string identifier,
+                                                               string ipAddress, string errorType)
         {
             try
             {
