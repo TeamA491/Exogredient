@@ -14,20 +14,22 @@ namespace TeamA.Exogredient.DAL
         private const string _tableName = Constants.UserDAOtableName;
 
         // Column names.
+        private const string _username = Constants.UserDAOusernameColumn;
         private const string _firstName = Constants.UserDAOfirstNameColumn;
         private const string _lastName = Constants.UserDAOlastNameColumn;
         private const string _email = Constants.UserDAOemailColumn;
-        private const string _userName = Constants.UserDAOusernameColumn;
         private const string _phoneNumber = Constants.UserDAOphoneNumberColumn;
         private const string _password = Constants.UserDAOpasswordColumn;
         private const string _disabled = Constants.UserDAOdisabledColumn;
         private const string _userType = Constants.UserDAOuserTypeColumn;
         private const string _salt = Constants.UserDAOsaltColumn;
+        private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
         private const string _emailCode= Constants.UserDAOemailCodeColumn;
         private const string _emailCodeTimestamp = Constants.UserDAOemailCodeTimestampColumn;
-        private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
-        private const string _loginFailures = Constants.UserDAOloginFaluresColmun;
-        private const string _lastFailTimestamp = Constants.UserDAOlastFailTimestampColumn;
+        private const string _loginFailures = Constants.UserDAOloginFailuresColmun;
+        private const string _lastLoginFailTimestamp = Constants.UserDAOlastLoginFailTimestampColumn;
+        private const string _emailCodeFailures = Constants.UserDAOemailCodeFailuresColumn;
+        private const string _phoneCodeFailures = Constants.UserDAOphoneCodeFailuresColumn;
 
         /// <summary>
         /// Get the hashed password and the salt stored in the database corresponding to the username.
@@ -48,7 +50,7 @@ namespace TeamA.Exogredient.DAL
                     throw new Exception("Invalid user name or password");
                 }
 
-                string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string storedPassword = "";
                 string salt = "";
 
@@ -144,7 +146,7 @@ namespace TeamA.Exogredient.DAL
                     throw new Exception("Invalid user name or password");
                 }
                 // Get the user type of the username
-                string sqlString = $"SELECT {_userType} FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string sqlString = $"SELECT {_userType} FROM {_tableName} WHERE {_username} = '{userName}';";
                 string userType;
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -173,7 +175,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
                 foreach (string userName in idsOfRows)
                 {
-                    string sqlString = $"DELETE {_tableName} WHERE {_userName} = '{userName}';";
+                    string sqlString = $"DELETE {_tableName} WHERE {_username} = '{userName}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     await command.ExecuteNonQueryAsync();
                 }
@@ -200,7 +202,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
                 foreach (string userName in idsOfRows)
                 {
-                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_userName} = '{userName}';";
+                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_username} = '{userName}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     var reader = await command.ExecuteReaderAsync();
 
@@ -240,14 +242,14 @@ namespace TeamA.Exogredient.DAL
 
                     foreach (KeyValuePair<string, string> pair in recordData)
                     {
-                        if (pair.Value != null && pair.Key != _userName)
+                        if (pair.Value != null && pair.Key != _username)
                         {
                             sqlString += $"{pair.Key} = '{pair.Value}',";
                         }
 
                     }
                     sqlString = sqlString.Remove(sqlString.Length - 1);
-                    sqlString += $" WHERE {_userName} = '{recordData[_userName]}';";
+                    sqlString += $" WHERE {_username} = '{recordData[_username]}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     await command.ExecuteNonQueryAsync();
 
@@ -282,7 +284,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
                 // Check if the username exists in the table.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_userName} = '{userName}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_username} = '{userName}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
@@ -380,7 +382,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
                 // Check if the username exists in the table.
-                string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_userName} = '{username}');";
+                string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_username} = '{username}');";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -414,7 +416,7 @@ namespace TeamA.Exogredient.DAL
                     throw new Exception("Invalid user name or password");
                 }
 
-                string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string emailCode = "";
                 string emailCodeTimestamp = "";
 

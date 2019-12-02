@@ -73,11 +73,11 @@ namespace TeamA.Exogredient.Services
         }
 
         public static async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                                       string phoneNumber, string password, string salt, string disabled, string userType)
+                                                       string phoneNumber, string password, string disabled, string userType, string salt)
         {
             string tempTimestamp = isTemp ? DateTime.UtcNow.ToString("hh:mm:ss MM-dd-yyyy UTC") : "";
 
-            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, salt, disabled, userType, tempTimestamp, "", "");
+            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, salt, disabled, userType, tempTimestamp, "", "", "", "", "", "");
 
             return await _userDAO.CreateAsync(record);
         }
