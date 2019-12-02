@@ -10,18 +10,17 @@ using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using Twilio;
 using Twilio.Rest.Preview.AccSecurity.Service;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
     public static class AuthenticationService
     {
-        
-
-        private static readonly string _sendingEmail = "exogredient.system@gmail.com";
-        private static readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
-        private static readonly string _twilioAccountSID = "AC94d03adc3d2da651c16c82932c29b047";
-        private static readonly string _twilioPathServiceSID = "VAa9682f046b6f511b9aa1807d4e2949e5";
-        private static readonly string _twilioAuthorizationToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN", EnvironmentVariableTarget.User);
+        private const string _systemEmailAddress = Constants.SystemEmailAddress;
+        private static readonly string _systemEmailPassword = Constants.SystemEmailPassword;
+        private const string _twilioAccountSID = Constants.TwilioAccountSID;
+        private const string _twilioPathServiceSID = Constants.TwilioPathServiceSID;
+        private static readonly string _twilioAuthorizationToken = Constants.TwilioAuthToken;
 
         private static readonly UserDAO _userDAO;
 
@@ -165,7 +164,7 @@ namespace TeamA.Exogredient.Services
             var message = new MimeMessage();
             var bodyBuilder = new BodyBuilder();
 
-            message.From.Add(new MailboxAddress(_sendingEmail));
+            message.From.Add(new MailboxAddress(_systemEmailAddress));
             message.To.Add(new MailboxAddress($"{emailAddress}"));
 
             message.Subject = "Exogredient Account Verification";
@@ -195,7 +194,7 @@ namespace TeamA.Exogredient.Services
             };
 
             await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-            await client.AuthenticateAsync(_sendingEmail, _sendingEmailPassword);
+            await client.AuthenticateAsync(_systemEmailAddress, _systemEmailPassword);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
             client.Dispose();

@@ -7,14 +7,15 @@ using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
     public static class UserManagementService
     {
-        private static readonly string _sendingEmail = "exogredient.system@gmail.com";
-        private static readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
-        private static readonly string _receivingEmail = "TEAMA.CS491@gmail.com";
+        private static readonly string _systemEmailAddress = Constants.SystemEmailAddress;
+        private static readonly string _systemEmailPassword = Constants.SystemEmailPassword;
+        private static readonly string _systemAdminEmailAddress = Constants.SystemAdminEmailAddress;
 
         private static readonly UserDAO _userDAO;
         private static readonly LockedIPDAO _lockedIPDAO;
@@ -186,8 +187,8 @@ namespace TeamA.Exogredient.Services
             var message = new MimeMessage();
             var bodyBuilder = new BodyBuilder();
 
-            message.From.Add(new MailboxAddress($"{_sendingEmail}"));
-            message.To.Add(new MailboxAddress($"{_receivingEmail}"));
+            message.From.Add(new MailboxAddress($"{_systemEmailAddress}"));
+            message.To.Add(new MailboxAddress($"{_systemAdminEmailAddress}"));
 
             message.Subject = title;
 
@@ -204,7 +205,7 @@ namespace TeamA.Exogredient.Services
             };
 
             await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-            await client.AuthenticateAsync($"{_sendingEmail}", $"{_sendingEmailPassword}");
+            await client.AuthenticateAsync($"{_systemEmailAddress}", $"{_systemEmailPassword}");
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
             client.Dispose();

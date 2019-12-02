@@ -4,19 +4,18 @@ using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
     public class LockedIPDAO : MasterSQLDAO<string>
     {
         // Table name.
-        private const string _tableName = "locked_ip";
+        private const string _tableName = Constants.IPAddressDAOTableName;
 
         // Column names.
-        private const string _ipAddress = "ip_address";          //VARCHAR(15)
-        private const string _timestamp = "timestamp";           //VARCHAR(23)
-        //00:00:00 mm-dd-yyyy UTC
-
+        private const string _ip = Constants.IPAddressDAOIPColumn;
+        private const string _timestampLocked = Constants.IPAddressDAOTimestampLockedColumn;
 
         public override async Task<bool> CreateAsync(object record)
         {
@@ -78,7 +77,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
                 foreach (string ipAddress in idsOfRows)
                 {
-                    string sqlString = $"DELETE {_tableName} WHERE {_ipAddress} = '{ipAddress}';";
+                    string sqlString = $"DELETE {_tableName} WHERE {_ip} = '{ipAddress}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     await command.ExecuteNonQueryAsync();
                 }
@@ -105,7 +104,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
                 foreach (string ipAddress in idsOfRows)
                 {
-                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_ipAddress} = '{ipAddress}';";
+                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_ip} = '{ipAddress}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     var reader = await command.ExecuteReaderAsync();
 
@@ -145,14 +144,14 @@ namespace TeamA.Exogredient.DAL
 
                     foreach (KeyValuePair<string, string> pair in recordData)
                     {
-                        if (pair.Value != null && pair.Key != _ipAddress)
+                        if (pair.Value != null && pair.Key != _ip)
                         {
                             sqlString += $"{pair.Key} = '{pair.Value}',";
                         }
 
                     }
                     sqlString = sqlString.Remove(sqlString.Length - 1);
-                    sqlString += $" WHERE {_ipAddress} = '{recordData[_ipAddress]}';";
+                    sqlString += $" WHERE {_ip} = '{recordData[_ip]}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     await command.ExecuteNonQueryAsync();
 
@@ -187,7 +186,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
                 // Check if the username exists in the table.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_ipAddress} = '{ipAddress}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_ip} = '{ipAddress}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
@@ -215,7 +214,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT {_timestamp}  FROM {_tableName} WHERE {_ipAddress} = '{ipAddress}';";
+                string sqlString = $"SELECT {_timestampLocked}  FROM {_tableName} WHERE {_ip} = '{ipAddress}';";
                 string result = "";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))

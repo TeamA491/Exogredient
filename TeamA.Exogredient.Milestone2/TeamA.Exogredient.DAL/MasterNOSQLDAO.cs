@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
     public abstract class MasterNOSQLDAO<T>
     {
-        protected static readonly string ConnectionString = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
+        protected static readonly string ConnectionString = Constants.NOSQLConnection;
 
         public abstract Task<bool> CreateAsync(object record, string yyyymmdd);
 
