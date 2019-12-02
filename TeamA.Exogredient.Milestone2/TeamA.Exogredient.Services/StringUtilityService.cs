@@ -324,6 +324,7 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // NOTE: does not account for 901. but will return tru for 012
         public static bool ContainsRepetitionOrSequence(string plaintextPassword)
         {
             // Repetition and sequence checking.
@@ -612,7 +613,7 @@ namespace TeamA.Exogredient.Services
                                         nextPositionIncrease = 1;
                                     }
 
-                                    if (nextPositionDecrease == 0)
+                                    if (nextPositionDecrease < 1)
                                     {
                                         nextPositionDecrease = 9;
                                     }

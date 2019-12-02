@@ -68,6 +68,41 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
         }
 
+        [DataTestMethod]
+        [DataRow("111111111111111111")]
+        [DataRow("aaaaaaaaaaaaaaaaaa")]
+        [DataRow("987654321098765432")]
+        [DataRow("abcdefghijklmnopqr")]
+        [DataRow("ABCDEFGHIJKLMNOPQR")]
+        [DataRow("zyxwvutsrqponmlkji")]
+        [DataRow("ZYXWVUTSRQPONMLKJI")]
+        [DataRow("ImTrying1234ToBeSneaky")]
+        [DataRow("SneakySneakyasdfhhlsadfjls987asdf")]
+        [DataRow("aabbccddeee")]
+        [DataRow("!!!!!!!!!!!@@@@@@@")]
+        [DataRow("%%%%%%%%%%%%%%%%%%")]
+        [DataRow("<<<<<<<<<<<<<<<<<<")]
+        [DataRow("::s:::::::::::::::")]
+        [DataRow("\"\"\"\"\"\"\"\"\"\"\"\"\"\"")]
+        [DataRow("912")]
+        public void StringUtilityService_ContainsRepetitionOrSequence_InvalidPasswordsRejected(string plaintextPassword)
+        {
+            bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
+            Assert.IsTrue(result);
+        }
+
+        [DataTestMethod]
+        [DataRow("05830672945710")]
+        [DataRow("imGoingTopass3489512")]
+        [DataRow("ABadPasswordThisIs")]
+        [DataRow("121212121223232323")]
+        [DataRow("thisshouldnotcontainreptitions")]
+        [DataRow("34895019")]
+        public void StringUtilityService_ContainsRepetitionOrSequence_validPasswordsApproved(string plaintextPassword)
+        {
+            bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
+            Assert.IsFalse(result);
+        }
 
     }
 }
