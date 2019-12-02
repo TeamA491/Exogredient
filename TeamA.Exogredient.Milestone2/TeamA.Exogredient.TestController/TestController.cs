@@ -13,7 +13,9 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
-            //lol
+            //await AuthenticationService.SendCallVerificationAsync("9499815506");
+            string result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "0738");
+            Console.WriteLine(result);
         }
     }
 }

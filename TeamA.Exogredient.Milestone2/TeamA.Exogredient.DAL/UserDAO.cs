@@ -25,6 +25,8 @@ namespace TeamA.Exogredient.DAL
         private const string _salt = Constants.UserDAOsaltColumn;
         private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
         //00:00:00 mm-dd-yyyy UTC
+        private const string _emailCode= Constants.UserDAOemailCodeColumn;
+        private const string _emailCodeTimestamp = Constants.UserDAOemailCodeTimestampColumn;
 
         /// <summary>
         /// Get the hashed password and the salt stored in the database corresponding to the username.
@@ -396,6 +398,44 @@ namespace TeamA.Exogredient.DAL
             }
 
             return result;
+        }
+
+        public async Task<Tuple<string, string>> GetEmailCodeAndTimestamp(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+
+                if (!(await CheckUserExistenceAsync(userName)))
+                {
+                    throw new Exception("Invalid user name or password");
+                }
+
+                string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string emailCode = "";
+                string emailCodeTimestamp = "";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    emailCode = reader.GetString(0);
+                    emailCodeTimestamp = reader.GetString(1);
+                    reader.Close();
+                }
+
+                return Tuple.Create(emailCode, emailCodeTimestamp);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
         }
     }
 }

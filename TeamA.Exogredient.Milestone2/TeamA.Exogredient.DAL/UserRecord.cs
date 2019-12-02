@@ -11,7 +11,8 @@ namespace TeamA.Exogredient.DAL
 
         public UserRecord(string username, string firstName = null, string lastName = null, string email = null, 
             string phoneNumber = null, string password = null, string salt = null,
-            string disabled = null, string userType = null, string tempTimestamp = null)
+            string disabled = null, string userType = null, string tempTimestamp = null, string emailCode = null,
+            string emailCodeTimestamp = null)
         {
             data.Add(Constants.UserDAOusernameColumn, username);
             data.Add(Constants.UserDAOfirstNameColumn, firstName);
@@ -23,6 +24,8 @@ namespace TeamA.Exogredient.DAL
             data.Add(Constants.UserDAOuserTypeColumn, userType);
             data.Add(Constants.UserDAOsaltColumn, salt);
             data.Add(Constants.UserDAOtempTimestampColumn, tempTimestamp);
+            data.Add(Constants.UserDAOemailCodeColumn, emailCode);
+            data.Add(Constants.UserDAOemailCodeTimestampColumn, emailCodeTimestamp);
         }
 
         public IDictionary<string, string> GetData()

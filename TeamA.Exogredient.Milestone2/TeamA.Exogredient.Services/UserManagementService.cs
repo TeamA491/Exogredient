@@ -76,7 +76,7 @@ namespace TeamA.Exogredient.Services
         {
             string tempTimestamp = isTemp ? DateTime.UtcNow.ToString("hh:mm:ss MM-dd-yyyy UTC") : "";
 
-            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, salt, disabled, userType, tempTimestamp);
+            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, salt, disabled, userType, tempTimestamp, "", "");
 
             return await _userDAO.CreateAsync(record);
         }
@@ -89,6 +89,20 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> MakeTempPerm(string username)
         {
             UserRecord record = new UserRecord(username, tempTimestamp: "");
+
+            return await _userDAO.UpdateAsync(record);
+        }
+
+        public static async Task<bool> StoreEmailCode(string username, string emailCode, string emailCodeTimestamp)
+        {
+            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp);
+
+            return await _userDAO.UpdateAsync(record);
+        }
+
+        public static async Task<bool> RemoveEmailCode(string username)
+        {
+            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: "");
 
             return await _userDAO.UpdateAsync(record);
         }
