@@ -18,7 +18,7 @@ namespace TeamA.Exogredient.Tests
         public async Task AuthenticationService_Authenticate_CorrectInputs(string userName, string password)
         {
             //Arrange
-            if (await userDAO.IsUserNameDisabledAsync(userName))
+            if (await userDAO.CheckIfUserDisabledAsync(userName))
             {
                 await UserManagementService.EnableUserNameAsync(userName);
             }
@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Tests
         public async Task AuthenticationService_Authenticate_IncorrectPassword(string userName, string password)
         {
             //Arrange
-            if (await userDAO.IsUserNameDisabledAsync(userName))
+            if (await userDAO.CheckIfUserDisabledAsync(userName))
             {
                 await UserManagementService.EnableUserNameAsync(userName);
             }
@@ -90,11 +90,11 @@ namespace TeamA.Exogredient.Tests
             try
             {
                 await UserManagementService.DisableUserNameAsync(userName);
-                result = await userDAO.IsUserNameDisabledAsync(userName);
+                result = await userDAO.CheckIfUserDisabledAsync(userName);
             }
             catch
             {
-                result = await userDAO.IsUserNameDisabledAsync(userName);
+                result = await userDAO.CheckIfUserDisabledAsync(userName);
             }
 
             //Assert
@@ -112,11 +112,11 @@ namespace TeamA.Exogredient.Tests
             try
             {
                 await UserManagementService.EnableUserNameAsync(userName);
-                result = await userDAO.IsUserNameDisabledAsync(userName);
+                result = await userDAO.CheckIfUserDisabledAsync(userName);
             }
             catch
             {
-                result = await userDAO.IsUserNameDisabledAsync(userName);
+                result = await userDAO.CheckIfUserDisabledAsync(userName);
             }
 
             //Assert

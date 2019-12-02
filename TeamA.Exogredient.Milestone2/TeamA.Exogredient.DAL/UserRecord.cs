@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TeamA.Exogredient.AppConstants;
 
 
 namespace TeamA.Exogredient.DAL
@@ -8,19 +9,20 @@ namespace TeamA.Exogredient.DAL
     {
         IDictionary<string, string> data = new Dictionary<string, string>();
 
-        public UserRecord(string userName, string firstName = null, string lastName = null, string email = null, 
+        public UserRecord(string username, string firstName = null, string lastName = null, string email = null, 
             string phoneNumber = null, string password = null, string salt = null,
-            string disabled = null, string userType = null)
+            string disabled = null, string userType = null, string tempTimestamp = null)
         {
-            data.Add("username", userName);
-            data.Add("first_name", firstName);
-            data.Add("last_name", lastName);
-            data.Add("email", email);
-            data.Add("phone_number", phoneNumber);
-            data.Add("password", password);
-            data.Add("disabled", disabled);
-            data.Add("user_type", userType);
-            data.Add("salt", salt);
+            data.Add(Constants.UserDAOusernameColumn, username);
+            data.Add(Constants.UserDAOfirstNameColumn, firstName);
+            data.Add(Constants.UserDAOlastNameColumn, lastName);
+            data.Add(Constants.UserDAOemailColumn, email);
+            data.Add(Constants.UserDAOphoneNumberColumn, phoneNumber);
+            data.Add(Constants.UserDAOpasswordColumn, password);
+            data.Add(Constants.UserDAOpasswordColumn, disabled);
+            data.Add(Constants.UserDAOuserTypeColumn, userType);
+            data.Add(Constants.UserDAOsaltColumn, salt);
+            data.Add(Constants.UserDAOtempTimestampColumn, tempTimestamp);
         }
 
         public IDictionary<string, string> GetData()

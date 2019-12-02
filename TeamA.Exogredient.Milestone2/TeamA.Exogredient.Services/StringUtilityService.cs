@@ -9,6 +9,22 @@ namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
     {
+        private static readonly IDictionary<int, int> monthDays = new Dictionary<int, int>()
+            {
+                { 1, 31 },
+                { 2, 28 },
+                { 3, 31 },
+                { 4, 30 },
+                { 5, 31 },
+                { 6, 30 },
+                { 7, 31 },
+                { 8, 31 },
+                { 9, 30 },
+                { 10, 31 },
+                { 11, 30 },
+                { 12, 31 }
+            };
+
         // No < or > to protect from SQL injections.
         private static readonly List<char> _alphaNumericSpecialCharacters = new List<char>()
         {
@@ -92,6 +108,194 @@ namespace TeamA.Exogredient.Services
         static StringUtilityService()
         {
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
+        }
+
+        // e.g. "21:03:00 12-01-2019 UTC"
+        public static bool CurrentTimePastDatePlusTimespan(string date, TimeSpan span)
+        {
+            int lockedHour = Int32.Parse(date.Substring(0, 2));
+            int lockedMinute = Int32.Parse(date.Substring(3, 2));
+            int lockedSecond = Int32.Parse(date.Substring(6, 2));
+            int lockedMonth = Int32.Parse(date.Substring(9, 2));
+            int lockedDay = Int32.Parse(date.Substring(12, 2));
+            int lockedYear = Int32.Parse(date.Substring(15, 4));
+
+            int inputHours = span.Hours;
+            int inputMinute = span.Minutes;
+            int inputSecond = span.Seconds;
+
+            int resultHour = lockedHour;
+            int resultMinute = lockedMinute;
+            int resultSecond = lockedSecond;
+            int resultMonth = lockedMonth;
+            int resultDay = lockedDay;
+            int resultYear = lockedYear;
+
+            // Get result date time
+
+            for (int i = 0; i < inputHours; i++)
+            {
+                resultHour++;
+
+                if (resultHour > 23)
+                {
+                    resultHour = 00;
+
+                    resultDay++;
+                }
+
+                if (resultDay > monthDays[resultMonth])
+                {
+                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    {
+                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        {
+                            // Not a leap year.
+                            resultDay = 01;
+
+                            resultMonth++;
+                        }
+                        else
+                        {
+                            // Leap year.
+                        }
+                    }
+                    else
+                    {
+                        resultDay = 01;
+
+                        resultMonth++;
+                    }
+                }
+
+                if (resultMonth > 12)
+                {
+                    resultMonth = 01;
+
+                    resultYear++;
+                }
+            }
+
+            for (int i = 0; i < inputMinute; i++)
+            {
+                resultMinute++;
+
+                if (resultMinute > 59)
+                {
+                    resultMinute = 00;
+
+                    resultHour++;
+                }
+
+                if (resultHour > 23)
+                {
+                    resultHour = 00;
+
+                    resultDay++;
+                }
+
+                if (resultDay > monthDays[resultMonth])
+                {
+                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    {
+                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        {
+                            // Not a leap year.
+                            resultDay = 01;
+
+                            resultMonth++;
+                        }
+                        else
+                        {
+                            // Leap year.
+                        }
+                    }
+                    else
+                    {
+                        resultDay = 01;
+
+                        resultMonth++;
+                    }
+                }
+
+                if (resultMonth > 12)
+                {
+                    resultMonth = 01;
+
+                    resultYear++;
+                }
+            }
+
+            for (int i = 0; i < inputSecond; i++)
+            {
+                resultSecond++;
+
+                if (resultSecond > 59)
+                {
+                    resultSecond = 00;
+
+                    resultMinute++;
+                }
+
+                if (resultMinute > 59)
+                {
+                    resultMinute = 00;
+
+                    resultHour++;
+                }
+
+                if (resultHour > 23)
+                {
+                    resultHour = 00;
+
+                    resultDay++;
+                }
+
+                if (resultDay > monthDays[resultMonth])
+                {
+                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    {
+                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        {
+                            // Not a leap year.
+                            resultDay = 01;
+
+                            resultMonth++;
+                        }
+                        else
+                        {
+                            // Leap year.
+                        }
+                    }
+                    else
+                    {
+                        resultDay = 01;
+
+                        resultMonth++;
+                    }
+                }
+
+                if (resultMonth > 12)
+                {
+                    resultMonth = 01;
+
+                    resultYear++;
+                }
+            }
+
+            // Compare datetimes
+            DateTime resultTime = new DateTime(resultYear, resultMonth, resultDay, resultHour, resultMinute, resultSecond, DateTimeKind.Utc);
+
+            int compareResult = DateTime.Compare(resultTime, DateTime.UtcNow);
+
+            if (compareResult < 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>

@@ -4,98 +4,27 @@ using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
     public class UserDAO : MasterSQLDAO<string>
     {
         // Table name.
-        private const string _tableName = "User";
+        private const string _tableName = "user";
 
         // Column names.
-        private const string _firstName = "first_name";         //VARCHAR(200)
-        private const string _lastName = "last_name";           //VARCHAR(200)
-        private const string _email = "email";                  //VARCHAR(200)
-        private const string _userName = "username";            //VARCHAR(200)
-        private const string _phoneNumber = "phone_number";     //VARCHAR(12)
-        private const string _password = "password";            //VARCHAR(2000)
-        private const string _disabled = "disabled";            //VARCHAR(5)
-        private const string _userType = "user_type";           //VARCHAR(11)
-        private const string _salt = "salt";                    //VARCHAR(200)
-
-
-        /// <summary>
-        /// check if the username is disabled.
-        /// </summary>
-        /// <param name="userName"> username to be checked </param>
-        /// <returns>true if username is disabled, false otherwise </returns>
-        ///
-        public async Task<bool> IsUserNameDisabledAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            bool isDisabled;
-            try
-            {
-                // Check if the username exists.
-                if (! (await UserNameExistsAsync(userName)))
-                {
-                    throw new Exception("The username doesn't exist!");
-                }
-                // Connect to the database.
-                connection.Open();
-                // Get the value in disabled column of the username.
-                string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_userName} = '{userName}'";
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    isDisabled = reader.GetBoolean(0);
-                    return isDisabled;
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
-        /// <summary>
-        /// Check if the username exists.
-        /// </summary>
-        /// <param name="userName"> username to be checked </param>
-        /// <returns> true if username exists, otherwise false </returns>
-        public async Task<bool> UserNameExistsAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            bool exist;
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-                // Check if the username exists in the table.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_userName} = '{userName}');";
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    exist = reader.GetBoolean(0);
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return exist;
-        }
+        private const string _firstName = Constants.UserDAOfirstNameColumn;
+        private const string _lastName = Constants.UserDAOlastNameColumn;
+        private const string _email = Constants.UserDAOemailColumn;
+        private const string _userName = Constants.UserDAOusernameColumn;
+        private const string _phoneNumber = Constants.UserDAOphoneNumberColumn;
+        private const string _password = Constants.UserDAOpasswordColumn;
+        private const string _disabled = Constants.UserDAOdisabledColumn;
+        private const string _userType = Constants.UserDAOuserTypeColumn;
+        private const string _salt = Constants.UserDAOsaltColumn;
+        private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
+        //00:00:00 mm-dd-yyyy UTC
 
         /// <summary>
         /// Get the hashed password and the salt stored in the database corresponding to the username.
@@ -111,7 +40,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                if (!(await UserNameExistsAsync(userName)))
+                if (!(await CheckUserExistenceAsync(userName)))
                 {
                     throw new Exception("Invalid user name or password");
                 }
@@ -181,7 +110,7 @@ namespace TeamA.Exogredient.DAL
                 }
                 catch (Exception e)
                 {
-                    return false;
+                    throw e;
                 }
                 finally
                 {
@@ -190,7 +119,7 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                return false;
+                throw new ArgumentException("UserDAO.CreateAsync argument must be of type UserRecord");
             }
         }
 
@@ -207,7 +136,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
                 // Check if the username exists.
-                if (! (await UserNameExistsAsync(userName)))
+                if (! (await CheckUserExistenceAsync(userName)))
                 {
                     throw new Exception("Invalid user name or password");
                 }
@@ -250,7 +179,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch (Exception e)
             {
-                return false;
+                throw e;
             }
             finally
             {
@@ -279,12 +208,10 @@ namespace TeamA.Exogredient.DAL
                         string stringResult = row.ToString();
                         result.Add(stringResult);
                     }
-                    //stringResult += row[_id].ToString() + "," + row[_testColumn];
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
                 throw e;
             }
             finally
@@ -323,9 +250,9 @@ namespace TeamA.Exogredient.DAL
 
                     return true;
                 }
-                catch
+                catch (Exception e)
                 {
-                    return false;
+                    throw e;
                 }
                 finally
                 {
@@ -334,36 +261,141 @@ namespace TeamA.Exogredient.DAL
             }
             else
             {
-                return false;
+                throw new ArgumentException("UserDAO.UpdateAsync argument must be of type UserRecord");
             }
         }
 
-        public bool CheckEmailUniquenessAsync(string phonenumber)
+        /// <summary>
+        /// Check if the username exists.
+        /// </summary>
+        /// <param name="userName"> username to be checked </param>
+        /// <returns> true if username exists, otherwise false </returns>
+        public async Task<bool> CheckUserExistenceAsync(string userName)
         {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            bool exist;
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+                // Check if the username exists in the table.
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_userName} = '{userName}');";
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    exist = reader.GetBoolean(0);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
 
-            return false;
+            return exist;
         }
 
-        public bool CheckUsernameUniquenessAsync(string username)
+        /// <summary>
+        /// Check if the phone number exists.
+        /// </summary>
+        /// <param name="phoneNumber"> phone number to be checked </param>
+        /// <returns> true if phone number exists, otherwise false </returns>
+        public async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
         {
-            return false;
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            bool exist;
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+                // Check if the username exists in the table.
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_phoneNumber} = '{phoneNumber}');";
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    exist = reader.GetBoolean(0);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return exist;
         }
 
-        public bool GenerateTempUser(string username)
+        /// <summary>
+        /// Check if the email exists.
+        /// </summary>
+        /// <param name="email"> email to be checked </param>
+        /// <returns> true if email exists, otherwise false </returns>
+        public async Task<bool> CheckEmailExistenceAsync(string email)
         {
-            return false;
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            bool exist;
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+                // Check if the username exists in the table.
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_email} = '{email}');";
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    exist = reader.GetBoolean(0);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return exist;
         }
 
-        public bool DeleteTempUser(string username)
+        public async Task<bool> CheckIfUserDisabledAsync(string username)
         {
-            return false;
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            bool result;
+
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+                // Check if the username exists in the table.
+                string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_userName} = '{username}');";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    result = reader.GetString(0) == "1" ? true : false;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result;
         }
-
-        public bool MakeTempUserPerm(string username)
-        {
-            return false;
-        }
-
-
     }
 }

@@ -13,7 +13,7 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            //lol
         }
     }
 }

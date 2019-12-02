@@ -43,12 +43,12 @@ namespace TeamA.Exogredient.Services
             try
             {
                 // Check if the username exists.
-                if (! (await _userDao.UserNameExistsAsync(userName)))
+                if (! (await _userDao.CheckUserExistenceAsync(userName)))
                 {
                     return false;
                 }
                 // Check if the username is disabled.
-                if (await _userDao.IsUserNameDisabledAsync(userName))
+                if (await _userDao.CheckIfUserDisabledAsync(userName))
                 {
                     // TODO Create Custom Exception: For User
                     throw new Exception("This username is locked! To enable, contact the admin");
