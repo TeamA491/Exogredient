@@ -8,14 +8,16 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class LockedIPDAO : MasterSQLDAO<string>
+    public class IPAddressDAO : MasterSQLDAO<string>
     {
         // Table name.
-        private const string _tableName = Constants.IPAddressDAOTableName;
+        private const string _tableName = Constants.IPAddressDAOtableName;
 
         // Column names.
         private const string _ip = Constants.IPAddressDAOIPColumn;
-        private const string _timestampLocked = Constants.IPAddressDAOTimestampLockedColumn;
+        private const string _timestampLocked = Constants.IPAddressDAOtimestampLockedColumn;
+        private const string _registrationFailures = Constants.IPAddressDAOregistrationFailuresColumn;
+        private const string _lastFailTimestamp = Constants.IPAddressDAOlastFailTimestampColumn;
 
         public override async Task<bool> CreateAsync(object record)
         {

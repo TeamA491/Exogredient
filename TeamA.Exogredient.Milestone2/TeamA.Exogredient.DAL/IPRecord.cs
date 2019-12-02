@@ -12,7 +12,7 @@ namespace TeamA.Exogredient.DAL
         public IPRecord(string ip, string timestamp = null)
         {
             data.Add(Constants.IPAddressDAOIPColumn, ip);
-            data.Add(Constants.IPAddressDAOTimestampLockedColumn, timestamp);
+            data.Add(Constants.IPAddressDAOtimestampLockedColumn, timestamp);
         }
 
         public IDictionary<string, string> GetData()

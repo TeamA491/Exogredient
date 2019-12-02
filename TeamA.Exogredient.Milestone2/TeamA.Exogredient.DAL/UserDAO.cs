@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.DAL
     public class UserDAO : MasterSQLDAO<string>
     {
         // Table name.
-        private const string _tableName = Constants.UserDAOTableName;
+        private const string _tableName = Constants.UserDAOtableName;
 
         // Column names.
         private const string _firstName = Constants.UserDAOfirstNameColumn;
@@ -26,7 +26,8 @@ namespace TeamA.Exogredient.DAL
         private const string _emailCode= Constants.UserDAOemailCodeColumn;
         private const string _emailCodeTimestamp = Constants.UserDAOemailCodeTimestampColumn;
         private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
-        //00:00:00 mm-dd-yyyy UTC
+        private const string _loginFailures = Constants.UserDAOloginFaluresColmun;
+        private const string _lastFailTimestamp = Constants.UserDAOlastFailTimestampColumn;
 
         /// <summary>
         /// Get the hashed password and the salt stored in the database corresponding to the username.

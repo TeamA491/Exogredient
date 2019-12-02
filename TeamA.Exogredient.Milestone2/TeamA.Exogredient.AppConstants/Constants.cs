@@ -27,7 +27,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogFileType = ".CSV";
 
         // USER TABLE
-        public const string UserDAOTableName = "user";
+        public const string UserDAOtableName = "user";
         public const string UserDAOusernameColumn = "username";                             // VARCHAR(200)
         public const string UserDAOfirstNameColumn = "first_name";                          // VARCHAR(200)
         public const string UserDAOlastNameColumn = "last_name";                            // VARCHAR(200)
@@ -40,15 +40,16 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDAOtempTimestampColumn = "temp_timestamp";                  // VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
         public const string UserDAOemailCodeColumn = "email_code";                          // VARCHAR(6)
         public const string UserDAOemailCodeTimestampColumn = "email_code_timestamp";       // VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
-        public const string UserDAOregistrationFailuresColumn = "registration_failures";    // VARCHAR(1)
-        public const string UserDAOlastFailTimestampColumn = "last_fail_timestamp";         // VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
+        public const string UserDAOloginFaluresColmun = "login_failures";              //VARCHAR(15)
+        public const string UserDAOlastFailTimestampColumn = "last_fail_timestamp";     //VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
 
         // IP TABLE
-        public const string IPAddressDAOTableName = "ip_address";
+        public const string IPAddressDAOtableName = "ip_address";
         public const string IPAddressDAOIPColumn = "ip";                                    //VARCHAR(15)
-        public const string IPAddressDAOTimestampLockedColumn = "timestamp_locked";         //VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
-        public const string IPAddressDAOloginFaluresColmun = "login_failures";              //VARCHAR(15)
-        public const string IPAddressDAOlastFailTimestampColumn= "last_fail_timestamp";     //VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
+        public const string IPAddressDAOtimestampLockedColumn = "timestamp_locked";         //VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
+
+        public const string IPAddressDAOregistrationFailuresColumn = "registration_failures";    // VARCHAR(1)
+        public const string IPAddressDAOlastFailTimestampColumn = "last_fail_timestamp";         // VARCHAR(23) -- 00:00:00 mm-dd-yyyy UTC
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";

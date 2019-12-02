@@ -18,12 +18,12 @@ namespace TeamA.Exogredient.Services
         private static readonly string _systemAdminEmailAddress = Constants.SystemAdminEmailAddress;
 
         private static readonly UserDAO _userDAO;
-        private static readonly LockedIPDAO _lockedIPDAO;
+        private static readonly IPAddressDAO _lockedIPDAO;
 
         static UserManagementService()
         {
             _userDAO = new UserDAO();
-            _lockedIPDAO = new LockedIPDAO();
+            _lockedIPDAO = new IPAddressDAO();
         }
 
 
