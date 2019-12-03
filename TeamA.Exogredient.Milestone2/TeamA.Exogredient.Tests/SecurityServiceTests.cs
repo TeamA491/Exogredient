@@ -41,8 +41,6 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(plainData.SequenceEqual(decryptedData));
         }
 
-        
-
         [DataTestMethod]
         [DataRow("string1")]
         public void SecurityService_HashWithKDF_GenerateSameHashWithSameInputs(string password)
@@ -105,8 +103,25 @@ namespace TeamA.Exogredient.Tests
             string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
-            string a = SecurityService.HashWithKDF(hexPassword, salt, hashBytesLength);
-            string b = SecurityService.HashWithKDF(hexPassword, salt, hashBytesLength-16);
+            string a = SecurityService.HashWithKDF(hexPassword, salt, hashLength:hashBytesLength);
+            string b = SecurityService.HashWithKDF(hexPassword, salt, hashLength:hashBytesLength-16);
+
+            //Assert
+            Assert.IsFalse(a.Equals(b));
+        }
+
+        [DataTestMethod]
+        [DataRow("string1")]
+        public void SecurityService_HashWithKDF_GenerateDifferentHashesWithDifferentIterations(string password)
+        {
+            //Arrange
+            byte[] salt = SecurityService.GenerateSalt();
+            int iterations = 10000;
+            string hexPassword = StringUtilityService.ToHexString(password);
+
+            //Act
+            string a = SecurityService.HashWithKDF(hexPassword, salt);
+            string b = SecurityService.HashWithKDF(hexPassword, salt, iterations:iterations-100);
 
             //Assert
             Assert.IsFalse(a.Equals(b));

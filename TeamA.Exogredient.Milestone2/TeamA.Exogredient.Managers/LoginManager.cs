@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using TeamA.Exogredient.Services;
 
@@ -17,12 +18,19 @@ namespace TeamA.Exogredient.Managers
                 {
                     Result<bool> result = new Result<bool>("Logged in successfully.");
                     result.Data = authenticationSuccess;
+                    string token = await AuthorizationService.CreateTokenAsync(userName);
+                    string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                    path = path + $"{path.Substring(0, 1)}" + "token.txt";
+                    using (StreamWriter sw = File.CreateText(path))
+                    {
+                        sw.WriteLine(token);
+                    }
                     return result;
                 }
                 else
                 {
                     //TODO add failure increment function here
-                    Result<bool> result = new Result<bool>("Invalid username or password.");
+                    Result<bool> result = new Result<bool>("Invalid username and/or password.");
                     result.Data = authenticationSuccess;
                     return result;
                 }

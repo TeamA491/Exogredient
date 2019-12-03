@@ -62,6 +62,7 @@ namespace TeamA.Exogredient.Services
 
             // Convert the salt to byte array.
             byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
+
             //Number of iterations for has && length of the hash in bytes.
             // Hash the decrypted password with the byte array of salt.
             string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
@@ -69,8 +70,6 @@ namespace TeamA.Exogredient.Services
             //Check if the stored password matches the hashed password
             if (storedPassword.Equals(hashedPassword))
             {
-                // TODO Uncomment when GenerateJWS is implemented
-                //string token = CreateToken(userName);
                 return true;
             }
             else
