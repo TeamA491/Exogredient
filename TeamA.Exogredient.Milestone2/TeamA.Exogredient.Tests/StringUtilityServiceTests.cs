@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 
@@ -102,6 +103,45 @@ namespace TeamA.Exogredient.Tests
         {
             bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
             Assert.IsFalse(result);
+        }
+
+        [DataTestMethod]
+        [DataRow(new byte[] { 104, 101, 108, 108, 111 }, "68656C6C6F")]
+        public void StringUtilityService_BytesToHexString_GenerateCorrectHexString(byte[] bytes, string expected)
+        {
+            //Arrange
+
+            //Act
+            string actual = StringUtilityService.BytesToHexString(bytes);
+
+            //Assert
+            Assert.IsTrue(actual.Equals(expected));
+        }
+
+        [DataTestMethod]
+        [DataRow("testing", "74657374696E67")]
+        public void StringUtilityService_ToHexString_GenerateCorrectHexString(string original, string expected)
+        {
+            //Arrange
+
+            //Act
+            string actual = StringUtilityService.ToHexString(original);
+
+            //Assert
+            Assert.IsTrue(expected.Equals(actual));
+        }
+
+        [DataTestMethod]
+        [DataRow("A3D1FF2CB29F5FDC", new byte[] { 163, 209, 255, 44, 178, 159, 95, 220 })]
+        public void StringUtilityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
+        {
+            //Arrange
+
+            //Act
+            byte[] actual = StringUtilityService.HexStringToBytes(hexString);
+
+            //Assert
+            Assert.IsTrue(expected.SequenceEqual(actual));
         }
 
     }
