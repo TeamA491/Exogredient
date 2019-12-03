@@ -7,12 +7,12 @@ namespace TeamA.Exogredient.DAL
 {
     public class UserRecord
     {
-        private static readonly IDictionary<string, string> _data = new Dictionary<string, string>();
+        private static readonly IDictionary<string, object> _data = new Dictionary<string, object>();
 
         public UserRecord(string username, string firstName = null, string lastName = null, string email = null, 
-            string phoneNumber = null, string password = null, string disabled = null, string userType = null, string salt = null,
-            string tempTimestamp = null, string emailCode = null, string emailCodeTimestamp = null, string loginFailures = null,
-            string lastLoginFailTimestamp = null, string emailCodeFailures = null, string phoneCodeFailures = null)
+            string phoneNumber = null, string password = null, short disabled = -1, string userType = null, string salt = null,
+            long tempTimestamp = -1, string emailCode = null, long emailCodeTimestamp = -1, int loginFailures = -1,
+            long lastLoginFailTimestamp = -1, int emailCodeFailures = -1, int phoneCodeFailures = -1)
         {
             _data.Add(Constants.UserDAOusernameColumn, username);
             _data.Add(Constants.UserDAOfirstNameColumn, firstName);
@@ -32,7 +32,7 @@ namespace TeamA.Exogredient.DAL
             _data.Add(Constants.UserDAOphoneCodeFailuresColumn, phoneCodeFailures);
         }
 
-        public IDictionary<string, string> GetData()
+        public IDictionary<string, object> GetData()
         {
             return _data;
         }

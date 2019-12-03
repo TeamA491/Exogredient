@@ -24,7 +24,7 @@ namespace TeamA.Exogredient.DAL
             if (record.GetType() == typeof(IPRecord))
             {
                 IPRecord ipRecord = (IPRecord)record;
-                IDictionary<string, string> recordData = ipRecord.GetData();
+                IDictionary<string, object> recordData = ipRecord.GetData();
 
                 MySqlConnection connection = new MySqlConnection(ConnectionString);
                 try
@@ -32,11 +32,21 @@ namespace TeamA.Exogredient.DAL
                     connection.Open();
                     string sqlString = $"INSERT INTO {_tableName} (";
 
-                    foreach (KeyValuePair<string, string> pair in recordData)
+                    foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Value == null)
+                        if (pair.Value is string)
                         {
-                            throw new NoNullAllowedException("All columns must be not null");
+                            if (pair.Value == null)
+                            {
+                                throw new NoNullAllowedException("All columns in IPRecord must be not null.");
+                            }
+                        }
+                        if (pair.Value is short || pair.Value is int || pair.Value is long)
+                        {
+                            if ((long)pair.Value == -1)
+                            {
+                                throw new NoNullAllowedException("All columns in IPRecord must be not null.");
+                            }
                         }
                         sqlString += $"{pair.Key},";
                     }
@@ -44,7 +54,7 @@ namespace TeamA.Exogredient.DAL
                     sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += ") VALUES (";
 
-                    foreach (KeyValuePair<string, string> pair in recordData)
+                    foreach (KeyValuePair<string, object> pair in recordData)
                     {
                         sqlString += $"'{pair.Value}',";
                     }
@@ -140,17 +150,26 @@ namespace TeamA.Exogredient.DAL
                 {
                     connection.Open();
                     IPRecord ipRecord = (IPRecord)record;
-                    IDictionary<string, string> recordData = ipRecord.GetData();
+                    IDictionary<string, object> recordData = ipRecord.GetData();
 
                     string sqlString = $"UPDATE {_tableName} SET ";
 
-                    foreach (KeyValuePair<string, string> pair in recordData)
+                    foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Value != null && pair.Key != _ip)
+                        if (pair.Key != _ip)
                         {
-                            sqlString += $"{pair.Key} = '{pair.Value}',";
+                            if (pair.Value is short || pair.Value is int || pair.Value is long)
+                            {
+                                if ((long)pair.Value != -1)
+                                {
+                                    sqlString += $"{pair.Key} = '{pair.Value}',";
+                                }
+                            }
+                            else if (pair.Value != null)
+                            {
+                                sqlString += $"{pair.Key} = '{pair.Value}',";
+                            }
                         }
-
                     }
                     sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += $" WHERE {_ip} = '{recordData[_ip]}';";
@@ -208,7 +227,7 @@ namespace TeamA.Exogredient.DAL
             return exist;
         }
 
-        public async Task<string> GetTimestamp(string ipAddress)
+        public async Task<long> GetTimestamp(string ipAddress)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
@@ -217,13 +236,13 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 string sqlString = $"SELECT {_timestampLocked}  FROM {_tableName} WHERE {_ip} = '{ipAddress}';";
-                string result = "";
+                long result = 0;
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
-                    result = reader.GetString(0);
+                    result = (long)reader.GetValue(0);
                     reader.Close();
                 }
 

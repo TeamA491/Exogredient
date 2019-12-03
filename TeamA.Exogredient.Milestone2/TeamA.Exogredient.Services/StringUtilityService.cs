@@ -12,6 +12,8 @@ namespace TeamA.Exogredient.Services
     {
         private static readonly IDictionary<int, int> _monthDays = Constants.MonthDays;
         private static readonly List<char> _alphaNumericAndSpecialCharacters = Constants.AlphaNumericAndSpecialCharacters;
+        private const int _secondsInAnHour = Constants.SecondsInAnHour;
+        private const int _secondsInAMinute = Constants.SecondsInAMinute;
            
         // NIST checking
         private const int _maxRepetitionOrSequence = Constants.MaxRepetitionOrSequence;
@@ -35,6 +37,34 @@ namespace TeamA.Exogredient.Services
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
         }
 
+        public static long CurrentUnixTime()
+        {
+            return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+        }
+
+        public static long TimespanToSeconds(TimeSpan span)
+        {
+            long result = 0;
+
+            int inputHours = span.Hours;
+            int inputMinutes = span.Minutes;
+            int inputSeconds = span.Seconds;
+
+            for (int i = 0; i < inputHours; i++)
+            {
+                result += _secondsInAnHour;
+            }
+
+            for (int i = 0; i < inputMinutes; i++)
+            {
+                result += _secondsInAMinute;
+            }
+
+            result += inputSeconds;
+
+            return result;
+        }
+
         // Change To Epoch Time
         public static bool CurrentTimePastDatePlusTimespan(string date, TimeSpan span)
         {
@@ -46,8 +76,8 @@ namespace TeamA.Exogredient.Services
             int lockedYear = Int32.Parse(date.Substring(15, 4));
 
             int inputHours = span.Hours;
-            int inputMinute = span.Minutes;
-            int inputSecond = span.Seconds;
+            int inputMinutes = span.Minutes;
+            int inputSeconds = span.Seconds;
 
             int resultHour = lockedHour;
             int resultMinute = lockedMinute;
@@ -101,7 +131,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            for (int i = 0; i < inputMinute; i++)
+            for (int i = 0; i < inputMinutes; i++)
             {
                 resultMinute++;
 
@@ -151,7 +181,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            for (int i = 0; i < inputSecond; i++)
+            for (int i = 0; i < inputSeconds; i++)
             {
                 resultSecond++;
 

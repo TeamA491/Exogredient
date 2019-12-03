@@ -81,7 +81,7 @@ namespace TeamA.Exogredient.DAL
             if (record.GetType() == typeof(UserRecord))
             {
                 UserRecord userRecord = (UserRecord)record;
-                IDictionary<string, string> recordData = userRecord.GetData();
+                IDictionary<string, object> recordData = userRecord.GetData();
 
                 MySqlConnection connection = new MySqlConnection(ConnectionString);
                 try
@@ -89,11 +89,21 @@ namespace TeamA.Exogredient.DAL
                     connection.Open();
                     string sqlString = $"INSERT INTO {_tableName} (";
 
-                    foreach (KeyValuePair<string, string> pair in recordData)
+                    foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Value == null)
+                        if (pair.Value is string)
                         {
-                            throw new NoNullAllowedException("All columns must be not null");
+                            if (pair.Value == null)
+                            {
+                                throw new NoNullAllowedException("All columns in UserRecord must be not null.");
+                            }
+                        }
+                        if (pair.Value is short || pair.Value is int || pair.Value is long)
+                        {
+                            if ((long)pair.Value == -1)
+                            {
+                                throw new NoNullAllowedException("All columns in UserRecord must be not null.");
+                            }
                         }
                         sqlString += $"{pair.Key},";
                     }
@@ -101,7 +111,7 @@ namespace TeamA.Exogredient.DAL
                     sqlString = sqlString.Remove(sqlString.Length - 1);
                     sqlString += ") VALUES (";
 
-                    foreach (KeyValuePair<string, string> pair in recordData)
+                    foreach (KeyValuePair<string, object> pair in recordData)
                     {
                         sqlString += $"'{pair.Value}',";
                     }
@@ -236,15 +246,25 @@ namespace TeamA.Exogredient.DAL
                 {
                     connection.Open();
                     UserRecord userRecord = (UserRecord)record;
-                    IDictionary<string, string> recordData = userRecord.GetData();
+                    IDictionary<string, object> recordData = userRecord.GetData();
 
                     string sqlString = $"UPDATE {_tableName} SET ";
 
-                    foreach (KeyValuePair<string, string> pair in recordData)
+                    foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Value != null && pair.Key != _username)
+                        if (pair.Key != _username)
                         {
-                            sqlString += $"{pair.Key} = '{pair.Value}',";
+                            if (pair.Value is short || pair.Value is int || pair.Value is long)
+                            {
+                                if ((long)pair.Value != -1)
+                                {
+                                    sqlString += $"{pair.Key} = '{pair.Value}',";
+                                }
+                            }
+                            else if (pair.Value != null)
+                            {
+                                sqlString += $"{pair.Key} = '{pair.Value}',";
+                            }
                         }
 
                     }
@@ -403,7 +423,7 @@ namespace TeamA.Exogredient.DAL
             return result;
         }
 
-        public async Task<Tuple<string, string>> GetEmailCodeAndTimestamp(string userName)
+        public async Task<Tuple<string, long>> GetEmailCodeAndTimestamp(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
@@ -418,14 +438,14 @@ namespace TeamA.Exogredient.DAL
 
                 string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string emailCode = "";
-                string emailCodeTimestamp = "";
+                long emailCodeTimestamp = 0;
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
                     emailCode = reader.GetString(0);
-                    emailCodeTimestamp = reader.GetString(1);
+                    emailCodeTimestamp = (long)reader.GetValue(1);
                     reader.Close();
                 }
 
@@ -441,7 +461,7 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public async Task<string> GetEmailCodeFailureCountAsync(string userName)
+        public async Task<int> GetEmailCodeFailureCountAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
@@ -449,19 +469,14 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                if (!(await CheckUserExistenceAsync(userName)))
-                {
-                    throw new Exception("Invalid user name or password");
-                }
-
-                string sqlString = $"SELECT {_emailCodeFailures}  FROM {_tableName} WHERE {_username} = '{userName}';";
-                string emailCodeFailureCount = "";
+                string sqlString = $"SELECT {_emailCodeFailures} FROM {_tableName} WHERE {_username} = '{userName}';";
+                int emailCodeFailureCount = 0;
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
-                    emailCodeFailureCount = reader.GetString(0);
+                    emailCodeFailureCount = (int)reader.GetValue(0);
                     reader.Close();
                 }
 
@@ -477,7 +492,7 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public async Task<string> GetPhoneCodeFaiureCountAsync(string userName)
+        public async Task<int> GetPhoneCodeFaiureCountAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
@@ -485,19 +500,14 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                if (!(await CheckUserExistenceAsync(userName)))
-                {
-                    throw new Exception("Invalid user name or password");
-                }
-
-                string sqlString = $"SELECT {_emailCodeFailures}  FROM {_tableName} WHERE {_username} = '{userName}';";
-                string phoneCodeFailureCount = "";
+                string sqlString = $"SELECT {_emailCodeFailures} FROM {_tableName} WHERE {_username} = '{userName}';";
+                int phoneCodeFailureCount = 0;
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
-                    phoneCodeFailureCount = reader.GetString(0);
+                    phoneCodeFailureCount = (int)reader.GetValue(0);
                     reader.Close();
                 }
 

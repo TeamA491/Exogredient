@@ -59,25 +59,28 @@ namespace TeamA.Exogredient.Services
             }
             else
             {
-                string timestamp = await _lockedIPDAO.GetTimestamp(ipAddress);
+                long timestamp = await _lockedIPDAO.GetTimestamp(ipAddress);
 
-                return !StringUtilityService.CurrentTimePastDatePlusTimespan(timestamp, maxLockTime);
+                long maxLockSeconds = StringUtilityService.TimespanToSeconds(maxLockTime);
+                long currentUnix = StringUtilityService.CurrentUnixTime();
+
+                return (timestamp + maxLockSeconds < currentUnix ? true : false);
             }
         }
 
         public static async Task<bool> LockIPAsync(string ipAddress)
         {
-            IPRecord record = new IPRecord(ipAddress, DateTime.UtcNow.ToString("hh:mm:ss MM-dd-yyyy UTC"));
+            IPRecord record = new IPRecord(ipAddress, StringUtilityService.CurrentUnixTime());
 
             return await _lockedIPDAO.CreateAsync(record);
         }
 
         public static async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                                       string phoneNumber, string password, string disabled, string userType, string salt)
+                                                       string phoneNumber, string password, short disabled, string userType, string salt)
         {
-            string tempTimestamp = isTemp ? DateTime.UtcNow.ToString("hh:mm:ss MM-dd-yyyy UTC") : "";
+            long tempTimestamp = isTemp ? StringUtilityService.CurrentUnixTime() : 0;
 
-            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, salt, disabled, userType, tempTimestamp, "", "", "", "", "", "");
+            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt, tempTimestamp, "", 0, 0, 0, 0, 0);
 
             return await _userDAO.CreateAsync(record);
         }
@@ -89,12 +92,12 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> MakeTempPerm(string username)
         {
-            UserRecord record = new UserRecord(username, tempTimestamp: "");
+            UserRecord record = new UserRecord(username, tempTimestamp: 0);
 
             return await _userDAO.UpdateAsync(record);
         }
 
-        public static async Task<bool> StoreEmailCode(string username, string emailCode, string emailCodeTimestamp)
+        public static async Task<bool> StoreEmailCode(string username, string emailCode, long emailCodeTimestamp)
         {
             UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp);
 
@@ -103,7 +106,7 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> RemoveEmailCode(string username)
         {
-            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: "");
+            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
 
             return await _userDAO.UpdateAsync(record);
         }
@@ -125,7 +128,7 @@ namespace TeamA.Exogredient.Services
                 //throw new Exception("The username is already disabled!");
             }
 
-            UserRecord disabledUser = new UserRecord(userName, disabled: "1");
+            UserRecord disabledUser = new UserRecord(userName, disabled: 1);
             await _userDAO.UpdateAsync(disabledUser);
 
             return true;
@@ -147,7 +150,7 @@ namespace TeamA.Exogredient.Services
                 //throw new Exception("The username is already enabled!");
             }
             // Enable the username.
-            UserRecord disabledUser = new UserRecord(userName, disabled: "0");
+            UserRecord disabledUser = new UserRecord(userName, disabled: 0);
             await _userDAO.UpdateAsync(disabledUser);
 
             return true;
@@ -226,10 +229,10 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> IncrementEmailCodeFailuresAsync(string username)
         {
             // Get the current failure count.
-            string currentFailure = await _userDAO.GetEmailCodeFailureCountAsync(username);
+            int currentFailures = await _userDAO.GetEmailCodeFailureCountAsync(username);
 
             // Create user record to insert into update.
-            UserRecord record = new UserRecord(username, emailCodeFailures:(Int32.Parse(currentFailure) +1).ToString());
+            UserRecord record = new UserRecord(username, emailCodeFailures: currentFailures + 1);
 
             // Increment the failure count for that user.
             await _userDAO.UpdateAsync(record);
@@ -237,22 +240,17 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
-        public static async Task<string> GetEmailCodeFailureCountAsync(string username)
+        public static async Task<int> GetEmailCodeFailureCountAsync(string username)
         {
             // This returns string right now. update to int when we update database
             return await _userDAO.GetEmailCodeFailureCountAsync(username);
         }
 
-        public static async Task<string> GetPhoneCodeFaiureCountAsync(string username)
+        public static async Task<int> GetPhoneCodeFaiureCountAsync(string username)
         {
             // This returns string right now. update to int when we update database
             return await _userDAO.GetPhoneCodeFaiureCountAsync(username);
         }
-
-
-
-
-
 
 
     }

@@ -106,9 +106,9 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> VerifyEmailCodeAsync(string username, string emailCodeInput, TimeSpan maxCodeValidTime)
         {
-            Tuple<string, string> emailCodeInformation = await _userDAO.GetEmailCodeAndTimestamp(username);
+            Tuple<string, long> emailCodeInformation = await _userDAO.GetEmailCodeAndTimestamp(username);
             string emailCode = emailCodeInformation.Item1;
-            string emailCodeTimestamp = emailCodeInformation.Item2;
+            long emailCodeTimestamp = emailCodeInformation.Item2;
             UserRecord record;
 
             if (emailCodeTimestamp.Equals(""))
@@ -116,19 +116,22 @@ namespace TeamA.Exogredient.Services
                 return false;
             }
 
-            if (StringUtilityService.CurrentTimePastDatePlusTimespan(emailCodeTimestamp, maxCodeValidTime))
+            long maxValidSeconds = StringUtilityService.TimespanToSeconds(maxCodeValidTime);
+            long currentUnix = StringUtilityService.CurrentUnixTime();
+
+            if (emailCodeTimestamp + maxValidSeconds < currentUnix)
             {
-                record = new UserRecord(username, emailCode: "", emailCodeTimestamp: "");
+                record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
                 await _userDAO.UpdateAsync(record);
                 return false;
             }
-            
+
             if (!emailCodeInput.Equals(emailCode))
             {
                 return false;
             }
 
-            record = new UserRecord(username, emailCode: "", emailCodeTimestamp: "");
+            record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
             await _userDAO.UpdateAsync(record);
 
             return true;
@@ -171,7 +174,7 @@ namespace TeamA.Exogredient.Services
 
             Random generator = new Random();
             string emailCode = generator.Next(100000, 1000000).ToString();
-            string emailCodeTimestamp = DateTime.UtcNow.ToString("hh:mm:ss MM-dd-yyyy UTC");
+            long emailCodeTimestamp = StringUtilityService.CurrentUnixTime();
 
             await UserManagementService.StoreEmailCode(username, emailCode, emailCodeTimestamp);
 
