@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Text;
+using TeamA.Exogredient.DAL;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 
-// TODO: DECIDE HOW TO HOLD EXPIRATION DATES
-// TODO: FUNCTION TO CHECK WHETHER WE CAN REFRESH A TOKEN OR NOT
+// TODO USE SECURITY SERVICE FOR HASHING
+
+// NOTE JWS TOKEN MUST BE IN THE AUTHORIZATION HEADER FOR EACH REQUEST
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -18,17 +19,30 @@ namespace TeamA.Exogredient.Services
     /// </summary>
     public static class AuthorizationService
     {
+        private const string SIGNING_ALGORITHM = "RS512";
+        private const string EXPIRATION_FIELD = "exp";
+        private const string PUBLIC_KEY_FIELD = "pk";
+
+        private const string ENV_PRIVATE_KEY = "AUTHORIZATION_PRIVATE_KEY";
+        private const string ENV_PUBLIC_KEY = "AUTHORIZATION_PUBLIC_KEY";
+        private static readonly string PRIVATE_KEY = Environment.GetEnvironmentVariable(ENV_PRIVATE_KEY, EnvironmentVariableTarget.Process);
+        private static readonly string PUBLIC_KEY = Environment.GetEnvironmentVariable(ENV_PUBLIC_KEY, EnvironmentVariableTarget.Process);
+
         private static readonly UserDAO _userDAO;
+
+        public enum USER_TYPE {
+            UNREGISTERED    = 0,
+            REGISTERED      = 1,
+            STORE_OWNER     = 2,
+            ADMIN           = 3,
+            SYS_ADMIN       = 4,
+        };
 
         static AuthorizationService()
         {
             _userDAO = new UserDAO();
         }
 
-        // TODO: LOAD RSA PRIVATE KEY FROM OS ENVIRONMENT
-        private const string SIGNING_ALGORITHM = "RS512";
-        private static readonly string PRIVATE_KEY = "TESTING_PRIVATE_RSA_KEY";
-        
         /// <summary>
         /// Generates a JWS with RSA512 using a private key loaded from the environment.
         /// </summary>
@@ -40,13 +54,26 @@ namespace TeamA.Exogredient.Services
         /// <returns>The JWS.</returns>
         public static string GenerateJWS(Dictionary<string, string> payload)
         {
+            // Make sure we have the proper parameters inside the dictionary
+            if (!payload.ContainsKey("userType") || !payload.ContainsKey("id"))
+                // TODO THROW PROPER EXCEPTION
+                throw new ArgumentException("UserType or ID was not provided.");
+
             // Create the header and convert it to a Base64 string
             Dictionary<string, string> joseHeader = new Dictionary<string, string>{
                 { "typ", "JWT" },  // Media type
                 { "alg", SIGNING_ALGORITHM }  // Signing algorithm type
             };
 
-            // TODO ADD EXPIRATION DATES
+            // If the expiration date wasn't already specified, then create one
+            if (!payload.ContainsKey(EXPIRATION_FIELD))
+            {
+                // Add a 20 min expiration
+                payload.Add(EXPIRATION_FIELD, Get20MinFromNow().ToString());
+            }
+
+            // Add the public key to the payload
+            payload.Add(PUBLIC_KEY_FIELD, PUBLIC_KEY);
 
             // Base64 encode the header and payload
             string encodedHeader = DictionaryToString(joseHeader).ToBase64();
@@ -98,9 +125,8 @@ namespace TeamA.Exogredient.Services
         /// Decrypts a JWS in order to see the encrypted payload.
         /// </summary>
         /// <param name="token">The token to decrypt.</param>
-        /// <param name="publicKey">The public key used to decrypt and verify the token.</param>
         /// <returns>The contents inside the decrypted token.</returns>
-        public static Dictionary<string, string> DecryptJWS(string token, string publicKey)
+        public static Dictionary<string, string> DecryptJWS(string token)
         {
             string[] segments = token.Split('.');
 
@@ -120,15 +146,16 @@ namespace TeamA.Exogredient.Services
             string decodedPayload = segments[1].FromBase64();
             Dictionary<string, string> payloadJSON = StringToDictionary(decodedPayload);
 
-            // Make sure that the token is still valid
-            if (TokenIsExpired(payloadJSON))
-                // TODO THROW PROPER EXCEPTION, THEN REFRESH THE TOKEN WHEN CAUGHT
-                throw new ArgumentException("JWS is expired!");
-
             // Make sure that we are using the correct encryption algorithm in the header
             if (headerJSON["alg"] != SIGNING_ALGORITHM)
+                // TODO THROW PROPER EXCEPTION
                 throw new ArgumentException("Incorrect encryption algorithm.");
 
+            if (!payloadJSON.ContainsKey(PUBLIC_KEY_FIELD))
+                // TODO THROW PROPER EXCEPTION
+                throw new ArgumentException("Public key not found in the JWS payload!");
+
+            string publicKey = payloadJSON[PUBLIC_KEY_FIELD];
             RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
             RSA.FromXmlString(publicKey);
 
@@ -157,14 +184,41 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
-        /// Checks whether a token is expired or not. If the token is expired,
-        /// but is still within the refresh period, the token will be regenerated. TODO: CHECK REGENERATION
+        /// Refreshes a token to be active for 20 more minutes.
         /// </summary>
-        /// <param name="payload">The JSON data that was encrypted inside the token.</param>
-        /// <returns>Whether the JWS is expired and cannot be refreshed.</returns>
-        public static bool TokenIsExpired(Dictionary<string, string> payload)
+        /// <param name="jws">The token that needs to be refreshed.</param>
+        /// <returns>A new token that has been refreshed and active for 20 more minutes.</returns>
+        public static string RefreshJWS(string jws)
         {
-            return false;
+            Dictionary<string, string> payload = DecryptJWS(jws);
+
+            // Refresh the token for an additional 20 minutes
+            payload[EXPIRATION_FIELD] = Get20MinFromNow().ToString();
+
+            return GenerateJWS(payload);
+        }
+
+        /// <summary>
+        /// Checks whether the current token is expired or not.
+        /// </summary>
+        /// <param name="jws">The token to check.</param>
+        /// <returns>Whether the current token is past it's 20 minute lifetime.</returns>
+        public static bool TokenIsExpired(string jws)
+        {
+            Dictionary<string, string> payload = DecryptJWS(jws);
+
+            // Check if the expiration key exists first
+            if (!payload.ContainsKey(EXPIRATION_FIELD))
+                throw new ArgumentException("Expiration time is not specified!");
+
+            long expTime;
+            bool isNumeric = long.TryParse(payload[EXPIRATION_FIELD], out expTime);
+
+            // Make sure we are dealing with number first
+            if (!isNumeric)
+                throw new ArgumentException("Expiration time is not a number!");
+
+            return GetEpochTime() > expTime;
         }
 
         /// <summary>
@@ -295,6 +349,25 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
+        /// Gets the current epoch time.
+        /// </summary>
+        /// <returns>A long representing the current epoch time.</returns>
+        private static long GetEpochTime()
+        {
+            return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+        }
+
+        /// <summary>
+        /// Gets the UTC epoch time 20 minutes from when it is called.
+        /// </summary>
+        /// <returns>Epoch time representing 20 minutes from now.</returns>
+        private static long Get20MinFromNow()
+        {
+            DateTime curTime = DateTime.UtcNow;
+            return ((DateTimeOffset)curTime.AddMinutes(20)).ToUnixTimeSeconds();
+        }
+
+        /// <summary>
         /// Extension function to convert a string to alpha numeric.
         /// </summary>
         /// <remarks>
@@ -379,20 +452,6 @@ namespace TeamA.Exogredient.Services
         {
             byte[] bytes = Convert.FromBase64String(str);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-        }
-
-
-
-        // TODO: CHECK IP ADDRESSES
-        /// <summary>
-        /// Determines whether the user is within the project scope.
-        /// </summary>
-        /// <param name="answer">The user's selected scope answer.</param>
-        /// <returns>Returns the value of bool that determines whether the 
-        /// user is allowed to proceed.</returns>
-        public static bool CheckScope(bool answer)
-        {
-            return answer == true;
         }
     }
 }
