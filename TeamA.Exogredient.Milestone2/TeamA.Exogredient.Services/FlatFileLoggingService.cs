@@ -4,13 +4,14 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
     public static class FlatFileLoggingService
     {
-        private static readonly string _logFolder = @"C:\Logs";
-        private static readonly string _fileType = ".CSV";
+        private static readonly string _logFolder = Constants.LogFolder;
+        private static readonly string _fileType = Constants.LogFileType;
 
         public static async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
                                                           string ipAddress, string errorType)

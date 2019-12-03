@@ -4,16 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
     public class CorruptedPasswordsDAO : MasterNOSQLDAOReadOnly
     {
-        private readonly string _id = "_id";
-
-        private readonly string _collectionName = "passwords";
-
-        private readonly string _schema = "corrupted_passwords";
+        private const string _schema = Constants.CorruptedPassSchemaName;
+        private const string _collectionName = Constants.CorruptedPassCollectionName;
+        private const string _passwordField = Constants.CorruptedPassPasswordField;
 
         public async override Task<List<string>> ReadAsync()
         {
@@ -30,7 +29,7 @@ namespace TeamA.Exogredient.DAL
             while (result.Next())
             {
                 // TODO: flesh out columns. make columns into fields.
-                string temp = (string)result.Current["password"];
+                string temp = (string)result.Current[_passwordField];
 
                 resultList.Add(temp);
 

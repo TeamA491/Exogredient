@@ -8,4 +8,8 @@
     <PackageReference Include="MySql.Data" Version="8.0.18" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
+  </ItemGroup>
+
 </Project>

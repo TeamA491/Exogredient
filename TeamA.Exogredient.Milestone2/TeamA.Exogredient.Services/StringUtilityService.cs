@@ -4,94 +4,223 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
     {
-        // No < or > to protect from SQL injections.
-        private static readonly List<char> _alphaNumericSpecialCharacters = new List<char>()
-        {
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '~', '`', '@', '#', '$', '%', '^', '&', '!', '*', '(', ')', '_', '-', '+', '=', '{',
-            '[', '}', ']', '|', '\\', '"', '\'', ':', ';', '?', '/', '.', ','
-        };
-
-        private static readonly List<char> _numericalCharacters = new List<char>()
-        {
-            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
-        };
-
-        // =================================================
-        // NIST CHECKING:
-        // =================================================
-
-        private static readonly int _maxRepetitionOrSequence = 3;
-
-        private static readonly List<string> _contextSpecificWords = new List<string>()
-        {
-            "exogredient"
-        };
-
-        private static readonly List<char> _lettersLower = new List<char>()
-        {
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-        };
-
-        private static readonly List<char> _lettersUpper = new List<char>()
-        {
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-        };
-
-        private static readonly List<char> _numbers = new List<char>()
-        {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-        };
-
-        private static readonly IDictionary<char, int> _lettersLowerToPositions = new Dictionary<char, int>()
-        {
-            {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8},
-            {'i', 9}, {'j', 10}, {'k', 11}, {'l', 12}, {'m', 13}, {'n', 14}, {'o', 15}, {'p', 16},
-            {'q', 17}, {'r', 18}, {'s', 19}, {'t', 20}, {'u', 21}, {'v', 22}, {'w', 23}, {'x', 24},
-            {'y', 25}, {'z', 26}
-        };
-
-        private static readonly IDictionary<char, int> _lettersUpperToPositions = new Dictionary<char, int>()
-        {
-            {'A', 1}, {'B', 2}, {'C', 3}, {'D', 4}, {'E', 5}, {'F', 6}, {'G', 7}, {'H', 8},
-            {'I', 9}, {'J', 10}, {'K', 11}, {'L', 12}, {'M', 13}, {'N', 14}, {'O', 15}, {'P', 16},
-            {'Q', 17}, {'R', 18}, {'S', 19}, {'T', 20}, {'U', 21}, {'V', 22}, {'W', 23}, {'X', 24},
-            {'Y', 25}, {'Z', 26}
-        };
-
-        private static readonly IDictionary<int, char> _positionsToLettersLower = new Dictionary<int, char>()
-        {
-            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'}, {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
-            {9, 'i'}, {10, 'j'}, {11, 'k'}, {12, 'l'}, {13, 'm'}, {14, 'n'}, {15, 'o'}, {16, 'p'},
-            {17, 'q'}, {18, 'r'}, {19, 's'}, {20, 't'}, {21, 'u'}, {22, 'v'}, {23, 'w'}, {24, 'x'},
-            {25, 'y'}, {26, 'z'}
-        };
-
-        private static readonly IDictionary<int, char> _positionsToLettersUpper = new Dictionary<int, char>()
-        {
-            {1, 'A'}, {2, 'B'}, {3, 'C'}, {4, 'D'}, {5, 'E'}, {6, 'F'}, {7, 'G'}, {8, 'H'},
-            {9, 'I'}, {10, 'J'}, {11, 'K'}, {12, 'L'}, {13, 'M'}, {14, 'N'}, {15, 'O'}, {16, 'P'},
-            {17, 'Q'}, {18, 'R'}, {19, 'S'}, {20, 'T'}, {21, 'U'}, {22, 'V'}, {23, 'W'}, {24, 'X'},
-            {25, 'Y'}, {26, 'Z'}
-        };
+        private static readonly IDictionary<int, int> _monthDays = Constants.MonthDays;
+        private static readonly List<char> _alphaNumericAndSpecialCharacters = Constants.AlphaNumericAndSpecialCharacters;
+           
+        // NIST checking
+        private const int _maxRepetitionOrSequence = Constants.MaxRepetitionOrSequence;
+        private static readonly List<string> _contextSpecificWords = Constants.ContextSpecificWords;
+        private static readonly List<char> _lettersLower = Constants.LettersLower;
+        private static readonly List<char> _lettersUpper = Constants.LettersUpper;
+        private static readonly List<char> _numbers = Constants.Numbers;
+        private static readonly IDictionary<char, int> _lettersLowerToPositions = Constants.LettersLowerToPositions;
+        private static readonly IDictionary<char, int> _lettersUpperToPositions = Constants.LettersUpperToPositions;
+        private static readonly IDictionary<int, char> _positionsToLettersLower = Constants.PositionsToLettersLower;
+        private static readonly IDictionary<int, char> _positionsToLettersUpper = Constants.PositionsToLettersUpper;
 
         private static readonly CorruptedPasswordsDAO _corruptedPasswordsDAO;
 
         /// <summary>
-        /// Constructor initializes the UserDAO object to provide
+        /// Constructor initializes the CorruptedPasswordsDAO object to provide
         /// the interface with the usertable.
         /// </summary>
         static StringUtilityService()
         {
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
+        }
+
+        // e.g. "21:03:00 12-01-2019 UTC"
+        public static bool CurrentTimePastDatePlusTimespan(string date, TimeSpan span)
+        {
+            int lockedHour = Int32.Parse(date.Substring(0, 2));
+            int lockedMinute = Int32.Parse(date.Substring(3, 2));
+            int lockedSecond = Int32.Parse(date.Substring(6, 2));
+            int lockedMonth = Int32.Parse(date.Substring(9, 2));
+            int lockedDay = Int32.Parse(date.Substring(12, 2));
+            int lockedYear = Int32.Parse(date.Substring(15, 4));
+
+            int inputHours = span.Hours;
+            int inputMinute = span.Minutes;
+            int inputSecond = span.Seconds;
+
+            int resultHour = lockedHour;
+            int resultMinute = lockedMinute;
+            int resultSecond = lockedSecond;
+            int resultMonth = lockedMonth;
+            int resultDay = lockedDay;
+            int resultYear = lockedYear;
+
+            // Get result date time
+
+            for (int i = 0; i < inputHours; i++)
+            {
+                resultHour++;
+
+                if (resultHour > 23)
+                {
+                    resultHour = 00;
+
+                    resultDay++;
+                }
+
+                if (resultDay > _monthDays[resultMonth])
+                {
+                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    {
+                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        {
+                            // Not a leap year.
+                            resultDay = 01;
+
+                            resultMonth++;
+                        }
+                        else
+                        {
+                            // Leap year.
+                        }
+                    }
+                    else
+                    {
+                        resultDay = 01;
+
+                        resultMonth++;
+                    }
+                }
+
+                if (resultMonth > 12)
+                {
+                    resultMonth = 01;
+
+                    resultYear++;
+                }
+            }
+
+            for (int i = 0; i < inputMinute; i++)
+            {
+                resultMinute++;
+
+                if (resultMinute > 59)
+                {
+                    resultMinute = 00;
+
+                    resultHour++;
+                }
+
+                if (resultHour > 23)
+                {
+                    resultHour = 00;
+
+                    resultDay++;
+                }
+
+                if (resultDay > _monthDays[resultMonth])
+                {
+                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    {
+                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        {
+                            // Not a leap year.
+                            resultDay = 01;
+
+                            resultMonth++;
+                        }
+                        else
+                        {
+                            // Leap year.
+                        }
+                    }
+                    else
+                    {
+                        resultDay = 01;
+
+                        resultMonth++;
+                    }
+                }
+
+                if (resultMonth > 12)
+                {
+                    resultMonth = 01;
+
+                    resultYear++;
+                }
+            }
+
+            for (int i = 0; i < inputSecond; i++)
+            {
+                resultSecond++;
+
+                if (resultSecond > 59)
+                {
+                    resultSecond = 00;
+
+                    resultMinute++;
+                }
+
+                if (resultMinute > 59)
+                {
+                    resultMinute = 00;
+
+                    resultHour++;
+                }
+
+                if (resultHour > 23)
+                {
+                    resultHour = 00;
+
+                    resultDay++;
+                }
+
+                if (resultDay > _monthDays[resultMonth])
+                {
+                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    {
+                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        {
+                            // Not a leap year.
+                            resultDay = 01;
+
+                            resultMonth++;
+                        }
+                        else
+                        {
+                            // Leap year.
+                        }
+                    }
+                    else
+                    {
+                        resultDay = 01;
+
+                        resultMonth++;
+                    }
+                }
+
+                if (resultMonth > 12)
+                {
+                    resultMonth = 01;
+
+                    resultYear++;
+                }
+            }
+
+            // Compare datetimes
+            DateTime resultTime = new DateTime(resultYear, resultMonth, resultDay, resultHour, resultMinute, resultSecond, DateTimeKind.Utc);
+
+            int compareResult = DateTime.Compare(resultTime, DateTime.UtcNow);
+
+            if (compareResult < 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -174,7 +303,7 @@ namespace TeamA.Exogredient.Services
 
             foreach (char c in name.ToLower())
             {
-                result = result && _alphaNumericSpecialCharacters.Contains(c);
+                result = result && _alphaNumericAndSpecialCharacters.Contains(c);
             }
 
             return result;
@@ -192,7 +321,7 @@ namespace TeamA.Exogredient.Services
 
             foreach (char c in name)
             {
-                result = result && _numericalCharacters.Contains(c);
+                result = result && _numbers.Contains(c);
             }
 
             return result;
@@ -324,6 +453,7 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // NOTE: does not account for 901. but will return tru for 012
         public static bool ContainsRepetitionOrSequence(string plaintextPassword)
         {
             // Repetition and sequence checking.
@@ -612,7 +742,7 @@ namespace TeamA.Exogredient.Services
                                         nextPositionIncrease = 1;
                                     }
 
-                                    if (nextPositionDecrease == 0)
+                                    if (nextPositionDecrease < 1)
                                     {
                                         nextPositionDecrease = 9;
                                     }

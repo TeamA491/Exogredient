@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
     public abstract class MasterSQLDAO<T>
     {
-        // HACK: Change this to your specific password
-        protected static readonly string ConnectionString = Environment.GetEnvironmentVariable("SQL_CONNECTION", EnvironmentVariableTarget.User);
+        protected static readonly string ConnectionString = Constants.SQLConnection;
 
         // Create a record in the data store based on the model argument.
         public abstract Task<bool> CreateAsync(object record);

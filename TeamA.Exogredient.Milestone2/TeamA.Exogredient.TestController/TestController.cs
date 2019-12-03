@@ -13,7 +13,14 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            await AuthenticationService.SendCallVerificationAsync("9499815506");
+            //string result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "0738");
+            //Console.WriteLine(result);
+
+            //DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
+            //LogRecord record = new LogRecord("test", "test", "test", "test", "test");
+
+            //await ds.CreateAsync(record, "20191201");
         }
     }
 }

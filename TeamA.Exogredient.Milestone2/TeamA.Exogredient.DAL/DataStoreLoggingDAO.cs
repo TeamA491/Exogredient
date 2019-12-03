@@ -1,20 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.Common;
 using MySqlX.XDevAPI.CRUD;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
     public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
     {
-        // ID field name.
-        private readonly string _id = "_id";
-
-        private readonly string _collectionPrefix = "logs_";
-
-        private readonly string _schema = "exogredient_logs";
+        private const string _schema = Constants.LogsSchemaName;
+        private const string _collectionPrefix = Constants.LogsCollectionPrefix;
+        private const string _id = Constants.LogsIdField;
 
         public async override Task<bool> CreateAsync(object record, string yyyymmdd)
         {
@@ -27,13 +26,14 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.CreateCollection(_collectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
+                // HACK: hardcoded here for now
                 // Created anon type to represent json in document store.
                 var document = new
                 {
                     timestamp = logRecord.Timestamp,
                     operation = logRecord.Operation,
                     identifier = logRecord.Identifier,
-                    ip = logRecord.IPAddress,
+                    ipAddress = logRecord.IPAddress,
                     errorType = logRecord.ErrorType
                 };
 
@@ -93,7 +93,7 @@ namespace TeamA.Exogredient.DAL
                 while (result.Next())
                 {
                     // TODO: flesh out columns. make columns into fields.
-                    resultstring = (string)result.Current["_id"];
+                    resultstring = (string)result.Current[_id];
 
                 }
 
