@@ -440,5 +440,78 @@ namespace TeamA.Exogredient.DAL
                 connection.Close();
             }
         }
+
+        public async Task<string> GetEmailCodeFailureCountAsync(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+
+                if (!(await CheckUserExistenceAsync(userName)))
+                {
+                    throw new Exception("Invalid user name or password");
+                }
+
+                string sqlString = $"SELECT {_emailCodeFailures}  FROM {_tableName} WHERE {_username} = '{userName}';";
+                string emailCodeFailureCount = "";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    emailCodeFailureCount = reader.GetString(0);
+                    reader.Close();
+                }
+
+                return emailCodeFailureCount;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        public async Task<string> GetPhoneCodeFaiureCountAsync(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+
+                if (!(await CheckUserExistenceAsync(userName)))
+                {
+                    throw new Exception("Invalid user name or password");
+                }
+
+                string sqlString = $"SELECT {_emailCodeFailures}  FROM {_tableName} WHERE {_username} = '{userName}';";
+                string phoneCodeFailureCount = "";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    phoneCodeFailureCount = reader.GetString(0);
+                    reader.Close();
+                }
+
+                return phoneCodeFailureCount;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
     }
 }
