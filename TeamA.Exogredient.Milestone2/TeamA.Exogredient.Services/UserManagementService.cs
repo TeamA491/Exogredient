@@ -212,5 +212,48 @@ namespace TeamA.Exogredient.Services
 
             return true;
         }
+
+
+
+        public static async Task<bool> IncrementLoginFailuresAsync(string username, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
+        {
+            // Everytime you increment you have to update the lastloginfailedtimestamp column.
+            // Need to check if the last maxtime + lastTime is less than now.
+                // if it is then reset the failure
+            return false;
+        }
+
+        public static async Task<bool> IncrementEmailCodeFailuresAsync(string username)
+        {
+            // Get the current failure count.
+            string currentFailure = await _userDAO.GetEmailCodeFailureCountAsync(username);
+
+            // Create user record to insert into update.
+            UserRecord record = new UserRecord(username, emailCodeFailures:(Int32.Parse(currentFailure) +1).ToString());
+
+            // Increment the failure count for that user.
+            await _userDAO.UpdateAsync(record);
+
+            return true;
+        }
+
+        public static async Task<string> GetEmailCodeFailureCountAsync(string username)
+        {
+            // This returns string right now. update to int when we update database
+            return await _userDAO.GetEmailCodeFailureCountAsync(username);
+        }
+
+        public static async Task<string> GetPhoneCodeFaiureCountAsync(string username)
+        {
+            // This returns string right now. update to int when we update database
+            return await _userDAO.GetPhoneCodeFaiureCountAsync(username);
+        }
+
+
+
+
+
+
+
     }
 }
