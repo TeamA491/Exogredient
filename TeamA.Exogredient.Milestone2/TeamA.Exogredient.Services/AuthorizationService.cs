@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using TeamA.Exogredient.DAL;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -26,6 +28,8 @@ namespace TeamA.Exogredient.Services
         private static readonly string PRIVATE_KEY = Environment.GetEnvironmentVariable(ENV_PRIVATE_KEY, EnvironmentVariableTarget.Process);
         private static readonly string PUBLIC_KEY = Environment.GetEnvironmentVariable(ENV_PUBLIC_KEY, EnvironmentVariableTarget.Process);
 
+        private static readonly UserDAO _userDAO;
+
         public enum USER_TYPE {
             UNREGISTERED    = 0,
             REGISTERED      = 1,
@@ -36,7 +40,7 @@ namespace TeamA.Exogredient.Services
 
         static AuthorizationService()
         {
-
+            _userDAO = new UserDAO();
         }
 
         /// <summary>
@@ -95,6 +99,26 @@ namespace TeamA.Exogredient.Services
             SHhash.Dispose();
 
             return string.Format("{0}.{1}.{2}", encodedHeader, encodedPayload, signature);
+        }
+
+        /// <summary>
+        /// Create a token for a logged-in user.
+        /// </summary>
+        /// <param name="userName"> logged-in username </param>
+        /// <returns> string of token that represents the user type and unique ID of the username </returns>
+        public static async Task<string> CreateTokenAsync(string userName)
+        {
+            // Get the user type of the username.
+            string userType = await _userDAO.GetUserTypeAsync(userName);
+
+            // Craete a dictionary that represents the user type and unique ID.
+            Dictionary<string, string> userInfo = new Dictionary<string, string>()
+            {
+                {"userType", userType},
+                {"id", userName }
+            };
+
+            return GenerateJWS(userInfo);
         }
 
         /// <summary>
