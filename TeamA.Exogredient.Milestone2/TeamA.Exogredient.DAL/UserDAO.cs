@@ -35,8 +35,6 @@ namespace TeamA.Exogredient.DAL
         /// Get the hashed password and the salt stored in the database corresponding to the username.
         /// </summary>
         /// <param name="userName"> the username of the password and salt </param>
-        /// <param name="storedPassword"> string variable where the stored password is assigned to </param>
-        /// <param name="salt"> string variable where the stored salt is assigned to </param>
         public async Task<Tuple<string, string>> GetStoredPasswordAndSaltAsync(string userName)
         {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
@@ -44,11 +42,6 @@ namespace TeamA.Exogredient.DAL
             {
                 // Connect to the database.
                 connection.Open();
-
-                if (!(await CheckUserExistenceAsync(userName)))
-                {
-                    throw new Exception("Invalid user name or password");
-                }
 
                 string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string storedPassword = "";
@@ -64,10 +57,6 @@ namespace TeamA.Exogredient.DAL
                 }
 
                 return Tuple.Create(storedPassword, salt);
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -123,10 +112,6 @@ namespace TeamA.Exogredient.DAL
 
                     return true;
                 }
-                catch (Exception e)
-                {
-                    throw e;
-                }
                 finally
                 {
                     connection.Close();
@@ -150,11 +135,7 @@ namespace TeamA.Exogredient.DAL
             {
                 // Connect to the database.
                 connection.Open();
-                // Check if the username exists.
-                if (! (await CheckUserExistenceAsync(userName)))
-                {
-                    throw new Exception("Invalid user name or password");
-                }
+
                 // Get the user type of the username
                 string sqlString = $"SELECT {_userType} FROM {_tableName} WHERE {_username} = '{userName}';";
                 string userType;
@@ -166,10 +147,6 @@ namespace TeamA.Exogredient.DAL
                     reader.Close();
                 }
                 return userType;
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -191,10 +168,6 @@ namespace TeamA.Exogredient.DAL
                 }
 
                 return true;
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -224,10 +197,6 @@ namespace TeamA.Exogredient.DAL
                     //result.Add(stringResult);
                 }
                 
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -275,10 +244,6 @@ namespace TeamA.Exogredient.DAL
 
                     return true;
                 }
-                catch (Exception e)
-                {
-                    throw e;
-                }
                 finally
                 {
                     connection.Close();
@@ -312,10 +277,6 @@ namespace TeamA.Exogredient.DAL
                     exist = reader.GetBoolean(0);
                 }
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
                 connection.Close();
@@ -337,7 +298,7 @@ namespace TeamA.Exogredient.DAL
             {
                 // Connect to the database.
                 connection.Open();
-                // Check if the username exists in the table.
+
                 string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_phoneNumber} = '{phoneNumber}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -345,10 +306,6 @@ namespace TeamA.Exogredient.DAL
                     await reader.ReadAsync();
                     exist = reader.GetBoolean(0);
                 }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -371,7 +328,7 @@ namespace TeamA.Exogredient.DAL
             {
                 // Connect to the database.
                 connection.Open();
-                // Check if the username exists in the table.
+
                 string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_email} = '{email}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
@@ -379,10 +336,6 @@ namespace TeamA.Exogredient.DAL
                     await reader.ReadAsync();
                     exist = reader.GetBoolean(0);
                 }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {
@@ -411,10 +364,6 @@ namespace TeamA.Exogredient.DAL
                     result = reader.GetString(0) == "1" ? true : false;
                 }
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
                 connection.Close();
@@ -431,11 +380,6 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                if (!(await CheckUserExistenceAsync(userName)))
-                {
-                    throw new Exception("Invalid user name or password");
-                }
-
                 string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string emailCode = "";
                 long emailCodeTimestamp = 0;
@@ -450,10 +394,6 @@ namespace TeamA.Exogredient.DAL
                 }
 
                 return Tuple.Create(emailCode, emailCodeTimestamp);
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
             finally
             {

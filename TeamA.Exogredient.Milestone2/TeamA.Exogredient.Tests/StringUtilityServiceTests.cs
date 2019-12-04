@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("Jason", 5, -1)] 
+        [DataRow("Jason", 5, -1)]
         [DataRow("David", 2000, 1)]
         public void StringUtilityService_CheckLength_WithinLengthSuccess(string name, int length, int min)
         {
@@ -50,7 +51,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act
             bool result = StringUtilityService.CheckLength(name, length, min);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -65,7 +66,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act
             bool result = StringUtilityService.CheckLength(name, length, min);
-            
+
             // Assert
             Assert.IsFalse(result);
         }
@@ -77,7 +78,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = StringUtilityService.CheckIfANSCharacters(name);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -88,7 +89,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = StringUtilityService.CheckIfNumericCharacters(name);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -101,7 +102,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = StringUtilityService.EmailFormatValidityCheck(email);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -141,7 +142,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = StringUtilityService.ContainsContextSpecificWords(plaintextPassword);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -155,7 +156,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -171,7 +172,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = await StringUtilityService.IsCorruptedPassword(plaintextPassword);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -197,7 +198,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Act
             bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
-            
+
             // Assert
             Assert.IsTrue(result);
         }
@@ -216,6 +217,21 @@ namespace TeamA.Exogredient.Tests
 
             // Assert
             Assert.IsFalse(result);
+
         }
+
+        [DataTestMethod]
+        [DataRow("A3D1FF2CB29F5FDC", new byte[] { 163, 209, 255, 44, 178, 159, 95, 220 })]
+        public void StringUtilityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
+        {
+            //Arrange
+
+            //Act
+            byte[] actual = StringUtilityService.HexStringToBytes(hexString);
+
+            //Assert
+            Assert.IsTrue(expected.SequenceEqual(actual));
+        }
+
     }
 }

@@ -39,52 +39,42 @@ namespace TeamA.Exogredient.Services
         /// <returns> true if the username and password are correct, false otherwise </returns>
         public static async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
         {
-            try
-            {
-                // Check if the username exists.
-                if (! (await _userDAO.CheckUserExistenceAsync(userName)))
-                {
-                    return false;
-                }
-                // Check if the username is disabled.
-                if (await _userDAO.CheckIfUserDisabledAsync(userName))
-                {
-                    // TODO Create Custom Exception: For User
-                    throw new Exception("This username is locked! To enable, contact the admin");
-                }
-
-                byte[] privateKey = SecurityService.GetRSAPrivateKey();
-                byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted,privateKey);
-                // Decrypt the encrypted password.
-                string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
-
-                // Get the password and the salt stored corresponding to the username.
-                Tuple<string, string> saltAndPassword = await _userDAO.GetStoredPasswordAndSaltAsync(userName);
-                string storedPassword = saltAndPassword.Item1;
-                string saltString = saltAndPassword.Item2;
-
-                // Convert the salt to byte array.
-                byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
-                //Number of iterations for has && length of the hash in bytes.
-                // Hash the decrypted password with the byte array of salt.
-                string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
-
-                //Check if the stored password matches the hashed password
-                if (storedPassword.Equals(hashedPassword))
-                {
-                    // TODO Uncomment when GenerateJWS is implemented
-                    //string token = CreateToken(userName);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception e)
+            // Check if the username exists.
+            if (!(await _userDAO.CheckUserExistenceAsync(userName)))
             {
                 return false;
-                //throw e;
+            }
+            // Check if the username is disabled.
+            if (await _userDAO.CheckIfUserDisabledAsync(userName))
+            {
+                throw new InvalidOperationException("This username is locked! To enable, contact the admin");
+            }
+
+            byte[] privateKey = SecurityService.GetRSAPrivateKey();
+            byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted, privateKey);
+            // Decrypt the encrypted password.
+            string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
+
+            // Get the password and the salt stored corresponding to the username.
+            Tuple<string, string> saltAndPassword = await _userDAO.GetStoredPasswordAndSaltAsync(userName);
+            string storedPassword = saltAndPassword.Item1;
+            string saltString = saltAndPassword.Item2;
+
+            // Convert the salt to byte array.
+            byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
+
+            //Number of iterations for has && length of the hash in bytes.
+            // Hash the decrypted password with the byte array of salt.
+            string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
+
+            //Check if the stored password matches the hashed password
+            if (storedPassword.Equals(hashedPassword))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

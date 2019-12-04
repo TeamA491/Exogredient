@@ -7,7 +7,7 @@ namespace TeamA.Exogredient.DAL
 {
     public class UserRecord : IRecord
     {
-        private static readonly IDictionary<string, object> _data = new Dictionary<string, object>();
+        private readonly IDictionary<string, object> _data = new Dictionary<string, object>();
 
         public string Username { get; }
         public string FirstName { get; }
@@ -26,7 +26,7 @@ namespace TeamA.Exogredient.DAL
         public int EmailCodeFailures { get; }
         public int PhoneCodeFailures { get; }
 
-        public UserRecord(string username, string firstName = null, string lastName = null, string email = null, 
+        public UserRecord(string username, string firstName = null, string lastName = null, string email = null,
             string phoneNumber = null, string password = null, short disabled = -1, string userType = null, string salt = null,
             long tempTimestamp = -1, string emailCode = null, long emailCodeTimestamp = -1, int loginFailures = -1,
             long lastLoginFailTimestamp = -1, int emailCodeFailures = -1, int phoneCodeFailures = -1)
