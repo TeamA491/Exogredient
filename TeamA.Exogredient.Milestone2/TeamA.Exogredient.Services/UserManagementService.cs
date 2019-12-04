@@ -87,21 +87,21 @@ namespace TeamA.Exogredient.Services
             return await _userDAO.DeleteByIdsAsync(new List<string>() { username });
         }
 
-        public static async Task<bool> MakeTempPerm(string username)
+        public static async Task<bool> MakeTempPermAsync(string username)
         {
             UserRecord record = new UserRecord(username, tempTimestamp: "");
 
             return await _userDAO.UpdateAsync(record);
         }
 
-        public static async Task<bool> StoreEmailCode(string username, string emailCode, string emailCodeTimestamp)
+        public static async Task<bool> StoreEmailCodeAsync(string username, string emailCode, string emailCodeTimestamp)
         {
             UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp);
 
             return await _userDAO.UpdateAsync(record);
         }
 
-        public static async Task<bool> RemoveEmailCode(string username)
+        public static async Task<bool> RemoveEmailCodeAsync(string username)
         {
             UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: "");
 

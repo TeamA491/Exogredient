@@ -209,7 +209,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("121212121223232323")]
         [DataRow("thisshouldnotcontainreptitions")]
         [DataRow("34895019")]
-        public void StringUtilityService_ContainsRepetitionOrSequence_NoReptitionFalse(string plaintextPassword)
+        public void StringUtilityService_ContainsRepetitionOrSequence_NoReptitionFailure(string plaintextPassword)
         {
             // Act
             bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
