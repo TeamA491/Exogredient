@@ -173,7 +173,7 @@ namespace TeamA.Exogredient.Services
             string emailCode = generator.Next(100000, 1000000).ToString();
             string emailCodeTimestamp = DateTime.UtcNow.ToString("hh:mm:ss MM-dd-yyyy UTC");
 
-            await UserManagementService.StoreEmailCode(username, emailCode, emailCodeTimestamp);
+            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp);
 
             bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
                 @"<tr>" +
