@@ -6,25 +6,22 @@ using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.Common;
 using MySqlX.XDevAPI.CRUD;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
+    public class DataStoreLoggingDAO : IMasterNOSQLDAO<string>
     {
-        private const string _schema = Constants.LogsSchemaName;
-        private const string _collectionPrefix = Constants.LogsCollectionPrefix;
-        private const string _id = Constants.LogsIdField;
-
-        public async override Task<bool> CreateAsync(object record, string yyyymmdd)
+        public async Task<bool> CreateAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
             {
                 LogRecord logRecord = (LogRecord)record;
-                Session session = MySQLX.GetSession(ConnectionString);
+                Session session = MySQLX.GetSession(Constants.NOSQLConnection);
 
-                Schema schema = session.GetSchema(_schema);
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
-                var collection = schema.CreateCollection(_collectionPrefix + yyyymmdd, ReuseExistingObject: true);
+                var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
                 // HACK: hardcoded here for now
                 // Created anon type to represent json in document store.
@@ -49,17 +46,17 @@ namespace TeamA.Exogredient.DAL
             
         }
 
-        public async override Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
+        public async Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
         {
             try
             {
-                Session session = MySQLX.GetSession(ConnectionString);
+                Session session = MySQLX.GetSession(Constants.NOSQLConnection);
 
-                Schema schema = session.GetSchema(_schema);
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
-                var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
+                var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
-                await collection.Remove($"{_id} = :id").Bind("id", uniqueId).ExecuteAsync();
+                await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync();
 
                 session.Close();
 
@@ -72,17 +69,17 @@ namespace TeamA.Exogredient.DAL
         }
 
         // TODO: Can't find id by identifier and timestamp... need operation
-        public async override Task<string> FindIdFieldAsync(object record, string yyyymmdd)
+        public async Task<string> FindIdFieldAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
             {
                 LogRecord logRecord = (LogRecord)record;
 
-                Session session = MySQLX.GetSession(ConnectionString);
+                Session session = MySQLX.GetSession(Constants.NOSQLConnection);
 
-                Schema schema = session.GetSchema(_schema);
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
-                var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
+                var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
                 var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
 
@@ -93,7 +90,7 @@ namespace TeamA.Exogredient.DAL
                 while (result.Next())
                 {
                     // TODO: flesh out columns. make columns into fields.
-                    resultstring = (string)result.Current[_id];
+                    resultstring = (string)result.Current[Constants.LogsIdField];
 
                 }
 

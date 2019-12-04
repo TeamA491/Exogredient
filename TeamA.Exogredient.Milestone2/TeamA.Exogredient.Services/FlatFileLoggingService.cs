@@ -5,20 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
     public static class FlatFileLoggingService
     {
-        private static readonly string _logFolder = Constants.LogFolder;
-        private static readonly string _fileType = Constants.LogFileType;
-
         public static async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
                                                           string ipAddress, string errorType)
         {
             try
             {
-                Directory.CreateDirectory(_logFolder);
+                Directory.CreateDirectory(Constants.LogFolder);
 
                 string[] splitResult = timestamp.Split(' ');
 
@@ -27,11 +25,11 @@ namespace TeamA.Exogredient.Services
                     throw new ArgumentException("Timestamp Format Incorrect");
                 }
 
-                string fileName = splitResult[2] + _fileType;
+                string fileName = splitResult[2] + Constants.LogFileType;
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                string path = _logFolder + @"\" + fileName;
+                string path = Constants.LogFolder + @"\" + fileName;
 
                 string result = "";
 
@@ -79,9 +77,9 @@ namespace TeamA.Exogredient.Services
                     throw new ArgumentException("Timestamp Format Incorrect");
                 }
 
-                string fileName = splitResult[2] + _fileType;
+                string fileName = splitResult[2] + Constants.LogFileType;
 
-                string path = _logFolder + @"\" + fileName;
+                string path = Constants.LogFolder + @"\" + fileName;
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 

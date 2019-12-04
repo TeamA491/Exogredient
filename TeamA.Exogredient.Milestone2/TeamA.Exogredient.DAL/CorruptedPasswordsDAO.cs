@@ -8,19 +8,15 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class CorruptedPasswordsDAO : MasterNOSQLDAOReadOnly
+    public class CorruptedPasswordsDAO : IMasterNOSQLDAOReadOnly
     {
-        private const string _schema = Constants.CorruptedPassSchemaName;
-        private const string _collectionName = Constants.CorruptedPassCollectionName;
-        private const string _passwordField = Constants.CorruptedPassPasswordField;
-
-        public async override Task<List<string>> ReadAsync()
+        public async Task<List<string>> ReadAsync()
         {
-            Session session = MySQLX.GetSession(ConnectionString);
+            Session session = MySQLX.GetSession(Constants.NOSQLConnection);
 
-            Schema schema = session.GetSchema(_schema);
+            Schema schema = session.GetSchema(Constants.CorruptedPassSchemaName);
 
-            var collection = schema.GetCollection(_collectionName);
+            var collection = schema.GetCollection(Constants.CorruptedPassCollectionName);
 
             DocResult result = await collection.Find().ExecuteAsync();
 
@@ -29,7 +25,7 @@ namespace TeamA.Exogredient.DAL
             while (result.Next())
             {
                 // TODO: flesh out columns. make columns into fields.
-                string temp = (string)result.Current[_passwordField];
+                string temp = (string)result.Current[Constants.CorruptedPassPasswordField];
 
                 resultList.Add(temp);
 

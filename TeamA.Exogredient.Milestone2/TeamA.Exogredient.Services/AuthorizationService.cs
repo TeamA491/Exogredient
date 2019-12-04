@@ -4,6 +4,7 @@ using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using TeamA.Exogredient.DataHelpers;
 
 // TODO USE SECURITY SERVICE FOR HASHING
 
@@ -106,16 +107,18 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="userName"> logged-in username </param>
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
-        public static async Task<string> CreateTokenAsync(string userName)
+        public static async Task<string> CreateTokenAsync(string username)
         {
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+
             // Get the user type of the username.
-            string userType = await _userDAO.GetUserTypeAsync(userName);
+            string userType = user.UserType;
 
             // Craete a dictionary that represents the user type and unique ID.
             Dictionary<string, string> userInfo = new Dictionary<string, string>()
             {
                 {"userType", userType},
-                {"id", userName }
+                {"id", username }
             };
 
             return GenerateJWS(userInfo);

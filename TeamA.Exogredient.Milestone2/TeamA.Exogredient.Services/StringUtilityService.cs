@@ -10,20 +10,6 @@ namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
     {
-        private static readonly IDictionary<int, int> _monthDays = Constants.MonthDays;
-        private static readonly List<char> _alphaNumericAndSpecialCharacters = Constants.AlphaNumericAndSpecialCharacters;
-           
-        // NIST checking
-        private const int _maxRepetitionOrSequence = Constants.MaxRepetitionOrSequence;
-        private static readonly List<string> _contextSpecificWords = Constants.ContextSpecificWords;
-        private static readonly List<char> _lettersLower = Constants.LettersLower;
-        private static readonly List<char> _lettersUpper = Constants.LettersUpper;
-        private static readonly List<char> _numbers = Constants.Numbers;
-        private static readonly IDictionary<char, int> _lettersLowerToPositions = Constants.LettersLowerToPositions;
-        private static readonly IDictionary<char, int> _lettersUpperToPositions = Constants.LettersUpperToPositions;
-        private static readonly IDictionary<int, char> _positionsToLettersLower = Constants.PositionsToLettersLower;
-        private static readonly IDictionary<int, char> _positionsToLettersUpper = Constants.PositionsToLettersUpper;
-
         private static readonly CorruptedPasswordsDAO _corruptedPasswordsDAO;
 
         /// <summary>
@@ -33,6 +19,34 @@ namespace TeamA.Exogredient.Services
         static StringUtilityService()
         {
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
+        }
+
+        public static long CurrentUnixTime()
+        {
+            return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+        }
+
+        public static long TimespanToSeconds(TimeSpan span)
+        {
+            long result = 0;
+
+            int inputHours = span.Hours;
+            int inputMinutes = span.Minutes;
+            int inputSeconds = span.Seconds;
+
+            for (int i = 0; i < inputHours; i++)
+            {
+                result += Constants.SecondsInAnHour;
+            }
+
+            for (int i = 0; i < inputMinutes; i++)
+            {
+                result += Constants.SecondsInAMinute;
+            }
+
+            result += inputSeconds;
+
+            return result;
         }
 
         // Change To Epoch Time
@@ -46,8 +60,8 @@ namespace TeamA.Exogredient.Services
             int lockedYear = Int32.Parse(date.Substring(15, 4));
 
             int inputHours = span.Hours;
-            int inputMinute = span.Minutes;
-            int inputSecond = span.Seconds;
+            int inputMinutes = span.Minutes;
+            int inputSeconds = span.Seconds;
 
             int resultHour = lockedHour;
             int resultMinute = lockedMinute;
@@ -69,7 +83,7 @@ namespace TeamA.Exogredient.Services
                     resultDay++;
                 }
 
-                if (resultDay > _monthDays[resultMonth])
+                if (resultDay > Constants.MonthDays[resultMonth])
                 {
                     if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
                     {
@@ -101,7 +115,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            for (int i = 0; i < inputMinute; i++)
+            for (int i = 0; i < inputMinutes; i++)
             {
                 resultMinute++;
 
@@ -119,7 +133,7 @@ namespace TeamA.Exogredient.Services
                     resultDay++;
                 }
 
-                if (resultDay > _monthDays[resultMonth])
+                if (resultDay > Constants.MonthDays[resultMonth])
                 {
                     if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
                     {
@@ -151,7 +165,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            for (int i = 0; i < inputSecond; i++)
+            for (int i = 0; i < inputSeconds; i++)
             {
                 resultSecond++;
 
@@ -176,7 +190,7 @@ namespace TeamA.Exogredient.Services
                     resultDay++;
                 }
 
-                if (resultDay > _monthDays[resultMonth])
+                if (resultDay > Constants.MonthDays[resultMonth])
                 {
                     if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
                     {
@@ -303,7 +317,7 @@ namespace TeamA.Exogredient.Services
 
             foreach (char c in name.ToLower())
             {
-                result = result && _alphaNumericAndSpecialCharacters.Contains(c);
+                result = result && Constants.AlphaNumericAndSpecialCharacters.Contains(c);
             }
 
             return result;
@@ -321,7 +335,7 @@ namespace TeamA.Exogredient.Services
 
             foreach (char c in name)
             {
-                result = result && _numbers.Contains(c);
+                result = result && Constants.Numbers.Contains(c);
             }
 
             return result;
@@ -403,7 +417,7 @@ namespace TeamA.Exogredient.Services
         {
             string lowerPassword = plaintextPassword.ToLower();
 
-            foreach (string word in _contextSpecificWords)
+            foreach (string word in Constants.ContextSpecificWords)
             {
                 if (lowerPassword.Contains(word))
                 {
@@ -498,17 +512,17 @@ namespace TeamA.Exogredient.Services
                             bool upperLetter = false;
                             bool lowerLetter = false;
 
-                            if (_lettersLower.Contains(previousCharacter))
+                            if (Constants.LettersLower.Contains(previousCharacter))
                             {
                                 lowerLetter = true;
-                                previousPosition = _lettersLowerToPositions[previousCharacter];
+                                previousPosition = Constants.LettersLowerToPositions[previousCharacter];
                             }
-                            else if (_lettersUpper.Contains(previousCharacter))
+                            else if (Constants.LettersUpper.Contains(previousCharacter))
                             {
                                 upperLetter = true;
-                                previousPosition = _lettersUpperToPositions[previousCharacter];
+                                previousPosition = Constants.LettersUpperToPositions[previousCharacter];
                             }
-                            else if (_numbers.Contains(previousCharacter))
+                            else if (Constants.Numbers.Contains(previousCharacter))
                             {
                                 number = true;
                                 // Characters represented by sequential numbers in every utf-16
@@ -524,7 +538,7 @@ namespace TeamA.Exogredient.Services
                                     nextPosition = 1;
                                 }
 
-                                if (_numbers[nextPosition] == character)
+                                if (Constants.Numbers[nextPosition] == character)
                                 {
                                     patternCount++;
                                 }
@@ -541,7 +555,7 @@ namespace TeamA.Exogredient.Services
                                     nextPosition = 1;
                                 }
 
-                                if (_positionsToLettersUpper[nextPosition] == character)
+                                if (Constants.PositionsToLettersUpper[nextPosition] == character)
                                 {
                                     patternCount++;
                                 }
@@ -558,7 +572,7 @@ namespace TeamA.Exogredient.Services
                                     nextPosition = 1;
                                 }
 
-                                if (_positionsToLettersLower[nextPosition] == character)
+                                if (Constants.PositionsToLettersLower[nextPosition] == character)
                                 {
                                     patternCount++;
                                 }
@@ -576,17 +590,17 @@ namespace TeamA.Exogredient.Services
                             bool upperLetter = false;
                             bool lowerLetter = false;
 
-                            if (_lettersLower.Contains(previousCharacter))
+                            if (Constants.LettersLower.Contains(previousCharacter))
                             {
                                 lowerLetter = true;
-                                previousPosition = _lettersLowerToPositions[previousCharacter];
+                                previousPosition = Constants.LettersLowerToPositions[previousCharacter];
                             }
-                            else if (_lettersUpper.Contains(previousCharacter))
+                            else if (Constants.LettersUpper.Contains(previousCharacter))
                             {
                                 upperLetter = true;
-                                previousPosition = _lettersUpperToPositions[previousCharacter];
+                                previousPosition = Constants.LettersUpperToPositions[previousCharacter];
                             }
-                            else if (_numbers.Contains(previousCharacter))
+                            else if (Constants.Numbers.Contains(previousCharacter))
                             {
                                 number = true;
                                 // Characters represented by sequential numbers in every utf-16
@@ -602,7 +616,7 @@ namespace TeamA.Exogredient.Services
                                     nextPosition = 9;
                                 }
 
-                                if (_numbers[nextPosition] == character)
+                                if (Constants.Numbers[nextPosition] == character)
                                 {
                                     patternCount++;
                                 }
@@ -619,7 +633,7 @@ namespace TeamA.Exogredient.Services
                                     nextPosition = 26;
                                 }
 
-                                if (_positionsToLettersUpper[nextPosition] == character)
+                                if (Constants.PositionsToLettersUpper[nextPosition] == character)
                                 {
                                     patternCount++;
                                 }
@@ -636,7 +650,7 @@ namespace TeamA.Exogredient.Services
                                     nextPosition = 26;
                                 }
 
-                                if (_positionsToLettersLower[nextPosition] == character)
+                                if (Constants.PositionsToLettersLower[nextPosition] == character)
                                 {
                                     patternCount++;
                                 }
@@ -658,13 +672,13 @@ namespace TeamA.Exogredient.Services
                         }
                         else
                         {
-                            if (_lettersLower.Contains(character))
+                            if (Constants.LettersLower.Contains(character))
                             {
                                 int previousPosition = 0;
 
-                                if (_lettersLower.Contains(previousCharacter))
+                                if (Constants.LettersLower.Contains(previousCharacter))
                                 {
-                                    previousPosition = _lettersLowerToPositions[previousCharacter];
+                                    previousPosition = Constants.LettersLowerToPositions[previousCharacter];
 
                                     int nextPositionIncrease = previousPosition + 1;
                                     int nextPositionDecrease = previousPosition - 1;
@@ -679,26 +693,26 @@ namespace TeamA.Exogredient.Services
                                         nextPositionDecrease = 26;
                                     }
 
-                                    if (_positionsToLettersLower[nextPositionIncrease] == character)
+                                    if (Constants.PositionsToLettersLower[nextPositionIncrease] == character)
                                     {
                                         patternCount++;
                                         increasingSequence = true;
                                     }
 
-                                    if (_positionsToLettersLower[nextPositionDecrease] == character)
+                                    if (Constants.PositionsToLettersLower[nextPositionDecrease] == character)
                                     {
                                         patternCount++;
                                         decreasingSequence = true;
                                     }
                                 }
                             }
-                            else if (_lettersUpper.Contains(character))
+                            else if (Constants.LettersUpper.Contains(character))
                             {
                                 int previousPosition = 0;
 
-                                if (_lettersUpper.Contains(previousCharacter))
+                                if (Constants.LettersUpper.Contains(previousCharacter))
                                 {
-                                    previousPosition = _lettersUpperToPositions[previousCharacter];
+                                    previousPosition = Constants.LettersUpperToPositions[previousCharacter];
 
                                     int nextPositionIncrease = previousPosition + 1;
                                     int nextPositionDecrease = previousPosition - 1;
@@ -713,24 +727,24 @@ namespace TeamA.Exogredient.Services
                                         nextPositionDecrease = 26;
                                     }
 
-                                    if (_positionsToLettersUpper[nextPositionIncrease] == character)
+                                    if (Constants.PositionsToLettersUpper[nextPositionIncrease] == character)
                                     {
                                         patternCount++;
                                         increasingSequence = true;
                                     }
 
-                                    if (_positionsToLettersUpper[nextPositionDecrease] == character)
+                                    if (Constants.PositionsToLettersUpper[nextPositionDecrease] == character)
                                     {
                                         patternCount++;
                                         decreasingSequence = true;
                                     }
                                 }
                             }
-                            else if (_numbers.Contains(character))
+                            else if (Constants.Numbers.Contains(character))
                             {
                                 int previousPosition = 0;
 
-                                if (_numbers.Contains(previousCharacter))
+                                if (Constants.Numbers.Contains(previousCharacter))
                                 {
                                     previousPosition = previousCharacter - '0';
 
@@ -747,13 +761,13 @@ namespace TeamA.Exogredient.Services
                                         nextPositionDecrease = 9;
                                     }
 
-                                    if (_numbers[nextPositionIncrease] == character)
+                                    if (Constants.Numbers[nextPositionIncrease] == character)
                                     {
                                         patternCount++;
                                         increasingSequence = true;
                                     }
 
-                                    if (_numbers[nextPositionDecrease] == character)
+                                    if (Constants.Numbers[nextPositionDecrease] == character)
                                     {
                                         patternCount++;
                                         decreasingSequence = true;
@@ -764,7 +778,7 @@ namespace TeamA.Exogredient.Services
                     }
 
                     // Constant check at end of each iteration to possibly return false from this function.
-                    if (patternCount == _maxRepetitionOrSequence)
+                    if (patternCount == Constants.MaxRepetitionOrSequence)
                     {
                         return true;
                     }

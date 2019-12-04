@@ -1,16 +1,18 @@
 ﻿using MySqlX.XDevAPI;
 using System;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 {
     public class CorruptedPasswordsScript
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
 
             string line;
 
+            // Change this to your specific path!!
             System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\Eli\Desktop\pwned-passwords-sha1-ordered-by-count-v5.txt");
 
             while ((line = file.ReadLine()) != null)
@@ -23,9 +25,9 @@ namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
     public abstract class MasterNOSQLDAO<T>
     {
         // HACK: Change this to your specific password
-        protected static readonly string ConnectionString = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
+        protected static readonly string ConnectionString = Constants.NOSQLConnection;
 
-        protected static readonly string Schema = "corrupted_passwords";
+        protected const string Schema = Constants.CorruptedPassSchemaName;
 
         public abstract void Create(string password);
 
@@ -49,7 +51,7 @@ namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
                 schema = session.GetSchema(Schema);
             }
 
-            var collection = schema.CreateCollection("passwords", ReuseExistingObject: true);
+            var collection = schema.CreateCollection(Constants.CorruptedPassCollectionName, ReuseExistingObject: true);
 
             // Created anon type to represent json in document store.
             var document = new

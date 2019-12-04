@@ -26,6 +26,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogFolder = @"C:\Logs";
         public const string LogFileType = ".CSV";
 
+        // SQL SCHEMA
+        public const string SQLSchemaName = "exogredient";
+
         // USER TABLE
         public const string UserDAOtableName = "user";
         public const string UserDAOusernameColumn = "username";                                  // VARCHAR(200)
@@ -34,23 +37,23 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDAOemailColumn = "email";                                        // VARCHAR(200)
         public const string UserDAOphoneNumberColumn = "phone_number";                           // VARCHAR(10)
         public const string UserDAOpasswordColumn = "password";                                  // VARCHAR(2000)
-        public const string UserDAOdisabledColumn = "disabled";                                  // BOOLEAN
+        public const string UserDAOdisabledColumn = "disabled";                                  // TINYINT
         public const string UserDAOuserTypeColumn = "user_type";                                 // VARCHAR(11) -- could be enum/set
         public const string UserDAOsaltColumn = "salt";                                          // VARCHAR(200)
-        public const string UserDAOtempTimestampColumn = "temp_timestamp";                       // BIGINT(20) -- unix
+        public const string UserDAOtempTimestampColumn = "temp_timestamp";                       // BIGINT -- unix
         public const string UserDAOemailCodeColumn = "email_code";                               // VARCHAR(6)
-        public const string UserDAOemailCodeTimestampColumn = "email_code_timestamp";            // BIGINT(20) -- unix
-        public const string UserDAOloginFailuresColmun = "login_failures";                       // INT
-        public const string UserDAOlastLoginFailTimestampColumn = "last_login_fail_timestamp";   // BIGINT(20) -- unix
+        public const string UserDAOemailCodeTimestampColumn = "email_code_timestamp";            // BIGINT -- unix
+        public const string UserDAOloginFailuresColumn = "login_failures";                       // INT
+        public const string UserDAOlastLoginFailTimestampColumn = "last_login_fail_timestamp";   // BIGINT -- unix
         public const string UserDAOemailCodeFailuresColumn = "email_code_failures";              // INT
         public const string UserDAOphoneCodeFailuresColumn = "phone_code_failures";              // INT
 
         // IP ADDRESS TABLE
         public const string IPAddressDAOtableName = "ip_address";
         public const string IPAddressDAOIPColumn = "ip";                                         // VARCHAR(15)
-        public const string IPAddressDAOtimestampLockedColumn = "timestamp_locked";              // BIGINT(20) -- unix
+        public const string IPAddressDAOtimestampLockedColumn = "timestamp_locked";              // BIGINT -- unix
         public const string IPAddressDAOregistrationFailuresColumn = "registration_failures";    // INT
-        public const string IPAddressDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT(20) -- unix
+        public const string IPAddressDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT -- unix
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
@@ -74,6 +77,9 @@ namespace TeamA.Exogredient.AppConstants
             { 6, 30 }, { 7, 31 }, { 8, 31 }, { 9, 30 }, { 10, 31 },
             { 11, 30 }, { 12, 31 }
         };
+
+        public const int SecondsInAnHour = 3600;
+        public const int SecondsInAMinute = 60;
 
         // No < or > to protect from SQL injections.
         public static readonly List<char> AlphaNumericAndSpecialCharacters = new List<char>()
