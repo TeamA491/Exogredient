@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.TestController
 {
@@ -32,7 +33,7 @@ namespace TeamA.Exogredient.TestController
 
             //Console.WriteLine(result);
 
-            UserRecord r = (UserRecord)await dao.ReadByIdAsync("eli");
+            UserObject r = (UserObject)await dao.ReadByIdAsync("eli");
 
             //Console.WriteLine(r.Username);
             //Console.WriteLine(r.Password);

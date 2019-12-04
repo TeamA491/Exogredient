@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -22,12 +23,12 @@ namespace TeamA.Exogredient.Tests
             try
             {
                 await UserManagementService.DisableUserAsync(username);
-                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
                 result = (user.Disabled == 1);
             }
             catch
             {
-                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
                 result = (user.Disabled == 1);
             }
 
@@ -46,12 +47,12 @@ namespace TeamA.Exogredient.Tests
             try
             {
                 await UserManagementService.EnableUserAsync(username);
-                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
                 result = (user.Disabled == 1);
             }
             catch
             {
-                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
                 result = (user.Disabled == 1);
             }
 
@@ -68,7 +69,7 @@ namespace TeamA.Exogredient.Tests
 
             //Act
             await UserManagementService.ChangePasswordAsync(username, password);
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             string storedPassword = user.Password;
             string saltString = user.Salt;

@@ -8,9 +8,9 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class CorruptedPasswordsDAO : MasterNOSQLDAOReadOnly
+    public class CorruptedPasswordsDAO : IMasterNOSQLDAOReadOnly
     {
-        public async override Task<List<string>> ReadAsync()
+        public async Task<List<string>> ReadAsync()
         {
             Session session = MySQLX.GetSession(Constants.NOSQLConnection);
 

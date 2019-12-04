@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class UserDAO : MasterSQLDAO<string>
+    public class UserDAO : IMasterSQLDAO<string>
     {
-        public override async Task<bool> CreateAsync(object record)
+        public async Task<bool> CreateAsync(ISQLRecord record)
         {
             if (record.GetType() == typeof(UserRecord))
             {
@@ -68,7 +69,7 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
+        public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
             try
@@ -89,9 +90,9 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override async Task<ISQLRecord> ReadByIdAsync(string id)
+        public async Task<IDataObject> ReadByIdAsync(string id)
         {
-            UserRecord result;
+            UserObject result;
 
             MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
 
@@ -108,7 +109,7 @@ namespace TeamA.Exogredient.DAL
                     dataTable.Load(reader);
                     DataRow row = dataTable.Rows[0];
                     string stringResult = row.ToString();
-                    result = new UserRecord((string)row[Constants.UserDAOusernameColumn], (string)row[Constants.UserDAOfirstNameColumn],
+                    result = new UserObject((string)row[Constants.UserDAOusernameColumn], (string)row[Constants.UserDAOfirstNameColumn],
                                             (string)row[Constants.UserDAOlastNameColumn], (string)row[Constants.UserDAOemailColumn],
                                             (string)row[Constants.UserDAOphoneNumberColumn], (string)row[Constants.UserDAOpasswordColumn],
                                             (bool)row[Constants.UserDAOdisabledColumn] ? 1 : 0, (string)row[Constants.UserDAOuserTypeColumn],
@@ -127,7 +128,7 @@ namespace TeamA.Exogredient.DAL
             return result;
         }
 
-        public override async Task<bool> UpdateAsync(object record)
+        public async Task<bool> UpdateAsync(ISQLRecord record)
         {
             if (record.GetType() == typeof(UserRecord))
             {

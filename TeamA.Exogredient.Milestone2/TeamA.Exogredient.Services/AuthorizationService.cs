@@ -4,6 +4,7 @@ using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using TeamA.Exogredient.DataHelpers;
 
 // TODO USE SECURITY SERVICE FOR HASHING
 
@@ -108,7 +109,7 @@ namespace TeamA.Exogredient.Services
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
         public static async Task<string> CreateTokenAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             // Get the user type of the username.
             string userType = user.UserType;

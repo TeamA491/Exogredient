@@ -8,6 +8,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
@@ -39,13 +40,13 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
             return (user.Disabled == 1);
         }
         
         public static async Task<bool> CheckIPLockAsync(string ipAddress, TimeSpan maxLockTime)
         {
-            IPAddressRecord ip = (IPAddressRecord)await _ipDAO.ReadByIdAsync(ipAddress);
+            IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress);
 
             if (! (await _ipDAO.CheckIPExistenceAsync(ipAddress)))
             {
@@ -111,7 +112,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="username"> username to disable </param>
         public static async Task<bool> DisableUserAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             // If the username doesn't exist, throw an exception.
             if (!(await _userDAO.CheckUserExistenceAsync(username)))
@@ -136,7 +137,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="username"> username to enable </param>
         public static async Task<bool> EnableUserAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             if (!(await _userDAO.CheckUserExistenceAsync(username)))
             {
@@ -156,7 +157,7 @@ namespace TeamA.Exogredient.Services
 
         public static async Task ChangePasswordAsync(string username, string password)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             // Check if the username exists.
             if (!(await _userDAO.CheckUserExistenceAsync(username)))
@@ -220,7 +221,7 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> IncrementLoginFailuresAsync(string username, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
             UserRecord record;
 
             record = new UserRecord(username, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
@@ -237,7 +238,7 @@ namespace TeamA.Exogredient.Services
                 await _userDAO.UpdateAsync(record);
             }
 
-            user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             int updatedLoginFailures = user.LogInFailures + 1;
             if (updatedLoginFailures >= maxNumberOfTries)
@@ -256,7 +257,7 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> IncrementEmailCodeFailuresAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             // Get the current failure count.
             int currentFailures = user.EmailCodeFailures;
@@ -272,14 +273,14 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<int> GetEmailCodeFailureCountAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
             // This returns string right now. update to int when we update database
             return user.EmailCodeFailures;
         }
 
         public static async Task<int> GetPhoneCodeFailureCountAsync(string username)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
             // This returns string right now. update to int when we update database
             return user.PhoneCodeFailures;
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TeamA.Exogredient.DAL
+namespace TeamA.Exogredient.DataHelpers
 {
     public interface ISQLRecord
     {

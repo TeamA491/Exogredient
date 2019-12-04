@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -18,7 +19,7 @@ namespace TeamA.Exogredient.Tests
         public async Task AuthenticationService_Authenticate_CorrectInputs(string username, string password)
         {
             //Arrange
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             if (user.Disabled == 1)
             {
@@ -44,7 +45,7 @@ namespace TeamA.Exogredient.Tests
         public async Task AuthenticationService_Authenticate_IncorrectPassword(string username, string password)
         {
             //Arrange
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             if (user.Disabled == 1)
             {

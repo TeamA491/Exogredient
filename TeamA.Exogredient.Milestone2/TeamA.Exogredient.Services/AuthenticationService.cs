@@ -11,6 +11,7 @@ using TeamA.Exogredient.DAL;
 using Twilio;
 using Twilio.Rest.Preview.AccSecurity.Service;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
@@ -33,7 +34,7 @@ namespace TeamA.Exogredient.Services
         /// <returns> true if the username and password are correct, false otherwise </returns>
         public static async Task<bool> AuthenticateAsync(string username, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             // Check if the username exists.
             if (!(await _userDAO.CheckUserExistenceAsync(username)))
@@ -92,7 +93,7 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> VerifyEmailCodeAsync(string username, string emailCodeInput, TimeSpan maxCodeValidTime)
         {
-            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
 
             string emailCode = user.EmailCode;
             long emailCodeTimestamp = user.EmailCodeTimestamp;

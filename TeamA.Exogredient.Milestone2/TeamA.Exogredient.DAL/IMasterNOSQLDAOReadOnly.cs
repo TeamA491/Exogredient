@@ -6,8 +6,8 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public abstract class MasterNOSQLDAOReadOnly
+    public interface IMasterNOSQLDAOReadOnly
     {
-        public abstract Task<List<string>> ReadAsync();
+        Task<List<string>> ReadAsync();
     }
 }

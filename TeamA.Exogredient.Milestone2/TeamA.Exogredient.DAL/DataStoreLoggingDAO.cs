@@ -6,12 +6,13 @@ using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.Common;
 using MySqlX.XDevAPI.CRUD;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
+    public class DataStoreLoggingDAO : IMasterNOSQLDAO<string>
     {
-        public async override Task<bool> CreateAsync(object record, string yyyymmdd)
+        public async Task<bool> CreateAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
             {
@@ -45,7 +46,7 @@ namespace TeamA.Exogredient.DAL
             
         }
 
-        public async override Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
+        public async Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
         {
             try
             {
@@ -68,7 +69,7 @@ namespace TeamA.Exogredient.DAL
         }
 
         // TODO: Can't find id by identifier and timestamp... need operation
-        public async override Task<string> FindIdFieldAsync(object record, string yyyymmdd)
+        public async Task<string> FindIdFieldAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
             {
