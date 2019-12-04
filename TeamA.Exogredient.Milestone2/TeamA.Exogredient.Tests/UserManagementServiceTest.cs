@@ -9,11 +9,11 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class UserManagementServiceTest
     {
-        UserDAO userDAO = new UserDAO();
+        private readonly UserDAO _userDAO = new UserDAO();
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public async Task UserManagementService_DisableUserName_ValidUserName(string userName)
+        public async Task UserManagementService_DisableUserAsync_ValidUserName(string username)
         {
             //Arrange
             bool result;
@@ -21,12 +21,14 @@ namespace TeamA.Exogredient.Tests
             //Act
             try
             {
-                await UserManagementService.DisableUserNameAsync(userName);
-                result = await userDAO.CheckIfUserDisabledAsync(userName);
+                await UserManagementService.DisableUserAsync(username);
+                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                result = (user.Disabled == 1);
             }
             catch
             {
-                result = await userDAO.CheckIfUserDisabledAsync(userName);
+                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                result = (user.Disabled == 1);
             }
 
             //Assert
@@ -35,7 +37,7 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("charles971026")]
-        public async Task UserManagementService_EnableUserName_ValidUserName(string userName)
+        public async Task UserManagementService_EnableUserName_ValidUserName(string username)
         {
             //Arrange
             bool result;
@@ -43,12 +45,14 @@ namespace TeamA.Exogredient.Tests
             //Act
             try
             {
-                await UserManagementService.EnableUserNameAsync(userName);
-                result = await userDAO.CheckIfUserDisabledAsync(userName);
+                await UserManagementService.EnableUserAsync(username);
+                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                result = (user.Disabled == 1);
             }
             catch
             {
-                result = await userDAO.CheckIfUserDisabledAsync(userName);
+                UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+                result = (user.Disabled == 1);
             }
 
             //Assert
@@ -57,17 +61,17 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("testuser", "newpassword")]
-        public async Task UserManagementService_ChangePassword_ValidUserName(string userName, string password)
+        public async Task UserManagementService_ChangePassword_ValidUserName(string username, string password)
         {
             //Arrange
 
 
             //Act
-            await UserManagementService.ChangePasswordAsync(userName, password);
-            Tuple<string, string> result = await userDAO.GetStoredPasswordAndSaltAsync(userName);
+            await UserManagementService.ChangePasswordAsync(username, password);
+            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
 
-            string storedPassword = result.Item1;
-            string saltString = result.Item2;
+            string storedPassword = user.Password;
+            string saltString = user.Salt;
             byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
             string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
 

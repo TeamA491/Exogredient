@@ -10,61 +10,6 @@ namespace TeamA.Exogredient.DAL
 {
     public class UserDAO : MasterSQLDAO<string>
     {
-        // Table name.
-        private const string _tableName = Constants.UserDAOtableName;
-
-        // Column names.
-        private const string _username = Constants.UserDAOusernameColumn;
-        private const string _firstName = Constants.UserDAOfirstNameColumn;
-        private const string _lastName = Constants.UserDAOlastNameColumn;
-        private const string _email = Constants.UserDAOemailColumn;
-        private const string _phoneNumber = Constants.UserDAOphoneNumberColumn;
-        private const string _password = Constants.UserDAOpasswordColumn;
-        private const string _disabled = Constants.UserDAOdisabledColumn;
-        private const string _userType = Constants.UserDAOuserTypeColumn;
-        private const string _salt = Constants.UserDAOsaltColumn;
-        private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
-        private const string _emailCode= Constants.UserDAOemailCodeColumn;
-        private const string _emailCodeTimestamp = Constants.UserDAOemailCodeTimestampColumn;
-        private const string _loginFailures = Constants.UserDAOloginFailuresColumn;
-        private const string _lastLoginFailTimestamp = Constants.UserDAOlastLoginFailTimestampColumn;
-        private const string _emailCodeFailures = Constants.UserDAOemailCodeFailuresColumn;
-        private const string _phoneCodeFailures = Constants.UserDAOphoneCodeFailuresColumn;
-
-        /// <summary>
-        /// Get the hashed password and the salt stored in the database corresponding to the username.
-        /// </summary>
-        /// <param name="userName"> the username of the password and salt </param>
-        public async Task<Tuple<string, string>> GetStoredPasswordAndSaltAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_username} = '{userName}';";
-                string storedPassword = "";
-                string salt = "";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    storedPassword = reader.GetString(0);
-                    salt = reader.GetString(1);
-                    reader.Close();
-                }
-
-                return Tuple.Create(storedPassword, salt);
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
-
         public override async Task<bool> CreateAsync(object record)
         {
             if (record.GetType() == typeof(UserRecord))
@@ -72,11 +17,11 @@ namespace TeamA.Exogredient.DAL
                 UserRecord userRecord = (UserRecord)record;
                 IDictionary<string, object> recordData = userRecord.GetData();
 
-                MySqlConnection connection = new MySqlConnection(ConnectionString);
+                MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
                 try
                 {
                     connection.Open();
-                    string sqlString = $"INSERT INTO {_tableName} (";
+                    string sqlString = $"INSERT INTO {Constants.UserDAOtableName} (";
 
                     foreach (KeyValuePair<string, object> pair in recordData)
                     {
@@ -87,7 +32,7 @@ namespace TeamA.Exogredient.DAL
                                 throw new NoNullAllowedException("All columns in UserRecord must be not null.");
                             }
                         }
-                        if (pair.Value is short || pair.Value is int || pair.Value is long)
+                        if (pair.Value is int || pair.Value is long)
                         {
                             if (pair.Value.Equals(-1))
                             {
@@ -123,46 +68,15 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        /// <summary>
-        /// Get the user type of the username.
-        /// </summary>
-        /// <param name="userName"> username whose user type is returned </param>
-        /// <returns> the user type of the username </returns>
-        public async Task<string> GetUserTypeAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                // Get the user type of the username
-                string sqlString = $"SELECT {_userType} FROM {_tableName} WHERE {_username} = '{userName}';";
-                string userType;
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    userType = reader.GetString(0);
-                    reader.Close();
-                }
-                return userType;
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
         public override async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
             try
             {
                 connection.Open();
                 foreach (string userName in idsOfRows)
                 {
-                    string sqlString = $"DELETE {_tableName} WHERE {_username} = '{userName}';";
+                    string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = '{userName}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     await command.ExecuteNonQueryAsync();
                 }
@@ -175,16 +89,17 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override async Task<IRecord> ReadByIdAsync(string id)
+        public override async Task<ISQLRecord> ReadByIdAsync(string id)
         {
-            UserRecord result = new UserRecord("try");
+            UserRecord result;
 
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
+
             try
             {
                 connection.Open();
 
-                string sqlString = $"SELECT * FROM {_tableName} WHERE {_username} = '{id}';";
+                string sqlString = $"SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = '{id}';";
                 MySqlCommand command = new MySqlCommand(sqlString, connection);
                 var reader = await command.ExecuteReaderAsync();
 
@@ -193,8 +108,14 @@ namespace TeamA.Exogredient.DAL
                     dataTable.Load(reader);
                     DataRow row = dataTable.Rows[0];
                     string stringResult = row.ToString();
-                    Console.WriteLine(stringResult);
-                    //result.Add(stringResult);
+                    result = new UserRecord((string)row[Constants.UserDAOusernameColumn], (string)row[Constants.UserDAOfirstNameColumn],
+                                            (string)row[Constants.UserDAOlastNameColumn], (string)row[Constants.UserDAOemailColumn],
+                                            (string)row[Constants.UserDAOphoneNumberColumn], (string)row[Constants.UserDAOpasswordColumn],
+                                            (bool)row[Constants.UserDAOdisabledColumn] ? 1 : 0, (string)row[Constants.UserDAOuserTypeColumn],
+                                            (string)row[Constants.UserDAOsaltColumn], (long)row[Constants.UserDAOtempTimestampColumn],
+                                            (string)row[Constants.UserDAOemailCodeColumn], (long)row[Constants.UserDAOemailCodeTimestampColumn],
+                                            (int)row[Constants.UserDAOloginFailuresColumn], (long)row[Constants.UserDAOlastLoginFailTimestampColumn],
+                                            (int)row[Constants.UserDAOemailCodeFailuresColumn], (int)row[Constants.UserDAOphoneCodeFailuresColumn]);
                 }
                 
             }
@@ -210,20 +131,20 @@ namespace TeamA.Exogredient.DAL
         {
             if (record.GetType() == typeof(UserRecord))
             {
-                MySqlConnection connection = new MySqlConnection(ConnectionString);
+                MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
                 try
                 {
                     connection.Open();
                     UserRecord userRecord = (UserRecord)record;
                     IDictionary<string, object> recordData = userRecord.GetData();
 
-                    string sqlString = $"UPDATE {_tableName} SET ";
+                    string sqlString = $"UPDATE {Constants.UserDAOtableName} SET ";
 
                     foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Key != _username)
+                        if (pair.Key != Constants.UserDAOusernameColumn)
                         {
-                            if (pair.Value is short || pair.Value is int || pair.Value is long)
+                            if (pair.Value is int || pair.Value is long)
                             {
                                 if (!pair.Value.Equals(-1))
                                 {
@@ -238,7 +159,7 @@ namespace TeamA.Exogredient.DAL
 
                     }
                     sqlString = sqlString.Remove(sqlString.Length - 1);
-                    sqlString += $" WHERE {_username} = '{recordData[_username]}';";
+                    sqlString += $" WHERE {Constants.UserDAOusernameColumn} = '{recordData[Constants.UserDAOusernameColumn]}';";
                     MySqlCommand command = new MySqlCommand(sqlString, connection);
                     await command.ExecuteNonQueryAsync();
 
@@ -262,14 +183,14 @@ namespace TeamA.Exogredient.DAL
         /// <returns> true if username exists, otherwise false </returns>
         public async Task<bool> CheckUserExistenceAsync(string userName)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
             bool exist;
             try
             {
                 // Connect to the database.
                 connection.Open();
                 // Check if the username exists in the table.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_username} = '{userName}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = '{userName}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
@@ -292,14 +213,14 @@ namespace TeamA.Exogredient.DAL
         /// <returns> true if phone number exists, otherwise false </returns>
         public async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
             bool exist;
             try
             {
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_phoneNumber} = '{phoneNumber}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOphoneNumberColumn} = '{phoneNumber}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
@@ -322,14 +243,14 @@ namespace TeamA.Exogredient.DAL
         /// <returns> true if email exists, otherwise false </returns>
         public async Task<bool> CheckEmailExistenceAsync(string email)
         {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            MySqlConnection connection = new MySqlConnection(Constants.SQLConnection);
             bool exist;
             try
             {
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {_tableName} WHERE {_email} = '{email}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOemailColumn} = '{email}');";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     var reader = await command.ExecuteReaderAsync();
@@ -343,186 +264,6 @@ namespace TeamA.Exogredient.DAL
             }
 
             return exist;
-        }
-
-        public async Task<bool> CheckIfUserDisabledAsync(string username)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            bool result;
-
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-                // Check if the username exists in the table.
-                string sqlString = $"SELECT {_disabled} FROM {_tableName} WHERE {_username} = '{username}');";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    result = reader.GetString(0) == "1" ? true : false;
-                }
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return result;
-        }
-
-        public async Task<Tuple<string, long>> GetEmailCodeAndTimestamp(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_username} = '{userName}';";
-                string emailCode = "";
-                long emailCodeTimestamp = 0;
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    emailCode = reader.GetString(0);
-                    emailCodeTimestamp = (long)reader.GetValue(1);
-                    reader.Close();
-                }
-
-                return Tuple.Create(emailCode, emailCodeTimestamp);
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
-        public async Task<int> GetEmailCodeFailureCountAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                string sqlString = $"SELECT {_emailCodeFailures} FROM {_tableName} WHERE {_username} = '{userName}';";
-                int emailCodeFailureCount = 0;
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    emailCodeFailureCount = (int)reader.GetValue(0);
-                    reader.Close();
-                }
-
-                return emailCodeFailureCount;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
-        public async Task<int> GetPhoneCodeFaiureCountAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                string sqlString = $"SELECT {_emailCodeFailures} FROM {_tableName} WHERE {_username} = '{userName}';";
-                int phoneCodeFailureCount = 0;
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    phoneCodeFailureCount = (int)reader.GetValue(0);
-                    reader.Close();
-                }
-
-                return phoneCodeFailureCount;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
-        public async Task<long> GetLastLoginFailTimestampAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                string sqlString = $"SELECT {_lastLoginFailTimestamp} FROM {_tableName} WHERE {_username} = '{userName}';";
-                long lastLoginFailTimestamp = 0;
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    lastLoginFailTimestamp = (long)reader.GetValue(0);
-                    reader.Close();
-                }
-
-                return lastLoginFailTimestamp;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }
-
-        public async Task<int> GetLoginFailuresAsync(string userName)
-        {
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                // Connect to the database.
-                connection.Open();
-
-                string sqlString = $"SELECT {_loginFailures} FROM {_tableName} WHERE {_username} = '{userName}';";
-                int loginFailures = 0;
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
-                    loginFailures = (int)reader.GetValue(0);
-                    reader.Close();
-                }
-
-                return loginFailures;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
         }
     }
 }

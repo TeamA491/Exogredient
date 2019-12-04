@@ -32,7 +32,19 @@ namespace TeamA.Exogredient.TestController
 
             //Console.WriteLine(result);
 
-            //await dao.ReadByIdAsync("eli");
+            UserRecord r = (UserRecord)await dao.ReadByIdAsync("eli");
+
+            //Console.WriteLine(r.Username);
+            //Console.WriteLine(r.Password);
+            //Console.WriteLine(r.Salt);
+            //Console.WriteLine(r.EmailCode);
+            //Console.WriteLine(r.EmailCodeFailures);
+            //Console.WriteLine(r.EmailCodeTimestamp);
+            //Console.WriteLine(r.TempTimestamp);
+            //Console.WriteLine(r.LastLoginFailTimestamp);
+            //Console.WriteLine(r.UserType);
+            //Console.WriteLine(r.Disabled);
+            //Console.WriteLine(r.Email);
         }
     }
 }

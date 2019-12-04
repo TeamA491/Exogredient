@@ -16,12 +16,6 @@ namespace TeamA.Exogredient.Services
 {
     public static class AuthenticationService
     {
-        private const string _systemEmailAddress = Constants.SystemEmailAddress;
-        private static readonly string _systemEmailPassword = Constants.SystemEmailPassword;
-        private const string _twilioAccountSID = Constants.TwilioAccountSID;
-        private const string _twilioPathServiceSID = Constants.TwilioPathServiceSID;
-        private static readonly string _twilioAuthorizationToken = Constants.TwilioAuthToken;
-
         private static readonly UserDAO _userDAO;
 
         static AuthenticationService()
@@ -37,15 +31,18 @@ namespace TeamA.Exogredient.Services
         /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
         /// <param name="aesIV"> AES Initialization Vector used for encrypting the password </param>
         /// <returns> true if the username and password are correct, false otherwise </returns>
-        public static async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
+        public static async Task<bool> AuthenticateAsync(string username, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
         {
+            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+
             // Check if the username exists.
-            if (!(await _userDAO.CheckUserExistenceAsync(userName)))
+            if (!(await _userDAO.CheckUserExistenceAsync(username)))
             {
                 return false;
             }
             // Check if the username is disabled.
-            if (await _userDAO.CheckIfUserDisabledAsync(userName))
+            
+            if (user.Disabled == 1)
             {
                 throw new InvalidOperationException("This username is locked! To enable, contact the admin");
             }
@@ -56,9 +53,8 @@ namespace TeamA.Exogredient.Services
             string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
 
             // Get the password and the salt stored corresponding to the username.
-            Tuple<string, string> saltAndPassword = await _userDAO.GetStoredPasswordAndSaltAsync(userName);
-            string storedPassword = saltAndPassword.Item1;
-            string saltString = saltAndPassword.Item2;
+            string storedPassword = user.Password;
+            string saltString = user.Salt;
 
             // Convert the salt to byte array.
             byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
@@ -80,15 +76,15 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> SendCallVerificationAsync(string phoneNumber)
         {
-            string accountSID = _twilioAccountSID;
-            string authorizationToken = _twilioAuthorizationToken;
+            string accountSID = Constants.TwilioAccountSID;
+            string authorizationToken = Constants.TwilioAuthToken;
 
             TwilioClient.Init(accountSID, authorizationToken);
 
             var verification = await VerificationResource.CreateAsync(
                 to: $"+1{phoneNumber}",
                 channel: "call",
-                pathServiceSid: _twilioPathServiceSID
+                pathServiceSid: Constants.TwilioPathServiceSID
             );
 
             return true;
@@ -96,9 +92,11 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> VerifyEmailCodeAsync(string username, string emailCodeInput, TimeSpan maxCodeValidTime)
         {
-            Tuple<string, long> emailCodeInformation = await _userDAO.GetEmailCodeAndTimestamp(username);
-            string emailCode = emailCodeInformation.Item1;
-            long emailCodeTimestamp = emailCodeInformation.Item2;
+            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+
+            string emailCode = user.EmailCode;
+            long emailCodeTimestamp = user.EmailCodeTimestamp;
+
             UserRecord record;
 
             if (emailCodeTimestamp.Equals(""))
@@ -129,8 +127,8 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
         {
-            string accountSID = _twilioAccountSID;
-            string authorizationToken = _twilioAuthorizationToken;
+            string accountSID = Constants.TwilioAccountSID;
+            string authorizationToken = Constants.TwilioAuthToken;
 
             TwilioClient.Init(accountSID, authorizationToken);
 
@@ -138,7 +136,7 @@ namespace TeamA.Exogredient.Services
             var verificationCheck = await VerificationCheckResource.CreateAsync(
                 to: $"+1{phoneNumber}",
                 code: $"{phoneCode}",
-                pathServiceSid: _twilioPathServiceSID
+                pathServiceSid: Constants.TwilioPathServiceSID
             );
 
 
@@ -157,7 +155,7 @@ namespace TeamA.Exogredient.Services
             var message = new MimeMessage();
             var bodyBuilder = new BodyBuilder();
 
-            message.From.Add(new MailboxAddress(_systemEmailAddress));
+            message.From.Add(new MailboxAddress(Constants.SystemEmailAddress));
             message.To.Add(new MailboxAddress($"{emailAddress}"));
 
             message.Subject = "Exogredient Account Verification";
@@ -187,7 +185,7 @@ namespace TeamA.Exogredient.Services
             };
 
             await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-            await client.AuthenticateAsync(_systemEmailAddress, _systemEmailPassword);
+            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
             client.Dispose();

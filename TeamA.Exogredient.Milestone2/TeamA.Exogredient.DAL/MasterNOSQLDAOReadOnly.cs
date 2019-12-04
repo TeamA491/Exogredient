@@ -8,8 +8,6 @@ namespace TeamA.Exogredient.DAL
 {
     public abstract class MasterNOSQLDAOReadOnly
     {
-        protected static readonly string ConnectionString = Constants.NOSQLConnection;
-
         public abstract Task<List<string>> ReadAsync();
     }
 }

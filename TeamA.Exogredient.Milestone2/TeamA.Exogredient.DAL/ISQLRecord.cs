@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TeamA.Exogredient.DAL
 {
-    public interface IRecord
+    public interface ISQLRecord
     {
         IDictionary<string, object> GetData();
     }

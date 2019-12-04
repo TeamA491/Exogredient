@@ -10,17 +10,19 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class AuthenticationUnitTests
     {
-        UserDAO userDAO = new UserDAO();
+        private readonly UserDAO _userDAO = new UserDAO();
 
 
         [DataTestMethod]
         [DataRow("charles971026", "correctpassword")]
-        public async Task AuthenticationService_Authenticate_CorrectInputs(string userName, string password)
+        public async Task AuthenticationService_Authenticate_CorrectInputs(string username, string password)
         {
             //Arrange
-            if (await userDAO.CheckIfUserDisabledAsync(userName))
+            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+
+            if (user.Disabled == 1)
             {
-                await UserManagementService.EnableUserNameAsync(userName);
+                await UserManagementService.EnableUserAsync(username);
             }
 
             string hexPassword = StringUtilityService.ToHexString(password);
@@ -31,7 +33,7 @@ namespace TeamA.Exogredient.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await AuthenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await AuthenticationService.AuthenticateAsync(username, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsTrue(result);
@@ -39,13 +41,16 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("charles971026", "wrongpassword")]
-        public async Task AuthenticationService_Authenticate_IncorrectPassword(string userName, string password)
+        public async Task AuthenticationService_Authenticate_IncorrectPassword(string username, string password)
         {
             //Arrange
-            if (await userDAO.CheckIfUserDisabledAsync(userName))
+            UserRecord user = (UserRecord)await _userDAO.ReadByIdAsync(username);
+
+            if (user.Disabled == 1)
             {
-                await UserManagementService.EnableUserNameAsync(userName);
+                await UserManagementService.EnableUserAsync(username);
             }
+
             string hexPassword = StringUtilityService.ToHexString(password);
             byte[] publicKey = SecurityService.GetRSAPublicKey();
             byte[] key = SecurityService.GenerateAESKey();
@@ -54,7 +59,7 @@ namespace TeamA.Exogredient.Tests
             byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
             //Act
-            bool result = await AuthenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
+            bool result = await AuthenticationService.AuthenticateAsync(username, encryptedPassword, encryptedKey, IV);
 
             //Assert
             Assert.IsFalse(result);

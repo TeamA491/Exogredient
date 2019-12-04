@@ -5,7 +5,7 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class UserRecord : IRecord
+    public class UserRecord : ISQLRecord
     {
         private readonly IDictionary<string, object> _data = new Dictionary<string, object>();
 
@@ -15,7 +15,7 @@ namespace TeamA.Exogredient.DAL
         public string Email { get; }
         public string PhoneNumber { get; }
         public string Password { get; }
-        public short Disabled { get; }
+        public int Disabled { get; }
         public string UserType { get; }
         public string Salt { get; }
         public long TempTimestamp { get; }
@@ -27,7 +27,7 @@ namespace TeamA.Exogredient.DAL
         public int PhoneCodeFailures { get; }
 
         public UserRecord(string username, string firstName = null, string lastName = null, string email = null,
-            string phoneNumber = null, string password = null, short disabled = -1, string userType = null, string salt = null,
+            string phoneNumber = null, string password = null, int disabled = -1, string userType = null, string salt = null,
             long tempTimestamp = -1, string emailCode = null, long emailCodeTimestamp = -1, int loginFailures = -1,
             long lastLoginFailTimestamp = -1, int emailCodeFailures = -1, int phoneCodeFailures = -1)
         {
