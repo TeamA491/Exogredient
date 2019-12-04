@@ -23,13 +23,15 @@ namespace TeamA.Exogredient.TestController
             //await ds.CreateAsync(record, "20191201");
 
             //UserRecord record = new UserRecord("eli", "first", "last", "email", "dkkdk", "password", 1, "kddk", "salt", StringUtilityService.CurrentUnixTime(), "", 0, 0, 0, 0, 0);
-            //UserDAO dao = new UserDAO();
+            UserDAO dao = new UserDAO();
 
             //await dao.CreateAsync(record);
 
             //int result = await dao.GetEmailCodeFailureCountAsync("eli");
 
             //Console.WriteLine(result);
+
+            //await dao.ReadByIdAsync("eli");
         }
     }
 }

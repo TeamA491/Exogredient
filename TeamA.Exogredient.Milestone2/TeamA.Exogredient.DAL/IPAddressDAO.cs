@@ -106,37 +106,37 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override async Task<List<string>> ReadByIdsAsync(List<string> idsOfRows)
+        public override async Task<IRecord> ReadByIdAsync(string id)
         {
-            List<string> result = new List<string>();
+            IPRecord result = new IPRecord(id);
 
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            try
-            {
-                connection.Open();
-                foreach (string ipAddress in idsOfRows)
-                {
-                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_ip} = '{ipAddress}';";
-                    MySqlCommand command = new MySqlCommand(sqlString, connection);
-                    var reader = await command.ExecuteReaderAsync();
+            //MySqlConnection connection = new MySqlConnection(ConnectionString);
+            //try
+            //{
+            //    connection.Open();
+            //    foreach (string ipAddress in idsOfRows)
+            //    {
+            //        string sqlString = $"SELECT * FROM {_tableName} WHERE {_ip} = '{ipAddress}';";
+            //        MySqlCommand command = new MySqlCommand(sqlString, connection);
+            //        var reader = await command.ExecuteReaderAsync();
 
-                    using (DataTable dataTable = new DataTable())
-                    {
-                        dataTable.Load(reader);
-                        DataRow row = dataTable.Rows[0];
-                        string stringResult = row.ToString();
-                        result.Add(stringResult);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                connection.Close();
-            }
+            //        using (DataTable dataTable = new DataTable())
+            //        {
+            //            dataTable.Load(reader);
+            //            DataRow row = dataTable.Rows[0];
+            //            string stringResult = row.ToString();
+            //            result.Add(stringResult);
+            //        }
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    throw e;
+            //}
+            //finally
+            //{
+            //    connection.Close();
+            //}
 
             return result;
         }

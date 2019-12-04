@@ -43,7 +43,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDAOtempTimestampColumn = "temp_timestamp";                       // BIGINT -- unix
         public const string UserDAOemailCodeColumn = "email_code";                               // VARCHAR(6)
         public const string UserDAOemailCodeTimestampColumn = "email_code_timestamp";            // BIGINT -- unix
-        public const string UserDAOloginFailuresColmun = "login_failures";                       // INT
+        public const string UserDAOloginFailuresColumn = "login_failures";                       // INT
         public const string UserDAOlastLoginFailTimestampColumn = "last_login_fail_timestamp";   // BIGINT -- unix
         public const string UserDAOemailCodeFailuresColumn = "email_code_failures";              // INT
         public const string UserDAOphoneCodeFailuresColumn = "phone_code_failures";              // INT

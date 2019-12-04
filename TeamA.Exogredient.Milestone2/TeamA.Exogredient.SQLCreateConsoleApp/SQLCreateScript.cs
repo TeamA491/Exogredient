@@ -27,7 +27,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
         private const string _emailCode = Constants.UserDAOemailCodeColumn;
         private const string _emailCodeTimestamp = Constants.UserDAOemailCodeTimestampColumn;
-        private const string _loginFailures = Constants.UserDAOloginFailuresColmun;
+        private const string _loginFailures = Constants.UserDAOloginFailuresColumn;
         private const string _lastLoginFailTimestamp = Constants.UserDAOlastLoginFailTimestampColumn;
         private const string _emailCodeFailures = Constants.UserDAOemailCodeFailuresColumn;
         private const string _phoneCodeFailures = Constants.UserDAOphoneCodeFailuresColumn;
@@ -61,7 +61,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"`{_email}` VARCHAR(200) NOT NULL," +
                                $@"`{_phoneNumber}` VARCHAR(10) NOT NULL," +
                                $@"`{_password}` VARCHAR(2000) NOT NULL," +
-                               $@"`{_disabled}` BINARY NOT NULL," +
+                               $@"`{_disabled}` TINYINT(1) NOT NULL," +
                                $@"`{_userType}` VARCHAR(11) NOT NULL," +
                                $@"`{_salt}` VARCHAR(200) NOT NULL," +
                                $@"`{_tempTimestamp}` BIGINT NOT NULL," +

@@ -5,7 +5,7 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class IPRecord
+    public class IPRecord : IRecord
     {
         private static readonly IDictionary<string, object> _data = new Dictionary<string, object>();
 

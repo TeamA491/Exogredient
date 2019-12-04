@@ -220,7 +220,27 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> IncrementLoginFailuresAsync(string username, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
         {
-            // Everytime you increment you have to update the lastloginfailedtimestamp column.
+            UserRecord record;
+            record = new UserRecord(username, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
+
+            long lastLoginFailTimestamp = await _userDAO.GetLastLoginFailTimestampAsync(username);
+            long maxSeconds = StringUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = StringUtilityService.CurrentUnixTime();
+
+            if (lastLoginFailTimestamp + maxSeconds < currentUnix)
+            {
+                record = new UserRecord(username, loginFailures: 0);
+                await _userDAO.UpdateAsync(record);
+            }
+            else
+            {
+                int updatedLoginFailures = (await _userDAO.GetLoginFailuresAsync(username)) + 1;
+                if (updatedLoginFailures > maxNumberOfTries)
+                {
+                    
+                }
+            }
+
             // Need to check if the last maxtime + lastTime is less than now.
                 // if it is then reset the failure
             return false;

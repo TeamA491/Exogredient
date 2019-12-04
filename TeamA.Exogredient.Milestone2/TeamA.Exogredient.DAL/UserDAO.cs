@@ -26,7 +26,7 @@ namespace TeamA.Exogredient.DAL
         private const string _tempTimestamp = Constants.UserDAOtempTimestampColumn;
         private const string _emailCode= Constants.UserDAOemailCodeColumn;
         private const string _emailCodeTimestamp = Constants.UserDAOemailCodeTimestampColumn;
-        private const string _loginFailures = Constants.UserDAOloginFailuresColmun;
+        private const string _loginFailures = Constants.UserDAOloginFailuresColumn;
         private const string _lastLoginFailTimestamp = Constants.UserDAOlastLoginFailTimestampColumn;
         private const string _emailCodeFailures = Constants.UserDAOemailCodeFailuresColumn;
         private const string _phoneCodeFailures = Constants.UserDAOphoneCodeFailuresColumn;
@@ -202,28 +202,28 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public override async Task<List<string>> ReadByIdsAsync(List<string> idsOfRows)
+        public override async Task<IRecord> ReadByIdAsync(string id)
         {
-            List<string> result = new List<string>();
+            UserRecord result = new UserRecord("try");
 
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             try
             {
                 connection.Open();
-                foreach (string userName in idsOfRows)
-                {
-                    string sqlString = $"SELECT * FROM {_tableName} WHERE {_username} = '{userName}';";
-                    MySqlCommand command = new MySqlCommand(sqlString, connection);
-                    var reader = await command.ExecuteReaderAsync();
 
-                    using (DataTable dataTable = new DataTable())
-                    {
-                        dataTable.Load(reader);
-                        DataRow row = dataTable.Rows[0];
-                        string stringResult = row.ToString();
-                        result.Add(stringResult);
-                    }
+                string sqlString = $"SELECT * FROM {_tableName} WHERE {_username} = '{id}';";
+                MySqlCommand command = new MySqlCommand(sqlString, connection);
+                var reader = await command.ExecuteReaderAsync();
+
+                using (DataTable dataTable = new DataTable())
+                {
+                    dataTable.Load(reader);
+                    DataRow row = dataTable.Rows[0];
+                    string stringResult = row.ToString();
+                    Console.WriteLine(stringResult);
+                    //result.Add(stringResult);
                 }
+                
             }
             catch (Exception e)
             {
@@ -523,5 +523,66 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        public async Task<long> GetLastLoginFailTimestampAsync(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+
+                string sqlString = $"SELECT {_lastLoginFailTimestamp} FROM {_tableName} WHERE {_username} = '{userName}';";
+                long lastLoginFailTimestamp = 0;
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    lastLoginFailTimestamp = (long)reader.GetValue(0);
+                    reader.Close();
+                }
+
+                return lastLoginFailTimestamp;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        public async Task<int> GetLoginFailuresAsync(string userName)
+        {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            try
+            {
+                // Connect to the database.
+                connection.Open();
+
+                string sqlString = $"SELECT {_loginFailures} FROM {_tableName} WHERE {_username} = '{userName}';";
+                int loginFailures = 0;
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    var reader = await command.ExecuteReaderAsync();
+                    await reader.ReadAsync();
+                    loginFailures = (int)reader.GetValue(0);
+                    reader.Close();
+                }
+
+                return loginFailures;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
     }
 }
