@@ -43,7 +43,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string sqlString = $"SELECT {_password},{_salt}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string storedPassword = "";
                 string salt = "";
 
@@ -360,7 +360,7 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_userName} = '{userName}';";
+                string sqlString = $"SELECT {_emailCode},{_emailCodeTimestamp}  FROM {_tableName} WHERE {_username} = '{userName}';";
                 string emailCode = "";
                 string emailCodeTimestamp = "";
 
