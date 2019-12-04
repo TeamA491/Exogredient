@@ -26,6 +26,10 @@ namespace TeamA.Exogredient.TestController
             //UserDAO dao = new UserDAO();
 
             //await dao.CreateAsync(record);
+
+            //int result = await dao.GetEmailCodeFailureCountAsync("eli");
+
+            //Console.WriteLine(result);
         }
     }
 }

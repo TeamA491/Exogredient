@@ -61,7 +61,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"`{_email}` VARCHAR(200) NOT NULL," +
                                $@"`{_phoneNumber}` VARCHAR(10) NOT NULL," +
                                $@"`{_password}` VARCHAR(2000) NOT NULL," +
-                               $@"`{_disabled}` TINYINT NOT NULL," +
+                               $@"`{_disabled}` BINARY NOT NULL," +
                                $@"`{_userType}` VARCHAR(11) NOT NULL," +
                                $@"`{_salt}` VARCHAR(200) NOT NULL," +
                                $@"`{_tempTimestamp}` BIGINT NOT NULL," +
