@@ -35,7 +35,7 @@ namespace TeamA.Exogredient.Services
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
         }
 
-        // e.g. "21:03:00 12-01-2019 UTC"
+        // Change To Epoch Time
         public static bool CurrentTimePastDatePlusTimespan(string date, TimeSpan span)
         {
             int lockedHour = Int32.Parse(date.Substring(0, 2));

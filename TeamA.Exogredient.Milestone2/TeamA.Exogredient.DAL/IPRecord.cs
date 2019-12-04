@@ -7,17 +7,20 @@ namespace TeamA.Exogredient.DAL
 {
     public class IPRecord
     {
-        IDictionary<string, string> data = new Dictionary<string, string>();
+        private static readonly IDictionary<string, string> _data = new Dictionary<string, string>();
 
-        public IPRecord(string ip, string timestamp = null)
+        public IPRecord(string ip, string timestampLocked = null, string registrationFailures = null,
+                        string lastRegFailTimestamp = null)
         {
-            data.Add(Constants.IPAddressDAOIPColumn, ip);
-            data.Add(Constants.IPAddressDAOtimestampLockedColumn, timestamp);
+            _data.Add(Constants.IPAddressDAOIPColumn, ip);
+            _data.Add(Constants.IPAddressDAOtimestampLockedColumn, timestampLocked);
+            _data.Add(Constants.IPAddressDAOregistrationFailuresColumn, registrationFailures);
+            _data.Add(Constants.IPAddressDAOlastRegFailTimestampColumn, lastRegFailTimestamp);
         }
 
         public IDictionary<string, string> GetData()
         {
-            return data;
+            return _data;
         }
     }
 }

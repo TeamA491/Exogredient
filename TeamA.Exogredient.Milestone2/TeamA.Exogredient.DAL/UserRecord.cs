@@ -9,10 +9,10 @@ namespace TeamA.Exogredient.DAL
     {
         private readonly IDictionary<string, string> _data = new Dictionary<string, string>();
 
-        public UserRecord(string username, string firstName = null, string lastName = null, string email = null, 
-            string phoneNumber = null, string password = null, string salt = null,
-            string disabled = null, string userType = null, string tempTimestamp = null, string emailCode = null,
-            string emailCodeTimestamp = null)
+        public UserRecord(string username, string firstName = null, string lastName = null, string email = null,
+            string phoneNumber = null, string password = null, string disabled = null, string userType = null, string salt = null,
+            string tempTimestamp = null, string emailCode = null, string emailCodeTimestamp = null, string loginFailures = null,
+            string lastLoginFailTimestamp = null, string emailCodeFailures = null, string phoneCodeFailures = null)
         {
             _data.Add(Constants.UserDAOusernameColumn, username);
             _data.Add(Constants.UserDAOfirstNameColumn, firstName);
@@ -26,6 +26,10 @@ namespace TeamA.Exogredient.DAL
             _data.Add(Constants.UserDAOtempTimestampColumn, tempTimestamp);
             _data.Add(Constants.UserDAOemailCodeColumn, emailCode);
             _data.Add(Constants.UserDAOemailCodeTimestampColumn, emailCodeTimestamp);
+            _data.Add(Constants.UserDAOloginFailuresColmun, loginFailures);
+            _data.Add(Constants.UserDAOlastLoginFailTimestampColumn, lastLoginFailTimestamp);
+            _data.Add(Constants.UserDAOemailCodeFailuresColumn, emailCodeFailures);
+            _data.Add(Constants.UserDAOphoneCodeFailuresColumn, phoneCodeFailures);
         }
 
         public IDictionary<string, string> GetData()

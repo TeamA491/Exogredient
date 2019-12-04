@@ -17,7 +17,7 @@ namespace TeamA.Exogredient.DAL
         private const string _ip = Constants.IPAddressDAOIPColumn;
         private const string _timestampLocked = Constants.IPAddressDAOtimestampLockedColumn;
         private const string _registrationFailures = Constants.IPAddressDAOregistrationFailuresColumn;
-        private const string _lastFailTimestamp = Constants.IPAddressDAOlastFailTimestampColumn;
+        private const string _lastRegFailTimestamp = Constants.IPAddressDAOlastRegFailTimestampColumn;
 
         public override async Task<bool> CreateAsync(object record)
         {
