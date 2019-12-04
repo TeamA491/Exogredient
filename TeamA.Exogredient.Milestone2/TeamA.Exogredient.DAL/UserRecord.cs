@@ -20,7 +20,7 @@ namespace TeamA.Exogredient.DAL
             _data.Add(Constants.UserDAOemailColumn, email);
             _data.Add(Constants.UserDAOphoneNumberColumn, phoneNumber);
             _data.Add(Constants.UserDAOpasswordColumn, password);
-            _data.Add(Constants.UserDAOpasswordColumn, disabled);
+            _data.Add(Constants.UserDAOdisabledColumn, disabled);
             _data.Add(Constants.UserDAOuserTypeColumn, userType);
             _data.Add(Constants.UserDAOsaltColumn, salt);
             _data.Add(Constants.UserDAOtempTimestampColumn, tempTimestamp);

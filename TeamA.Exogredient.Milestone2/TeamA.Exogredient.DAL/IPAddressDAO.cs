@@ -43,7 +43,7 @@ namespace TeamA.Exogredient.DAL
                         }
                         if (pair.Value is short || pair.Value is int || pair.Value is long)
                         {
-                            if ((long)pair.Value == -1)
+                            if (pair.Value.Equals(-1))
                             {
                                 throw new NoNullAllowedException("All columns in IPRecord must be not null.");
                             }
@@ -160,7 +160,7 @@ namespace TeamA.Exogredient.DAL
                         {
                             if (pair.Value is short || pair.Value is int || pair.Value is long)
                             {
-                                if ((long)pair.Value != -1)
+                                if (!pair.Value.Equals(-1))
                                 {
                                     sqlString += $"{pair.Key} = '{pair.Value}',";
                                 }

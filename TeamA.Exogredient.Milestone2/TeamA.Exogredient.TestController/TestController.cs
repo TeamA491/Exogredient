@@ -13,7 +13,7 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
-            await AuthenticationService.SendCallVerificationAsync("9499815506");
+            //await AuthenticationService.SendCallVerificationAsync("9499815506");
             //string result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "0738");
             //Console.WriteLine(result);
 
@@ -21,6 +21,11 @@ namespace TeamA.Exogredient.TestController
             //LogRecord record = new LogRecord("test", "test", "test", "test", "test");
 
             //await ds.CreateAsync(record, "20191201");
+
+            //UserRecord record = new UserRecord("eli", "first", "last", "email", "dkkdk", "password", 1, "kddk", "salt", StringUtilityService.CurrentUnixTime(), "", 0, 0, 0, 0, 0);
+            //UserDAO dao = new UserDAO();
+
+            //await dao.CreateAsync(record);
         }
     }
 }
