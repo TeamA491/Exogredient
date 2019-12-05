@@ -271,6 +271,11 @@ namespace TeamA.Exogredient.Services
             return BitConverter.ToString(bytes).Replace("-", "");
         }
 
+        public static string BytesToUTF8String(this byte[] bytes)
+        {
+            return Encoding.UTF8.GetString(bytes);
+        }
+
         /// <summary>
         /// Convert a string to a hex string using ASCII encoding.
         /// </summary>

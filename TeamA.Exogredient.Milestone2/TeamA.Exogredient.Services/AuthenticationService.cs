@@ -21,57 +21,6 @@ namespace TeamA.Exogredient.Services
             _userDAO = new UserDAO();
         }
 
-        /// <summary>
-        /// Check if the username and the password are correct.
-        /// </summary>
-        /// <param name="userName"> the username used for login</param>
-        /// <param name="encryptedPassword"> the password used for login encrypted </param>
-        /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
-        /// <param name="aesIV"> AES Initialization Vector used for encrypting the password </param>
-        /// <returns> true if the username and password are correct, false otherwise </returns>
-        public static async Task<bool> AuthenticateAsync(string username, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
-        {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
-
-            // Check if the username exists.
-            if (!(await _userDAO.CheckUserExistenceAsync(username)))
-            {
-                return false;
-            }
-            // Check if the username is disabled.
-            
-            if (user.Disabled == 1)
-            {
-                throw new InvalidOperationException("This username is locked! To enable, contact the admin");
-            }
-
-            byte[] privateKey = SecurityService.GetRSAPrivateKey();
-            byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted, privateKey);
-            // Decrypt the encrypted password.
-            string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
-
-            // Get the password and the salt stored corresponding to the username.
-            string storedPassword = user.Password;
-            string saltString = user.Salt;
-
-            // Convert the salt to byte array.
-            byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
-
-            //Number of iterations for has && length of the hash in bytes.
-            // Hash the decrypted password with the byte array of salt.
-            string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
-
-            //Check if the stored password matches the hashed password
-            if (storedPassword.Equals(hashedPassword))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public static async Task<bool> SendCallVerificationAsync(string phoneNumber)
         {
             string accountSID = Constants.TwilioAccountSID;
@@ -79,7 +28,7 @@ namespace TeamA.Exogredient.Services
 
             TwilioClient.Init(accountSID, authorizationToken);
 
-            var verification = await VerificationResource.CreateAsync(
+            _ = await VerificationResource.CreateAsync(
                 to: $"+1{phoneNumber}",
                 channel: "call",
                 pathServiceSid: Constants.TwilioPathServiceSID

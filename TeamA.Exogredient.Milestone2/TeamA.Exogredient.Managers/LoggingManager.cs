@@ -16,7 +16,7 @@ namespace TeamA.Exogredient.Managers
 
             int count = 0;
 
-            while (!(ffLoggingResult && dsLoggingResult) && count < Constants.LoggingRetiesAmount)
+            while (!(ffLoggingResult && dsLoggingResult) && count < Constants.LoggingRetriesAmount)
             {
                 if (!ffLoggingResult)
                 {

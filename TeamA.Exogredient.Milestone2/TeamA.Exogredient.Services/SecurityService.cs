@@ -10,25 +10,6 @@ namespace TeamA.Exogredient.Services
 {
     public static class SecurityService
     {
-
-        /// <summary>
-        /// Return the environment variable of RSA encryption public key.
-        /// </summary>
-        /// <returns> a byte array of the public key </returns>
-        public static byte[] GetRSAPublicKey()
-        {
-            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PUBLICKEY",EnvironmentVariableTarget.User));
-        }
-
-        /// <summary>
-        /// Return the environment variable of RSA encryption private key.
-        /// </summary>
-        /// <returns> a byte array of the public key </returns>
-        public static byte[] GetRSAPrivateKey()
-        {
-            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PRIVATEKEY", EnvironmentVariableTarget.User));
-        }
-
         // Reference:
         // https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.aescryptoserviceprovider?view=netstandard-2.0
         /// <summary>

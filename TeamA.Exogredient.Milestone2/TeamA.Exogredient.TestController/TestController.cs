@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.AppConstants;
+using System.Text;
 
 namespace TeamA.Exogredient.TestController
 {
@@ -15,9 +17,22 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
+            string password = "password";
+            string passHex = StringUtilityService.ToHexString(password);
+            byte[] passBytes = StringUtilityService.HexStringToBytes(passHex);
+
+            byte[] pubBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
+
+            byte[] encryptedBytes = SecurityService.EncryptRSA(passBytes, pubBytes);
+
+            byte[] result = SecurityService.DecryptRSA(encryptedBytes, StringUtilityService.HexStringToBytes(Constants.PrivateKey));
+
+            Console.WriteLine(Encoding.UTF8.GetString(result));
+
+
             //await AuthenticationService.SendCallVerificationAsync("9499815506");
-            bool result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "8932");
-            Console.WriteLine(result);
+            //bool result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "8932");
+            //Console.WriteLine(result);
             //Console.WriteLine(result);
 
             //DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
@@ -34,7 +49,7 @@ namespace TeamA.Exogredient.TestController
 
             //Console.WriteLine(result);
 
-            UserObject r = (UserObject)await dao.ReadByIdAsync("eli");
+            //UserObject r = (UserObject)await dao.ReadByIdAsync("eli");
 
             //Console.WriteLine(r.Username);
             //Console.WriteLine(r.Password);

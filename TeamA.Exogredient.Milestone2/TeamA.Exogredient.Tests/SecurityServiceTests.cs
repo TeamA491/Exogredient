@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -29,8 +30,8 @@ namespace TeamA.Exogredient.Tests
         public void SecurityService_EncryptRSADecryptRSA_RevertBackToOriginalData(byte[] plainData)
         {
             //Arrange
-            byte[] publicKey = SecurityService.GetRSAPublicKey();
-            byte[] privateKey = SecurityService.GetRSAPrivateKey();
+            byte[] publicKey = StringUtilityService.HexStringToBytes(Constants.PublicKey);
+            byte[] privateKey = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
 
             //Act
             byte[] encryptedData = SecurityService.EncryptRSA(plainData, publicKey);
