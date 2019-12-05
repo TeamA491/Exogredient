@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Managers
 {
     public static class LoggingManager
     {
-        // timestamp is in format of "HH:mm:ss:ff UTC yyyyMMdd", CultureInfo.InvariantCulture);
-
-        private static readonly int _loggingRetriesAmount = 3;
+        // timestamp is in format of "HH:mm:ss:ff UTC yyyyMMdd"
 
         public static async Task<bool> LogAsync(string timestamp, string operation, string identifier,
                                                 string ipAddress, string errorType = "null")
@@ -20,7 +19,7 @@ namespace TeamA.Exogredient.Managers
 
             int count = 0;
 
-            while (!(ffLoggingResult && dsLoggingResult) && count < _loggingRetriesAmount)
+            while (!(ffLoggingResult && dsLoggingResult) && count < Constants.LoggingRetiesAmount)
             {
                 if (!ffLoggingResult)
                 {

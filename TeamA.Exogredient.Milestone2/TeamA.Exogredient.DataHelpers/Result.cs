@@ -1,5 +1,8 @@
 ﻿using System;
-namespace TeamA.Exogredient.Managers
+using System.Collections.Generic;
+using System.Text;
+
+namespace TeamA.Exogredient.DataHelpers
 {
     public class Result<T>
     {
