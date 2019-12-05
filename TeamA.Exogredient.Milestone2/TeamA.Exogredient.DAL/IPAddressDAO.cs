@@ -53,9 +53,12 @@ namespace TeamA.Exogredient.DAL
                 sqlString = sqlString.Remove(sqlString.Length - 1);
                 sqlString += ") VALUES (";
 
+                int count = 0;
+
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    sqlString += $"'{pair.Value}',";
+                    sqlString += $"@PARAM{count},";
+                    count++;
                 }
 
                 sqlString = sqlString.Remove(sqlString.Length - 1);
@@ -63,6 +66,14 @@ namespace TeamA.Exogredient.DAL
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    count = 0;
+
+                    foreach (KeyValuePair<string, object> pair in recordData)
+                    {
+                        command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        count++;
+                    }
+
                     await command.ExecuteNonQueryAsync();
                 }
 
@@ -78,10 +89,11 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (string ipAddress in idsOfRows)
                 {
-                    string sqlString = $"DELETE {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = '{ipAddress}';";
+                    string sqlString = $"DELETE {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS;";
 
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                     {
+                        command.Parameters.AddWithValue("@IPADDRESS", ipAddress);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
@@ -98,11 +110,12 @@ namespace TeamA.Exogredient.DAL
             {
                 connection.Open();
 
-                string sqlString = $"SELECT * FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = '{id}';";
+                string sqlString = $"SELECT * FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @ID;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
                 {
+                    command.Parameters.AddWithValue("@ID", id);
                     var reader = await command.ExecuteReaderAsync();
                     dataTable.Load(reader);
                     DataRow row = dataTable.Rows[0];
@@ -138,6 +151,8 @@ namespace TeamA.Exogredient.DAL
 
                 string sqlString = $"UPDATE {Constants.IPAddressDAOtableName} SET ";
 
+                int count = 0;
+
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
                     if (pair.Key != Constants.IPAddressDAOIPColumn)
@@ -146,14 +161,16 @@ namespace TeamA.Exogredient.DAL
                         {
                             if (!pair.Value.Equals(-1))
                             {
-                                sqlString += $"{pair.Key} = '{pair.Value}',";
+                                sqlString += $"{pair.Key} = @PARAM{count},";
                             }
                         }
                         else if (pair.Value != null)
                         {
-                            sqlString += $"{pair.Key} = '{pair.Value}',";
+                            sqlString += $"{pair.Key} = @PARAM{count},";
                         }
                     }
+
+                    count++;
                 }
 
                 sqlString = sqlString.Remove(sqlString.Length - 1);
@@ -161,6 +178,18 @@ namespace TeamA.Exogredient.DAL
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    count = 0;
+
+                    foreach (KeyValuePair<string, object> pair in recordData)
+                    {
+                        if (pair.Key != Constants.IPAddressDAOIPColumn)
+                        {
+                            command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        }
+
+                        count++;
+                    }
+
                     await command.ExecuteNonQueryAsync();
                 }
 
@@ -183,10 +212,11 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 // Check if the username exists in the table.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = '{ipAddress}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS);";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    command.Parameters.AddWithValue("@IPADDRESS", ipAddress);
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
                     result = reader.GetBoolean(0);

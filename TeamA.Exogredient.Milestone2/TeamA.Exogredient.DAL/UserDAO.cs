@@ -55,9 +55,14 @@ namespace TeamA.Exogredient.DAL
                 sqlString = sqlString.Remove(sqlString.Length - 1);
                 sqlString += ") VALUES (";
 
+
+                // SQL Injection Prevention:
+                int count = 0;
+
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    sqlString += $"'{pair.Value}',";
+                    sqlString += $"@PARAM{count},";
+                    count++;
                 }
 
                 sqlString = sqlString.Remove(sqlString.Length - 1);
@@ -65,6 +70,14 @@ namespace TeamA.Exogredient.DAL
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    count = 0;
+
+                    foreach (KeyValuePair<string, object> pair in recordData)
+                    {
+                        command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        count++;
+                    }
+
                     await command.ExecuteNonQueryAsync();
                 }
                     
@@ -78,11 +91,13 @@ namespace TeamA.Exogredient.DAL
             {
                 connection.Open();
 
-                foreach (string userName in idsOfRows)
+                foreach (string username in idsOfRows)
                 {
-                    string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = '{userName}';";
+                    string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
+
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                     {
+                        command.Parameters.AddWithValue("@USERNAME", username);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
@@ -100,11 +115,12 @@ namespace TeamA.Exogredient.DAL
             {
                 connection.Open();
 
-                string sqlString = $"SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = '{id}';";
+                string sqlString = $"SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @ID;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
                 {
+                    command.Parameters.AddWithValue("@ID", id);
                     var reader = await command.ExecuteReaderAsync();
                     dataTable.Load(reader);
                     DataRow row = dataTable.Rows[0];
@@ -143,6 +159,8 @@ namespace TeamA.Exogredient.DAL
                 IDictionary<string, object> recordData = userRecord.GetData();
 
                 string sqlString = $"UPDATE {Constants.UserDAOtableName} SET ";
+                
+                int count = 0;
 
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
@@ -152,21 +170,35 @@ namespace TeamA.Exogredient.DAL
                         {
                             if (!pair.Value.Equals(-1))
                             {
-                                sqlString += $"{pair.Key} = '{pair.Value}',";
+                                sqlString += $"{pair.Key} = @PARAM{count},";
                             }
                         }
                         else if (pair.Value != null)
                         {
-                            sqlString += $"{pair.Key} = '{pair.Value}',";
+                            sqlString += $"{pair.Key} = @PARAM{count},";
                         }
                     }
 
+                    count++;
                 }
+
                 sqlString = sqlString.Remove(sqlString.Length - 1);
                 sqlString += $" WHERE {Constants.UserDAOusernameColumn} = '{recordData[Constants.UserDAOusernameColumn]}';";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    count = 0;
+
+                    foreach (KeyValuePair<string, object> pair in recordData)
+                    {
+                        if (pair.Key != Constants.UserDAOusernameColumn)
+                        {
+                            command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        }
+
+                        count++;
+                    }
+
                     await command.ExecuteNonQueryAsync();
                 }
 
@@ -189,9 +221,10 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 // Check if the username exists in the table.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = '{username}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME);";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    command.Parameters.AddWithValue("@USERNAME", username);
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
                     result = reader.GetBoolean(0);
@@ -215,9 +248,10 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOphoneNumberColumn} = '{phoneNumber}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOphoneNumberColumn} = @PHONENUMBER);";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    command.Parameters.AddWithValue("@PHONENUMBER", phoneNumber);
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
                     result = reader.GetBoolean(0);
@@ -241,9 +275,10 @@ namespace TeamA.Exogredient.DAL
                 // Connect to the database.
                 connection.Open();
 
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOemailColumn} = '{email}');";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOemailColumn} = @EMAIL);";
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    command.Parameters.AddWithValue("@EMAIL", email);
                     var reader = await command.ExecuteReaderAsync();
                     await reader.ReadAsync();
                     result = reader.GetBoolean(0);
