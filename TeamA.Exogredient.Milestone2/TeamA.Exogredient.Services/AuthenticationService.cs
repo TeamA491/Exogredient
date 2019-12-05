@@ -51,8 +51,8 @@ namespace TeamA.Exogredient.Services
                 return false;
             }
 
-            long maxValidSeconds = StringUtilityService.TimespanToSeconds(maxCodeValidTime);
-            long currentUnix = StringUtilityService.CurrentUnixTime();
+            long maxValidSeconds = UtilityService.TimespanToSeconds(maxCodeValidTime);
+            long currentUnix = UtilityService.CurrentUnixTime();
 
             if (emailCodeTimestamp + maxValidSeconds < currentUnix)
             {
@@ -109,7 +109,7 @@ namespace TeamA.Exogredient.Services
 
             Random generator = new Random();
             string emailCode = generator.Next(100000, 1000000).ToString();
-            long emailCodeTimestamp = StringUtilityService.CurrentUnixTime();
+            long emailCodeTimestamp = UtilityService.CurrentUnixTime();
 
             await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp);
 

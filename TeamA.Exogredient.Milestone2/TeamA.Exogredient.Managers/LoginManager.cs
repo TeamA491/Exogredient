@@ -10,62 +10,47 @@ namespace TeamA.Exogredient.Managers
     public class LogInManager
     {
         // Encrypted password, encrypted AES key, and aesIV are all in hex string format.
-        public static async Task<Result<bool>> LogInAsync(string username, string encryptedPassword,
-                                                          string encryptedAESKey, string aesIV, string ipAddress)
+        public static async Task<Result<bool>> LogInAsync(string username, string ipAddress,
+                                                          string encryptedPassword, string encryptedAESKey,
+                                                          string aesIV)
         {
             try
             {
-                Result<bool> result;
                 bool authenticationSuccess = false;
 
                 if (! (await UserManagementService.CheckUserExistenceAsync(username)))
                 {
-                    result = new Result<bool>("Username or password was invalid.")
-                    {
-                        Data = authenticationSuccess
-                    };
-
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, "Username does not exist");
 
-                    return result;
+                    return UtilityService.CreateResult("Username or password was invalid.", authenticationSuccess);
                 }
 
                 UserObject user = await UserManagementService.GetUserInfoAsync(username);
                 
                 if (user.Disabled == 1)
                 {
-                    result = new Result<bool>("Your account is disabled, please contact the system administrator.")
-                    {
-                        Data = authenticationSuccess
-                    };
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, "User disabled");
 
-
-                    return result;
+                    return UtilityService.CreateResult("Your account is disabled, please contact the system administrator.", authenticationSuccess);
                 }
 
-                byte[] encryptedPasswordBytes = StringUtilityService.HexStringToBytes(encryptedPassword);
-                byte[] encryptedAESKeyBytes = StringUtilityService.HexStringToBytes(encryptedAESKey);
-                byte[] AESIVBytes = StringUtilityService.HexStringToBytes(aesIV);
-                byte[] publicKeyBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
-                byte[] privateKeyBytes = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
+                byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
+                byte[] encryptedAESKeyBytes = UtilityService.HexStringToBytes(encryptedAESKey);
+                byte[] AESIVBytes = UtilityService.HexStringToBytes(aesIV);
+                byte[] publicKeyBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
+                byte[] privateKeyBytes = UtilityService.HexStringToBytes(Constants.PrivateKey);
 
                 byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
 
                 string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
 
-                byte[] userSaltBytes = StringUtilityService.HexStringToBytes(user.Salt);
+                byte[] userSaltBytes = UtilityService.HexStringToBytes(user.Salt);
 
                 string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
 
                 if (user.Password == hashedPassword)
                 {
                     authenticationSuccess = true;
-
-                    result = new Result<bool>("Logged in successfully.")
-                    {
-                        Data = authenticationSuccess
-                    };
 
                     string token = await AuthorizationService.CreateTokenAsync(username);
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -78,7 +63,7 @@ namespace TeamA.Exogredient.Managers
 
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress);
 
-                    return result;
+                    return UtilityService.CreateResult("Logged in successfully.", authenticationSuccess);
                 }
                 else
                 {
@@ -86,27 +71,17 @@ namespace TeamA.Exogredient.Managers
                                                                             Constants.LogInTriesResetTime,
                                                                             Constants.MaxLogInAttempts);
 
-                    result = new Result<bool>("Username or password was invalid.")
-                    {
-                        Data = authenticationSuccess
-                    };
-
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, "Invalid password entered");
 
-                    return result;
+                    return UtilityService.CreateResult("Username or password was invalid.", authenticationSuccess);
                 }
             }
             catch (Exception e)
             {
-                Result<bool> result = new Result<bool>("A system error occurred. Please try again later." + 
-                                                       "A team of highly trained monkeys is working on the situation.")
-                {
-                    Data = false
-                };
-
                 await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, e.Message);
 
-                return result;
+                return UtilityService.CreateResult("A system error occurred. Please try again later." +
+                                                   "A team of highly trained monkeys is working on the situation.", false);
             }
         }
     }

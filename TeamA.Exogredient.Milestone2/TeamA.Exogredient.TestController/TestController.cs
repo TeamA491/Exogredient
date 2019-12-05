@@ -18,14 +18,14 @@ namespace TeamA.Exogredient.TestController
         public async static Task Main(string[] args)
         {
             string password = "password";
-            string passHex = StringUtilityService.ToHexString(password);
-            byte[] passBytes = StringUtilityService.HexStringToBytes(passHex);
+            string passHex = UtilityService.ToHexString(password);
+            byte[] passBytes = UtilityService.HexStringToBytes(passHex);
 
-            byte[] pubBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
+            byte[] pubBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
 
             byte[] encryptedBytes = SecurityService.EncryptRSA(passBytes, pubBytes);
 
-            byte[] result = SecurityService.DecryptRSA(encryptedBytes, StringUtilityService.HexStringToBytes(Constants.PrivateKey));
+            byte[] result = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
 
             Console.WriteLine(Encoding.UTF8.GetString(result));
 
@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.TestController
 
             //await ds.CreateAsync(record, "20191201");
 
-            UserRecord record = new UserRecord("test2", "first", "last", "email2", "sdf", "sdf", 1, "sdf", "salt", StringUtilityService.CurrentUnixTime(), "", 0, 0, 0, 0, 0);
+            UserRecord record = new UserRecord("test2", "first", "last", "email2", "sdf", "sdf", 1, "sdf", "salt", UtilityService.CurrentUnixTime(), "", 0, 0, 0, 0, 0);
             UserDAO dao = new UserDAO();
 
             //await dao.CreateAsync(record);

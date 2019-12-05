@@ -55,8 +55,8 @@ namespace TeamA.Exogredient.Services
             {
                 long timestamp = ip.TimestampLocked;
 
-                long maxLockSeconds = StringUtilityService.TimespanToSeconds(maxLockTime);
-                long currentUnix = StringUtilityService.CurrentUnixTime();
+                long maxLockSeconds = UtilityService.TimespanToSeconds(maxLockTime);
+                long currentUnix = UtilityService.CurrentUnixTime();
 
                 return (timestamp + maxLockSeconds < currentUnix ? true : false);
             }
@@ -69,7 +69,7 @@ namespace TeamA.Exogredient.Services
             {
                 return false;
             }
-            IPAddressRecord record = new IPAddressRecord(ipAddress, StringUtilityService.CurrentUnixTime());
+            IPAddressRecord record = new IPAddressRecord(ipAddress, UtilityService.CurrentUnixTime());
 
             return await _ipDAO.CreateAsync(record);
         }
@@ -83,7 +83,7 @@ namespace TeamA.Exogredient.Services
                 return false;
             }
 
-            long tempTimestamp = isTemp ? StringUtilityService.CurrentUnixTime() : 0;
+            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : 0;
 
             UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt, tempTimestamp, "", 0, 0, 0, 0, 0);
 
@@ -188,7 +188,7 @@ namespace TeamA.Exogredient.Services
             }
             byte[] saltBytes = SecurityService.GenerateSalt();
             string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
-            string saltString = StringUtilityService.BytesToHexString(saltBytes);
+            string saltString = UtilityService.BytesToHexString(saltBytes);
             UserRecord newPasswordUser = new UserRecord(username, password: hashedPassword, salt: saltString);
             await _userDAO.UpdateAsync(newPasswordUser);
         }
@@ -240,8 +240,8 @@ namespace TeamA.Exogredient.Services
             UserRecord record;
 
             long lastLoginFailTimestamp = user.LastLoginFailTimestamp;
-            long maxSeconds = StringUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
-            long currentUnix = StringUtilityService.CurrentUnixTime();
+            long maxSeconds = UtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = UtilityService.CurrentUnixTime();
 
             // Need to check if the last maxtime + lastTime is less than now.
             // if it is then reset the failure
@@ -263,11 +263,11 @@ namespace TeamA.Exogredient.Services
             // Update the last login fail time.
             if (updatedLoginFailures >= maxNumberOfTries)
             {
-                record = new UserRecord(username, loginFailures: updatedLoginFailures, disabled: 1, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
+                record = new UserRecord(username, loginFailures: updatedLoginFailures, disabled: 1, lastLoginFailTimestamp: UtilityService.CurrentUnixTime());
             }
             else
             {
-                record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
+                record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: UtilityService.CurrentUnixTime());
             }
 
             await _userDAO.UpdateAsync(record);

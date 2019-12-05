@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
-    public static class StringUtilityService
+    public static class UtilityService
     {
         private static readonly CorruptedPasswordsDAO _corruptedPasswordsDAO;
 
@@ -16,7 +17,7 @@ namespace TeamA.Exogredient.Services
         /// Constructor initializes the CorruptedPasswordsDAO object to provide
         /// the interface with the usertable.
         /// </summary>
-        static StringUtilityService()
+        static UtilityService()
         {
             _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
         }
@@ -24,6 +25,16 @@ namespace TeamA.Exogredient.Services
         public static long CurrentUnixTime()
         {
             return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+        }
+
+        public static Result<T> CreateResult<T>(string message, T data)
+        {
+            Result<T> result = new Result<T>(message)
+            {
+                Data = data
+            };
+
+            return result;
         }
 
         public static long TimespanToSeconds(TimeSpan span)
@@ -315,32 +326,13 @@ namespace TeamA.Exogredient.Services
         /// <param name="name">The string that we are checking.</param>
         /// <returns>Returns value of bool to represent whether all the characters
         /// in name meet the specification.</returns>
-        public static bool CheckIfANSCharacters(string name)
+        public static bool CheckCharacters(string name, List<char> data)
         {
-
             bool result = true;
 
             foreach (char c in name.ToLower())
             {
-                result = result && Constants.AlphaNumericAndSpecialCharacters.Contains(c);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Check whether a given string contains only numerical characters.
-        /// </summary>
-        /// <param name="name">The string that we are checking.</param>
-        /// <returns>Returns value of bool to represent whether all the characters
-        /// in name meet the specification.</returns>
-        public static bool CheckIfNumericCharacters(string name)
-        {
-            bool result = true;
-
-            foreach (char c in name)
-            {
-                result = result && Constants.Numbers.Contains(c);
+                result = result && data.Contains(c);
             }
 
             return result;
@@ -353,7 +345,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="email">The email we are checking</param>
         /// <returns>Returns a bool representing whether the email satisfies
         /// the specifications.</returns>
-        public static bool EmailFormatValidityCheck(string email)
+        public static bool CheckEmailFormatValidity(string email)
         {
             string[] splitResult = email.Split('@');
 
@@ -390,7 +382,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="email">The email we are checking.</param>
         /// <returns>Returns value of string to represent the 
         /// canonicalized email.</returns>
-        public static string CanonicalizingEmail(string email)
+        public static string CanonicalizeEmail(string email)
         {
             string[] splitResult = email.Split('@');
             string username = splitResult[0].ToLower();
@@ -456,7 +448,7 @@ namespace TeamA.Exogredient.Services
 
         // Check if password has been corrupted in previous breaches. Done second to last because
         // it is the slowest IO check.
-        public static async Task<bool> IsCorruptedPassword(string plaintextPassword)
+        public static async Task<bool> IsCorruptedPasswordAsync(string plaintextPassword)
         {
             List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
             string passwordSha1 = SecurityService.HashWithSHA1(plaintextPassword);

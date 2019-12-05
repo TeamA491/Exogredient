@@ -72,7 +72,7 @@ namespace TeamA.Exogredient.Tests
 
             string storedPassword = user.Password;
             string saltString = user.Salt;
-            byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
+            byte[] saltBytes = UtilityService.HexStringToBytes(saltString);
             string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
 
             //Assert

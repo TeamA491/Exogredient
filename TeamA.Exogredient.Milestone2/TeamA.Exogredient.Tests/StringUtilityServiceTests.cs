@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -13,7 +14,7 @@ namespace TeamA.Exogredient.Tests
         public void SecurityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
         {
             // Act
-            byte[] actual = StringUtilityService.HexStringToBytes(hexString);
+            byte[] actual = UtilityService.HexStringToBytes(hexString);
 
             // Assert
             Assert.IsTrue(expected.SequenceEqual(actual));
@@ -24,7 +25,7 @@ namespace TeamA.Exogredient.Tests
         public void StringUtilityService_BytesToHexString_GenerateCorrectHexString(byte[] bytes, string expected)
         {
             // Act
-            string actual = StringUtilityService.BytesToHexString(bytes);
+            string actual = UtilityService.BytesToHexString(bytes);
 
             // Assert
             Assert.IsTrue(actual.Equals(expected));
@@ -35,7 +36,7 @@ namespace TeamA.Exogredient.Tests
         public void StringUtilityService_ToHexString_GenerateCorrectHexString(string original, string expected)
         {
             // Act
-            string actual = StringUtilityService.ToHexString(original);
+            string actual = UtilityService.ToHexString(original);
 
             // Assert
             Assert.IsTrue(expected.Equals(actual));
@@ -49,7 +50,7 @@ namespace TeamA.Exogredient.Tests
             // if min = -1 we are not checking withing a range/ the string has to be equal to length.
 
             // Act
-            bool result = StringUtilityService.CheckLength(name, length, min);
+            bool result = UtilityService.CheckLength(name, length, min);
 
             // Assert
             Assert.IsTrue(result);
@@ -64,7 +65,7 @@ namespace TeamA.Exogredient.Tests
             // if min = -1 we are not checking withing a range/ the string has to be equal to length.
 
             // Act
-            bool result = StringUtilityService.CheckLength(name, length, min);
+            bool result = UtilityService.CheckLength(name, length, min);
 
             // Assert
             Assert.IsFalse(result);
@@ -73,10 +74,10 @@ namespace TeamA.Exogredient.Tests
         [DataTestMethod]
         [DataRow("asdsa12312#!@#")]
         [DataRow("...fas313ads[];'{}312")]
-        public void StringUtilityService_CheckIfANSCharacters_OnlyANSCharactersSuccess(string name)
+        public void StringUtilityService_CheckCharacters_OnlyANSCharactersSuccess(string name)
         {
             // Act
-            bool result = StringUtilityService.CheckIfANSCharacters(name);
+            bool result = UtilityService.CheckCharacters(name, Constants.CharSetsData[Constants.ANSNoAngle]);
 
             // Assert
             Assert.IsTrue(result);
@@ -84,10 +85,10 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("123123123")]
-        public void StringUtilityService_CheckIfNumericCharacters_OnlyNumericCharactersSuccess(string name)
+        public void StringUtilityService_CheckCharacters_OnlyNumericCharactersSuccess(string name)
         {
             // Act
-            bool result = StringUtilityService.CheckIfNumericCharacters(name);
+            bool result = UtilityService.CheckCharacters(name, Constants.CharSetsData[Constants.Numeric]);
 
             // Assert
             Assert.IsTrue(result);
@@ -100,7 +101,7 @@ namespace TeamA.Exogredient.Tests
         public void StringUtilityService_EmailFormatValidityCheck_ValidEmailFormatSuccess(string email)
         {
             // Act
-            bool result = StringUtilityService.EmailFormatValidityCheck(email);
+            bool result = UtilityService.CheckEmailFormatValidity(email);
 
             // Assert
             Assert.IsTrue(result);
@@ -115,7 +116,7 @@ namespace TeamA.Exogredient.Tests
         {
 
             // Act
-            string canonicalizedEmail = StringUtilityService.CanonicalizingEmail(email);
+            string canonicalizedEmail = UtilityService.CanonicalizeEmail(email);
 
 
             // Check if act matches with expected value.
@@ -140,7 +141,7 @@ namespace TeamA.Exogredient.Tests
         public void StringUtilityService_ContainsContextSpecificWords_HasContextSuccess(string plaintextPassword)
         {
             // Act
-            bool result = StringUtilityService.ContainsContextSpecificWords(plaintextPassword);
+            bool result = UtilityService.ContainsContextSpecificWords(plaintextPassword);
 
             // Assert
             Assert.IsTrue(result);
@@ -154,7 +155,7 @@ namespace TeamA.Exogredient.Tests
         public async Task StringUtilityService_ContainsDictionaryWordsAsync_HasDicionaryAsyncSuccess(string plaintextPassword)
         {
             // Act
-            bool result = await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword);
+            bool result = await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword);
 
             // Assert
             Assert.IsTrue(result);
@@ -170,7 +171,7 @@ namespace TeamA.Exogredient.Tests
         public async Task StringUtilityService_IsCorruptedPassword_IsCorruptedAsyncSuccess(string plaintextPassword)
         {
             // Act
-            bool result = await StringUtilityService.IsCorruptedPassword(plaintextPassword);
+            bool result = await UtilityService.IsCorruptedPasswordAsync(plaintextPassword);
 
             // Assert
             Assert.IsTrue(result);
@@ -196,7 +197,7 @@ namespace TeamA.Exogredient.Tests
         public void StringUtilityService_ContainsRepetitionOrSequence_HasPatternSuccess(string plaintextPassword)
         {
             // Act
-            bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
+            bool result = UtilityService.ContainsRepetitionOrSequence(plaintextPassword);
 
             // Assert
             Assert.IsTrue(result);
@@ -212,7 +213,7 @@ namespace TeamA.Exogredient.Tests
         public void StringUtilityService_ContainsRepetitionOrSequence_NoReptitionFailure(string plaintextPassword)
         {
             // Act
-            bool result = StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword);
+            bool result = UtilityService.ContainsRepetitionOrSequence(plaintextPassword);
 
             // Assert
             Assert.IsFalse(result);
@@ -226,7 +227,7 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             //Act
-            byte[] actual = StringUtilityService.HexStringToBytes(hexString);
+            byte[] actual = UtilityService.HexStringToBytes(hexString);
 
             //Assert
             Assert.IsTrue(expected.SequenceEqual(actual));
