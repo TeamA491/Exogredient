@@ -38,29 +38,29 @@ namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 
         public override void Create(string password)
         {
-            Session session = MySQLX.GetSession(ConnectionString);
-
-            Schema schema;
-
-            try
+            using (Session session = MySQLX.GetSession(ConnectionString))
             {
-                schema = session.CreateSchema(Schema);
+                Schema schema;
+
+                try
+                {
+                    schema = session.CreateSchema(Schema);
+                }
+                catch
+                {
+                    schema = session.GetSchema(Schema);
+                }
+
+                var collection = schema.CreateCollection(Constants.CorruptedPassCollectionName, ReuseExistingObject: true);
+
+                // Created anon type to represent json in document store.
+                var document = new
+                {
+                    password
+                };
+
+                collection.Add(document).Execute();
             }
-            catch
-            {
-                schema = session.GetSchema(Schema);
-            }
-
-            var collection = schema.CreateCollection(Constants.CorruptedPassCollectionName, ReuseExistingObject: true);
-
-            // Created anon type to represent json in document store.
-            var document = new
-            {
-                password
-            };
-
-            collection.Add(document).Execute();
-            session.Close();
         }
     }
 }

@@ -16,10 +16,28 @@ namespace TeamA.Exogredient.DAL
         {
             try
             {
-                LogRecord logRecord = (LogRecord)record;
-                Session session = MySQLX.GetSession(Constants.NOSQLConnection);
+                LogRecord temp = (LogRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException("DataStoreLoggingDAO.CreateAsync record argument must be of type LogRecord");
+            }
 
-                Schema schema = session.GetSchema(Constants.LogsSchemaName);
+            LogRecord logRecord = (LogRecord)record;
+
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            {
+                // Create schema if it doesn't exist.
+                Schema schema;
+
+                try
+                {
+                    schema = session.CreateSchema(Constants.LogsSchemaName);
+                }
+                catch
+                {
+                    schema = session.GetSchema(Constants.LogsSchemaName);
+                }
 
                 var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
@@ -35,36 +53,23 @@ namespace TeamA.Exogredient.DAL
                 };
 
                 await collection.Add(document).ExecuteAsync();
-                session.Close();
 
                 return true;
             }
-            catch
-            {
-                return false;
-            }
-            
         }
 
         public async Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
         {
-            try
-            {
-                Session session = MySQLX.GetSession(Constants.NOSQLConnection);
 
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            {
                 Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
                 var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
                 await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync();
 
-                session.Close();
-
                 return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -73,10 +78,17 @@ namespace TeamA.Exogredient.DAL
         {
             try
             {
-                LogRecord logRecord = (LogRecord)record;
+                LogRecord temp = (LogRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException("DataStoreLoggingDAO.FindIdFieldAsync record argument must be of type LogRecord");
+            }
 
-                Session session = MySQLX.GetSession(Constants.NOSQLConnection);
+            LogRecord logRecord = (LogRecord)record;
 
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            {
                 Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
                 var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
@@ -87,6 +99,7 @@ namespace TeamA.Exogredient.DAL
 
                 // Prepare string to be returned
                 string resultstring = "";
+
                 while (result.Next())
                 {
                     // TODO: flesh out columns. make columns into fields.
@@ -94,14 +107,7 @@ namespace TeamA.Exogredient.DAL
 
                 }
 
-                session.Close();
-
                 return resultstring;
-            }
-            catch (Exception e)
-            {
-                // HACK !!!!
-                throw e;
             }
         }
     }
