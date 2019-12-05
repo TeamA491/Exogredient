@@ -148,9 +148,9 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123")]
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
         public async Task UserManagementService_CreateUserAsync_CreateNonExistentUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                                       string phoneNumber, string password, string disabled, string userType, string salt)
+                                                       string phoneNumber, string password, int disabled, string userType, string salt)
         {
             
             // Act 
@@ -168,9 +168,9 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123")]
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
         public async Task UserManagementService_DeleteUserAsync_DeleteUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                                string phoneNumber, string password, string disabled, string userType, string salt)
+                                                string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange 
             // Create a user to be deleted
@@ -192,7 +192,7 @@ namespace TeamA.Exogredient.Tests
         [DataTestMethod]
         [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123")]
         public async Task UserManagementService_MakeTempPerm_ChangeTempToPermSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                         string phoneNumber, string password, string disabled, string userType, string salt)
+                                         string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange 
             // Create a temporary user to be deleted
@@ -213,9 +213,9 @@ namespace TeamA.Exogredient.Tests
 
         // TODO: update the email code timestamp
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123", "1233", "yyyy-mm-dd")]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123", "1233", 123123123123)]
         public async Task UserManagementService_StoreEmailCode_StoreEmailCodeForUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                         string phoneNumber, string password, string disabled, string userType, string salt, string emailCode, string emailCodeTimestamp)
+                                         string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
             // Arrange 
             // Create a temporary user to be deleted
@@ -234,9 +234,9 @@ namespace TeamA.Exogredient.Tests
 
         // TODO: update the email code timestamp
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123", "1233", "yyyy-mm-dd")]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", "yyyy-mm-dd")]
         public async Task UserManagementService_RemoveEmailCode_StoreEmailCodeForUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                         string phoneNumber, string password, string disabled, string userType, string salt, string emailCode, string emailCodeTimestamp)
+                                         string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, string emailCodeTimestamp)
         {
             // Arrange 
             // Create a temporary user to be deleted
@@ -261,7 +261,7 @@ namespace TeamA.Exogredient.Tests
             // Create the user that will be disabled
 
             // Act 
-            bool result = await UserManagementService.DisableUserNameAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username);
             Assert.IsFalse(result);
 
             // Read that user and check if it was disabled
@@ -275,7 +275,7 @@ namespace TeamA.Exogredient.Tests
         public async Task UserManagementService_DisableUserNameAsync_DisableNonExistingUserFailureAsync(string username)
         {
             // Act 
-            bool result = await UserManagementService.DisableUserNameAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username);
             Assert.IsFalse(result);
         }
 
@@ -288,7 +288,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Make the temporary user perm
-            bool result = await UserManagementService.DisableUserNameAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username);
             Assert.IsFalse(result);
         }
 
@@ -300,11 +300,11 @@ namespace TeamA.Exogredient.Tests
             // Create the user that will be disabled
 
    
-            bool result = await UserManagementService.DisableUserNameAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username);
             Assert.IsTrue(result);
 
             // Act 
-            bool enableResult = await UserManagementService.EnableUserNameAsync(username);
+            bool enableResult = await UserManagementService.EnableUserAsync(username);
 
             Assert.IsTrue(enableResult);
             // Cleanup 
@@ -320,7 +320,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Make the temporary user perm
-            bool result = await UserManagementService.EnableUserNameAsync(username);
+            bool result = await UserManagementService.EnableUserAsync(username);
             Assert.IsFalse(result);
         }
 

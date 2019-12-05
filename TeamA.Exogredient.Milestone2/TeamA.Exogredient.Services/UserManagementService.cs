@@ -65,14 +65,25 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> LockIPAsync(string ipAddress)
         {
+            // CHANGE: should we check existence here?
+            if (!(await _ipDAO.CheckIPExistenceAsync(ipAddress)))
+            {
+                return false;
+            }
             IPAddressRecord record = new IPAddressRecord(ipAddress, StringUtilityService.CurrentUnixTime());
 
             return await _ipDAO.CreateAsync(record);
         }
 
         public static async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                                       string phoneNumber, string password, short disabled, string userType, string salt)
+                                                       string phoneNumber, string password, int disabled, string userType, string salt)
         {
+            // CHANGE: should we check user existence here 
+            if(!await CheckUserExistenceAsync(username))
+            {
+                return false;
+            }
+
             long tempTimestamp = isTemp ? StringUtilityService.CurrentUnixTime() : 0;
 
             UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt, tempTimestamp, "", 0, 0, 0, 0, 0);
@@ -83,6 +94,11 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> DeleteUserAsync(string username)
         {
             return await _userDAO.DeleteByIdsAsync(new List<string>() { username });
+        }
+
+        public static async Task<UserObject> GetUserInfoAsync(string username)
+        {
+            return (UserObject) await _userDAO.ReadByIdAsync(username);
         }
 
         public static async Task<bool> MakeTempPermAsync(string username)
@@ -121,8 +137,8 @@ namespace TeamA.Exogredient.Services
             }
             if (user.Disabled == 1)
             {
-                return false;
                 //throw new Exception("The username is already disabled!");
+                return false;
             }
 
             UserRecord disabledUser = new UserRecord(username, disabled: 1);
@@ -145,8 +161,8 @@ namespace TeamA.Exogredient.Services
             }
             if (user.Disabled == 0)
             {
-                return false;
                 //throw new Exception("The username is already enabled!");
+                return false;
             }
             // Enable the username.
             UserRecord disabledUser = new UserRecord(username, disabled: 0);
@@ -224,30 +240,35 @@ namespace TeamA.Exogredient.Services
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
             UserRecord record;
 
-            record = new UserRecord(username, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
-
             long lastLoginFailTimestamp = user.LastLoginFailTimestamp;
             long maxSeconds = StringUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
             long currentUnix = StringUtilityService.CurrentUnixTime();
 
             // Need to check if the last maxtime + lastTime is less than now.
             // if it is then reset the failure
+
+            bool reset = false;
+
+            // If the last Login Time has passed the maxTimeBeforeFailureReset then reset their loginFailure number.
             if (lastLoginFailTimestamp + maxSeconds < currentUnix)
             {
+                reset = true;
                 record = new UserRecord(username, loginFailures: 0);
                 await _userDAO.UpdateAsync(record);
             }
 
-            user = (UserObject)await _userDAO.ReadByIdAsync(username);
-
-            int updatedLoginFailures = user.LogInFailures + 1;
+            // Increment the user's login Failure count.
+            int updatedLoginFailures = reset ? 1 : user.LogInFailures + 1;
+            
+            // Disable the user if they have reached the max number of tries. 
+            // Update the last login fail time.
             if (updatedLoginFailures >= maxNumberOfTries)
             {
-                record = new UserRecord(username, loginFailures: updatedLoginFailures, disabled: 1);
+                record = new UserRecord(username, loginFailures: updatedLoginFailures, disabled: 1, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
             }
             else
             {
-                record = new UserRecord(username, loginFailures: updatedLoginFailures);
+                record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: StringUtilityService.CurrentUnixTime());
             }
 
             await _userDAO.UpdateAsync(record);
@@ -270,21 +291,5 @@ namespace TeamA.Exogredient.Services
 
             return true;
         }
-
-        public static async Task<int> GetEmailCodeFailureCountAsync(string username)
-        {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
-            // This returns string right now. update to int when we update database
-            return user.EmailCodeFailures;
-        }
-
-        public static async Task<int> GetPhoneCodeFailureCountAsync(string username)
-        {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
-            // This returns string right now. update to int when we update database
-            return user.PhoneCodeFailures;
-        }
-
-
     }
 }
