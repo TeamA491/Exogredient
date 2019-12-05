@@ -12,28 +12,28 @@ namespace TeamA.Exogredient.DAL
     {
         public async Task<List<string>> ReadAsync()
         {
-            Session session = MySQLX.GetSession(Constants.NOSQLConnection);
-
-            Schema schema = session.GetSchema(Constants.CorruptedPassSchemaName);
-
-            var collection = schema.GetCollection(Constants.CorruptedPassCollectionName);
-
-            DocResult result = await collection.Find().ExecuteAsync();
-
-            List<string> resultList = new List<string>();
-
-            while (result.Next())
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
             {
-                // TODO: flesh out columns. make columns into fields.
-                string temp = (string)result.Current[Constants.CorruptedPassPasswordField];
 
-                resultList.Add(temp);
+                Schema schema = session.GetSchema(Constants.CorruptedPassSchemaName);
 
+                var collection = schema.GetCollection(Constants.CorruptedPassCollectionName);
+
+                DocResult result = await collection.Find().ExecuteAsync();
+
+                List<string> resultList = new List<string>();
+
+                while (result.Next())
+                {
+                    // TODO: flesh out columns. make columns into fields.
+                    string temp = (string)result.Current[Constants.CorruptedPassPasswordField];
+
+                    resultList.Add(temp);
+
+                }
+
+                return resultList;
             }
-
-            session.Close();
-
-            return resultList;
         }
     }
 }
