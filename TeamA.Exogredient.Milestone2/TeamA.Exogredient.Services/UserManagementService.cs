@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {

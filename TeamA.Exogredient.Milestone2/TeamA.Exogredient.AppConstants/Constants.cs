@@ -15,9 +15,11 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
 
         // BUSINESS RULES
-        public const int LoggingRetiesAmount = 3;
+        public const int LoggingRetriesAmount = 3;
         public const int MaxLogInAttempts = 18;
         public const int MaxRegistrationAttempts = 3;
+        public const int MaxEmailCodeAttempts = 3;
+        public const int MaxPhoneCodeAttempts = 3;
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
         public static readonly TimeSpan EmailCodeMaxValidTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan MaxTempUserTime = new TimeSpan(1, 0, 0);

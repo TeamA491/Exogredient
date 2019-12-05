@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text;
-using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 // TODO USE SECURITY SERVICE FOR HASHING
 

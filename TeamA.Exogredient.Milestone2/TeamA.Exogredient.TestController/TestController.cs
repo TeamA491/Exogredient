@@ -16,7 +16,8 @@ namespace TeamA.Exogredient.TestController
         public async static Task Main(string[] args)
         {
             //await AuthenticationService.SendCallVerificationAsync("9499815506");
-            //string result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "0738");
+            bool result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "8932");
+            Console.WriteLine(result);
             //Console.WriteLine(result);
 
             //DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
@@ -27,7 +28,7 @@ namespace TeamA.Exogredient.TestController
             UserRecord record = new UserRecord("test2", "first", "last", "email2", "sdf", "sdf", 1, "sdf", "salt", StringUtilityService.CurrentUnixTime(), "", 0, 0, 0, 0, 0);
             UserDAO dao = new UserDAO();
 
-            await dao.CreateAsync(record);
+            //await dao.CreateAsync(record);
 
             //int result = await dao.GetEmailCodeFailureCountAsync("eli");
 

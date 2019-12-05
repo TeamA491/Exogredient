@@ -1,9 +1,7 @@
 using System;
-using System.Security.Cryptography;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
-using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.Tests
 {

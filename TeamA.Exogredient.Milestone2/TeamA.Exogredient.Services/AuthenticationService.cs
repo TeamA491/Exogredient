@@ -1,17 +1,14 @@
-﻿using MailKit;
+﻿using System;
+using System.Threading.Tasks;
+using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 using Twilio;
 using Twilio.Rest.Preview.AccSecurity.Service;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {

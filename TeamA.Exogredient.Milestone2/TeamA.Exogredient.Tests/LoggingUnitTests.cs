@@ -1,9 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TeamA.Exogredient.Managers;
-using TeamA.Exogredient.Services;
-using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.Tests
 {

@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;

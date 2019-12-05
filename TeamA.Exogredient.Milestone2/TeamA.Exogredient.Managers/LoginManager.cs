@@ -6,11 +6,10 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Managers
 {
-    public class LoginManager
+    public class LogInManager
     {
-        private const int MaxAttempts = 15;
-
-        public static async Task<Result<bool>> InitLogin(string userName, byte[] encryptedPassword, byte[] encryptedAESKey, byte[] aesIV)
+        public static async Task<Result<bool>> LogInAsync(string userName, byte[] encryptedPassword,
+                                                          byte[] encryptedAESKey, byte[] aesIV)
         {
             try
             {
@@ -36,7 +35,7 @@ namespace TeamA.Exogredient.Managers
                     return result;
                 }
             }
-            catch(InvalidOperationException e)
+            catch (InvalidOperationException e)
             {
                 Result<bool> result = new Result<bool>(e.Message);
                 result.Data = false;

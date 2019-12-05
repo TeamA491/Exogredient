@@ -1,8 +1,6 @@
-﻿using System;
-using TeamA.Exogredient.AppConstants;
+﻿using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.SQLCreateConsoleApp
 {

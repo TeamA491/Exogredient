@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
-using MySqlX.XDevAPI.Common;
 using MySqlX.XDevAPI.CRUD;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;

@@ -1,5 +1,4 @@
 ﻿using MySqlX.XDevAPI;
-using System;
 using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
