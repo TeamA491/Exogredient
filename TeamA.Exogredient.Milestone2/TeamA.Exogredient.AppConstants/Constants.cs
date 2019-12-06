@@ -15,6 +15,18 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
 
         // BUSINESS RULES
+        public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
+
+        public const string RegistrationOperation = "Registration";
+        public const string LogInOperation = "Log In";
+
+        public const string CustomerUserType = "Customer";
+        public const string AnonymousUserType = "Unregistered Customer";
+        public const string AnonymousUserIdentifier = "<Unregistered Customer>";
+
+        public const int DisabledStatus = 1;
+        public const int EnabledStatus = 0;
+
         public const int LoggingRetriesAmount = 3;
         public const int MaxLogInAttempts = 18;
         public const int MaxRegistrationAttempts = 3;
@@ -56,6 +68,66 @@ namespace TeamA.Exogredient.AppConstants
         public const int MinimumPasswordCharacters = 12;
         public const string PasswordCharacterType = ANSNoAngle;
 
+        // BUSINESS RULES -- MESSAGES
+        public const string RegistrationSuccessUserMessage = "Registration Successful!";
+        public const string LogInSuccessUserMessage = "Logged in successfully!";
+
+        public const string SystemErrorUserMessage = "A system error occurred. Please try again later. A team of highly trained monkeys is currently working on the situation.";
+
+        public const string UsernameDNELogMessage = "Username does not exist";
+        public const string InvalidLogInUserMessage = "Id or password was invalid";
+
+        public const string UserDisableLogMessage = "User disabled";
+        public const string UserDisableUserMessage = "Your account is disabled, please contact the system administrator.";
+
+        public const string InvalidPasswordLogMessage = "Invalid password entered";
+
+        public const string UsernameExistsLogMessage = "Username taken";
+        public const string EmailExistsLogMessage = "Email taken";
+        public const string PhoneNumberExistsLogMessage = "Phone number taken";
+        public const string UniqueIdExistsRegistrationUserMessage = "Your email, username, or phone number was invalid... please try again";
+
+        public const string InvalidScopeLogMessage = "User not in scope";
+        public const string InvalidScopeUserMassage = "You must in California to register";
+
+        public const string InvalidFirstNameLengthLogMessage = "First name length invalid";
+        public static readonly string InvalidFirstNameLengthUserMessage = $"Fist name length invalid ({MaximumFirstNameCharacters} max)";
+        public const string InvalidFirstNameCharactersLogMessage = "First name characters invalid";
+        public const string InvalidFirstNameCharactersUserMessage = "First name characters invalid, < and > not allowed";
+
+        public const string InvalidLastNameLengthLogMessage = "Last name length invalid";
+        public static readonly string InvalidLastNameLengthUserMessage = $"Last name length invalid ({MaximumLastNameCharacters} max)";
+        public const string InvalidLastNameCharactersLogMessage = "Last name characters invalid";
+        public const string InvalidLastNameCharactersUserMessage = "Last name characters invalid, < and > not allowed";
+
+        public const string InvalidEmailLengthLogMessage = "Email length invalid";
+        public static readonly string InvalidEmailLengthUserMessage = $"Email length invalid ({MaximumEmailCharacters} max)";
+        public const string InvalidEmailCharactersLogMessage = "Email characters invalid";
+        public const string InvalidEmailCharactersUserMessage = "Email characters invalid, < and > not allowed";
+        public const string InvalidEmailFormatMessage = "Email format invalid";
+
+        public const string InvalidUsernameLengthLogMessage = "Username length invalid";
+        public static readonly string InvalidUsernameLengthUserMessage = $"Username length invalid ({MaximumUsernameCharacters} max)";
+        public const string InvalidUsernameCharactersLogMessage = "Username characters invalid";
+        public const string InvalidUsernameCharactersUserMessage = "Username characters invalid, < and > not allowed";
+
+        public const string InvalidPhoneNumberLengthLogMessage = "Phone number length invalid";
+        public static readonly string InvalidPhoneNumberLengthUserMessage = $"Phone number length invalid ({PhoneNumberCharacterLength} only)";
+        public const string InvalidPhoneNumberCharactersLogMessage = "Phone number characters invalid";
+        public const string InvalidPhoneNumberCharactersUserMessage = "Phone number characters invalid, < and > not allowed";
+
+        public const string InvalidPasswordLengthLogMessage = "Password length invalid";
+        public static readonly string InvalidPasswordLengthUserMessage = $"Password length invalid ({MaximumPasswordCharacters} max, {MinimumPasswordCharacters} min)";
+        public const string InvalidPasswordCharactersLogMessage = "Password characters invalid";
+        public const string InvalidPasswordCharactersUserMessage = "Password characters invalid, < and > not allowed";
+        public const string PasswordContextSpecificMessage = "Password contains context specific words";
+        public const string PasswordSequencesOrRepetitionsLogMessage = "Password contains sequences or repetitions";
+        public const string PasswordSequencesOrRepetitionsUserMessage = "Password contains sequences (111) or repetitions (123).";
+        public const string PasswordWordsLogMessage = "Password contains words";
+        public const string PasswordWordsUserMessage = "Password contains words from the English language";
+        public const string PasswordCorruptedLogMessage = "Password corrupted";
+        public const string PasswordCorruptedUserMessage = "Your password has been corrupted";
+
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";
         public const string SystemAdminEmailAddress = "TEAMA.CS491@gmail.com";
@@ -64,9 +136,10 @@ namespace TeamA.Exogredient.AppConstants
         public const string TwilioAccountSID = "AC94d03adc3d2da651c16c82932c29b047";
         public const string TwilioPathServiceSID = "VAa9682f046b6f511b9aa1807d4e2949e5";
 
-        // FLAT FILE LOGGING
+        // FLAT FILE
         public const string LogFolder = @"C:\Logs";
         public const string LogFileType = ".CSV";
+        public const string TokenFile = "token.txt";
 
         // SQL SCHEMA
         public const string SQLSchemaName = "exogredient";

@@ -20,22 +20,22 @@ namespace TeamA.Exogredient.Managers
 
                 if (!await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Log In", username, ipAddress,
-                                                  "Username does not exist").ConfigureAwait(false);
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                  Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                  Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult("Username or password was invalid.", authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess);
                 }
 
                 UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
                 
                 if (user.Disabled == 1)
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Log In", username, ipAddress,
-                                                  "User disabled").ConfigureAwait(false);
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                  Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                  Constants.UserDisableLogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult("Your account is disabled, please contact the system administrator.", authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.UserDisableUserMessage, authenticationSuccess);
                 }
 
                 byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
@@ -58,17 +58,17 @@ namespace TeamA.Exogredient.Managers
 
                     string token = await AuthorizationService.CreateTokenAsync(username).ConfigureAwait(false);
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                    path = path + $"{path.Substring(0, 1)}" + "token.txt";
+                    path = path + $"{path.Substring(0, 1)}" + Constants.TokenFile;
 
                     using (StreamWriter sw = File.CreateText(path))
                     {
                         sw.WriteLine(token);
                     }
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Log In", username, ipAddress).ConfigureAwait(false);
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                  Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult("Logged in successfully.", authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenticationSuccess);
                 }
                 else
                 {
@@ -76,20 +76,19 @@ namespace TeamA.Exogredient.Managers
                                                                             Constants.LogInTriesResetTime,
                                                                             Constants.MaxLogInAttempts).ConfigureAwait(false);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Log In", username, ipAddress,
-                                                  "Invalid password entered").ConfigureAwait(false);
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                  Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                  Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult("Username or password was invalid.", authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess);
                 }
             }
             catch (Exception e)
             {
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                              "Log In", username, ipAddress, e.Message).ConfigureAwait(false);
+                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                              Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
-                return UtilityService.CreateResult("A system error occurred. Please try again later." +
-                                                   "A team of highly trained monkeys is working on the situation.", false);
+                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false);
             }
         }
     }
