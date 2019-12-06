@@ -25,43 +25,14 @@ namespace TeamA.Exogredient.TestController
 
             byte[] encryptedBytes = SecurityService.EncryptRSA(passBytes, pubBytes);
 
-            byte[] result = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
+            byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
 
-            Console.WriteLine(Encoding.UTF8.GetString(result));
+            Console.WriteLine(Encoding.UTF8.GetString(res));
 
-
-            //await AuthenticationService.SendCallVerificationAsync("9499815506");
-            //bool result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "8932");
-            //Console.WriteLine(result);
-            //Console.WriteLine(result);
-
-            //DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
-            //LogRecord record = new LogRecord("test", "test", "test", "test", "test");
-
-            //await ds.CreateAsync(record, "20191201");
-
-            UserRecord record = new UserRecord("test2", "first", "last", "email2", "sdf", "sdf", 1, "sdf", "salt", UtilityService.CurrentUnixTime(), "", 0, 0, 0, 0, 0);
-            UserDAO dao = new UserDAO();
-
-            //await dao.CreateAsync(record);
-
-            //int result = await dao.GetEmailCodeFailureCountAsync("eli");
+            //await AuthenticationService.SendCallVerificationAsync("9499815506").ConfigureAwait(false);
+            //bool result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "8932").ConfigureAwait(false);
 
             //Console.WriteLine(result);
-
-            //UserObject r = (UserObject)await dao.ReadByIdAsync("eli");
-
-            //Console.WriteLine(r.Username);
-            //Console.WriteLine(r.Password);
-            //Console.WriteLine(r.Salt);
-            //Console.WriteLine(r.EmailCode);
-            //Console.WriteLine(r.EmailCodeFailures);
-            //Console.WriteLine(r.EmailCodeTimestamp);
-            //Console.WriteLine(r.TempTimestamp);
-            //Console.WriteLine(r.LastLoginFailTimestamp);
-            //Console.WriteLine(r.UserType);
-            //Console.WriteLine(r.Disabled);
-            //Console.WriteLine(r.Email);
         }
     }
 }

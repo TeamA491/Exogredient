@@ -17,7 +17,7 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.GetCollection(Constants.CorruptedPassCollectionName);
 
-                DocResult result = await collection.Find().ExecuteAsync();
+                DocResult result = await collection.Find().ExecuteAsync().ConfigureAwait(false);
 
                 List<string> resultList = new List<string>();
 

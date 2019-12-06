@@ -21,13 +21,13 @@ namespace TeamA.Exogredient.Tests
             //Act
             try
             {
-                await UserManagementService.DisableUserAsync(username);
-                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+                await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
                 result = (user.Disabled == 1);
             }
             catch
             {
-                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
                 result = (user.Disabled == 1);
             }
 
@@ -45,13 +45,13 @@ namespace TeamA.Exogredient.Tests
             //Act
             try
             {
-                await UserManagementService.EnableUserAsync(username);
-                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+                await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
                 result = (user.Disabled == 1);
             }
             catch
             {
-                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+                UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
                 result = (user.Disabled == 1);
             }
 
@@ -67,8 +67,8 @@ namespace TeamA.Exogredient.Tests
 
 
             //Act
-            await UserManagementService.ChangePasswordAsync(username, password);
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+            await UserManagementService.ChangePasswordAsync(username, password).ConfigureAwait(false);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
             string storedPassword = user.Password;
             string saltString = user.Salt;

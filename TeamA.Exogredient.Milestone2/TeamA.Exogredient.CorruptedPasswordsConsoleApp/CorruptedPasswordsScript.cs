@@ -1,11 +1,12 @@
 ﻿using MySqlX.XDevAPI;
+using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 {
     public class CorruptedPasswordsScript
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
 
@@ -16,7 +17,7 @@ namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 
             while ((line = file.ReadLine()) != null)
             {
-                ds.Create(line.Split(':')[0]);
+                await ds.CreateAsync(line.Split(':')[0]).ConfigureAwait(false);
             }
         }
     }
@@ -28,14 +29,14 @@ namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 
         protected const string Schema = Constants.CorruptedPassSchemaName;
 
-        public abstract void Create(string password);
+        public abstract Task<bool> CreateAsync(string password);
 
     }
 
     public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
     {
 
-        public override void Create(string password)
+        public override async Task<bool> CreateAsync(string password)
         {
             using (Session session = MySQLX.GetSession(ConnectionString))
             {
@@ -58,7 +59,9 @@ namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
                     password
                 };
 
-                collection.Add(document).Execute();
+                await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
+
+                return true;
             }
         }
     }

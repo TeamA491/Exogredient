@@ -434,7 +434,7 @@ namespace TeamA.Exogredient.Services
 
             using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
             {
-                while ((lineInput = await reader.ReadLineAsync()) != null)
+                while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                 {
                     if (plaintextPassword.Contains(lineInput))
                     {
@@ -450,7 +450,7 @@ namespace TeamA.Exogredient.Services
         // it is the slowest IO check.
         public static async Task<bool> IsCorruptedPasswordAsync(string plaintextPassword)
         {
-            List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
+            List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync().ConfigureAwait(false);
             string passwordSha1 = SecurityService.HashWithSHA1(plaintextPassword);
 
             foreach (string hash in passwordHashes)

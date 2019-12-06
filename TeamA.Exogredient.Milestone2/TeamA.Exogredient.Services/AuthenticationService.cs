@@ -28,18 +28,18 @@ namespace TeamA.Exogredient.Services
 
             TwilioClient.Init(accountSID, authorizationToken);
 
-            _ = await VerificationResource.CreateAsync(
+            await VerificationResource.CreateAsync(
                 to: $"+1{phoneNumber}",
                 channel: "call",
                 pathServiceSid: Constants.TwilioPathServiceSID
-            );
+            ).ConfigureAwait(false);
 
             return true;
         }
 
         public static async Task<bool> VerifyEmailCodeAsync(string username, string emailCodeInput, TimeSpan maxCodeValidTime)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
             string emailCode = user.EmailCode;
             long emailCodeTimestamp = user.EmailCodeTimestamp;
@@ -57,7 +57,7 @@ namespace TeamA.Exogredient.Services
             if (emailCodeTimestamp + maxValidSeconds < currentUnix)
             {
                 record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
-                await _userDAO.UpdateAsync(record);
+                await _userDAO.UpdateAsync(record).ConfigureAwait(false);
                 return false;
             }
 
@@ -67,7 +67,7 @@ namespace TeamA.Exogredient.Services
             }
 
             record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
-            await _userDAO.UpdateAsync(record);
+            await _userDAO.UpdateAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -84,7 +84,7 @@ namespace TeamA.Exogredient.Services
                 to: $"+1{phoneNumber}",
                 code: $"{phoneCode}",
                 pathServiceSid: Constants.TwilioPathServiceSID
-            );
+            ).ConfigureAwait(false);
 
 
             if (verificationCheck.Status.Equals("approved"))
@@ -111,7 +111,7 @@ namespace TeamA.Exogredient.Services
             string emailCode = generator.Next(100000, 1000000).ToString();
             long emailCodeTimestamp = UtilityService.CurrentUnixTime();
 
-            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp);
+            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
 
             bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
                 @"<tr>" +
@@ -131,10 +131,10 @@ namespace TeamA.Exogredient.Services
                 ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
             };
 
-            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword).ConfigureAwait(false);
+            await client.SendAsync(message).ConfigureAwait(false);
+            await client.DisconnectAsync(true).ConfigureAwait(false);
             client.Dispose();
 
             return true;

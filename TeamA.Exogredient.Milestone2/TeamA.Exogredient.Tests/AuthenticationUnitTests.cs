@@ -9,7 +9,7 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class AuthenticationUnitTests
     {
-        private readonly UserDAO _userDAO = new UserDAO();
+        //private readonly UserDAO _userDAO = new UserDAO();
 
 
         //[DataTestMethod]
@@ -17,11 +17,11 @@ namespace TeamA.Exogredient.Tests
         //public async Task AuthenticationService_Authenticate_CorrectInputs(string username, string password)
         //{
         //    //Arrange
-        //    UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+        //    UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
         //    if (user.Disabled == 1)
         //    {
-        //        await UserManagementService.EnableUserAsync(username);
+        //        await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
         //    }
 
         //    string hexPassword = StringUtilityService.ToHexString(password);
@@ -32,7 +32,7 @@ namespace TeamA.Exogredient.Tests
         //    byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
         //    //Act
-        //    bool result = await AuthenticationService.AuthenticateAsync(username, encryptedPassword, encryptedKey, IV);
+        //    bool result = await AuthenticationService.AuthenticateAsync(username, encryptedPassword, encryptedKey, IV).ConfigureAwait(false);
 
         //    //Assert
         //    Assert.IsTrue(result);
@@ -43,11 +43,11 @@ namespace TeamA.Exogredient.Tests
         //public async Task AuthenticationService_Authenticate_IncorrectPassword(string username, string password)
         //{
         //    //Arrange
-        //    UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+        //    UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
         //    if (user.Disabled == 1)
         //    {
-        //        await UserManagementService.EnableUserAsync(username);
+        //        await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
         //    }
 
         //    string hexPassword = StringUtilityService.ToHexString(password);
@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.Tests
         //    byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
         //    //Act
-        //    bool result = await AuthenticationService.AuthenticateAsync(username, encryptedPassword, encryptedKey, IV);
+        //    bool result = await AuthenticationService.AuthenticateAsync(username, encryptedPassword, encryptedKey, IV).ConfigureAwait(false);
 
         //    //Assert
         //    Assert.IsFalse(result);
@@ -77,7 +77,7 @@ namespace TeamA.Exogredient.Tests
         //    byte[] encryptedPassword = SecurityService.EncryptAES(hexPassword, key, IV);
 
         //    //Act
-        //    bool result = await AuthenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV);
+        //    bool result = await AuthenticationService.AuthenticateAsync(userName, encryptedPassword, encryptedKey, IV).ConfigureAwait(false);
 
         //    //Assert
         //    Assert.IsFalse(result);

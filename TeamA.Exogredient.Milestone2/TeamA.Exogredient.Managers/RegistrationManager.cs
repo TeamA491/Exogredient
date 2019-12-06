@@ -19,10 +19,11 @@ namespace TeamA.Exogredient.Managers
                 bool registrationSuccess = false;
 
                 // Check existence of username.
-                if (await UserManagementService.CheckUserExistenceAsync(username))
+                if (await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Username taken");
+                                                  "Registration", "", ipAddress,
+                                                  "Username taken").ConfigureAwait(false);
 
                     return UtilityService.CreateResult("Username or password was invalid.", registrationSuccess);
                 }
@@ -31,7 +32,8 @@ namespace TeamA.Exogredient.Managers
                 if (!scopeAnswer)
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Username not in scope");
+                                                  "Registration", "", ipAddress,
+                                                  "Username not in scope").ConfigureAwait(false);
 
                     return UtilityService.CreateResult("User was not located in California.", registrationSuccess);
                 }
@@ -41,7 +43,8 @@ namespace TeamA.Exogredient.Managers
                                                 Constants.MinimumFirstNameCharacters))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "First Name length invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "First Name length invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"First name length invalid ({Constants.MaximumFirstNameCharacters}" +
                                                        " max)", registrationSuccess);
@@ -51,7 +54,8 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckCharacters(firstName, Constants.CharSetsData[Constants.FirstNameCharacterType]))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "First Name characters invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "First Name characters invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"First name characters invalid", registrationSuccess);
                 }
@@ -61,7 +65,8 @@ namespace TeamA.Exogredient.Managers
                                                 Constants.MinimumLastNameCharacters))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Last Name length invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Last Name length invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Last name length invalid ({Constants.MaximumLastNameCharacters}" +
                                                        " max).", registrationSuccess);
@@ -71,7 +76,8 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckCharacters(lastName, Constants.CharSetsData[Constants.LastNameCharacterType]))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Last Name characters invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Last Name characters invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Last name characters invalid.", registrationSuccess);
                 }
@@ -81,7 +87,8 @@ namespace TeamA.Exogredient.Managers
                                                 Constants.MinimumEmailCharacters))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Email length invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Email length invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Email length invalid ({Constants.MaximumEmailCharacters}" +
                                                        " max).", registrationSuccess);
@@ -91,7 +98,8 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckCharacters(email, Constants.CharSetsData[Constants.EmailCharacterType]))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Email characters invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Email characters invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Email characters invalid.", registrationSuccess);
                 }
@@ -100,7 +108,8 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckEmailFormatValidity(email))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Email format invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Email format invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Email format invalid.", registrationSuccess);
                 }
@@ -108,10 +117,11 @@ namespace TeamA.Exogredient.Managers
                 // Email must be unique after canonicalization.
                 string canonicalizedEmail = UtilityService.CanonicalizeEmail(email);
 
-                if (await UserManagementService.CheckEmailExistenceAsync(canonicalizedEmail))
+                if (await UserManagementService.CheckEmailExistenceAsync(canonicalizedEmail).ConfigureAwait(false))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Email not uniqe");
+                                                  "Registration", "", ipAddress,
+                                                  "Email not uniqe").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Your email, username, or phone number was invalid... " +
                                                        "please try again.", registrationSuccess);
@@ -122,7 +132,8 @@ namespace TeamA.Exogredient.Managers
                                                 Constants.MinimumUsernameCharacters))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Username length invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Username length invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Username length invalid ({Constants.MaximumUsernameCharacters}" +
                                                        " max).", registrationSuccess);
@@ -132,16 +143,18 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckCharacters(email, Constants.CharSetsData[Constants.UsernameCharacterType]))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Username characters invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Username characters invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Username characters invalid.", registrationSuccess);
                 }
 
                 // Check username uniqueness.
-                if (await UserManagementService.CheckUserExistenceAsync(username))
+                if (await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Username exists");
+                                                  "Registration", "", ipAddress,
+                                                  "Username exists").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Your email, username, or phone number was invalid... " +
                                                        "please try again.", registrationSuccess);
@@ -151,7 +164,8 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckLength(phoneNumber, Constants.PhoneNumberCharacterLength))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Phone number length invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Phone number length invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Phone number length invalid ({Constants.PhoneNumberCharacterLength}" +
                                                        " max).", registrationSuccess);
@@ -161,16 +175,18 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckCharacters(phoneNumber, Constants.CharSetsData[Constants.PhoneNumberCharacterType]))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Phone number characters invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Phone number characters invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Phone number characters invalid.", registrationSuccess);
                 }
 
                 // Check username uniqueness.
-                if (await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber))
+                if (await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Phone number exists");
+                                                  "Registration", "", ipAddress,
+                                                  "Phone number exists").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Your email, username, or phone number was invalid... " +
                                                        "please try again.", registrationSuccess);
@@ -194,7 +210,8 @@ namespace TeamA.Exogredient.Managers
                                                 Constants.MinimumPasswordCharacters))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Password length invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Password length invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Password length invalid ({Constants.MaximumUsernameCharacters}" +
                                                        $" max, {Constants.MinimumPasswordCharacters} min).",
@@ -205,7 +222,8 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Password characters invalid");
+                                                  "Registration", "", ipAddress,
+                                                  "Password characters invalid").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Password characters invalid.", registrationSuccess);
                 }
@@ -214,7 +232,8 @@ namespace TeamA.Exogredient.Managers
                 if (UtilityService.ContainsContextSpecificWords(plaintextPassword))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Password contains context specific words");
+                                                  "Registration", "", ipAddress,
+                                                  "Password contains context specific words").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Password contains context specific words.",
                                                        registrationSuccess);
@@ -224,27 +243,30 @@ namespace TeamA.Exogredient.Managers
                 if (UtilityService.ContainsRepetitionOrSequence(plaintextPassword))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Password contains sequences or repetitions");
+                                                  "Registration", "", ipAddress,
+                                                  "Password contains sequences or repetitions").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Password contains sequences (111) or repetitions (123).",
                                                        registrationSuccess);
                 }
 
                 // Check if password contains dictionary words.
-                if (await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword))
+                if (await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Password contains words");
+                                                  "Registration", "", ipAddress,
+                                                  "Password contains words").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Password contains words from the English dicitonary.",
                                                        registrationSuccess);
                 }
 
                 // Check if password is a previously corrupted password.
-                if (await UtilityService.IsCorruptedPasswordAsync(plaintextPassword))
+                if (await UtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
                 {
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                                  "Registration", "", ipAddress, "Password corrupted");
+                                                  "Registration", "", ipAddress,
+                                                  "Password corrupted").ConfigureAwait(false);
 
                     return UtilityService.CreateResult($"Your password has been corrupted.", registrationSuccess);
                 }
@@ -258,19 +280,19 @@ namespace TeamA.Exogredient.Managers
 
                 string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
-                await AuthenticationService.SendEmailVerificationAsync(username, canonicalizedEmail);
+                await AuthenticationService.SendEmailVerificationAsync(username, canonicalizedEmail).ConfigureAwait(false);
                 await UserManagementService.CreateUserAsync(true, username, firstName, lastName, canonicalizedEmail,
-                                                            phoneNumber, digest, 0, "Customer", saltHex);
+                                                            phoneNumber, digest, 0, "Customer", saltHex).ConfigureAwait(false);
 
                 await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                              "Registration", "", ipAddress);
+                                              "Registration", "", ipAddress).ConfigureAwait(false);
 
                 return UtilityService.CreateResult($"Registration Successful!", registrationSuccess);
             }
             catch (Exception e)
             {
                 await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
-                                              "Registration", username, ipAddress, e.Message);
+                                              "Registration", username, ipAddress, e.Message).ConfigureAwait(false);
 
                 return UtilityService.CreateResult("A system error occurred. Please try again later." +
                                                    " A team of highly trained monkeys is working on the situation.", false);

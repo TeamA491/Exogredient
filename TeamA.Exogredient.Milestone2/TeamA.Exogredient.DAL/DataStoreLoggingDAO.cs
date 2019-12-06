@@ -49,7 +49,7 @@ namespace TeamA.Exogredient.DAL
                     errorType = logRecord.ErrorType
                 };
 
-                await collection.Add(document).ExecuteAsync();
+                await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
 
                 return true;
             }
@@ -64,7 +64,7 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
-                await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync();
+                await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync().ConfigureAwait(false);
 
                 return true;
             }
@@ -92,7 +92,7 @@ namespace TeamA.Exogredient.DAL
 
                 var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
 
-                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync();
+                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync().ConfigureAwait(false);
 
                 // Prepare string to be returned
                 string resultstring = "";

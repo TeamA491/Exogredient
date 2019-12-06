@@ -18,18 +18,22 @@ namespace TeamA.Exogredient.Managers
             {
                 bool authenticationSuccess = false;
 
-                if (! (await UserManagementService.CheckUserExistenceAsync(username)))
+                if (!await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, "Username does not exist");
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
+                                                  "Log In", username, ipAddress,
+                                                  "Username does not exist").ConfigureAwait(false);
 
                     return UtilityService.CreateResult("Username or password was invalid.", authenticationSuccess);
                 }
 
-                UserObject user = await UserManagementService.GetUserInfoAsync(username);
+                UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
                 
                 if (user.Disabled == 1)
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, "User disabled");
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
+                                                  "Log In", username, ipAddress,
+                                                  "User disabled").ConfigureAwait(false);
 
                     return UtilityService.CreateResult("Your account is disabled, please contact the system administrator.", authenticationSuccess);
                 }
@@ -52,7 +56,7 @@ namespace TeamA.Exogredient.Managers
                 {
                     authenticationSuccess = true;
 
-                    string token = await AuthorizationService.CreateTokenAsync(username);
+                    string token = await AuthorizationService.CreateTokenAsync(username).ConfigureAwait(false);
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                     path = path + $"{path.Substring(0, 1)}" + "token.txt";
 
@@ -61,7 +65,8 @@ namespace TeamA.Exogredient.Managers
                         sw.WriteLine(token);
                     }
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress);
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
+                                                  "Log In", username, ipAddress).ConfigureAwait(false);
 
                     return UtilityService.CreateResult("Logged in successfully.", authenticationSuccess);
                 }
@@ -69,16 +74,19 @@ namespace TeamA.Exogredient.Managers
                 {
                     await UserManagementService.IncrementLoginFailuresAsync(username,
                                                                             Constants.LogInTriesResetTime,
-                                                                            Constants.MaxLogInAttempts);
+                                                                            Constants.MaxLogInAttempts).ConfigureAwait(false);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, "Invalid password entered");
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
+                                                  "Log In", username, ipAddress,
+                                                  "Invalid password entered").ConfigureAwait(false);
 
                     return UtilityService.CreateResult("Username or password was invalid.", authenticationSuccess);
                 }
             }
             catch (Exception e)
             {
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"), "Log In", username, ipAddress, e.Message);
+                await LoggingManager.LogAsync(DateTime.UtcNow.ToString("HH: mm:ss: ff UTC yyyyMMdd"),
+                                              "Log In", username, ipAddress, e.Message).ConfigureAwait(false);
 
                 return UtilityService.CreateResult("A system error occurred. Please try again later." +
                                                    "A team of highly trained monkeys is working on the situation.", false);

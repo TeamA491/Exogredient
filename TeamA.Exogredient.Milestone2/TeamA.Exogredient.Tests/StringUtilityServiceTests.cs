@@ -155,7 +155,7 @@ namespace TeamA.Exogredient.Tests
         public async Task StringUtilityService_ContainsDictionaryWordsAsync_HasDicionaryAsyncSuccess(string plaintextPassword)
         {
             // Act
-            bool result = await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword);
+            bool result = await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false);
 
             // Assert
             Assert.IsTrue(result);
@@ -171,7 +171,7 @@ namespace TeamA.Exogredient.Tests
         public async Task StringUtilityService_IsCorruptedPassword_IsCorruptedAsyncSuccess(string plaintextPassword)
         {
             // Act
-            bool result = await UtilityService.IsCorruptedPasswordAsync(plaintextPassword);
+            bool result = await UtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false);
 
             // Assert
             Assert.IsTrue(result);
