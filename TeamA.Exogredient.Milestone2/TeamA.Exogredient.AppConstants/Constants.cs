@@ -21,6 +21,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogInOperation = "Log In";
         public const string VerifyEmailOperation = "Verify Email Code";
         public const string VerifyPhoneOperation = "Verify Phone Code";
+        public const string SendPhoneCodeOperation = "Send Phone Code";
+        public const string SendEmailCodeOperation = "Send Email Code";
+        public const string UpdatePasswordOperation = "Update Password";
 
         public const string CustomerUserType = "Customer";
         public const string AnonymousUserType = "Unregistered Customer";
@@ -77,6 +80,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogInSuccessUserMessage = "Logged in successfully!";
         public const string VerifyEmailSuccessUserMessage = "Email verified! Please select the 'Call Me' option";
         public const string VerifyPhoneSuccessUserMessage = "Phone code verified!";
+        public const string SendPhoneCodeSuccessUserMessage = "Phone code sent!";
+        public const string SendEmailCodeSuccessUserMessage = "Email code sent!";
+        public const string UpdatePasswordSuccessUserMessage = "Updated password!";
 
         public const string SystemErrorUserMessage = "A system error occurred. Please try again later. A team of highly trained monkeys is currently working on the situation.";
 

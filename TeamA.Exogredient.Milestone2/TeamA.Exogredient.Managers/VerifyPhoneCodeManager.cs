@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.Managers
 {
     public class VerifyPhoneCodeManager
     {
-        public static async Task<Result<bool>> VerifyEmailCodeAsync(string username, string inputCode, string ipAddress,
+        public static async Task<Result<bool>> VerifyPhoneCodeAsync(string username, string inputCode, string ipAddress,
                                                                     string phoneNumber, bool duringRegistration)
         {
             try
@@ -33,6 +33,11 @@ namespace TeamA.Exogredient.Managers
                     phoneVerificationSuccess = true;
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyPhoneOperation, username, ipAddress).ConfigureAwait(false);
+
+                    if (duringRegistration)
+                    {
+                        await UserManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
+                    }
 
                     return UtilityService.CreateResult(Constants.VerifyPhoneSuccessUserMessage, phoneVerificationSuccess);
                 }

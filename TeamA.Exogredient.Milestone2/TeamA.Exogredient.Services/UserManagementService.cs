@@ -170,7 +170,7 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
-        public static async Task ChangePasswordAsync(string username, string password)
+        public static async Task ChangePasswordAsync(string username, string digest, string saltString)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
@@ -186,10 +186,8 @@ namespace TeamA.Exogredient.Services
                 // TODO Create Custom Exception: For User
                 throw new Exception("This username is locked! To enable, contact the admin");
             }
-            byte[] saltBytes = SecurityService.GenerateSalt();
-            string hashedPassword = SecurityService.HashWithKDF(password, saltBytes);
-            string saltString = UtilityService.BytesToHexString(saltBytes);
-            UserRecord newPasswordUser = new UserRecord(username, password: hashedPassword, salt: saltString);
+
+            UserRecord newPasswordUser = new UserRecord(username, password: digest, salt: saltString);
             await _userDAO.UpdateAsync(newPasswordUser).ConfigureAwait(false);
         }
 

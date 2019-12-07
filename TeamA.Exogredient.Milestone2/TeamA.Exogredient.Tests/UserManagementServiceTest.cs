@@ -60,14 +60,14 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("testuser", "newpassword")]
-        public async Task UserManagementService_ChangePassword_ValidUserName(string username, string password)
+        [DataRow("testuser", "newpassword", "update this")] // TODO: IMPORTANT!!!!!! UPDATE THIS DATA ROW
+        public async Task UserManagementService_ChangePassword_ValidUserName(string username, string password, string saltHex)
         {
             //Arrange
 
 
             //Act
-            await UserManagementService.ChangePasswordAsync(username, password).ConfigureAwait(false);
+            await UserManagementService.ChangePasswordAsync(username, password, saltHex).ConfigureAwait(false);
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
             string storedPassword = user.Password;
