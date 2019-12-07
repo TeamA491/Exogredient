@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using System.IO;
 using System;
+using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -9,7 +10,7 @@ namespace TeamA.Exogredient.Tests
     public class FTPServiceTests
     {
         [TestMethod]
-        public void FTPService_Send_SendValidCredentials()
+        public async Task FTPService_Send_SendValidCredentials()
         {
             //arrange
             DateTime currentTime = DateTime.Now;
@@ -18,13 +19,13 @@ namespace TeamA.Exogredient.Tests
             string userName = "*****";
             string password = "*****";
             //act
-            bool results = FTPService.Send(ftpUrl, "", targetDirectory, userName, password);
+            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
             //assert
             Assert.IsTrue(results);
         }
 
         [TestMethod]
-        public void FTPService_Send_SendInvalidCredentials()
+        public async Task FTPService_Send_SendInvalidCredentials()
         {
             //arrange
             DateTime currentTime = DateTime.Now;
@@ -35,13 +36,13 @@ namespace TeamA.Exogredient.Tests
             string password = "********";
             //act
 
-            bool results = FTPService.Send(ftpUrl, "", targetDirectory, userName, password);
+            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
             //assert
             Assert.IsFalse(results);
         }
 
         [TestMethod]
-        public void FTPService_Send_SendWithoutTargetFile()
+        public async Task FTPService_Send_SendWithoutTargetFile()
         {
             DateTime currentTime = DateTime.Now;
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
@@ -57,7 +58,7 @@ namespace TeamA.Exogredient.Tests
             File.Delete(targetFilePath);
 
             //act
-            bool results = FTPService.Send(ftpUrl, "", targetDirectory, userName, password);
+            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
 
             //assert
             Assert.IsFalse(results);
