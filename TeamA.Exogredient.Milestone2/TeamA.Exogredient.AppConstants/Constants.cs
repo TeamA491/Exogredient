@@ -20,6 +20,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
         public const string VerifyEmailOperation = "Verify Email Code";
+        public const string VerifyPhoneOperation = "Verify Phone Code";
 
         public const string CustomerUserType = "Customer";
         public const string AnonymousUserType = "Unregistered Customer";
@@ -69,10 +70,13 @@ namespace TeamA.Exogredient.AppConstants
         public const int MinimumPasswordCharacters = 12;
         public const string PasswordCharacterType = ANSNoAngle;
 
+        public const string TwilioExpiredReturnString = "expired";
+
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
         public const string LogInSuccessUserMessage = "Logged in successfully!";
         public const string VerifyEmailSuccessUserMessage = "Email verified! Please select the 'Call Me' option";
+        public const string VerifyPhoneSuccessUserMessage = "Phone code verified!";
 
         public const string SystemErrorUserMessage = "A system error occurred. Please try again later. A team of highly trained monkeys is currently working on the situation.";
 
@@ -137,6 +141,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string EmailCodeExpiredUserMessage = "Email code expired, select the option to re-send.";
 
         public const string WrongEmailCodeMessage = "Wrong email code input";
+
+        public const string MaxPhoneTriesReachedLogMessage = "Max phone tries reached";
+        public static readonly string MaxPhoneTriesReachedUserMessage = $"Maximum pone code tries reached ({MaxPhoneCodeAttempts} max)";
+
+        public const string PhoneCodeExpiredLogMessage = "Phone code expired";
+        public const string PhoneCodeExpiredUserMessage = "Phone code expired, select the option to re-send.";
+
+        public const string WrongPhoneCodeMessage = "Wrong phone code input";
 
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";

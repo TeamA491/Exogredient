@@ -27,10 +27,10 @@ namespace TeamA.Exogredient.TestController
 
             byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
 
-            Console.WriteLine(Encoding.UTF8.GetString(res));
+            //Console.WriteLine(Encoding.UTF8.GetString(res));
 
-            //await AuthenticationService.SendCallVerificationAsync("9499815506").ConfigureAwait(false);
-            //bool result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "8932").ConfigureAwait(false);
+            //await AuthenticationService.SendCallVerificationAsync("eli", "9499815506").ConfigureAwait(false);
+            //string result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "2247").ConfigureAwait(false);
 
             //Console.WriteLine(result);
         }

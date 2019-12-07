@@ -109,14 +109,14 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> StoreEmailCodeAsync(string username, string emailCode, long emailCodeTimestamp)
         {
-            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp);
+            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp, emailCodeFailures: 0);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
 
         public static async Task<bool> RemoveEmailCodeAsync(string username)
         {
-            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
+            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0, emailCodeFailures: 0);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -232,6 +232,14 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
+        public static async Task<bool> UpdatePhoneCodeFailuresAsync(string username, int numFailures)
+        {
+            UserRecord record = new UserRecord(username, phoneCodeFailures: numFailures);
+
+            await _userDAO.UpdateAsync(record).ConfigureAwait(false);
+
+            return true;
+        }
 
 
         public static async Task<bool> IncrementLoginFailuresAsync(string username, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
@@ -284,6 +292,22 @@ namespace TeamA.Exogredient.Services
 
             // Create user record to insert into update.
             UserRecord record = new UserRecord(username, emailCodeFailures: currentFailures + 1);
+
+            // Increment the failure count for that user.
+            await _userDAO.UpdateAsync(record).ConfigureAwait(false);
+
+            return true;
+        }
+
+        public static async Task<bool> IncrementPhoneCodeFailuresAsync(string username)
+        {
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+
+            // Get the current failure count.
+            int currentFailures = user.PhoneCodeFailures;
+
+            // Create user record to insert into update.
+            UserRecord record = new UserRecord(username, phoneCodeFailures: currentFailures + 1);
 
             // Increment the failure count for that user.
             await _userDAO.UpdateAsync(record).ConfigureAwait(false);

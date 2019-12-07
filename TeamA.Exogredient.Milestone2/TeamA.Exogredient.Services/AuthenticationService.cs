@@ -5,9 +5,9 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using Twilio;
+using Twilio.Exceptions;
 using Twilio.Rest.Preview.AccSecurity.Service;
 using TeamA.Exogredient.AppConstants;
-using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
@@ -21,7 +21,7 @@ namespace TeamA.Exogredient.Services
             _userDAO = new UserDAO();
         }
 
-        public static async Task<bool> SendCallVerificationAsync(string phoneNumber)
+        public static async Task<bool> SendCallVerificationAsync(string username, string phoneNumber)
         {
             string accountSID = Constants.TwilioAccountSID;
             string authorizationToken = Constants.TwilioAuthToken;
@@ -34,66 +34,33 @@ namespace TeamA.Exogredient.Services
                 pathServiceSid: Constants.TwilioPathServiceSID
             ).ConfigureAwait(false);
 
-            return true;
-        }
-
-        public static async Task<bool> VerifyEmailCodeAsync(string username, string emailCodeInput, TimeSpan maxCodeValidTime)
-        {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
-
-            string emailCode = user.EmailCode;
-            long emailCodeTimestamp = user.EmailCodeTimestamp;
-
-            UserRecord record;
-
-            if (emailCodeTimestamp.Equals(""))
-            {
-                return false;
-            }
-
-            long maxValidSeconds = UtilityService.TimespanToSeconds(maxCodeValidTime);
-            long currentUnix = UtilityService.CurrentUnixTime();
-
-            if (emailCodeTimestamp + maxValidSeconds < currentUnix)
-            {
-                record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
-                await _userDAO.UpdateAsync(record).ConfigureAwait(false);
-                return false;
-            }
-
-            if (!emailCodeInput.Equals(emailCode))
-            {
-                return false;
-            }
-
-            record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
-            await _userDAO.UpdateAsync(record).ConfigureAwait(false);
+            await UserManagementService.UpdatePhoneCodeFailuresAsync(username, 0).ConfigureAwait(false);
 
             return true;
         }
 
-        public static async Task<bool> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
+        public static async Task<string> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
         {
-            string accountSID = Constants.TwilioAccountSID;
-            string authorizationToken = Constants.TwilioAuthToken;
-
-            TwilioClient.Init(accountSID, authorizationToken);
-
-
-            var verificationCheck = await VerificationCheckResource.CreateAsync(
-                to: $"+1{phoneNumber}",
-                code: $"{phoneCode}",
-                pathServiceSid: Constants.TwilioPathServiceSID
-            ).ConfigureAwait(false);
-
-
-            if (verificationCheck.Status.Equals("approved"))
+            // Must catch twilio.exceptions.twilioapiexception if they try to verify after expiration time
+            try
             {
-                return true;
+                string accountSID = Constants.TwilioAccountSID;
+                string authorizationToken = Constants.TwilioAuthToken;
+
+                TwilioClient.Init(accountSID, authorizationToken);
+
+
+                var verificationCheck = await VerificationCheckResource.CreateAsync(
+                    to: $"+1{phoneNumber}",
+                    code: $"{phoneCode}",
+                    pathServiceSid: Constants.TwilioPathServiceSID
+                ).ConfigureAwait(false);
+
+                return verificationCheck.Status;
             }
-            else
+            catch (TwilioException)
             {
-                return false;
+                return Constants.TwilioExpiredReturnString;
             }
         }
 
