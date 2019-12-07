@@ -1,8 +1,8 @@
 using System;
-using System.Security.Cryptography;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -30,8 +30,8 @@ namespace TeamA.Exogredient.Tests
         public void SecurityService_EncryptRSADecryptRSA_RevertBackToOriginalData(byte[] plainData)
         {
             //Arrange
-            byte[] publicKey = SecurityService.GetRSAPublicKey();
-            byte[] privateKey = SecurityService.GetRSAPrivateKey();
+            byte[] publicKey = UtilityService.HexStringToBytes(Constants.PublicKey);
+            byte[] privateKey = UtilityService.HexStringToBytes(Constants.PrivateKey);
 
             //Act
             byte[] encryptedData = SecurityService.EncryptRSA(plainData, publicKey);
@@ -47,7 +47,7 @@ namespace TeamA.Exogredient.Tests
         {
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
-            string hexPassword = StringUtilityService.ToHexString(password);
+            string hexPassword = UtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt);
@@ -65,8 +65,8 @@ namespace TeamA.Exogredient.Tests
         {
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
-            string hexPassword1 = StringUtilityService.ToHexString(password1);
-            string hexPassword2 = StringUtilityService.ToHexString(password2);
+            string hexPassword1 = UtilityService.ToHexString(password1);
+            string hexPassword2 = UtilityService.ToHexString(password2);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword1, salt);
@@ -83,7 +83,7 @@ namespace TeamA.Exogredient.Tests
             //Arrange
             byte[] salt1 = SecurityService.GenerateSalt();
             byte[] salt2 = SecurityService.GenerateSalt();
-            string hexPassword = StringUtilityService.ToHexString(password);
+            string hexPassword = UtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt1);
@@ -100,7 +100,7 @@ namespace TeamA.Exogredient.Tests
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
             int hashBytesLength = 32;
-            string hexPassword = StringUtilityService.ToHexString(password);
+            string hexPassword = UtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt, hashLength:hashBytesLength);
@@ -117,7 +117,7 @@ namespace TeamA.Exogredient.Tests
             //Arrange
             byte[] salt = SecurityService.GenerateSalt();
             int iterations = 10000;
-            string hexPassword = StringUtilityService.ToHexString(password);
+            string hexPassword = UtilityService.ToHexString(password);
 
             //Act
             string a = SecurityService.HashWithKDF(hexPassword, salt);

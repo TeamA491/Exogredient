@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
@@ -74,7 +73,7 @@ namespace TeamA.Exogredient.DAL
                         count++;
                     }
 
-                    await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 }
 
                 return true;
@@ -94,7 +93,7 @@ namespace TeamA.Exogredient.DAL
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                     {
                         command.Parameters.AddWithValue("@IPADDRESS", ipAddress);
-                        await command.ExecuteNonQueryAsync();
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
 
@@ -116,7 +115,7 @@ namespace TeamA.Exogredient.DAL
                 using (DataTable dataTable = new DataTable())
                 {
                     command.Parameters.AddWithValue("@ID", id);
-                    var reader = await command.ExecuteReaderAsync();
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                     dataTable.Load(reader);
                     DataRow row = dataTable.Rows[0];
 
@@ -190,7 +189,7 @@ namespace TeamA.Exogredient.DAL
                         count++;
                     }
 
-                    await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 }
 
                 return true;
@@ -217,8 +216,8 @@ namespace TeamA.Exogredient.DAL
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     command.Parameters.AddWithValue("@IPADDRESS", ipAddress);
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.ReadAsync();
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    await reader.ReadAsync().ConfigureAwait(false);
                     result = reader.GetBoolean(0);
                 }
 

@@ -1,9 +1,7 @@
-﻿using MySqlX.XDevAPI;
-using MySqlX.XDevAPI.CRUD;
-using System;
+﻿using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using MySqlX.XDevAPI;
+using MySqlX.XDevAPI.CRUD;
 using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
@@ -19,7 +17,7 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.GetCollection(Constants.CorruptedPassCollectionName);
 
-                DocResult result = await collection.Find().ExecuteAsync();
+                DocResult result = await collection.Find().ExecuteAsync().ConfigureAwait(false);
 
                 List<string> resultList = new List<string>();
 

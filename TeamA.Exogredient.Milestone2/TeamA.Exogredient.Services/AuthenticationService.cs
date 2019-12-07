@@ -1,17 +1,14 @@
-﻿using MailKit;
+﻿using System;
+using System.Threading.Tasks;
+using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 using Twilio;
 using Twilio.Rest.Preview.AccSecurity.Service;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
@@ -24,57 +21,6 @@ namespace TeamA.Exogredient.Services
             _userDAO = new UserDAO();
         }
 
-        /// <summary>
-        /// Check if the username and the password are correct.
-        /// </summary>
-        /// <param name="userName"> the username used for login</param>
-        /// <param name="encryptedPassword"> the password used for login encrypted </param>
-        /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
-        /// <param name="aesIV"> AES Initialization Vector used for encrypting the password </param>
-        /// <returns> true if the username and password are correct, false otherwise </returns>
-        public static async Task<bool> AuthenticateAsync(string username, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
-        {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
-
-            // Check if the username exists.
-            if (!(await _userDAO.CheckUserExistenceAsync(username)))
-            {
-                return false;
-            }
-            // Check if the username is disabled.
-            
-            if (user.Disabled == 1)
-            {
-                throw new InvalidOperationException("This username is locked! To enable, contact the admin");
-            }
-
-            byte[] privateKey = SecurityService.GetRSAPrivateKey();
-            byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted, privateKey);
-            // Decrypt the encrypted password.
-            string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
-
-            // Get the password and the salt stored corresponding to the username.
-            string storedPassword = user.Password;
-            string saltString = user.Salt;
-
-            // Convert the salt to byte array.
-            byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
-
-            //Number of iterations for has && length of the hash in bytes.
-            // Hash the decrypted password with the byte array of salt.
-            string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
-
-            //Check if the stored password matches the hashed password
-            if (storedPassword.Equals(hashedPassword))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public static async Task<bool> SendCallVerificationAsync(string phoneNumber)
         {
             string accountSID = Constants.TwilioAccountSID;
@@ -82,18 +28,18 @@ namespace TeamA.Exogredient.Services
 
             TwilioClient.Init(accountSID, authorizationToken);
 
-            var verification = await VerificationResource.CreateAsync(
+            await VerificationResource.CreateAsync(
                 to: $"+1{phoneNumber}",
                 channel: "call",
                 pathServiceSid: Constants.TwilioPathServiceSID
-            );
+            ).ConfigureAwait(false);
 
             return true;
         }
 
         public static async Task<bool> VerifyEmailCodeAsync(string username, string emailCodeInput, TimeSpan maxCodeValidTime)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username);
+            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
             string emailCode = user.EmailCode;
             long emailCodeTimestamp = user.EmailCodeTimestamp;
@@ -105,13 +51,13 @@ namespace TeamA.Exogredient.Services
                 return false;
             }
 
-            long maxValidSeconds = StringUtilityService.TimespanToSeconds(maxCodeValidTime);
-            long currentUnix = StringUtilityService.CurrentUnixTime();
+            long maxValidSeconds = UtilityService.TimespanToSeconds(maxCodeValidTime);
+            long currentUnix = UtilityService.CurrentUnixTime();
 
             if (emailCodeTimestamp + maxValidSeconds < currentUnix)
             {
                 record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
-                await _userDAO.UpdateAsync(record);
+                await _userDAO.UpdateAsync(record).ConfigureAwait(false);
                 return false;
             }
 
@@ -121,7 +67,7 @@ namespace TeamA.Exogredient.Services
             }
 
             record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0);
-            await _userDAO.UpdateAsync(record);
+            await _userDAO.UpdateAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -138,7 +84,7 @@ namespace TeamA.Exogredient.Services
                 to: $"+1{phoneNumber}",
                 code: $"{phoneCode}",
                 pathServiceSid: Constants.TwilioPathServiceSID
-            );
+            ).ConfigureAwait(false);
 
 
             if (verificationCheck.Status.Equals("approved"))
@@ -163,9 +109,9 @@ namespace TeamA.Exogredient.Services
 
             Random generator = new Random();
             string emailCode = generator.Next(100000, 1000000).ToString();
-            long emailCodeTimestamp = StringUtilityService.CurrentUnixTime();
+            long emailCodeTimestamp = UtilityService.CurrentUnixTime();
 
-            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp);
+            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
 
             bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
                 @"<tr>" +
@@ -185,10 +131,10 @@ namespace TeamA.Exogredient.Services
                 ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
             };
 
-            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword).ConfigureAwait(false);
+            await client.SendAsync(message).ConfigureAwait(false);
+            await client.DisconnectAsync(true).ConfigureAwait(false);
             client.Dispose();
 
             return true;

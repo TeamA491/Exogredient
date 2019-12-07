@@ -10,25 +10,6 @@ namespace TeamA.Exogredient.Services
 {
     public static class SecurityService
     {
-
-        /// <summary>
-        /// Return the environment variable of RSA encryption public key.
-        /// </summary>
-        /// <returns> a byte array of the public key </returns>
-        public static byte[] GetRSAPublicKey()
-        {
-            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PUBLICKEY",EnvironmentVariableTarget.User));
-        }
-
-        /// <summary>
-        /// Return the environment variable of RSA encryption private key.
-        /// </summary>
-        /// <returns> a byte array of the public key </returns>
-        public static byte[] GetRSAPrivateKey()
-        {
-            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PRIVATEKEY", EnvironmentVariableTarget.User));
-        }
-
         // Reference:
         // https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.aescryptoserviceprovider?view=netstandard-2.0
         /// <summary>
@@ -177,11 +158,11 @@ namespace TeamA.Exogredient.Services
         /// <returns> a string of hash code </returns>
         public static string HashWithHMACSHA256(string data)
         {
-            byte[] dataBytes = StringUtilityService.HexStringToBytes(data);
+            byte[] dataBytes = UtilityService.HexStringToBytes(data);
             using (HMACSHA256 hmac = new HMACSHA256())
             {
                 byte[] hashBytes = hmac.ComputeHash(dataBytes);
-                return StringUtilityService.BytesToHexString(hashBytes);
+                return UtilityService.BytesToHexString(hashBytes);
             }
         }
 
@@ -196,12 +177,12 @@ namespace TeamA.Exogredient.Services
         public static string HashWithKDF(string password, byte[] salt, int iterations = 10000, int hashLength = 32)
         {
 
-            byte[] passwordBytes = StringUtilityService.HexStringToBytes(password);
+            byte[] passwordBytes = UtilityService.HexStringToBytes(password);
             Pkcs5S2ParametersGenerator pbkdf = new Pkcs5S2ParametersGenerator(new Sha3Digest());
             pbkdf.Init(passwordBytes, salt, iterations);
             KeyParameter derivedKey = (KeyParameter)pbkdf.GenerateDerivedMacParameters(hashLength * 8);
 
-            return StringUtilityService.BytesToHexString(derivedKey.GetKey());
+            return UtilityService.BytesToHexString(derivedKey.GetKey());
         }
 
         /// <summary>
@@ -218,7 +199,7 @@ namespace TeamA.Exogredient.Services
                 // Convert the password to ASCII byte array ->
                 // Compute the hashcode in byte array with the ASCII byte array ->
                 // Convert the hashcode byte array to a hex string
-                return StringUtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(password)));
+                return UtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(password)));
             }
         }
         

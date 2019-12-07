@@ -1,8 +1,6 @@
-﻿using System;
-using TeamA.Exogredient.AppConstants;
+﻿using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.SQLCreateConsoleApp
 {
@@ -44,8 +42,8 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         {
             // Directions: Uncomment the line which corresponds to the table you want to create.
 
-            await CreateUserTable();
-            //await CreateIPTable();
+            await CreateUserTable().ConfigureAwait(false);
+            //await CreateIPTable().ConfigureAwait(false);
         }
 
         private static async Task CreateUserTable()
@@ -76,8 +74,8 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"UNIQUE INDEX `{_phoneNumber}_UNIQUE` (`{_phoneNumber}` ASC) VISIBLE);";
 
             MySqlCommand command = new MySqlCommand(sqlString, connection);
-            await command.ExecuteNonQueryAsync();
-            await command.DisposeAsync();
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await command.DisposeAsync().ConfigureAwait(false);
         }
 
         private static async Task CreateIPTable()
@@ -93,8 +91,8 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"PRIMARY KEY(`{_ip}`));";
 
             MySqlCommand command = new MySqlCommand(sqlString, connection);
-            await command.ExecuteNonQueryAsync();
-            await command.DisposeAsync();
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await command.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

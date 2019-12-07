@@ -1,9 +1,7 @@
 using System;
-using System.Security.Cryptography;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
-using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -17,7 +15,7 @@ namespace TeamA.Exogredient.Tests
             // Arrange
             // Create user 
 
-            bool result = await UserManagementService.CheckUserExistenceAsync(username);
+            bool result = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Cleanup: delete user
@@ -30,7 +28,7 @@ namespace TeamA.Exogredient.Tests
         {
             // check if user exists
             // delete it if it does 
-            bool result = await UserManagementService.CheckUserExistenceAsync(username);
+            bool result = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -40,7 +38,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange
             // Create users with phonenumber above
-            bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber);
+            bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Cleanup 
@@ -54,7 +52,7 @@ namespace TeamA.Exogredient.Tests
             // Arrange
             // Check if phonenumber exists. if it does delete that user
 
-            bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber);
+            bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -65,7 +63,7 @@ namespace TeamA.Exogredient.Tests
             // Arrange
             // Create user. 
 
-            bool result = await UserManagementService.CheckEmailExistenceAsync(email);
+            bool result = await UserManagementService.CheckEmailExistenceAsync(email).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Cleanup 
@@ -80,7 +78,7 @@ namespace TeamA.Exogredient.Tests
             // check if that email exist
             // if it does delete that user
 
-            bool result = await UserManagementService.CheckEmailExistenceAsync(email);
+            bool result = await UserManagementService.CheckEmailExistenceAsync(email).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -94,7 +92,7 @@ namespace TeamA.Exogredient.Tests
             // Create user
             // Disable user
 
-            bool result = await UserManagementService.CheckIfUserDisabledAsync(username);
+            bool result = await UserManagementService.CheckIfUserDisabledAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Cleanup 
@@ -109,7 +107,7 @@ namespace TeamA.Exogredient.Tests
             // Create user that is not diabled
             
 
-            bool result = await UserManagementService.CheckIfUserDisabledAsync(username);
+            bool result = await UserManagementService.CheckIfUserDisabledAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
 
             // Cleanup
@@ -128,7 +126,7 @@ namespace TeamA.Exogredient.Tests
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
 
             // Act
-            bool result = await UserManagementService.CheckIPLockAsync(ipAddress, maxLockTime);
+            bool result = await UserManagementService.CheckIPLockAsync(ipAddress, maxLockTime).ConfigureAwait(false);
             
             // Assert
             Assert.IsTrue(result);
@@ -143,7 +141,7 @@ namespace TeamA.Exogredient.Tests
             // if it is selete it from it 
 
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-            bool result = await UserManagementService.CheckIPLockAsync(username, maxLockTime);
+            bool result = await UserManagementService.CheckIPLockAsync(username, maxLockTime).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -155,7 +153,7 @@ namespace TeamA.Exogredient.Tests
             
             // Act 
             // Create the user 
-            bool result = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            bool result = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
             // Assert that user creation was successful 
             Assert.IsTrue(result);
@@ -174,11 +172,11 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
             // Act 
             // Delete the user 
-            bool result = await UserManagementService.DeleteUserAsync(username);
+            bool result = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
 
             Assert.IsTrue(result);
 
@@ -196,11 +194,11 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a temporary user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
             // Act 
             // Make the temporary user perm
-            bool result = await UserManagementService.MakeTempPermAsync(username);
+            bool result = await UserManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
 
             // Assert
             Assert.IsTrue(result);
@@ -219,10 +217,10 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a temporary user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
             // Act 
-            bool result = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp);
+            bool result = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
 
             Assert.IsTrue(result);
 
@@ -240,10 +238,10 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a temporary user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
             // Act 
-            bool result = await UserManagementService.RemoveEmailCodeAsync(username);
+            bool result = await UserManagementService.RemoveEmailCodeAsync(username).ConfigureAwait(false);
 
             Assert.IsTrue(result);
             
@@ -261,7 +259,7 @@ namespace TeamA.Exogredient.Tests
             // Create the user that will be disabled
 
             // Act 
-            bool result = await UserManagementService.DisableUserAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
 
             // Read that user and check if it was disabled
@@ -275,7 +273,7 @@ namespace TeamA.Exogredient.Tests
         public async Task UserManagementService_DisableUserNameAsync_DisableNonExistingUserFailureAsync(string username)
         {
             // Act 
-            bool result = await UserManagementService.DisableUserAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -288,7 +286,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Make the temporary user perm
-            bool result = await UserManagementService.DisableUserAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -300,11 +298,11 @@ namespace TeamA.Exogredient.Tests
             // Create the user that will be disabled
 
    
-            bool result = await UserManagementService.DisableUserAsync(username);
+            bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Act 
-            bool enableResult = await UserManagementService.EnableUserAsync(username);
+            bool enableResult = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
 
             Assert.IsTrue(enableResult);
             // Cleanup 
@@ -320,7 +318,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Make the temporary user perm
-            bool result = await UserManagementService.EnableUserAsync(username);
+            bool result = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -333,7 +331,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Change the user password 
-            await UserManagementService.ChangePasswordAsync(username, password);
+            await UserManagementService.ChangePasswordAsync(username, password).ConfigureAwait(false);
 
             // Assert 
             // Read the user and make sure his password now matches the change
@@ -344,7 +342,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act
             // Send message to system admin 
-            bool result = await UserManagementService.NotifySystemAdminAsync(body);
+            bool result = await UserManagementService.NotifySystemAdminAsync(body).ConfigureAwait(false);
 
             // Assert
             // TODO: how do we ensure that the system admin got the email?

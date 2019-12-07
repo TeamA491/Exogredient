@@ -14,6 +14,48 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string SQLConnection = Environment.GetEnvironmentVariable("SQL_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
 
+        // BUSINESS RULES
+        public const int LoggingRetriesAmount = 3;
+        public const int MaxLogInAttempts = 18;
+        public const int MaxRegistrationAttempts = 3;
+        public const int MaxEmailCodeAttempts = 3;
+        public const int MaxPhoneCodeAttempts = 3;
+        public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
+        public static readonly TimeSpan EmailCodeMaxValidTime = new TimeSpan(0, 15, 0);
+        public static readonly TimeSpan MaxTempUserTime = new TimeSpan(1, 0, 0);
+
+        public const string ANSNoAngle = "ANS-NoAngle";
+        public const string Numeric = "NUM";
+
+        public static readonly IDictionary<string, List<char>> CharSetsData = new Dictionary<string, List<char>>()
+        {
+            { ANSNoAngle, ANSNoAngleBrackets },
+            { Numeric, Numbers }
+        };
+
+        public const int MaximumFirstNameCharacters = 200;
+        public const int MinimumFirstNameCharacters = 1;
+        public const string FirstNameCharacterType = ANSNoAngle;
+
+        public const int MaximumLastNameCharacters = 200;
+        public const int MinimumLastNameCharacters = 1;
+        public const string LastNameCharacterType = ANSNoAngle;
+
+        public const int MaximumEmailCharacters = 200;
+        public const int MinimumEmailCharacters = 1;
+        public const string EmailCharacterType = ANSNoAngle;
+
+        public const int MaximumUsernameCharacters = 200;
+        public const int MinimumUsernameCharacters = 1;
+        public const string UsernameCharacterType = ANSNoAngle;
+
+        public const int PhoneNumberCharacterLength = 10;
+        public const string PhoneNumberCharacterType = Numeric;
+
+        public const int MaximumPasswordCharacters = 2000;
+        public const int MinimumPasswordCharacters = 12;
+        public const string PasswordCharacterType = ANSNoAngle;
+
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";
         public const string SystemAdminEmailAddress = "TEAMA.CS491@gmail.com";
@@ -82,7 +124,7 @@ namespace TeamA.Exogredient.AppConstants
         public const int SecondsInAMinute = 60;
 
         // No < or > to protect from SQL injections.
-        public static readonly List<char> AlphaNumericAndSpecialCharacters = new List<char>()
+        public static readonly List<char> ANSNoAngleBrackets = new List<char>()
         {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9',

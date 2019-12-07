@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
@@ -54,7 +51,7 @@ namespace TeamA.Exogredient.Services
                 // TODO: See what write field does and emulate
                 using (StreamWriter writer = File.AppendText(path))
                 {
-                    await writer.WriteLineAsync(result);
+                    await writer.WriteLineAsync(result).ConfigureAwait(false);
                 }
 
                 return true;
@@ -110,11 +107,11 @@ namespace TeamA.Exogredient.Services
                     // Get rid of last comma.
                     lineToDelete = lineToDelete.Substring(0, lineToDelete.Length - 1);
 
-                    while ((lineInput = await reader.ReadLineAsync()) != null)
+                    while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                     {
                         if (lineInput != lineToDelete)
                         {
-                            await writer.WriteLineAsync(lineInput);
+                            await writer.WriteLineAsync(lineInput).ConfigureAwait(false);
                         }
                     }
                 }
