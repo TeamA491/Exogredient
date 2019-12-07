@@ -1,14 +1,13 @@
 ﻿using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.Services
 {
     public static class FTPService
     {
-        public static bool Send(string ftpURL, string ftpFolder, string sourceDirectory, string userName, string password)
+        public static async Task<bool> SendAsync(string ftpURL, string ftpFolder, string sourceDirectory, string userName, string password)
         {
-            byte[] fileBytes = null;
-
             // File to send on local machine.
             string archiveFilePath = sourceDirectory + ".7z";
             if (!File.Exists(archiveFilePath))
@@ -16,12 +15,12 @@ namespace TeamA.Exogredient.Services
                 return false;
             }
 
-            fileBytes = File.ReadAllBytes(archiveFilePath);
+            byte[] fileBytes = File.ReadAllBytes(archiveFilePath);
 
             try
             {
                 // Create the FTP request. Set the folder and file name.
-                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpURL + ftpFolder + Path.GetFileName(archiveFilePath));
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpURL + ftpFolder + Path.GetFileName(filePath));
                 request.Method = WebRequestMethods.Ftp.UploadFile;
 
                 // Entering in FTP user credentials.
@@ -33,7 +32,7 @@ namespace TeamA.Exogredient.Services
                 request.UseBinary = false;
                 request.EnableSsl = false;
 
-                using (Stream requestStream = request.GetRequestStream())
+                using (Stream requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false))
                 {
                     requestStream.Write(fileBytes, 0, fileBytes.Length);
                     requestStream.Close();
@@ -41,8 +40,10 @@ namespace TeamA.Exogredient.Services
             }
             catch (WebException ex)
             {
-                return false;
+                await requestStream.WriteAsync(fileBytes, 0, fileBytes.Length).ConfigureAwait(false);
+                requestStream.Close();
             }
+
             return true;
         }
     }

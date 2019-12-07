@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
@@ -30,7 +28,7 @@ namespace TeamA.Exogredient.Services
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]);
+                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]).ConfigureAwait(false);
             }
             catch
             {
@@ -52,9 +50,9 @@ namespace TeamA.Exogredient.Services
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                string id = await _dsLoggingDAO.FindIdFieldAsync(logRecord, splitResult[2]);
+                string id = await _dsLoggingDAO.FindIdFieldAsync(logRecord, splitResult[2]).ConfigureAwait(false);
 
-                await _dsLoggingDAO.DeleteAsync(id, splitResult[2]);
+                await _dsLoggingDAO.DeleteAsync(id, splitResult[2]).ConfigureAwait(false);
 
                 return true;
             }

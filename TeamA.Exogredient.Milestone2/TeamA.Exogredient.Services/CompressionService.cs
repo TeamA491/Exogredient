@@ -17,14 +17,16 @@ namespace TeamA.Exogredient.Services
             string targetFile = targetDirectory + ".7z";
 
             // Set up arguments needed to start a 7zip process 
-            ProcessStartInfo sevenZipProcessInfo = new ProcessStartInfo();
-            sevenZipProcessInfo.FileName = sevenZipPath;
+            ProcessStartInfo sevenZipProcessInfo = new ProcessStartInfo
+            {
+                FileName = sevenZipPath,
 
-            // Pass arguments for 7zip command. Archive source directory to targetfile and delete files that were compressed from source directory
-            sevenZipProcessInfo.Arguments = "a -t7z " + targetFile + " " + sourceDirectory + " -sdel";
+                // Pass arguments for 7zip command. Archive source directory to targetfile and delete files that were compressed from source directory
+                Arguments = "a -t7z " + targetFile + " " + sourceDirectory + " -sdel",
 
-            // Set window property of the process to Hidden so it runs in background. 
-            sevenZipProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                // Set window property of the process to Hidden so it runs in background. 
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
 
             // Start 7zip process with parameters defined in the ProcessStartInfo object.
             Process activeSevenZipProcess = Process.Start(sevenZipProcessInfo);

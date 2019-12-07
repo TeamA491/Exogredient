@@ -2,7 +2,6 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -11,31 +10,6 @@ namespace TeamA.Exogredient.Services
 {
     public static class SecurityService
     {
-        /*
-        private readonly static RSACryptoServiceProvider FieldRSA = new RSACryptoServiceProvider();
-        // Static RSA Public key.
-        private readonly static byte[] _publicKey = FieldRSA.ExportCspBlob(false);
-        // Static RSA Private key.
-        private readonly static byte[] _privateKey = FieldRSA.ExportCspBlob(true);
-        */
-
-        /// <summary>
-        /// Return the static public key for RSA
-        /// </summary>
-        /// <returns>
-        /// RSAParameters
-        /// </returns>
-        public static byte[] GetRSAPublicKey()
-        {
-            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PUBLICKEY",EnvironmentVariableTarget.User));
-        }
-
-        // RSA Private key getter
-        public static byte[] GetRSAPrivateKey()
-        {
-            return StringUtilityService.HexStringToBytes(Environment.GetEnvironmentVariable("PRIVATEKEY", EnvironmentVariableTarget.User));
-        }
-
         // Reference:
         // https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.aescryptoserviceprovider?view=netstandard-2.0
         /// <summary>
@@ -44,7 +18,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="plainData"> string to be encrypted </param>
         /// <param name="key"> key to be used for encryption </param>
         /// <param name="IV"> Initialization vectore to be used for encryption </param>
-        /// <returns> byte array of the encrypted data</returns>
+        /// <returns> byte array of the encrypted data </returns>
         public static byte[] EncryptAES(string plainData, byte[] key, byte[] IV)
         {
             try
@@ -177,43 +151,38 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        // Reference:
-        // https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rfc2898derivebytes?view=netstandard-2.0
         /// <summary>
-        /// Hash a password with PBKDF2 based on HMACSHA1.
+        /// Hash a string data with HMAC SHA256.
+        /// </summary>
+        /// <param name="data"> a string to be hashed </param>
+        /// <returns> a string of hash code </returns>
+        public static string HashWithHMACSHA256(string data)
+        {
+            byte[] dataBytes = UtilityService.HexStringToBytes(data);
+            using (HMACSHA256 hmac = new HMACSHA256())
+            {
+                byte[] hashBytes = hmac.ComputeHash(dataBytes);
+                return UtilityService.BytesToHexString(hashBytes);
+            }
+        }
+
+        /// <summary>
+        /// Hash a password with SHA3-256 KDF. 
         /// </summary>
         /// <param name="password"> password to be hashed</param>
         /// <param name="salt"> salt used for hashing </param>
-        /// <param name="iterations"> number of iterations for hashing </param>
+        /// <param name="iterations"> number of iterations </param>
         /// <param name="hashLength"> the length of the output hashcode </param>
-        /// <returns></returns>
-        public static string HashWithHMACSHA256(string data)
+        /// <returns> a string of derived key </returns>
+        public static string HashWithKDF(string password, byte[] salt, int iterations = 10000, int hashLength = 32)
         {
-            byte[] dataBytes = StringUtilityService.HexStringToBytes(data);
-            HMACSHA256 hmac = new HMACSHA256();
-            byte[] hashBytes = hmac.ComputeHash(dataBytes);
-            return StringUtilityService.BytesToHexString(hashBytes);
 
-        }
+            byte[] passwordBytes = UtilityService.HexStringToBytes(password);
+            Pkcs5S2ParametersGenerator pbkdf = new Pkcs5S2ParametersGenerator(new Sha3Digest());
+            pbkdf.Init(passwordBytes, salt, iterations);
+            KeyParameter derivedKey = (KeyParameter)pbkdf.GenerateDerivedMacParameters(hashLength * 8);
 
-        public static string HashWithKDF(string password, byte[] salt, int hashLength = 32)
-        {
-            IDigest SHA256 = new Sha256Digest();
-            byte[] ikm = StringUtilityService.HexStringToBytes(password);
-            HkdfBytesGenerator hkdf = new HkdfBytesGenerator(SHA256);
-            hkdf.Init(new HkdfParameters(ikm, salt, null));
-            byte[] derivedBytes = new byte[hashLength];
-            hkdf.GenerateBytes(derivedBytes,0,hashLength);
-
-            return StringUtilityService.BytesToHexString(derivedBytes);
-
-            // Pass the password, salt, and the number of iterations.
-            //asswordDeriveBytes pdb = new PasswordDeriveBytes(password, salt, "SHA256", iterations);
-            //Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(password, salt, iterations);
-            // Generate a hashcode in byte array that is hashLength bytes long
-            //byte[] hashBytes = pdb.GetBytes(hashLength);
-            // Convert the byte array to a hex string.
-            //return BytesToHexString(hashBytes);
+            return UtilityService.BytesToHexString(derivedKey.GetKey());
         }
 
         /// <summary>
@@ -225,11 +194,13 @@ namespace TeamA.Exogredient.Services
         /// <returns> hex string of the hashed password </returns>
         public static string HashWithSHA1(string password)
         {
-            SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider();
-            // Convert the password to ASCII byte array ->
-            // Compute the hashcode in byte array with the ASCII byte array ->
-            // Convert the hashcode byte array to a hex string
-            return StringUtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(password)));
+            using(SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider())
+            {
+                // Convert the password to ASCII byte array ->
+                // Compute the hashcode in byte array with the ASCII byte array ->
+                // Convert the hashcode byte array to a hex string
+                return UtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(password)));
+            }
         }
         
         /// <summary>
@@ -256,8 +227,11 @@ namespace TeamA.Exogredient.Services
         /// <returns> size 32 byte array of AES key </returns>
         public static byte[] GenerateAESKey()
         {
-            AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
-            return aes.Key;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                return aes.Key;
+            }
+            
         }
 
         /// <summary>
@@ -266,8 +240,10 @@ namespace TeamA.Exogredient.Services
         /// <returns> size 16 byte array of IV </returns>
         public static byte[] GenerateAESIV()
         {
-            AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
-            return aes.IV;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                return aes.IV;
+            }
         }
 
     }

@@ -1,16 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.18" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
-    <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj" />
   </ItemGroup>
 
 </Project>

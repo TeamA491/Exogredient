@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace TeamA.Exogredient.DAL
+namespace TeamA.Exogredient.DataHelpers
 {
-    public class LogRecord
+    public class LogRecord : INOSQLRecord
     {
         public string Timestamp { get; }
 
@@ -20,7 +18,7 @@ namespace TeamA.Exogredient.DAL
         // All fields in the order you want them to be in, both in the database and flat file
         public List<string> Fields { get; }
 
-        public LogRecord(string timestamp, string operation, 
+        public LogRecord(string timestamp, string operation,
                          string identifier, string ipAddress, string errorType)
         {
             Fields = new List<string>();

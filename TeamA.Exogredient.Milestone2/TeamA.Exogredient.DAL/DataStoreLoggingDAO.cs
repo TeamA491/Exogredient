@@ -1,110 +1,110 @@
 ﻿using System;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
-using MySqlX.XDevAPI.Common;
 using MySqlX.XDevAPI.CRUD;
+using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
+    public class DataStoreLoggingDAO : IMasterNOSQLDAO<string>
     {
-        // ID field name.
-        private readonly string _id = "_id";
-
-        private readonly string _collectionPrefix = "logs_";
-
-        private readonly string _schema = "exogredient_logs";
-
-        public async override Task<bool> CreateAsync(object record, string yyyymmdd)
+        public async Task<bool> CreateAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
             {
-                LogRecord logRecord = (LogRecord)record;
-                Session session = MySQLX.GetSession(ConnectionString);
+                LogRecord temp = (LogRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException("DataStoreLoggingDAO.CreateAsync record argument must be of type LogRecord");
+            }
 
-                Schema schema = session.GetSchema(_schema);
+            LogRecord logRecord = (LogRecord)record;
 
-                var collection = schema.CreateCollection(_collectionPrefix + yyyymmdd, ReuseExistingObject: true);
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            {
+                // Create schema if it doesn't exist.
+                Schema schema;
 
+                try
+                {
+                    schema = session.CreateSchema(Constants.LogsSchemaName);
+                }
+                catch
+                {
+                    schema = session.GetSchema(Constants.LogsSchemaName);
+                }
+
+                var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + yyyymmdd, ReuseExistingObject: true);
+
+                // HACK: hardcoded here for now
                 // Created anon type to represent json in document store.
                 var document = new
                 {
                     timestamp = logRecord.Timestamp,
                     operation = logRecord.Operation,
                     identifier = logRecord.Identifier,
-                    ip = logRecord.IPAddress,
+                    ipAddress = logRecord.IPAddress,
                     errorType = logRecord.ErrorType
                 };
 
-                await collection.Add(document).ExecuteAsync();
-                session.Close();
+                await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
 
                 return true;
             }
-            catch
-            {
-                return false;
-            }
-            
         }
 
-        public async override Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
+        public async Task<bool> DeleteAsync(string uniqueId, string yyyymmdd)
         {
-            try
+
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
             {
-                Session session = MySQLX.GetSession(ConnectionString);
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
-                Schema schema = session.GetSchema(_schema);
+                var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
-                var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
-
-                await collection.Remove($"{_id} = :id").Bind("id", uniqueId).ExecuteAsync();
-
-                session.Close();
+                await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync().ConfigureAwait(false);
 
                 return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
         // TODO: Can't find id by identifier and timestamp... need operation
-        public async override Task<string> FindIdFieldAsync(object record, string yyyymmdd)
+        public async Task<string> FindIdFieldAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
             {
-                LogRecord logRecord = (LogRecord)record;
+                LogRecord temp = (LogRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException("DataStoreLoggingDAO.FindIdFieldAsync record argument must be of type LogRecord");
+            }
 
-                Session session = MySQLX.GetSession(ConnectionString);
+            LogRecord logRecord = (LogRecord)record;
 
-                Schema schema = session.GetSchema(_schema);
+            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            {
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
 
-                var collection = schema.GetCollection(_collectionPrefix + yyyymmdd);
+                var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
                 var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
 
-                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync();
+                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync().ConfigureAwait(false);
 
                 // Prepare string to be returned
                 string resultstring = "";
+
                 while (result.Next())
                 {
                     // TODO: flesh out columns. make columns into fields.
-                    resultstring = (string)result.Current["_id"];
+                    resultstring = (string)result.Current[Constants.LogsIdField];
 
                 }
 
-                session.Close();
-
                 return resultstring;
-            }
-            catch (Exception e)
-            {
-                // HACK !!!!
-                throw e;
             }
         }
     }
