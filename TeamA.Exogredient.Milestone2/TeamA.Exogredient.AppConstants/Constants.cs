@@ -19,6 +19,7 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
+        public const string VerifyEmailOperation = "Verify Email Code";
 
         public const string CustomerUserType = "Customer";
         public const string AnonymousUserType = "Unregistered Customer";
@@ -71,6 +72,7 @@ namespace TeamA.Exogredient.AppConstants
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
         public const string LogInSuccessUserMessage = "Logged in successfully!";
+        public const string VerifyEmailSuccessUserMessage = "Email verified! Please select the 'Call Me' option";
 
         public const string SystemErrorUserMessage = "A system error occurred. Please try again later. A team of highly trained monkeys is currently working on the situation.";
 
@@ -127,6 +129,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string PasswordWordsUserMessage = "Password contains words from the English language";
         public const string PasswordCorruptedLogMessage = "Password corrupted";
         public const string PasswordCorruptedUserMessage = "Your password has been corrupted";
+
+        public const string MaxEmailTriesReachedLogMessage = "Max email tries reached";
+        public static readonly string MaxEmailTriesReachedUserMessage = $"Maximum email code tries reached ({MaxEmailCodeAttempts} max)";
+
+        public const string EmailCodeExpiredLogMessage = "Email code expired";
+        public const string EmailCodeExpiredUserMessage = "Email code expired, select the option to re-send.";
+
+        public const string WrongEmailCodeMessage = "Wrong email code input";
 
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";
