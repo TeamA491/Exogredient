@@ -12,13 +12,18 @@ namespace TeamA.Exogredient.Tests
         [DataRow("Jason")]
         public async Task UserManagementService_CheckUserExistenceAsync_UserExistsSuccessAsync(string username)
         {
-            // Arrange
-            // Create user 
+            // Arrange: Create user 
+            bool createResult = await UserManagementService.CreateUserAsync(false, username, "Jason", "nguuuu", "emailf@gmail.com", "5629871234", "password", 0, 
+                                                                                "Customer", "123123123");
+            Assert.IsTrue(createResult);
 
+            // Assert: Check that an existing user returns true.
             bool result = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup: delete user
+            // Cleanup: delete the created user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
@@ -26,58 +31,64 @@ namespace TeamA.Exogredient.Tests
         [DataRow("123123321")]
         public async Task UserManagementService_CheckUserExistenceAsync_UserDoesNotExistsFailureAsync(string username)
         {
-            // check if user exists
-            // delete it if it does 
+            // Assert: Check that an non existing user returns false.
             bool result = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
-        [DataRow("5622537232")]
-        public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberExistsSuccessAsync(string phoneNumber)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberExistsSuccessAsync(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange
-            // Create users with phonenumber above
+            // Arrange: Create users with the phonenumber inputted. 
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password,
+                                                                                isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
+
+            // Assert: check that an existing phonenumber returns true.
             bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup 
-            // Delete Created user
+            // Cleanup: Delete Created user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
         [DataRow("0000000000")]
         public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberDoesNotExistsFailureAsync(string phoneNumber)
         {
-            // Arrange
-            // Check if phonenumber exists. if it does delete that user
-
+            // Act: Check that a nonexistent phonenumber returns false. 
             bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
-        [DataRow("jasonExists@gmail.com")]
-        public async Task UserManagementService_CheckEmailExistenceAsync_EmailExistsSuccessAsync(string email)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        public async Task UserManagementService_CheckEmailExistenceAsync_EmailExistsSuccessAsync(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange
-            // Create user. 
+            // Arrange: Create user. 
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password,
+                                                                    isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
+
+            // Act: check that an existing email returns true.
             bool result = await UserManagementService.CheckEmailExistenceAsync(email).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup 
-            // Delete that user
+            // Cleanup: Delete that user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
         [DataRow("JasonDoesNotExists@gmail.com")]
         public async Task UserManagementService_CheckEmailExistenceAsync_EmailDoesNotExistsFailureAsync(string email)
         {
-            // Arrange
-            // check if that email exist
-            // if it does delete that user
-
+            // Act: check that a non existing email returns false.
             bool result = await UserManagementService.CheckEmailExistenceAsync(email).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
@@ -85,33 +96,41 @@ namespace TeamA.Exogredient.Tests
 
         // TODO: insert actual diabled / enabled user into the database
         [DataTestMethod]
-        [DataRow("BadUser")]
-        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsDisabledSuccessAsync(string username)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 1, "Customer", "123123123")]
+        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsDisabledSuccessAsync(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange 
-            // Create user
-            // Disable user
+            // Arrange: Create a disabled user.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password,
+                                                        isDisabled, userType, salt);
+            Assert.IsTrue(createResult);
 
+            // Act: Check that the disabled is disabled.
             bool result = await UserManagementService.CheckIfUserDisabledAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup 
-            // delete that user
+            // Cleanup: Delete that user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
-        [DataRow("GoodUser")]
-        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsNotDisabledSuccessAsync(string username)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsNotDisabledSuccessAsync(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange 
-            // Create user that is not diabled
-            
+            // Arrange: Create user that is not diabled
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password,
+                                            isDisabled, userType, salt);
+            Assert.IsTrue(createResult);
 
+            // Act: Check that the non disabled returns false.
             bool result = await UserManagementService.CheckIfUserDisabledAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
 
-            // Cleanup
-            // Delete user
+            // Cleanup: Delete that user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username);
+            Assert.IsTrue(deleteResult);
         }
 
 
@@ -120,12 +139,14 @@ namespace TeamA.Exogredient.Tests
         [DataRow("ipaddress", 3, 0, 0)]
         public async Task UserManagementService_CheckIPLockAsync_IpIsDisabledSuccessAsync(string ipAddress, int hours, int minutes, int seconds)
         {
-            // Arrange 
-            // Insert Ip into ip table
+            // Arrange: Insert Ip into ip table
+            bool lockResult = await UserManagementService.LockIPAsync(ipAddress);
+            Assert.IsTrue(lockResult);
 
+            // Set how the Ip is locked
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
 
-            // Act
+            // Act: Check that a locked IP returns true.
             bool result = await UserManagementService.CheckIPLockAsync(ipAddress, maxLockTime).ConfigureAwait(false);
             
             // Assert
@@ -136,11 +157,10 @@ namespace TeamA.Exogredient.Tests
         [DataRow("ipaddress", 3, 0, 0)]
         public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccessAsync(string username, int hours, int minutes, int seconds)
         {
-            // Arrange
-            // Check if ip is in table 
-            // if it is selete it from it 
-
+            // Arrange:  Check if ip is in table 
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
+
+            // Act: Check that a non existing IP returns false.
             bool result = await UserManagementService.CheckIPLockAsync(username, maxLockTime).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
@@ -150,16 +170,14 @@ namespace TeamA.Exogredient.Tests
         public async Task UserManagementService_CreateUserAsync_CreateNonExistentUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
                                                        string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            
-            // Act 
-            // Create the user 
+            // Act: Create the user 
             bool result = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
-            // Assert that user creation was successful 
+            // Assert: that user creation was successful 
             Assert.IsTrue(result);
 
             // Read that user. and assert that it has all the correct columns 
-
+            bool readResult = await UserManagementService.
 
             // Cleanup 
             // Delete user
