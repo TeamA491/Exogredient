@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
@@ -9,7 +10,7 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> SendAsync(string ftpURL, string ftpFolder, string sourceDirectory, string userName, string password)
         {
             // File to send on local machine.
-            string archiveFilePath = sourceDirectory + ".7z";
+            string archiveFilePath = sourceDirectory + Constants.SevenZipFileExtension;
 
             if (!File.Exists(archiveFilePath))
             {
