@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -22,7 +23,7 @@ namespace TeamA.Exogredient.Tests
         public async Task FlatFileLoggingService_LogToFlatFileAsync_InvalidTimestampRejected(string timestamp, string operation, string identifier,
                                                                                              string ipAddress, string errorType)
         {
-            bool result = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+            bool result = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
             Assert.IsFalse(result);
         }
@@ -44,7 +45,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = Directory.Exists(_logDirectory);
 
@@ -72,7 +73,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = File.Exists(_logDirectory + @"\20191125.CSV");
 
@@ -101,7 +102,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = false;
                 bool lineRead = false;

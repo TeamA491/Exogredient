@@ -61,15 +61,9 @@ namespace TeamA.Exogredient.Services
         }
 
         // Change To Epoch Time
-        public static bool CurrentTimePastDatePlusTimespan(string date, TimeSpan span)
+        public static bool CurrentTimePastDatePlusTimespan(TimeSpan span, int lockedHour, int lockedMinute,
+                                                           int lockedSecond, int lockedMonth, int lockedDay, int lockedYear)
         {
-            int lockedHour = Int32.Parse(date.Substring(0, 2));
-            int lockedMinute = Int32.Parse(date.Substring(3, 2));
-            int lockedSecond = Int32.Parse(date.Substring(6, 2));
-            int lockedMonth = Int32.Parse(date.Substring(9, 2));
-            int lockedDay = Int32.Parse(date.Substring(12, 2));
-            int lockedYear = Int32.Parse(date.Substring(15, 4));
-
             int inputHours = span.Hours;
             int inputMinutes = span.Minutes;
             int inputSeconds = span.Seconds;
@@ -81,27 +75,30 @@ namespace TeamA.Exogredient.Services
             int resultDay = lockedDay;
             int resultYear = lockedYear;
 
-            // Get result date time
-
+            
+            // Hours
             for (int i = 0; i < inputHours; i++)
             {
                 resultHour++;
 
-                if (resultHour > 23)
+                if (resultHour >= Constants.HoursInADay)
                 {
-                    resultHour = 00;
+                    resultHour = Constants.HourStartValue;
 
                     resultDay++;
                 }
 
                 if (resultDay > Constants.MonthDays[resultMonth])
                 {
-                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    if (resultMonth == Constants.FebruaryMonthValue &&
+                        resultYear % Constants.LeapYearOccurrenceYears == 0 &&
+                        resultDay == Constants.LeapDayValue)
                     {
-                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        if (resultYear % Constants.LeapYearUnoccurenceYears == 0 &&
+                            resultYear % Constants.LeapYearReoccurenceYears != 0)
                         {
                             // Not a leap year.
-                            resultDay = 01;
+                            resultDay = Constants.DayStartValue;
 
                             resultMonth++;
                         }
@@ -112,46 +109,50 @@ namespace TeamA.Exogredient.Services
                     }
                     else
                     {
-                        resultDay = 01;
+                        resultDay = Constants.DayStartValue;
 
                         resultMonth++;
                     }
                 }
 
-                if (resultMonth > 12)
+                if (resultMonth > Constants.MonthsInAYear)
                 {
-                    resultMonth = 01;
+                    resultMonth = Constants.MonthStartValue;
 
                     resultYear++;
                 }
             }
 
+            // Minutes
             for (int i = 0; i < inputMinutes; i++)
             {
                 resultMinute++;
 
-                if (resultMinute > 59)
+                if (resultMinute >= Constants.MinutesInAnHour)
                 {
-                    resultMinute = 00;
+                    resultMinute = Constants.MinuteStartValue;
 
                     resultHour++;
                 }
 
-                if (resultHour > 23)
+                if (resultHour >= Constants.HoursInADay)
                 {
-                    resultHour = 00;
+                    resultHour = Constants.HourStartValue;
 
                     resultDay++;
                 }
 
                 if (resultDay > Constants.MonthDays[resultMonth])
                 {
-                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    if (resultMonth == Constants.FebruaryMonthValue &&
+                        resultYear % Constants.LeapYearOccurrenceYears == 0 &&
+                        resultDay == Constants.LeapDayValue)
                     {
-                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        if (resultYear % Constants.LeapYearUnoccurenceYears == 0 &&
+                            resultYear % Constants.LeapYearReoccurenceYears != 0)
                         {
                             // Not a leap year.
-                            resultDay = 01;
+                            resultDay = Constants.DayStartValue;
 
                             resultMonth++;
                         }
@@ -162,53 +163,57 @@ namespace TeamA.Exogredient.Services
                     }
                     else
                     {
-                        resultDay = 01;
+                        resultDay = Constants.DayStartValue;
 
                         resultMonth++;
                     }
                 }
 
-                if (resultMonth > 12)
+                if (resultMonth > Constants.MonthsInAYear)
                 {
-                    resultMonth = 01;
+                    resultMonth = Constants.MonthStartValue;
 
                     resultYear++;
                 }
             }
 
+            // Seconds
             for (int i = 0; i < inputSeconds; i++)
             {
                 resultSecond++;
 
-                if (resultSecond > 59)
+                if (resultSecond >= Constants.SecondsInAMinute)
                 {
-                    resultSecond = 00;
+                    resultSecond = Constants.SecondsStartValue;
 
                     resultMinute++;
                 }
 
-                if (resultMinute > 59)
+                if (resultMinute >= Constants.MinutesInAnHour)
                 {
-                    resultMinute = 00;
+                    resultMinute = Constants.MinuteStartValue;
 
                     resultHour++;
                 }
 
-                if (resultHour > 23)
+                if (resultHour >= Constants.HoursInADay)
                 {
-                    resultHour = 00;
+                    resultHour = Constants.HourStartValue;
 
                     resultDay++;
                 }
 
                 if (resultDay > Constants.MonthDays[resultMonth])
                 {
-                    if (resultMonth == 2 && resultYear % 4 == 0 && resultDay == 29)
+                    if (resultMonth == Constants.FebruaryMonthValue &&
+                        resultYear % Constants.LeapYearOccurrenceYears == 0 &&
+                        resultDay == Constants.LeapDayValue)
                     {
-                        if (resultYear % 100 == 0 && resultYear % 400 != 0)
+                        if (resultYear % Constants.LeapYearUnoccurenceYears == 0 &&
+                            resultYear % Constants.LeapYearReoccurenceYears != 0)
                         {
                             // Not a leap year.
-                            resultDay = 01;
+                            resultDay = Constants.DayStartValue;
 
                             resultMonth++;
                         }
@@ -219,15 +224,15 @@ namespace TeamA.Exogredient.Services
                     }
                     else
                     {
-                        resultDay = 01;
+                        resultDay = Constants.DayStartValue;
 
                         resultMonth++;
                     }
                 }
 
-                if (resultMonth > 12)
+                if (resultMonth > Constants.MonthsInAYear)
                 {
-                    resultMonth = 01;
+                    resultMonth = Constants.MonthStartValue;
 
                     resultYear++;
                 }
@@ -390,7 +395,7 @@ namespace TeamA.Exogredient.Services
 
             string transposedUsername = username;
 
-            if (domain.Equals("gmail.com"))
+            if (domain.Equals(Constants.GmailHost))
             {
                 // Remove dots.
                 transposedUsername = transposedUsername.Replace(".", "");
@@ -432,7 +437,7 @@ namespace TeamA.Exogredient.Services
         {
             string lineInput = "";
 
-            using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
+            using (StreamReader reader = new StreamReader(Constants.WordsTxtPath))
             {
                 while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                 {
@@ -530,7 +535,7 @@ namespace TeamA.Exogredient.Services
 
                             if (number)
                             {
-                                if (nextPosition == 10)
+                                if (nextPosition > Constants.MaxDigitValue)
                                 {
                                     nextPosition = 1;
                                 }
@@ -547,7 +552,7 @@ namespace TeamA.Exogredient.Services
                             }
                             else if (upperLetter)
                             {
-                                if (nextPosition == 27)
+                                if (nextPosition > Constants.MaxAlphaValue)
                                 {
                                     nextPosition = 1;
                                 }
@@ -564,7 +569,7 @@ namespace TeamA.Exogredient.Services
                             }
                             else if (lowerLetter)
                             {
-                                if (nextPosition == 27)
+                                if (nextPosition > Constants.MaxAlphaValue)
                                 {
                                     nextPosition = 1;
                                 }
@@ -610,7 +615,7 @@ namespace TeamA.Exogredient.Services
                             {
                                 if (nextPosition == 0)
                                 {
-                                    nextPosition = 9;
+                                    nextPosition = Constants.MaxDigitValue;
                                 }
 
                                 if (Constants.Numbers[nextPosition] == character)
@@ -627,7 +632,7 @@ namespace TeamA.Exogredient.Services
                             {
                                 if (nextPosition == 0)
                                 {
-                                    nextPosition = 26;
+                                    nextPosition = Constants.MaxAlphaValue;
                                 }
 
                                 if (Constants.PositionsToLettersUpper[nextPosition] == character)
@@ -644,7 +649,7 @@ namespace TeamA.Exogredient.Services
                             {
                                 if (nextPosition == 0)
                                 {
-                                    nextPosition = 26;
+                                    nextPosition = Constants.MaxAlphaValue;
                                 }
 
                                 if (Constants.PositionsToLettersLower[nextPosition] == character)
@@ -680,14 +685,14 @@ namespace TeamA.Exogredient.Services
                                     int nextPositionIncrease = previousPosition + 1;
                                     int nextPositionDecrease = previousPosition - 1;
 
-                                    if (nextPositionIncrease == 27)
+                                    if (nextPositionIncrease > Constants.MaxAlphaValue)
                                     {
                                         nextPositionIncrease = 1;
                                     }
 
                                     if (nextPositionDecrease == 0)
                                     {
-                                        nextPositionDecrease = 26;
+                                        nextPositionDecrease = Constants.MaxAlphaValue;
                                     }
 
                                     if (Constants.PositionsToLettersLower[nextPositionIncrease] == character)
@@ -714,14 +719,14 @@ namespace TeamA.Exogredient.Services
                                     int nextPositionIncrease = previousPosition + 1;
                                     int nextPositionDecrease = previousPosition - 1;
 
-                                    if (nextPositionIncrease == 27)
+                                    if (nextPositionIncrease > Constants.MaxAlphaValue)
                                     {
                                         nextPositionIncrease = 1;
                                     }
 
                                     if (nextPositionDecrease == 0)
                                     {
-                                        nextPositionDecrease = 26;
+                                        nextPositionDecrease = Constants.MaxAlphaValue;
                                     }
 
                                     if (Constants.PositionsToLettersUpper[nextPositionIncrease] == character)
@@ -748,14 +753,14 @@ namespace TeamA.Exogredient.Services
                                     int nextPositionIncrease = previousPosition + 1;
                                     int nextPositionDecrease = previousPosition - 1;
 
-                                    if (nextPositionIncrease == 10)
+                                    if (nextPositionIncrease > Constants.MaxDigitValue)
                                     {
                                         nextPositionIncrease = 1;
                                     }
 
                                     if (nextPositionDecrease < 1)
                                     {
-                                        nextPositionDecrease = 9;
+                                        nextPositionDecrease = Constants.MaxDigitValue;
                                     }
 
                                     if (Constants.Numbers[nextPositionIncrease] == character)

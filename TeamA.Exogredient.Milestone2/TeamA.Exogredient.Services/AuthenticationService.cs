@@ -14,13 +14,6 @@ namespace TeamA.Exogredient.Services
 {
     public static class AuthenticationService
     {
-        private static readonly UserDAO _userDAO;
-
-        static AuthenticationService()
-        {
-            _userDAO = new UserDAO();
-        }
-
         public static async Task<bool> SendCallVerificationAsync(string username, string phoneNumber)
         {
             string accountSID = Constants.TwilioAccountSID;
@@ -30,7 +23,7 @@ namespace TeamA.Exogredient.Services
 
             await VerificationResource.CreateAsync(
                 to: $"+1{phoneNumber}",
-                channel: "call",
+                channel: Constants.TwilioCallChannel,
                 pathServiceSid: Constants.TwilioPathServiceSID
             ).ConfigureAwait(false);
 
@@ -72,10 +65,11 @@ namespace TeamA.Exogredient.Services
             message.From.Add(new MailboxAddress(Constants.SystemEmailAddress));
             message.To.Add(new MailboxAddress($"{emailAddress}"));
 
-            message.Subject = "Exogredient Account Verification";
+            message.Subject = Constants.EmailVerificationSubject;
 
             Random generator = new Random();
-            string emailCode = generator.Next(100000, 1000000).ToString();
+            string emailCode = generator.Next((int)Math.Pow(10, Constants.EmailCodeLength),
+                                              (int)Math.Pow(10, Constants.EmailCodeLength + 1)).ToString();
             long emailCodeTimestamp = UtilityService.CurrentUnixTime();
 
             await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
@@ -98,7 +92,7 @@ namespace TeamA.Exogredient.Services
                 ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
             };
 
-            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.ConnectAsync(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
             await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword).ConfigureAwait(false);
             await client.SendAsync(message).ConfigureAwait(false);
             await client.DisconnectAsync(true).ConfigureAwait(false);

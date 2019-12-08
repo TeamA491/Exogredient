@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -343,7 +344,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act
             // Send message to system admin 
-            bool result = await UserManagementService.NotifySystemAdminAsync(body).ConfigureAwait(false);
+            bool result = await UserManagementService.NotifySystemAdminAsync(body, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
 
             // Assert
             // TODO: how do we ensure that the system admin got the email?

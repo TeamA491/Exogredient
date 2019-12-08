@@ -60,7 +60,7 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
-            return (user.Disabled == 1);
+            return (user.Disabled == Constants.DisabledStatus);
         }
 
         /// <summary>
@@ -128,9 +128,11 @@ namespace TeamA.Exogredient.Services
                 return false;
             }
 
-            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : 0;
+            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
-            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt, tempTimestamp, "", 0, 0, 0, 0, 0);
+            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password,
+                                               disabled, userType, salt, tempTimestamp, Constants.NoValueString, Constants.NoValueLong,
+                                               Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
             return await _userDAO.CreateAsync(record).ConfigureAwait(false);
         }
@@ -162,7 +164,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> MakeTempPermAsync(string username)
         {
-            UserRecord record = new UserRecord(username, tempTimestamp: 0);
+            UserRecord record = new UserRecord(username, tempTimestamp: Constants.NoValueLong);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -176,7 +178,8 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> StoreEmailCodeAsync(string username, string emailCode, long emailCodeTimestamp)
         {
-            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp, emailCodeFailures: 0);
+            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp,
+                                               emailCodeFailures: Constants.NoValueInt);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -188,7 +191,9 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> RemoveEmailCodeAsync(string username)
         {
-            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0, emailCodeFailures: 0);
+            UserRecord record = new UserRecord(username, emailCode: Constants.NoValueString,
+                                               emailCodeTimestamp: Constants.NoValueLong,
+                                               emailCodeFailures: Constants.NoValueInt);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -207,13 +212,13 @@ namespace TeamA.Exogredient.Services
             {
                 return false;
             }
-            if (user.Disabled == 1)
+            if (user.Disabled == Constants.DisabledStatus)
             {
                 //throw new Exception("The username is already disabled!");
                 return false;
             }
 
-            UserRecord disabledUser = new UserRecord(username, disabled: 1);
+            UserRecord disabledUser = new UserRecord(username, disabled: Constants.DisabledStatus);
             await _userDAO.UpdateAsync(disabledUser).ConfigureAwait(false);
 
             return true;
@@ -232,13 +237,13 @@ namespace TeamA.Exogredient.Services
             {
                 return false;
             }
-            if (user.Disabled == 0)
+            if (user.Disabled == Constants.EnabledStatus)
             {
                 //throw new Exception("The username is already enabled!");
                 return false;
             }
             // Enable the username.
-            UserRecord disabledUser = new UserRecord(username, disabled: 0);
+            UserRecord disabledUser = new UserRecord(username, disabled: Constants.EnabledStatus);
             await _userDAO.UpdateAsync(disabledUser).ConfigureAwait(false);
 
             return true;
@@ -258,13 +263,13 @@ namespace TeamA.Exogredient.Services
             if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
             {
                 // TODO Create Custom Exception: For System
-                throw new Exception("The username doesn't exsit.");
+                throw new Exception(Constants.UsernameDNE);
             }
             // Check if the username is disabled.
-            if (user.Disabled == 1)
+            if (user.Disabled == Constants.DisabledStatus)
             {
                 // TODO Create Custom Exception: For User
-                throw new Exception("This username is locked! To enable, contact the admin");
+                throw new Exception(Constants.UserLocked);
             }
 
             UserRecord newPasswordUser = new UserRecord(username, password: digest, salt: saltString);
@@ -277,20 +282,19 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task<bool> NotifySystemAdminAsync(string body)
+        public static async Task<bool> NotifySystemAdminAsync(string body, string sysAdminEmailAddress)
         {
-            string title = DateTime.UtcNow.ToString("MM-dd-yyyy");
+            string title = DateTime.UtcNow.ToString(Constants.NotifySysAdminSubjectFormatString);
 
             var message = new MimeMessage();
             var bodyBuilder = new BodyBuilder();
 
             message.From.Add(new MailboxAddress($"{Constants.SystemEmailAddress}"));
-            message.To.Add(new MailboxAddress($"{Constants.SystemAdminEmailAddress}"));
+            message.To.Add(new MailboxAddress($"{sysAdminEmailAddress}"));
 
             message.Subject = title;
 
             Random generator = new Random();
-            string emailCode = generator.Next(100000, 1000000).ToString();
 
             bodyBuilder.HtmlBody = body;
 
@@ -301,7 +305,7 @@ namespace TeamA.Exogredient.Services
                 ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
             };
 
-            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.ConnectAsync(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
             await client.AuthenticateAsync($"{Constants.SystemEmailAddress}", $"{Constants.SystemEmailPassword}").ConfigureAwait(false);
             await client.SendAsync(message).ConfigureAwait(false);
             await client.DisconnectAsync(true).ConfigureAwait(false);
