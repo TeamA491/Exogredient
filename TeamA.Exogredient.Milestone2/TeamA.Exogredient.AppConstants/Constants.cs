@@ -297,6 +297,9 @@ namespace TeamA.Exogredient.AppConstants
 
         // ARCHIVING 
         public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+        public const string ArchivePrefixArgument = "a -t7z ";
+        public const string ArchivePostfixArgument = " -sdel";
+        public const string SevenZipFileExtension = ".7z";
 
         // STRING UTILITY HELPER DATA STRUCTURES
         public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
