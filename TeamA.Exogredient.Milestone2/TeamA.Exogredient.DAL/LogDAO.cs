@@ -7,7 +7,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class DataStoreLoggingDAO : IMasterNOSQLDAO<string>
+    public class LogDAO : IMasterNOSQLDAO<string>
     {
         public async Task<bool> CreateAsync(INOSQLRecord record, string yyyymmdd)
         {

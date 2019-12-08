@@ -8,11 +8,11 @@ namespace TeamA.Exogredient.Services
 {
     public static class DataStoreLoggingService
     {
-        private static readonly DataStoreLoggingDAO _dsLoggingDAO;
+        private static readonly LogDAO _dsLoggingDAO;
 
         static DataStoreLoggingService()
         {
-            _dsLoggingDAO = new DataStoreLoggingDAO();
+            _dsLoggingDAO = new LogDAO();
         }
 
         public static async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,

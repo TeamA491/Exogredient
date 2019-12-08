@@ -395,5 +395,7 @@ namespace TeamA.Exogredient.AppConstants
         // EXCEPTION MESSAGES -- User Management
         public const string UsernameDNE = "The username doesn't exsit.";
         public const string UserLocked = "This user is locked!";
+
+        // EXCEPTION MESSAGES -- LoggingDAO
     }
 }

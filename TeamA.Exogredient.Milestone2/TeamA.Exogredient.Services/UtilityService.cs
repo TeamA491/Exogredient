@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.Services
 {
     public static class UtilityService
     {
-        private static readonly CorruptedPasswordsDAO _corruptedPasswordsDAO;
+        private static readonly CorruptedPasswordDAO _corruptedPasswordsDAO;
 
         /// <summary>
         /// Constructor initializes the CorruptedPasswordsDAO object to provide
@@ -19,7 +19,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         static UtilityService()
         {
-            _corruptedPasswordsDAO = new CorruptedPasswordsDAO();
+            _corruptedPasswordsDAO = new CorruptedPasswordDAO();
         }
 
         public static long CurrentUnixTime()
