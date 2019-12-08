@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Diagnostics;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
@@ -14,15 +15,15 @@ namespace TeamA.Exogredient.Services
             }
 
             // Set the name of the compressed target file 
-            string targetFile = targetDirectory + ".7z";
+            string targetFile = targetDirectory + Constants.SevenZipFileExtension;
 
             // Set up arguments needed to start a 7zip process 
             ProcessStartInfo sevenZipProcessInfo = new ProcessStartInfo
             {
-                FileName = sevenZipPath,
+                FileName = Constants.SevenZipPath,
 
                 // Pass arguments for 7zip command. Archive source directory to targetfile and delete files that were compressed from source directory
-                Arguments = "a -t7z " + targetFile + " " + sourceDirectory + " -sdel",
+                Arguments = Constants.ArchivePrefixArgument + targetFile + " " + sourceDirectory + Constants.ArchivePostfixArgument,
 
                 // Set window property of the process to Hidden so it runs in background. 
                 WindowStyle = ProcessWindowStyle.Hidden
