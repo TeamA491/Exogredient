@@ -27,11 +27,13 @@ namespace TeamA.Exogredient.Services
             return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         }
 
-        public static Result<T> CreateResult<T>(string message, T data)
+        public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred, int numExceptions)
         {
             Result<T> result = new Result<T>(message)
             {
-                Data = data
+                Data = data,
+                ExceptionOccurred = exceptionOccurred,
+                NumExceptions = numExceptions
             };
 
             return result;

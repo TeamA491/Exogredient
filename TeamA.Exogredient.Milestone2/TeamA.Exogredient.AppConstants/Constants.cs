@@ -114,6 +114,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int NoValueInt = 0;
         public const string NoValueString = "";
 
+        public const int MaximumOperationRetries = 3;
+
         public const int LoggingRetriesAmount = 3;
         public const int MaxLogInAttempts = 18;
         public const int MaxRegistrationAttempts = 3;

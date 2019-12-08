@@ -9,6 +9,7 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.Managers;
 using System.Text;
 
 namespace TeamA.Exogredient.TestController
@@ -26,6 +27,15 @@ namespace TeamA.Exogredient.TestController
             byte[] encryptedBytes = SecurityService.EncryptRSA(passBytes, pubBytes);
 
             byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
+
+
+
+            //var task = Task.Run(() => VerifyPhoneCodeManager.VerifyPhoneCodeAsync("eli", "0432", "ip", "9499815506", false));
+
+            //if (task.Wait(TimeSpan.FromSeconds(30)))
+            //    Console.WriteLine(task.Result);
+            //else
+            //    Console.WriteLine("Timed out");
 
             //Console.WriteLine(Encoding.UTF8.GetString(res));
 
