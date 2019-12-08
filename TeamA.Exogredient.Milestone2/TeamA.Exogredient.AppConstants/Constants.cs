@@ -295,6 +295,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
 
+        // ARCHIVING 
+        public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+
         // STRING UTILITY HELPER DATA STRUCTURES
         public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
         {
