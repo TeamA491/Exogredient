@@ -270,7 +270,7 @@ namespace TeamA.Exogredient.Services
                 // Create a string of two characters at i*2 and i*2+1 index of hexString
                 string temp = "" + charArray[i * 2] + charArray[i * 2 + 1];
                 // Convert the hex string to a byte and store at i index of the byte array
-                bytes[i] = Convert.ToByte(temp, 16);
+                bytes[i] = Convert.ToByte(temp, Constants.HexBaseValue);
             }
 
             return bytes;

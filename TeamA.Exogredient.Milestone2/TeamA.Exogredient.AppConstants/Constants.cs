@@ -64,6 +64,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int DefaultHashIterations = 10000;
         public const int DefaultHashLength = 32;
 
+        public const int ByteLength = 8;
+
         // USER MANAGEMENT
         public const string NotifySysAdminSubjectFormatString = "MM-dd-yyyy";
 
@@ -86,6 +88,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int MonthStartValue = 1;
 
         public const string GmailHost = "gmail.com";
+
+        public const int HexBaseValue = 16;
 
         public const string WordsTxtPath = @"..\..\..\..\words.txt";
 
@@ -396,6 +400,18 @@ namespace TeamA.Exogredient.AppConstants
         public const string UsernameDNE = "The username doesn't exsit.";
         public const string UserLocked = "This user is locked!";
 
-        // EXCEPTION MESSAGES -- LoggingDAO
+        // EXCEPTION MESSAGES -- IPAddressDAO
+        public const string IPCreateInvalidArgument = "IPAddressDAO.CreateAsync record argument must be of type IPAddressRecord";
+        public const string IPRecordNoNull = "All columns in IPRecord must be not null.";
+        public const string IPUpdateInvalidArgument = "IPAddressDAO.UpdateAsync record argument must be of type IPAddressRecord";
+
+        // EXCEPTION MESSAGES -- LogDAO
+        public const string LogCreateInvalidArgument = "LogDAO.CreateAsync record argument must be of type LogRecord";
+        public const string LogFindInvalidArgument = "LogDAO.FindIdFieldAsync record argument must be of type LogRecord";
+
+        // EXCEPTION MESSAGES -- UserDAO
+        public const string UserCreateInvalidArgument = "UserDAO.CreateAsync record argument must be of type UserRecord";
+        public const string UserRecordNoNull = "All columns in UserRecord must be not null.";
+        public const string UserUpdateInvalidArgument = "UserDAO.UpdateAsync record argument must be of type UserRecord";
     }
 }

@@ -18,7 +18,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("UserDAO.CreateAsync record argument must be of type UserRecord");
+                throw new ArgumentException(Constants.UserCreateInvalidArgument);
             }
 
             UserRecord userRecord = (UserRecord)record;
@@ -36,7 +36,7 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (pair.Value == null)
                         {
-                            throw new NoNullAllowedException("All columns in UserRecord must be not null.");
+                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
                         }
                     }
 
@@ -44,7 +44,7 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (pair.Value.Equals(-1))
                         {
-                            throw new NoNullAllowedException("All columns in UserRecord must be not null.");
+                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
                         }
                     }
 
@@ -146,7 +146,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("UserDAO.UpdateAsync record argument must be of type UserRecord");
+                throw new ArgumentException(Constants.UserUpdateInvalidArgument);
             }
 
             UserRecord userRecord = (UserRecord)record;

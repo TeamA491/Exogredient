@@ -17,7 +17,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("DataStoreLoggingDAO.CreateAsync record argument must be of type LogRecord");
+                throw new ArgumentException(Constants.LogCreateInvalidArgument);
             }
 
             LogRecord logRecord = (LogRecord)record;
@@ -70,7 +70,6 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        // TODO: Can't find id by identifier and timestamp... need operation
         public async Task<string> FindIdFieldAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
@@ -79,7 +78,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("DataStoreLoggingDAO.FindIdFieldAsync record argument must be of type LogRecord");
+                throw new ArgumentException(Constants.LogFindInvalidArgument);
             }
 
             LogRecord logRecord = (LogRecord)record;
@@ -99,9 +98,7 @@ namespace TeamA.Exogredient.DAL
 
                 while (result.Next())
                 {
-                    // TODO: flesh out columns. make columns into fields.
                     resultstring = (string)result.Current[Constants.LogsIdField];
-
                 }
 
                 return resultstring;

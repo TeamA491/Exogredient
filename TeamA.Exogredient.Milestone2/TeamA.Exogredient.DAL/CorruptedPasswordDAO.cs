@@ -26,7 +26,6 @@ namespace TeamA.Exogredient.DAL
                     string temp = (string)result.Current[Constants.CorruptedPassPasswordField];
 
                     resultList.Add(temp);
-
                 }
 
                 return resultList;

@@ -18,7 +18,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("IPAddressDAO.CreateAsync record argument must be of type IPAddressRecord");
+                throw new ArgumentException(Constants.IPCreateInvalidArgument);
             }
 
             IPAddressRecord ipRecord = (IPAddressRecord)record;
@@ -36,14 +36,14 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (pair.Value == null)
                         {
-                            throw new NoNullAllowedException("All columns in IPRecord must be not null.");
+                            throw new NoNullAllowedException(Constants.IPRecordNoNull);
                         }
                     }
                     if (pair.Value is int || pair.Value is long)
                     {
                         if (pair.Value.Equals(-1))
                         {
-                            throw new NoNullAllowedException("All columns in IPRecord must be not null.");
+                            throw new NoNullAllowedException(Constants.IPRecordNoNull);
                         }
                     }
                     sqlString += $"{pair.Key},";
@@ -137,7 +137,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("IPAddressDAO.UpdateAsync record argument must be of type IPAddressRecord");
+                throw new ArgumentException(Constants.IPUpdateInvalidArgument);
             }
 
             IPAddressRecord ipRecord = (IPAddressRecord)record;
