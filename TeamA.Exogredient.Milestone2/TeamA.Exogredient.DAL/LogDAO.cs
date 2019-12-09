@@ -59,6 +59,21 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
+                DocResult result = await collection.Find($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync().ConfigureAwait(false);
+
+                // Prepare string to be returned
+                string resultstring = "";
+
+                while (result.Next())
+                {
+                    resultstring = (string)result.Current[Constants.LogsIdField];
+                }
+
+                if (resultstring.Equals(""))
+                {
+                    throw new ArgumentException(Constants.LogDeleteDNE);
+                }
+
                 await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync().ConfigureAwait(false);
 
                 return true;
@@ -94,6 +109,11 @@ namespace TeamA.Exogredient.DAL
                 while (result.Next())
                 {
                     resultstring = (string)result.Current[Constants.LogsIdField];
+                }
+
+                if (resultstring.Equals(""))
+                {
+                    throw new ArgumentException(Constants.LogFindDNE);
                 }
 
                 return resultstring;

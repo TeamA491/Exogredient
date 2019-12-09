@@ -28,6 +28,9 @@ namespace TeamA.Exogredient.TestController
 
             byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
 
+            LogRecord record = new LogRecord("fail", "fail", "fail", "fail", "fail");
+            LogDAO ldao = new LogDAO();
+
             //var task = Task.Run(() => VerifyPhoneCodeManager.VerifyPhoneCodeAsync("eli", "0432", "ip", "9499815506", false));
 
             //if (task.Wait(TimeSpan.FromSeconds(30)))

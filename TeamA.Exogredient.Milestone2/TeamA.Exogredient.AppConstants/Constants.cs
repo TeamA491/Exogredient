@@ -421,6 +421,8 @@ namespace TeamA.Exogredient.AppConstants
         // EXCEPTION MESSAGES -- LogDAO
         public const string LogCreateInvalidArgument = "LogDAO.CreateAsync record argument must be of type LogRecord";
         public const string LogFindInvalidArgument = "LogDAO.FindIdFieldAsync record argument must be of type LogRecord";
+        public const string LogFindDNE = "LogDAO.FindIdFieldAsync record did not exist in the collection";
+        public const string LogDeleteDNE = "LogDAO.DeleteAsync uniqueId did not exist in the collection";
 
         // EXCEPTION MESSAGES -- UserDAO
         public const string UserCreateInvalidArgument = "UserDAO.CreateAsync record argument must be of type UserRecord";
