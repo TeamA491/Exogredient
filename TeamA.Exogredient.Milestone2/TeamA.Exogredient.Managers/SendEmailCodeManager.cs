@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.Managers
 {
     public class SendEmailCodeManager
     {
-        public static async Task<Result<bool>> SendPhoneCodeAsync(string username, string emailAddress, string ipAddress, int currentNumExceptions)
+        public static async Task<Result<bool>> SendEmailCodeAsync(string username, string emailAddress, string ipAddress, int currentNumExceptions)
         {
             try
             {

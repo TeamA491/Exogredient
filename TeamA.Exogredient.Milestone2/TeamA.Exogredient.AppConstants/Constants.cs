@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace TeamA.Exogredient.AppConstants
 {
+    /// <summary>
+    /// The constants, reaonly values, and other literal values used throughout our system.
+    /// </summary>
     public static class Constants
     {
         // ENVIRONMENT VARIABLES
