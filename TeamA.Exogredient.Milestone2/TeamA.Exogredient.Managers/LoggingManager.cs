@@ -26,6 +26,7 @@ namespace TeamA.Exogredient.Managers
                 {
                     dsLoggingResult = await DataStoreLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
                 }
+                count++;
             }
 
             if (ffLoggingResult && dsLoggingResult)

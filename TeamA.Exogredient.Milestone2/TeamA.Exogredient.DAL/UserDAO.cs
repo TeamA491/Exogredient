@@ -92,6 +92,11 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (string username in idsOfRows)
                 {
+                    if (!await CheckUserExistenceAsync(username).ConfigureAwait(false))
+                    {
+                        throw new ArgumentException(Constants.UserDeleteDNE);
+                    }
+
                     string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
 
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -107,6 +112,11 @@ namespace TeamA.Exogredient.DAL
 
         public async Task<IDataObject> ReadByIdAsync(string id)
         {
+            if (!await CheckUserExistenceAsync(id).ConfigureAwait(false))
+            {
+                throw new ArgumentException(Constants.UserReadDNE);
+            }
+
             // TODO: check if user exists first
             UserObject result;
 
@@ -163,6 +173,13 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
+                    if (pair.Key == Constants.UserDAOusernameColumn)
+                    {
+                        if (!await CheckUserExistenceAsync((string)pair.Value).ConfigureAwait(false))
+                        {
+                            throw new ArgumentException(Constants.UserUpdateDNE);
+                        }
+                    }
                     if (pair.Key != Constants.UserDAOusernameColumn)
                     {
                         if (pair.Value is int || pair.Value is long)

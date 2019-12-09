@@ -38,9 +38,6 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
-                // HACK: hardcoded here for now
-                // Created anon type to represent json in document store.
-
                 string document = $@"{{""{Constants.LogsTimestampField}"": ""{logRecord.Timestamp}"", " +
                                   $@"""{Constants.LogsOperationField}"": ""{logRecord.Operation}"", " +
                                   $@"""{Constants.LogsIdentifierField}"": ""{logRecord.Identifier}"", " +

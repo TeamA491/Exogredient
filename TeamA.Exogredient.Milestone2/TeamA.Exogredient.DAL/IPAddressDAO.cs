@@ -88,6 +88,11 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (string ipAddress in idsOfRows)
                 {
+                    if (!await CheckIPExistenceAsync(ipAddress).ConfigureAwait(false))
+                    {
+                        throw new ArgumentException(Constants.IPDeleteDNE);
+                    }
+
                     string sqlString = $"DELETE {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS;";
 
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -103,6 +108,11 @@ namespace TeamA.Exogredient.DAL
 
         public async Task<IDataObject> ReadByIdAsync(string id)
         {
+            if(!await CheckIPExistenceAsync(id).ConfigureAwait(false))
+            {
+                throw new ArgumentException(Constants.IPReadDNE);
+            }
+
             IPAddressObject result;
 
             using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
@@ -154,6 +164,14 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
+                    if (pair.Key == Constants.IPAddressDAOIPColumn)
+                    {
+                        if (!await CheckIPExistenceAsync((string)pair.Value).ConfigureAwait(false))
+                        {
+                            throw new ArgumentException(Constants.IPUpdateDNE);
+                        }
+                    }
+
                     if (pair.Key != Constants.IPAddressDAOIPColumn)
                     {
                         if (pair.Value is int || pair.Value is long)

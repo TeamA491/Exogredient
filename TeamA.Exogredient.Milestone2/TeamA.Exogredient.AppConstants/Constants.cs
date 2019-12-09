@@ -414,6 +414,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string IPCreateInvalidArgument = "IPAddressDAO.CreateAsync record argument must be of type IPAddressRecord";
         public const string IPRecordNoNull = "All columns in IPRecord must be not null.";
         public const string IPUpdateInvalidArgument = "IPAddressDAO.UpdateAsync record argument must be of type IPAddressRecord";
+        public const string IPDeleteDNE = "IPAddressDAO.DeleteByIdsAsync ip did not exist";
+        public const string IPReadDNE = "IPAddressDAO.ReadByIdAsync ip did not exist";
+        public const string IPUpdateDNE = "IPAddressDAO.UpdateAsync ip did not exist";
 
         // EXCEPTION MESSAGES -- LogDAO
         public const string LogCreateInvalidArgument = "LogDAO.CreateAsync record argument must be of type LogRecord";
@@ -423,5 +426,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserCreateInvalidArgument = "UserDAO.CreateAsync record argument must be of type UserRecord";
         public const string UserRecordNoNull = "All columns in UserRecord must be not null.";
         public const string UserUpdateInvalidArgument = "UserDAO.UpdateAsync record argument must be of type UserRecord";
+        public const string UserDeleteDNE = "UserDAO.DeleteByIdsAsync username did not exist";
+        public const string UserReadDNE = "UserDAO.ReadByIdAsync username did not exist";
+        public const string UserUpdateDNE = "UserDAO.UpdateAsync username did not exist";
+
     }
 }

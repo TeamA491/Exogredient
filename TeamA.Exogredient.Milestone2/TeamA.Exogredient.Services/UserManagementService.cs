@@ -109,12 +109,6 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName, string email,
                                                        string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // CHANGE: should we check user existence here
-            if(!await CheckUserExistenceAsync(username).ConfigureAwait(false))
-            {
-                return false;
-            }
-
             long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
             UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password,
@@ -189,19 +183,13 @@ namespace TeamA.Exogredient.Services
         /// Disable a user from login.
         /// </summary>
         /// <param name="username">Username of the user to disable.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
+        /// <returns>Returns true if the user was originally enabled, false otherwise.</returns>
         public static async Task<bool> DisableUserAsync(string username)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
-            // If the username doesn't exist, throw an exception.
-            if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
-            {
-                return false;
-            }
             if (user.Disabled == Constants.DisabledStatus)
             {
-                //throw new Exception("The username is already disabled!");
                 return false;
             }
 
@@ -215,20 +203,16 @@ namespace TeamA.Exogredient.Services
         /// Enable a disabled user to login.
         /// </summary>
         /// <param name="username">Username of a user to enable.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
+        /// <returns>Returns true if the user was originally disabled, false otherwise.</returns>
         public static async Task<bool> EnableUserAsync(string username)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
-            if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
-            {
-                return false;
-            }
             if (user.Disabled == Constants.EnabledStatus)
             {
-                //throw new Exception("The username is already enabled!");
                 return false;
             }
+
             // Enable the username.
             UserRecord disabledUser = new UserRecord(username, disabled: Constants.EnabledStatus);
             await _userDAO.UpdateAsync(disabledUser).ConfigureAwait(false);
@@ -241,24 +225,9 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="username">Username of the user to update.</param>
         /// <param name="password">The password to hash.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
+        /// <returns>Returns true if the operation is successful and false if it failed.</returns>
         public static async Task ChangePasswordAsync(string username, string digest, string saltString)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
-
-            // Check if the username exists.
-            if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
-            {
-                // TODO Create Custom Exception: For System
-                throw new Exception(Constants.UsernameDNE);
-            }
-            // Check if the username is disabled.
-            if (user.Disabled == Constants.DisabledStatus)
-            {
-                // TODO Create Custom Exception: For User
-                throw new Exception(Constants.UserLocked);
-            }
-
             UserRecord newPasswordUser = new UserRecord(username, password: digest, salt: saltString);
             await _userDAO.UpdateAsync(newPasswordUser).ConfigureAwait(false);
         }
