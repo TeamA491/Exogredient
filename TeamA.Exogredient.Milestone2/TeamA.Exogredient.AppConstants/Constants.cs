@@ -143,6 +143,9 @@ namespace TeamA.Exogredient.AppConstants
             { Numeric, Numbers }
         };
 
+        public const int MaximumUserTypeLength = 11;
+        public const int IPAddressLength = 15;
+
         public const int MaximumFirstNameCharacters = 200;
         public const int MinimumFirstNameCharacters = 1;
         public const string FirstNameCharacterType = ANSNoAngle;

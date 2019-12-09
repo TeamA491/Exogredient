@@ -25,17 +25,17 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             connection.Open();
             string sqlString = @$"CREATE TABLE `{_schema}`.`{Constants.UserDAOtableName}` (" +
-                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR(200) NOT NULL," +
-                               $@"`{Constants.UserDAOfirstNameColumn}` VARCHAR(200) NOT NULL," +
-                               $@"`{Constants.UserDAOlastNameColumn}` VARCHAR(200) NOT NULL," +
-                               $@"`{Constants.UserDAOemailColumn}` VARCHAR(200) NOT NULL," +
-                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR(10) NOT NULL," +
-                               $@"`{Constants.UserDAOpasswordColumn}` VARCHAR(2000) NOT NULL," +
+                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({Constants.MaximumUsernameCharacters}) NOT NULL," +
+                               $@"`{Constants.UserDAOfirstNameColumn}` VARCHAR({Constants.MaximumFirstNameCharacters}) NOT NULL," +
+                               $@"`{Constants.UserDAOlastNameColumn}` VARCHAR({Constants.MaximumLastNameCharacters}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({Constants.MaximumEmailCharacters}) NOT NULL," +
+                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({Constants.PhoneNumberCharacterLength}) NOT NULL," +
+                               $@"`{Constants.UserDAOpasswordColumn}` VARCHAR({Constants.DefaultHashLength}) NOT NULL," +
                                $@"`{Constants.UserDAOdisabledColumn}` TINYINT(1) NOT NULL," +
-                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR(11) NOT NULL," +
-                               $@"`{Constants.UserDAOsaltColumn}` VARCHAR(200) NOT NULL," +
+                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({Constants.MaximumUserTypeLength}) NOT NULL," +
+                               $@"`{Constants.UserDAOsaltColumn}` VARCHAR({Constants.DefaultSaltLength}) NOT NULL," +
                                $@"`{Constants.UserDAOtempTimestampColumn}` BIGINT NOT NULL," +
-                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR(6) NOT NULL," +
+                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({Constants.EmailCodeLength}) NOT NULL," +
                                $@"`{Constants.UserDAOemailCodeTimestampColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.UserDAOloginFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.UserDAOlastLoginFailTimestampColumn}` BIGINT NOT NULL," +
@@ -56,7 +56,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             connection.Open();
             string sqlString = @$"CREATE TABLE `{_schema}`.`{Constants.IPAddressDAOtableName}` (" +
-                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR(15) NOT NULL," +
+                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({Constants.IPAddressLength}) NOT NULL," +
                                $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.IPAddressDAOregistrationFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.IPAddressDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
