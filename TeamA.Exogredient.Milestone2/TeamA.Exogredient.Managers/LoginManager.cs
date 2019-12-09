@@ -20,6 +20,10 @@ namespace TeamA.Exogredient.Managers
 
                 if (!await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementLoginFailuresAsync(username,
+                                                                            Constants.LogInTriesResetTime,
+                                                                            Constants.MaxLogInAttempts).ConfigureAwait(false);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameDNELogMessage).ConfigureAwait(false);

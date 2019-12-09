@@ -121,7 +121,10 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxRegistrationAttempts = 3;
         public const int MaxEmailCodeAttempts = 3;
         public const int MaxPhoneCodeAttempts = 3;
+        
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
+        public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);
+        public static readonly TimeSpan MaxIPLockTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan EmailCodeMaxValidTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan MaxTempUserTime = new TimeSpan(1, 0, 0);
 
@@ -182,6 +185,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string EmailExistsLogMessage = "Email taken";
         public const string PhoneNumberExistsLogMessage = "Phone number taken";
         public const string UniqueIdExistsRegistrationUserMessage = "Your email, username, or phone number was invalid... please try again";
+
+        public const string IPLockedLogMessage = "IP locked";
+        public const string IPLockedUserMessage = "You cannot currently register, please try again later";
 
         public const string InvalidScopeLogMessage = "User not in scope";
         public const string InvalidScopeUserMassage = "You must in California to register";

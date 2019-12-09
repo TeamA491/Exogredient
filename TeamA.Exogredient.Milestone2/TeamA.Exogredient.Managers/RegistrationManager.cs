@@ -23,9 +23,39 @@ namespace TeamA.Exogredient.Managers
             {
                 bool registrationSuccess = false;
 
+                if (!await UserManagementService.CheckIPExistenceAsync(ipAddress).ConfigureAwait(false))
+                {
+                    await UserManagementService.CreateIPAsync(ipAddress).ConfigureAwait(false);
+                }
+
+                IPAddressObject ip = await UserManagementService.GetIPAddressInfoAsync(ipAddress).ConfigureAwait(false);
+
+                long timeLocked = ip.TimestampLocked;
+                long maxSeconds = UtilityService.TimespanToSeconds(Constants.MaxIPLockTime);
+                long currentUnix = UtilityService.CurrentUnixTime();
+
+                // If the time has passed their max time before unlock, unlock them
+                if (timeLocked + maxSeconds < currentUnix && timeLocked != Constants.NoValueLong)
+                {
+                    await UserManagementService.UnlockIPAsync(ipAddress).ConfigureAwait(false);
+                }
+
+                if (await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false))
+                {
+                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.IPLockedLogMessage).ConfigureAwait(false);
+
+                    return UtilityService.CreateResult(Constants.IPLockedUserMessage, registrationSuccess, false, currentNumExceptions);
+                }
+
                 // Validate there answer to the scope question.
                 if (!scopeAnswer)
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidScopeLogMessage).ConfigureAwait(false);
@@ -37,6 +67,10 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckLength(firstName, Constants.MaximumFirstNameCharacters,
                                                 Constants.MinimumFirstNameCharacters))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidFirstNameLengthLogMessage).ConfigureAwait(false);
@@ -47,6 +81,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their first name.
                 if (!UtilityService.CheckCharacters(firstName, Constants.CharSetsData[Constants.FirstNameCharacterType]))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidFirstNameCharactersLogMessage).ConfigureAwait(false);
@@ -58,6 +96,10 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckLength(lastName, Constants.MaximumLastNameCharacters,
                                                 Constants.MinimumLastNameCharacters))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidLastNameLengthLogMessage).ConfigureAwait(false);
@@ -68,6 +110,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their last name.
                 if (!UtilityService.CheckCharacters(lastName, Constants.CharSetsData[Constants.LastNameCharacterType]))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidLastNameCharactersLogMessage).ConfigureAwait(false);
@@ -79,6 +125,10 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckLength(email, Constants.MaximumEmailCharacters,
                                                 Constants.MinimumEmailCharacters))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailLengthLogMessage).ConfigureAwait(false);
@@ -89,6 +139,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their email.
                 if (!UtilityService.CheckCharacters(email, Constants.CharSetsData[Constants.EmailCharacterType]))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailCharactersLogMessage).ConfigureAwait(false);
@@ -99,6 +153,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the format of their email.
                 if (!UtilityService.CheckEmailFormatValidity(email))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailFormatMessage).ConfigureAwait(false);
@@ -111,6 +169,10 @@ namespace TeamA.Exogredient.Managers
 
                 if (await UserManagementService.CheckEmailExistenceAsync(canonicalizedEmail).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.EmailExistsLogMessage).ConfigureAwait(false);
@@ -122,6 +184,10 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckLength(username, Constants.MaximumUsernameCharacters,
                                                 Constants.MinimumUsernameCharacters))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidUsernameLengthLogMessage).ConfigureAwait(false);
@@ -132,6 +198,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their username.
                 if (!UtilityService.CheckCharacters(email, Constants.CharSetsData[Constants.UsernameCharacterType]))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidUsernameCharactersLogMessage).ConfigureAwait(false);
@@ -142,6 +212,10 @@ namespace TeamA.Exogredient.Managers
                 // Check username uniqueness.
                 if (await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameExistsLogMessage).ConfigureAwait(false);
@@ -152,6 +226,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the length of their phone number.
                 if (!UtilityService.CheckLength(phoneNumber, Constants.PhoneNumberCharacterLength))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPhoneNumberLengthLogMessage).ConfigureAwait(false);
@@ -162,6 +240,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their phone number.
                 if (!UtilityService.CheckCharacters(phoneNumber, Constants.CharSetsData[Constants.PhoneNumberCharacterType]))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPhoneNumberCharactersLogMessage).ConfigureAwait(false);
@@ -172,6 +254,10 @@ namespace TeamA.Exogredient.Managers
                 // Check username uniqueness.
                 if (await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PhoneNumberExistsLogMessage).ConfigureAwait(false);
@@ -196,6 +282,10 @@ namespace TeamA.Exogredient.Managers
                 if (!UtilityService.CheckLength(plaintextPassword, Constants.MaximumPasswordCharacters,
                                                 Constants.MinimumPasswordCharacters))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
@@ -207,6 +297,10 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their password.
                 if (!UtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
@@ -217,6 +311,10 @@ namespace TeamA.Exogredient.Managers
                 // Check if password for context specific words.
                 if (UtilityService.ContainsContextSpecificWords(plaintextPassword))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
@@ -228,6 +326,10 @@ namespace TeamA.Exogredient.Managers
                 // Check if password contains sequences or repetitions.
                 if (UtilityService.ContainsRepetitionOrSequence(plaintextPassword))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
@@ -239,6 +341,10 @@ namespace TeamA.Exogredient.Managers
                 // Check if password contains dictionary words.
                 if (await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordWordsLogMessage).ConfigureAwait(false);
@@ -250,6 +356,10 @@ namespace TeamA.Exogredient.Managers
                 // Check if password is a previously corrupted password.
                 if (await UtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                                                                                   Constants.RegistrationTriesResetTime,
+                                                                                   Constants.MaxRegistrationAttempts);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
