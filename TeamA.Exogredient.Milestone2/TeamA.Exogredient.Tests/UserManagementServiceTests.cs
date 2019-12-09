@@ -118,16 +118,14 @@ namespace TeamA.Exogredient.Tests
 
         // TODO: insert acutal ip results into the database
         [DataTestMethod]
-        [DataRow("ipaddress", 3, 0, 0)]
+        [DataRow("ipaddress")]
         public async Task UserManagementService_CheckIPLockAsync_IpIsDisabledSuccessAsync(string ipAddress, int hours, int minutes, int seconds)
         {
             // Arrange 
             // Insert Ip into ip table
 
-            TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-
             // Act
-            bool result = await UserManagementService.CheckIPLockAsync(ipAddress, maxLockTime).ConfigureAwait(false);
+            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
             
             // Assert
             Assert.IsTrue(result);
@@ -135,14 +133,14 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("ipaddress", 3, 0, 0)]
-        public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccessAsync(string username, int hours, int minutes, int seconds)
+        public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccessAsync(string ipAddress, int hours, int minutes, int seconds)
         {
             // Arrange
             // Check if ip is in table 
             // if it is selete it from it 
 
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-            bool result = await UserManagementService.CheckIPLockAsync(username, maxLockTime).ConfigureAwait(false);
+            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
