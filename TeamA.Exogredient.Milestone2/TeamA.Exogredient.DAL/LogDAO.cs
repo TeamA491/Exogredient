@@ -40,14 +40,12 @@ namespace TeamA.Exogredient.DAL
 
                 // HACK: hardcoded here for now
                 // Created anon type to represent json in document store.
-                var document = new
-                {
-                    timestamp = logRecord.Timestamp,
-                    operation = logRecord.Operation,
-                    identifier = logRecord.Identifier,
-                    ipAddress = logRecord.IPAddress,
-                    errorType = logRecord.ErrorType
-                };
+
+                string document = $@"{{""{Constants.LogsTimestampField}"": ""{logRecord.Timestamp}"", " +
+                                  $@"""{Constants.LogsOperationField}"": ""{logRecord.Operation}"", " +
+                                  $@"""{Constants.LogsIdentifierField}"": ""{logRecord.Identifier}"", " +
+                                  $@"""{Constants.LogsIPAddressField}"": ""{logRecord.IPAddress}"", " +
+                                  $@"""{Constants.LogsErrorTypeField}"": ""{logRecord.ErrorType}""}}";
 
                 await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
 
@@ -91,7 +89,7 @@ namespace TeamA.Exogredient.DAL
 
                 var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
 
-                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync().ConfigureAwait(false);
+                DocResult result = await collection.Find($"{Constants.LogsTimestampField} = :timestamp && {Constants.LogsOperationField} = :operation && {Constants.LogsIdentifierField} = :identifier && {Constants.LogsIPAddressField} = :ip").Bind(documentParams).ExecuteAsync().ConfigureAwait(false);
 
                 // Prepare string to be returned
                 string resultstring = "";

@@ -28,8 +28,6 @@ namespace TeamA.Exogredient.TestController
 
             byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
 
-
-
             //var task = Task.Run(() => VerifyPhoneCodeManager.VerifyPhoneCodeAsync("eli", "0432", "ip", "9499815506", false));
 
             //if (task.Wait(TimeSpan.FromSeconds(30)))
