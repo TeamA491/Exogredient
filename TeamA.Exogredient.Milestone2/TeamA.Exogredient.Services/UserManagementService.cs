@@ -428,6 +428,7 @@ namespace TeamA.Exogredient.Services
             if (updatedRegistrationFailures >= maxNumberOfTries)
             {
                 record = new IPAddressRecord(ipAddress, timestampLocked: currentUnix, registrationFailures: updatedRegistrationFailures, lastRegFailTimestamp: currentUnix);
+                await NotifySystemAdminAsync($"{ipAddress} was locked at {currentUnix}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
             }
             else
             {
