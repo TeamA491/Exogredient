@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
@@ -14,7 +15,7 @@ namespace TeamA.Exogredient.Services
 
             if (!File.Exists(archiveFilePath))
             {
-                return false;
+                throw new ArgumentException("Archive File not found.");
             }
 
             byte[] fileBytes = File.ReadAllBytes(archiveFilePath);

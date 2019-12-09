@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Diagnostics;
 using TeamA.Exogredient.AppConstants;
+using System;
 
 namespace TeamA.Exogredient.Services
 {
@@ -11,7 +12,7 @@ namespace TeamA.Exogredient.Services
             // Check to make sure source Directory exists
             if (!(Directory.Exists(sourceDirectory) && Directory.Exists(targetDirectory) && File.Exists(sevenZipPath)))
             {
-                return false;
+                throw new ArgumentException("Invalid source Directory or 7zip file path.");
             }
 
             // Set the name of the compressed target file 
@@ -34,7 +35,14 @@ namespace TeamA.Exogredient.Services
             activeSevenZipProcess.WaitForExit();
 
             // Check to see if archive was successfully created
-            return File.Exists(targetFile);
+            if (!File.Exists(targetFile))
+            {
+                throw new Exception("Archive failed to create.");
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

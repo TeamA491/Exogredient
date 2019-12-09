@@ -10,7 +10,7 @@ namespace TeamA.Exogredient.Services
             // Check to make sure source Directory exists.
             if (!Directory.Exists(sourceDirectory))
             {
-                return false;
+                throw new ArgumentException("Source Directory does not exist.");
             }
 
             // Create a folder that will get compressed and send later on. Delete already existing folder with same name. 
@@ -30,7 +30,7 @@ namespace TeamA.Exogredient.Services
             // Return false if no log files found
             if (logFilePaths.Length == 0)
             {
-                return false;
+                throw new ArgumentException("No logs to archive in the source directory.");
             }
 
             // Identify files older than _days amount of days and move them to the target directory. 
@@ -50,7 +50,7 @@ namespace TeamA.Exogredient.Services
             string[] newLogFilePaths = Directory.GetFiles(targetDirectory);
             if (newLogFilePaths.Length == 0)
             {
-                return false;
+                throw new Exception("Files were not moved to the target directory");
             }
             else
             {
