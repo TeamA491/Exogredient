@@ -4,22 +4,22 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
+    /// <summary>
+    /// Labels the common methods for normal SQL DAOs.
+    /// CreateAsync which takes an ISQLRecord and inserts it into the data store.
+    /// DeleteByIdsAsync which takes a list of ids and deletes them from the data store.
+    /// ReadByIdAsync which takes an id and returns the information as an IDataObject.
+    /// UpdateAsync which takes an ISQLRecord and updates the fields that need to be updated in the data store.
+    /// </summary>
+    /// <typeparam name="T">The type of the id in the data store.</typeparam>
     public interface IMasterSQLDAO<T>
     {
-        // Create a record in the data store based on the model argument.
         Task<bool> CreateAsync(ISQLRecord record);
 
-        // Deletes all rows based on each primary key id in the argument list.
         Task<bool> DeleteByIdsAsync(List<string> idsOfRows);
 
-        // Reads all rows based on each primary key id in the argument list.
         Task<IDataObject> ReadByIdAsync(T id);
 
-        // Updates the row marked by the primary key id using the record object.
-        // The "record" object defines default values for every column of the table,
-        // the user passes named values to each column they wish to update.
-        // Example: record = User(lastName : "Example")
-        //          Update("jason1234", record)
         Task<bool> UpdateAsync(ISQLRecord record);
     }
 }
