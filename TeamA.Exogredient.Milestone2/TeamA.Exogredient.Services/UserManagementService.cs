@@ -281,10 +281,10 @@ namespace TeamA.Exogredient.Services
         /// <param name="username">Username of the user to update.</param>
         /// <param name="password">The password to hash.</param>
         /// <returns>Returns true if the operation is successful and false if it failed.</returns>
-        public static async Task ChangePasswordAsync(string username, string digest, string saltString)
+        public static async Task<bool> ChangePasswordAsync(string username, string digest, string saltString)
         {
             UserRecord newPasswordUser = new UserRecord(username, password: digest, salt: saltString);
-            await _userDAO.UpdateAsync(newPasswordUser).ConfigureAwait(false);
+            return await _userDAO.UpdateAsync(newPasswordUser).ConfigureAwait(false);
         }
 
         /// <summary>

@@ -100,7 +100,7 @@ namespace TeamA.Exogredient.DAL
                     // Asynchronously execute the non query.
                     await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 }
-                    
+
                 return true;
             }
         }
@@ -128,7 +128,7 @@ namespace TeamA.Exogredient.DAL
                     }
 
                     // Construct the sql string for deleteing where the username column equals the @USERNAME parameter.
-                    string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
+                    string sqlString = $"DELETE FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
 
                     // Get the command object inside a using statement to properly dispose/close.
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))

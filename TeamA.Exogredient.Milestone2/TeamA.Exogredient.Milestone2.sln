@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.SQLCreate
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_HelperObjects", "_HelperObjects", "{3E7FFB8E-CE6D-48EF-82E8-1E7E5184F6B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.DataHelpers", "TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj", "{905325F5-4FE1-4246-8A65-DDF49CA7A50D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DataHelpers", "TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj", "{905325F5-4FE1-4246-8A65-DDF49CA7A50D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

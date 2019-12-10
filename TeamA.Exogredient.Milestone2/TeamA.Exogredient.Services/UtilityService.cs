@@ -7,6 +7,7 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
+// TODO FIX AFTER ELI MERGES TO MASTER
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -115,7 +116,7 @@ namespace TeamA.Exogredient.Services
             int resultDay = day;
             int resultYear = year;
 
-            
+
             // Sum the input hours to the result.
             for (int i = 0; i < inputHours; i++)
             {
@@ -321,6 +322,8 @@ namespace TeamA.Exogredient.Services
         /// <returns> byte array of the hex string </returns>
         public static byte[] HexStringToBytes(string hexString)
         {
+            // TODO VALIDATE INPUT
+
             // The length of the byte array of the hex string is hexString.Length / 2
             byte[] bytes = new byte[hexString.Length / 2];
             char[] charArray = hexString.ToCharArray();
@@ -365,6 +368,8 @@ namespace TeamA.Exogredient.Services
         /// <returns> hex string of the string </returns>
         public static string ToHexString(string s)
         {
+            // TODO VALIDATE INPUT HERE
+
             // Convert the string into a ASCII byte array
             byte[] bytes = Encoding.ASCII.GetBytes(s);
 
@@ -377,7 +382,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="name">The string the user wants to check length of.</param>
         /// <param name="length">The length that the string must be equal to.</param>
-        /// <param name="min">A optional parameter. If this is set then, name's length can be a 
+        /// <param name="min">A optional parameter. If this is set then, name's length can be a
         /// range from min to length (inclusive).</param>
         /// <returns>Returns value of bool to represent whether the name met the required constraints.</returns>
         public static bool CheckLength(string name, int length, int min = -1)
@@ -413,6 +418,7 @@ namespace TeamA.Exogredient.Services
             return result;
         }
 
+        // TODO WHY CHECKING FOR ..
         /// <summary>
         /// Check whether the email is in a valid format (minimally: contains an @ with text on
         /// either side, and that text does not contain "..").
@@ -448,11 +454,12 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // TODO WHY ONLY CHECKING FOR GMAIL
         /// <summary>
         /// Removes the superfluous elements of an email so it can be properly checked for uniqueness.
         /// </summary>
         /// <param name="email">The email we are checking.</param>
-        /// <returns>Returns value of string to represent the 
+        /// <returns>Returns value of string to represent the
         /// canonicalized email.</returns>
         public static string CanonicalizeEmail(string email)
         {
