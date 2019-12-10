@@ -97,7 +97,7 @@ namespace TeamA.Exogredient.DAL
                         throw new ArgumentException(Constants.UserDeleteDNE);
                     }
 
-                    string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
+                    string sqlString = $"DELETE FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
 
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                     {
