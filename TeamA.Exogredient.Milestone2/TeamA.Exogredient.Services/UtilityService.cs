@@ -344,30 +344,7 @@ namespace TeamA.Exogredient.Services
 
             foreach (char c in name.ToLower())
             {
-<<<<<<< HEAD:TeamA.Exogredient.Milestone2/TeamA.Exogredient.Services/StringUtilityService.cs
-                result = result && _alphaNumericSpecialCharacters.Contains(c);
-            }
-
-            return result;
-        }
-
-        // TODO FIX TO .NET STANDARD
-        /// <summary>
-        /// Check whether a given string contains only numerical characters.
-        /// </summary>
-        /// <param name="name">The string that we are checking.</param>
-        /// <returns>Returns value of bool to represent whether all the characters
-        /// in name meet the specification.</returns>
-        public static bool CheckIfNumericCharacters(string name)
-        {
-            bool result = true;
-
-            foreach (char c in name)
-            {
-                result = result && _numericalCharacters.Contains(c);
-=======
                 result = result && data.Contains(c);
->>>>>>> 2a046fc57064065c0fb06a946436b636f3c2f8ec:TeamA.Exogredient.Milestone2/TeamA.Exogredient.Services/UtilityService.cs
             }
 
             return result;

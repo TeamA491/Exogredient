@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+// TODO LISTS SHOULD BE CONVERTED TO ARRAYS
+
 namespace TeamA.Exogredient.AppConstants
 {
     /// <summary>
@@ -20,19 +22,17 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
 
         // AUTHORIZATION
+        public const int TOKEN_EXPIRATION_MIN = 20;
+
+        public const string MediaTyp = "typ";
+        public const string MediaJWT = "JWT";
+        public const string SigningAlg = "alg";
         public const string AuthzSigningAlgorithm = "RS512";
         public const string AuthzExpirationField = "exp";
         public const string AuthzPublicKeyField = "pk";
 
         public const string UserTypeKey = "userType";
         public const string IdKey = "id";
-
-        public const string MediaTyp = "typ";
-        public const string MediaJWT = "JWT";
-        public const string SigningAlg = "alg";
-
-        public const string SHA1 = "SHA1";
-
 
         public enum USER_TYPE
         {
