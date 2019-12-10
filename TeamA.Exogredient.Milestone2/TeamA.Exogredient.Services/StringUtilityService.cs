@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 
+// TODO FIX AFTER ELI MERGES TO MASTER
 namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
@@ -18,6 +19,7 @@ namespace TeamA.Exogredient.Services
             '[', '}', ']', '|', '\\', '"', '\'', ':', ';', '?', '/', '.', ','
         };
 
+        // TODO REMOVE
         private static readonly List<char> _numericalCharacters = new List<char>()
         {
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
@@ -101,6 +103,8 @@ namespace TeamA.Exogredient.Services
         /// <returns> byte array of the hex string </returns>
         public static byte[] HexStringToBytes(string hexString)
         {
+            // TODO VALIDATE INPUT
+
             // The length of the byte array of the hex string is hexString.Length / 2
             byte[] bytes = new byte[hexString.Length / 2];
             char[] charArray = hexString.ToCharArray();
@@ -135,6 +139,8 @@ namespace TeamA.Exogredient.Services
         /// <returns> hex string of the string </returns>
         public static string ToHexString(string s)
         {
+            // TODO VALIDATE INPUT HERE
+
             // Convert the string into a ASCII byte array
             byte[] bytes = Encoding.ASCII.GetBytes(s);
             // Convert the byte array to hex string
@@ -180,6 +186,7 @@ namespace TeamA.Exogredient.Services
             return result;
         }
 
+        // TODO FIX TO .NET STANDARD
         /// <summary>
         /// Check whether a given string contains only numerical characters.
         /// </summary>
@@ -198,6 +205,7 @@ namespace TeamA.Exogredient.Services
             return result;
         }
 
+        // TODO WHY CHECKING FOR ..
         /// <summary>
         /// Check whether the email is in a valid format (minimally: contains an @ with text on
         /// either side, and that text does not contain "..").
@@ -230,6 +238,7 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // TODO WHY ONLY CHECKING FOR GMAIL
         /// <summary>
         /// Breaks email address up into two parts, the local-part 
         /// and the domain.
@@ -292,6 +301,7 @@ namespace TeamA.Exogredient.Services
         {
             string lineInput = "";
 
+            // TODO HARDCODED PATH!
             using (StreamReader reader = new StreamReader(@"..\..\..\..\words.txt"))
             {
                 while ((lineInput = await reader.ReadLineAsync()) != null)
@@ -308,6 +318,7 @@ namespace TeamA.Exogredient.Services
 
         // Check if password has been corrupted in previous breaches. Done second to last because
         // it is the slowest IO check.
+        // TODO MAYBE STORE IN A DICTIONARY FOR FASTER LOOK UP TIMES?
         public static async Task<bool> IsCorruptedPassword(string plaintextPassword)
         {
             List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync();
@@ -324,6 +335,9 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // TODO
+        // SPLIT INTO 2 FUNCTIONS, ONE TO CHECK SEQUENCE OR REPITION
+        // USE SUBSTRING ALGORITHM FOR SEQUENCE
         public static bool ContainsRepetitionOrSequence(string plaintextPassword)
         {
             // Repetition and sequence checking.

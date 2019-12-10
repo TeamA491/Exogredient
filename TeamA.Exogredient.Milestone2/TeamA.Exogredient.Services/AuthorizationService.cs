@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
-// TODO USE SECURITY SERVICE FOR HASHING
-
 // NOTE JWS TOKEN MUST BE IN THE AUTHORIZATION HEADER FOR EACH REQUEST
 namespace TeamA.Exogredient.Services
 {
@@ -23,8 +21,8 @@ namespace TeamA.Exogredient.Services
         private const string EXPIRATION_FIELD = "exp";
         private const string PUBLIC_KEY_FIELD = "pk";
 
-        private const string ENV_PRIVATE_KEY = "AUTHORIZATION_PRIVATE_KEY";
         private const string ENV_PUBLIC_KEY = "AUTHORIZATION_PUBLIC_KEY";
+        private const string ENV_PRIVATE_KEY = "AUTHORIZATION_PRIVATE_KEY";
         private static readonly string PRIVATE_KEY = Environment.GetEnvironmentVariable(ENV_PRIVATE_KEY, EnvironmentVariableTarget.Process);
         private static readonly string PUBLIC_KEY = Environment.GetEnvironmentVariable(ENV_PUBLIC_KEY, EnvironmentVariableTarget.Process);
 
@@ -56,7 +54,6 @@ namespace TeamA.Exogredient.Services
         {
             // Make sure we have the proper parameters inside the dictionary
             if (!payload.ContainsKey("userType") || !payload.ContainsKey("id"))
-                // TODO THROW PROPER EXCEPTION
                 throw new ArgumentException("UserType or ID was not provided.");
 
             // Create the header and convert it to a Base64 string
@@ -97,6 +94,7 @@ namespace TeamA.Exogredient.Services
 
             // Release resources
             SHhash.Dispose();
+            RSA.Dispose();
 
             return string.Format("{0}.{1}.{2}", encodedHeader, encodedPayload, signature);
         }
@@ -108,11 +106,12 @@ namespace TeamA.Exogredient.Services
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
         public static async Task<string> CreateTokenAsync(string userName)
         {
-            // Get the user type of the username.
+            // Get the user type of the username
+            // TODO GET WHAT USER TYPES THERE ARE
             string userType = await _userDAO.GetUserTypeAsync(userName);
 
             // Craete a dictionary that represents the user type and unique ID.
-            Dictionary<string, string> userInfo = new Dictionary<string, string>()
+            Dictionary<string, string> userInfo = new Dictionary<string, string>
             {
                 {"userType", userType},
                 {"id", userName }
@@ -132,7 +131,7 @@ namespace TeamA.Exogredient.Services
 
             // Make sure we have the proper JWS format of 3 tokens delimited by periods
             if (segments.Length != 3)
-                throw new ArgumentException("JWS must have 3 segments separated by periods.");
+                throw new InvalidTokenException("JWS must have 3 segments separated by periods.");
 
             string encodedHeader = segments[0];
             string encodedPayload = segments[1];
@@ -148,12 +147,10 @@ namespace TeamA.Exogredient.Services
 
             // Make sure that we are using the correct encryption algorithm in the header
             if (headerJSON["alg"] != SIGNING_ALGORITHM)
-                // TODO THROW PROPER EXCEPTION
-                throw new ArgumentException("Incorrect encryption algorithm.");
+                throw new InvalidTokenException("Incorrect encryption algorithm.");
 
             if (!payloadJSON.ContainsKey(PUBLIC_KEY_FIELD))
-                // TODO THROW PROPER EXCEPTION
-                throw new ArgumentException("Public key not found in the JWS payload!");
+                throw new InvalidTokenException("Public key not found in the JWS payload!");
 
             string publicKey = payloadJSON[PUBLIC_KEY_FIELD];
             RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
@@ -171,6 +168,7 @@ namespace TeamA.Exogredient.Services
 
             // Release resources
             SHhash.Dispose();
+            RSA.Dispose();
 
             // Verify that the JWS is correct and untampered with
             if (RSADeformatter.VerifySignature(hashedString, System.Convert.FromBase64String(encodedSignature)))
@@ -179,7 +177,7 @@ namespace TeamA.Exogredient.Services
             }
             else
             {
-                throw new ArgumentException("JWS could not be verified!");
+                throw new InvalidTokenException("JWS could not be verified!");
             }
         }
 
@@ -328,8 +326,8 @@ namespace TeamA.Exogredient.Services
 
                 // TODO CHECK IF "\"" == '"'
                 // Check for condition (3)
-                bool keyHasQuotes = key.Length > 2 || key[0] == '"' || key[key.Length - 1] == '"';
-                bool valHasQuotes = val.Length > 2 || val[0] == '"' || val[val.Length - 1] == '"';
+                bool keyHasQuotes = key.Length > 2 && key[0] == '"' && key[key.Length - 1] == '"';
+                bool valHasQuotes = val.Length > 2 && val[0] == '"' && val[val.Length - 1] == '"';
 
                 if (!keyHasQuotes || !valHasQuotes)
                 {
@@ -337,7 +335,7 @@ namespace TeamA.Exogredient.Services
                 }
 
                 // Check for condition (4)
-                if (!p[0].IsAlphaNumeric() || !p[1].IsAlphaNumeric())
+                if (!(p[0].IsAlphaNumeric() && p[1].IsAlphaNumeric()))
                 {
                     throw new ArgumentException("Key or value is not alpha-numeric (excluding white-space).");
                 }
@@ -453,5 +451,17 @@ namespace TeamA.Exogredient.Services
             byte[] bytes = Convert.FromBase64String(str);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
+    }
+
+    [Serializable]
+    public class InvalidTokenException : Exception
+    {
+        public InvalidTokenException() { }
+
+        public InvalidTokenException(string message)
+            : base(message) { }
+
+        public InvalidTokenException(string message, Exception inner)
+            : base(message, inner) { }
     }
 }
