@@ -7,6 +7,7 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
+// TODO FIX AFTER ELI MERGES TO MASTER
 namespace TeamA.Exogredient.Services
 {
     public static class UtilityService
@@ -262,6 +263,8 @@ namespace TeamA.Exogredient.Services
         /// <returns> byte array of the hex string </returns>
         public static byte[] HexStringToBytes(string hexString)
         {
+            // TODO VALIDATE INPUT
+
             // The length of the byte array of the hex string is hexString.Length / 2
             byte[] bytes = new byte[hexString.Length / 2];
             char[] charArray = hexString.ToCharArray();
@@ -301,6 +304,8 @@ namespace TeamA.Exogredient.Services
         /// <returns> hex string of the string </returns>
         public static string ToHexString(string s)
         {
+            // TODO VALIDATE INPUT HERE
+
             // Convert the string into a ASCII byte array
             byte[] bytes = Encoding.ASCII.GetBytes(s);
             // Convert the byte array to hex string
@@ -345,6 +350,7 @@ namespace TeamA.Exogredient.Services
             return result;
         }
 
+        // TODO WHY CHECKING FOR ..
         /// <summary>
         /// Check whether the email is in a valid format (minimally: contains an @ with text on
         /// either side, and that text does not contain "..").
@@ -377,6 +383,7 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // TODO WHY ONLY CHECKING FOR GMAIL
         /// <summary>
         /// Breaks email address up into two parts, the local-part 
         /// and the domain.
@@ -471,6 +478,7 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
+        // TODO SPLIT INTO 2 FUNCTIONS
         // NOTE: does not account for 901. but will return tru for 012
         public static bool ContainsRepetitionOrSequence(string plaintextPassword)
         {
