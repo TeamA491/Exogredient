@@ -31,6 +31,10 @@ namespace TeamA.Exogredient.TestController
             LogRecord record = new LogRecord("fail", "fail", "fail", "fail", "fail");
             LogDAO ldao = new LogDAO();
 
+            string result = await AuthenticationService.VerifyPhoneCodeAsync("9498675309", "7865");
+
+            Console.WriteLine(result);
+
             //var task = Task.Run(() => VerifyPhoneCodeManager.VerifyPhoneCodeAsync("eli", "0432", "ip", "9499815506", false));
 
             //if (task.Wait(TimeSpan.FromSeconds(30)))

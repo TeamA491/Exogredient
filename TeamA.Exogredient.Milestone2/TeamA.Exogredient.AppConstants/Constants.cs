@@ -96,7 +96,10 @@ namespace TeamA.Exogredient.AppConstants
         public const string WordsTxtPath = @"..\..\..\..\words.txt";
 
         public const int MaxDigitValue = 9;
+        public const int MinDigitValue = 1;
+
         public const int MaxAlphaValue = 26;
+        public const int MinAlphaValue = 1;
 
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
@@ -169,7 +172,9 @@ namespace TeamA.Exogredient.AppConstants
         public const int MinimumPasswordCharacters = 12;
         public const string PasswordCharacterType = ANSNoAngle;
 
-        public const string TwilioExpiredReturnString = "expired";
+        public const string TwilioAuthenticationFailString = "fail";
+        public const string TwilioAuthenticationApprovedString = "approved";
+        public const string TwilioAuthenticationPendingString = "pending";
 
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
