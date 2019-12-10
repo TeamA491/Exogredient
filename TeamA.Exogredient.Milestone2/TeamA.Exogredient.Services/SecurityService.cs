@@ -1,10 +1,10 @@
 ﻿using System.IO;
-using System.Security.Cryptography;
 using System.Text;
+using System.Security.Cryptography;
+using TeamA.Exogredient.AppConstants;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
-using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
@@ -63,17 +63,18 @@ namespace TeamA.Exogredient.Services
 
                 // Pass the encrypted data to the memory stream.
                 MemoryStream ms = new MemoryStream(encryptedData);
-                using CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
-                using StreamReader sr = new StreamReader(cs);
-
-                // Read the decrypted data as string from the stream reader.
-                decryptedData = sr.ReadToEnd();
-
+                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                {
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        // Read the decrypted data as string from the stream reader.
+                        decryptedData = sr.ReadToEnd();
+                    }
+                }
             }
             return decryptedData;
         }
 
-        // TODO WHAT RSA ALGORITHM IS THIS?
         // Reference:
         // https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsacryptoserviceprovider?view=netstandard-2.0
         /// <summary>
@@ -95,7 +96,6 @@ namespace TeamA.Exogredient.Services
             return decryptedData;
         }
 
-        // TODO WHAT RSA ALGORITHM IS THIS?
         // Reference:
         // https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsacryptoserviceprovider?view=netstandard-2.0
         /// <summary>
@@ -124,7 +124,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="plainData">The data to sign.</param>
         /// <param name="privateKey"></param>
         /// <returns></returns>
-        public static byte[] SignRSA512(byte[] plainData, byte[] privateKey)
+        public static byte[] SignRSA(byte[] plainData, byte[] privateKey)
         {
             return new byte[] { };
         }
@@ -135,7 +135,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="signedData">The signed data to be verified.</param>
         /// <param name="publicKey">The public key used to verify the signed data.</param>
         /// <returns></returns>
-        public static byte[] VerifyRSA512(byte[] signedData, byte[] publicKey)
+        public static byte[] VerifyRSA(byte[] signedData, byte[] publicKey)
         {
             return new byte[] { };
         }
@@ -182,11 +182,13 @@ namespace TeamA.Exogredient.Services
         /// <returns>Hex string of the hashed input</returns>
         public static string HashWithSHA1(string str)
         {
-            using SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider();
-            // Convert the str to ASCII byte array ->
-            // Compute the hashcode in byte array with the ASCII byte array ->
-            // Convert the hashcode byte array to a hex string
-            return UtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(str)));
+            using (SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider())
+            {
+                // Convert the str to ASCII byte array ->
+                // Compute the hashcode in byte array with the ASCII byte array ->
+                // Convert the hashcode byte array to a hex string
+                return UtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(str)));
+            }
         }
         
         /// <summary>
@@ -213,9 +215,10 @@ namespace TeamA.Exogredient.Services
         /// <returns> size 32 byte array of AES key </returns>
         public static byte[] GenerateAESKey()
         {
-            using AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
-            return aes.Key;
-
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                return aes.Key;
+            }
         }
 
         /// <summary>
@@ -224,8 +227,10 @@ namespace TeamA.Exogredient.Services
         /// <returns> size 16 byte array of IV </returns>
         public static byte[] GenerateAESIV()
         {
-            using AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
-            return aes.IV;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                return aes.IV;
+            }
         }
     }
 }

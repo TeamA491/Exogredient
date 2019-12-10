@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// TODO LISTS SHOULD BE CONVERTED TO ARRAYS
-
 namespace TeamA.Exogredient.AppConstants
 {
     /// <summary>

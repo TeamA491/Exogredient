@@ -273,12 +273,10 @@ namespace TeamA.Exogredient.Services
             {
                 throw new ArgumentException(Constants.DictionaryMissingBrackets);
             }
-            else
-            {
-                // Remove the first and last brackets
-                dictStr = dictStr.Remove(0, 1)
-                                 .Remove(dictStr.Length - 1, 1);
-            }
+
+            // Remove the first and last brackets
+            dictStr = dictStr.Remove(0, 1)
+                             .Remove(dictStr.Length - 1, 1);
 
             // String should look like this now:
             // "key1:value1,key2:value2"
