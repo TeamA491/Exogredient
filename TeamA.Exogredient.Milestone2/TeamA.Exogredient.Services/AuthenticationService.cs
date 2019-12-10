@@ -1,125 +1,44 @@
-﻿using MailKit;
+﻿using System;
+using System.Threading.Tasks;
+using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 using Twilio;
+using Twilio.Exceptions;
 using Twilio.Rest.Preview.AccSecurity.Service;
+using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
     public static class AuthenticationService
     {
-        
-
-        private static readonly string _sendingEmail = "exogredient.system@gmail.com";
-        private static readonly string _sendingEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
-        private static readonly string _twilioAccountSID = "AC94d03adc3d2da651c16c82932c29b047";
-        private static readonly string _twilioPathServiceSID = "VAa9682f046b6f511b9aa1807d4e2949e5";
-        private static readonly string _twilioAuthorizationToken = Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN", EnvironmentVariableTarget.User);
-
-        private static readonly UserDAO _userDao;
-
-        static AuthenticationService()
+        public static async Task<bool> SendCallVerificationAsync(string username, string phoneNumber)
         {
-            _userDao = new UserDAO();
+            string accountSID = Constants.TwilioAccountSID;
+            string authorizationToken = Constants.TwilioAuthToken;
+
+            TwilioClient.Init(accountSID, authorizationToken);
+
+            await VerificationResource.CreateAsync(
+                to: $"+1{phoneNumber}",
+                channel: Constants.TwilioCallChannel,
+                pathServiceSid: Constants.TwilioPathServiceSID
+            ).ConfigureAwait(false);
+
+            await UserManagementService.UpdatePhoneCodeFailuresAsync(username, 0).ConfigureAwait(false);
+
+            return true;
         }
 
-        /// <summary>
-        /// Check if the username and the password are correct.
-        /// </summary>
-        /// <param name="userName"> the username used for login</param>
-        /// <param name="encryptedPassword"> the password used for login encrypted </param>
-        /// <param name="aesKeyEncrypted"> AES key used for encrypting the password </param>
-        /// <param name="aesIV"> AES Initialization Vector used for encrypting the password </param>
-        /// <returns> true if the username and password are correct, false otherwise </returns>
-        public static async Task<bool> AuthenticateAsync(string userName, byte[] encryptedPassword, byte[] aesKeyEncrypted, byte[] aesIV)
+        public static async Task<string> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
         {
+            // Must catch twilio.exceptions.twilioapiexception if they try to verify after expiration time
             try
             {
-                // Check if the username exists.
-                if (! (await _userDao.UserNameExistsAsync(userName)))
-                {
-                    return false;
-                }
-                // Check if the username is disabled.
-                if (await _userDao.IsUserNameDisabledAsync(userName))
-                {
-                    // TODO Create Custom Exception: For User
-                    throw new Exception("This username is locked! To enable, contact the admin");
-                }
-
-                byte[] privateKey = SecurityService.GetRSAPrivateKey();
-                byte[] aesKey = SecurityService.DecryptRSA(aesKeyEncrypted,privateKey);
-                // Decrypt the encrypted password.
-                string hexPassword = SecurityService.DecryptAES(encryptedPassword, aesKey, aesIV);
-
-                // Get the password and the salt stored corresponding to the username.
-                Tuple<string, string> saltAndPassword = await _userDao.GetStoredPasswordAndSaltAsync(userName);
-                string storedPassword = saltAndPassword.Item1;
-                string saltString = saltAndPassword.Item2;
-
-                // Convert the salt to byte array.
-                byte[] saltBytes = StringUtilityService.HexStringToBytes(saltString);
-                //Number of iterations for has && length of the hash in bytes.
-                // Hash the decrypted password with the byte array of salt.
-                string hashedPassword = SecurityService.HashWithKDF(hexPassword, saltBytes);
-
-                //Check if the stored password matches the hashed password
-                if (storedPassword.Equals(hashedPassword))
-                {
-                    // TODO Uncomment when GenerateJWS is implemented
-                    //string token = CreateToken(userName);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                return false;
-                //throw e;
-            }
-        }
-
-        public static async Task<bool> SendCallVerificationAsync(string phoneNumber)
-        {
-            try
-            {
-                string accountSID = _twilioAccountSID;
-                string authorizationToken = _twilioAuthorizationToken;
-
-                TwilioClient.Init(accountSID, authorizationToken);
-
-                var verification = await VerificationResource.CreateAsync(
-                    to: $"+1{phoneNumber}",
-                    channel: "call",
-                    pathServiceSid: _twilioPathServiceSID
-                );
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
-
-        }
-
-        public static async Task<bool> VerifyPhoneCodeAsync(string phoneNumber, string phoneCode)
-        {
-            try
-            {
-                string accountSID = _twilioAccountSID;
-                string authorizationToken = _twilioAuthorizationToken;
+                string accountSID = Constants.TwilioAccountSID;
+                string authorizationToken = Constants.TwilioAuthToken;
 
                 TwilioClient.Init(accountSID, authorizationToken);
 
@@ -127,67 +46,59 @@ namespace TeamA.Exogredient.Services
                 var verificationCheck = await VerificationCheckResource.CreateAsync(
                     to: $"+1{phoneNumber}",
                     code: $"{phoneCode}",
-                    pathServiceSid: _twilioPathServiceSID
-                );
+                    pathServiceSid: Constants.TwilioPathServiceSID
+                ).ConfigureAwait(false);
 
-
-                return true;
+                return verificationCheck.Status;
             }
-            catch (Exception e)
+            catch (TwilioException)
             {
-                Console.WriteLine(e.ToString());
-                return false;
+                return Constants.TwilioExpiredReturnString;
             }
-
         }
 
-        public static async Task<bool> SendEmailVerificationAsync(string emailAddress)
+        public static async Task<bool> SendEmailVerificationAsync(string username, string emailAddress)
         {
-            try
+            var message = new MimeMessage();
+            var bodyBuilder = new BodyBuilder();
+
+            message.From.Add(new MailboxAddress(Constants.SystemEmailAddress));
+            message.To.Add(new MailboxAddress($"{emailAddress}"));
+
+            message.Subject = Constants.EmailVerificationSubject;
+
+            Random generator = new Random();
+            string emailCode = generator.Next((int)Math.Pow(10, Constants.EmailCodeLength),
+                                              (int)Math.Pow(10, Constants.EmailCodeLength + 1)).ToString();
+            long emailCodeTimestamp = UtilityService.CurrentUnixTime();
+
+            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
+
+            bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
+                @"<tr>" +
+                @"</tr>" +
+                @"<tr>" +
+                @"<td height = ""15"" style = ""font-size:0px; line-height:0px; height:15px;"" > &nbsp;</td>" +
+                            @"</tr>" +
+                            @"<tr>" +
+                            $@"<td align = ""center"" valign = ""top"" style = ""font-family:'Open Sans', Arial, sans-serif; font-size:18px; line-height:22px; color:#fbeb59; letter-spacing:2px; padding-bottom:12px;"">YOUR EMAIL VERIFICATION CODE IS: {emailCode}</td>" +
+                @"</tr>" +
+                @"<tr>";
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            var client = new SmtpClient
             {
-                var message = new MimeMessage();
-                var bodyBuilder = new BodyBuilder();
+                ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
+            };
 
-                message.From.Add(new MailboxAddress(_sendingEmail));
-                message.To.Add(new MailboxAddress($"{emailAddress}"));
+            await client.ConnectAsync(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword).ConfigureAwait(false);
+            await client.SendAsync(message).ConfigureAwait(false);
+            await client.DisconnectAsync(true).ConfigureAwait(false);
+            client.Dispose();
 
-                message.Subject = "Exogredient Account Verification";
-
-                Random generator = new Random();
-                string emailCode = generator.Next(100000, 1000000).ToString();
-
-                bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
-                    @"<tr>" +
-                    @"</tr>" +
-                    @"<tr>" +
-                    @"<td height = ""15"" style = ""font-size:0px; line-height:0px; height:15px;"" > &nbsp;</td>" +
-                               @"</tr>" +
-                               @"<tr>" +
-                               $@"<td align = ""center"" valign = ""top"" style = ""font-family:'Open Sans', Arial, sans-serif; font-size:18px; line-height:22px; color:#fbeb59; letter-spacing:2px; padding-bottom:12px;"">YOUR EMAIL VERIFICATION CODE IS: {emailCode}</td>" +
-                    @"</tr>" +
-                    @"<tr>";
-
-                message.Body = bodyBuilder.ToMessageBody();
-
-                var client = new SmtpClient
-                {
-                    ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
-                };
-
-                await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-                await client.AuthenticateAsync(_sendingEmail, _sendingEmailPassword);
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
-                client.Dispose();
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
-
+            return true;
         }
 
     }

@@ -1,64 +1,89 @@
 ﻿using MySqlX.XDevAPI;
-using System;
+using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 {
+    /// <summary>
+    /// Class containg the main method to store corrupted passwords.
+    /// </summary>
     public class CorruptedPasswordsScript
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// Executes the reading from the file of corrupted passwords and storing them in the correspondin
+        /// data store.
+        /// </summary>
+        /// <returns>Task</returns>
+        public static async Task Main()
         {
-            DataStoreLoggingDAO ds = new DataStoreLoggingDAO();
+            DAO ds = new DAO();
 
             string line;
 
-            System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\Eli\Desktop\pwned-passwords-sha1-ordered-by-count-v5.txt");
+            // Put the file in this location, or change this to your specific path!!
+            System.IO.StreamReader file = new System.IO.StreamReader(@"C:\pwned-passwords-sha1-ordered-by-count-v5.txt");
 
-            while ((line = file.ReadLine()) != null)
+            // Read every line in the file.
+            while ((line = await file.ReadLineAsync().ConfigureAwait(false)) != null)
             {
-                ds.Create(line.Split(':')[0]);
+                // Only take the first part (the digest) to the left of the : in the line. Store in the
+                await ds.CreateAsync(line.Split(':')[0]).ConfigureAwait(false);
             }
         }
     }
 
-    public abstract class MasterNOSQLDAO<T>
+    /// <summary>
+    /// Abstract class that defines the schema name, connection name, and create function of NOSQLDAOs
+    /// in this context.
+    /// </summary>
+    public abstract class MasterNOSQLDAO
     {
-        // HACK: Change this to your specific password
-        protected static readonly string ConnectionString = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
+        protected static readonly string ConnectionString = Constants.NOSQLConnection;
 
-        protected static readonly string Schema = "corrupted_passwords";
+        protected const string Schema = Constants.CorruptedPassSchemaName;
 
-        public abstract void Create(string password);
+        public abstract Task<bool> CreateAsync(string password);
 
     }
 
-    public class DataStoreLoggingDAO : MasterNOSQLDAO<string>
+    /// <summary>
+    /// Object for creating records in the corrupted passwords dao.
+    /// </summary>
+    public class DAO : MasterNOSQLDAO
     {
-
-        public override void Create(string password)
+        /// <summary>
+        /// Creates the schema and collection if necessary, then stores the <paramref name="password"/> in the
+        /// collection.
+        /// </summary>
+        /// <param name="password">The password digest to be stored in the collection (string)</param>
+        /// <returns>Task(bool) whether the process completed</returns>
+        public override async Task<bool> CreateAsync(string password)
         {
-            Session session = MySQLX.GetSession(ConnectionString);
-
-            Schema schema;
-
-            try
+            using (Session session = MySQLX.GetSession(ConnectionString))
             {
-                schema = session.CreateSchema(Schema);
+                // Create the schema if it doesn't exist, otherwise get the schema.
+                Schema schema;
+
+                try
+                {
+                    schema = session.CreateSchema(Schema);
+                }
+                catch
+                {
+                    schema = session.GetSchema(Schema);
+                }
+
+                // Create the collection if it doesn't exist, otherwise get the collection.
+                var collection = schema.CreateCollection(Constants.CorruptedPassCollectionName, ReuseExistingObject: true);
+
+                // Created the json string to store in the collection.
+                string document = $@"{{""{Constants.CorruptedPassPasswordField}"": ""{password}""}}";
+
+                // Add the json to the colleciton asynchronously.
+                await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
+
+                return true;
             }
-            catch
-            {
-                schema = session.GetSchema(Schema);
-            }
-
-            var collection = schema.CreateCollection("passwords", ReuseExistingObject: true);
-
-            // Created anon type to represent json in document store.
-            var document = new
-            {
-                password
-            };
-
-            collection.Add(document).Execute();
-            session.Close();
         }
     }
 }

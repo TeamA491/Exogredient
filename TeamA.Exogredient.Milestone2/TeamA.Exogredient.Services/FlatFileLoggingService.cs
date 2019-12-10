@@ -1,36 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
     public static class FlatFileLoggingService
     {
-        private static readonly string _logFolder = @"C:\Logs";
-        private static readonly string _fileType = ".CSV";
-
         public static async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
-                                                          string ipAddress, string errorType)
+                                                          string ipAddress, string errorType, string logFolder,
+                                                          string logFileType)
         {
             try
             {
-                Directory.CreateDirectory(_logFolder);
+                Directory.CreateDirectory(logFolder);
 
                 string[] splitResult = timestamp.Split(' ');
 
                 if (splitResult.Length != 3)
                 {
-                    throw new ArgumentException("Timestamp Format Incorrect");
+                    throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
 
-                string fileName = splitResult[2] + _fileType;
+                string fileName = splitResult[2] + logFileType;
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                string path = _logFolder + @"\" + fileName;
+                string path = Constants.LogFolder + @"\" + fileName;
 
                 string result = "";
 
@@ -39,9 +36,11 @@ namespace TeamA.Exogredient.Services
                 {
                     string field = logRecord.Fields[i];
 
-                    if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                    string startsWith = field.Substring(0, 1);
+
+                    if (Constants.CsvVulnerabilities.Contains(startsWith))
                     {
-                        result += (@"\t" + field + ",");
+                        result += ($"{Constants.CsvProtection}" + field + ",");
                     }
                     else
                     {
@@ -55,7 +54,7 @@ namespace TeamA.Exogredient.Services
                 // TODO: See what write field does and emulate
                 using (StreamWriter writer = File.AppendText(path))
                 {
-                    await writer.WriteLineAsync(result);
+                    await writer.WriteLineAsync(result).ConfigureAwait(false);
                 }
 
                 return true;
@@ -67,7 +66,8 @@ namespace TeamA.Exogredient.Services
         }
 
         public static async Task<bool> DeleteFromFlatFileAsync(string timestamp, string operation, string identifier,
-                                                               string ipAddress, string errorType)
+                                                               string ipAddress, string errorType, string logFolder,
+                                                               string logFileType)
         {
             try
             {
@@ -75,12 +75,12 @@ namespace TeamA.Exogredient.Services
 
                 if (splitResult.Length != 3)
                 {
-                    throw new ArgumentException("Timestamp Format Incorrect");
+                    throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
 
-                string fileName = splitResult[2] + _fileType;
+                string fileName = splitResult[2] + logFileType;
 
-                string path = _logFolder + @"\" + fileName;
+                string path = logFolder + @"\" + fileName;
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
@@ -98,9 +98,11 @@ namespace TeamA.Exogredient.Services
                     {
                         string field = logRecord.Fields[i];
 
-                        if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                        string startsWith = field.Substring(0, 1);
+
+                        if (Constants.CsvVulnerabilities.Contains(startsWith))
                         {
-                            lineToDelete += $@"\t{field},";
+                            lineToDelete += $"{Constants.CsvProtection}{field},";
                         }
                         else
                         {
@@ -111,11 +113,11 @@ namespace TeamA.Exogredient.Services
                     // Get rid of last comma.
                     lineToDelete = lineToDelete.Substring(0, lineToDelete.Length - 1);
 
-                    while ((lineInput = await reader.ReadLineAsync()) != null)
+                    while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                     {
                         if (lineInput != lineToDelete)
                         {
-                            await writer.WriteLineAsync(lineInput);
+                            await writer.WriteLineAsync(lineInput).ConfigureAwait(false);
                         }
                     }
                 }

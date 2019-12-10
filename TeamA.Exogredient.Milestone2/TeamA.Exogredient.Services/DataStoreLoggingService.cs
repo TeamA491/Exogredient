@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
     public static class DataStoreLoggingService
     {
-        private static readonly DataStoreLoggingDAO _dsLoggingDAO;
+        private static readonly LogDAO _dsLoggingDAO;
 
         static DataStoreLoggingService()
         {
-            _dsLoggingDAO = new DataStoreLoggingDAO();
+            _dsLoggingDAO = new LogDAO();
         }
 
         public static async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
@@ -25,12 +24,12 @@ namespace TeamA.Exogredient.Services
 
                 if (splitResult.Length != 3)
                 {
-                    throw new ArgumentException("Timestamp Format Incorrect");
+                    throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]);
+                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]).ConfigureAwait(false);
             }
             catch
             {
@@ -47,14 +46,14 @@ namespace TeamA.Exogredient.Services
 
                 if (splitResult.Length != 3)
                 {
-                    throw new ArgumentException("Timestamp Format Incorrect");
+                    throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                string id = await _dsLoggingDAO.FindIdFieldAsync(logRecord, splitResult[2]);
+                string id = await _dsLoggingDAO.FindIdFieldAsync(logRecord, splitResult[2]).ConfigureAwait(false);
 
-                await _dsLoggingDAO.DeleteAsync(id, splitResult[2]);
+                await _dsLoggingDAO.DeleteAsync(id, splitResult[2]).ConfigureAwait(false);
 
                 return true;
             }
@@ -62,8 +61,6 @@ namespace TeamA.Exogredient.Services
             {
                 return false;
             }
-            
         }
-
     }
 }

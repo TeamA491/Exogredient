@@ -1,9 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TeamA.Exogredient.Managers;
-using TeamA.Exogredient.Services;
-using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -24,7 +23,7 @@ namespace TeamA.Exogredient.Tests
         public async Task FlatFileLoggingService_LogToFlatFileAsync_InvalidTimestampRejected(string timestamp, string operation, string identifier,
                                                                                              string ipAddress, string errorType)
         {
-            bool result = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+            bool result = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
             Assert.IsFalse(result);
         }
@@ -46,7 +45,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = Directory.Exists(_logDirectory);
 
@@ -74,7 +73,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = File.Exists(_logDirectory + @"\20191125.CSV");
 
@@ -103,7 +102,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType);
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = false;
                 bool lineRead = false;
@@ -112,7 +111,7 @@ namespace TeamA.Exogredient.Tests
 
                 using (StreamReader reader = new StreamReader(_logDirectory + @"\20191125.CSV"))
                 {
-                    while ((lineInput = await reader.ReadLineAsync()) != null)
+                    while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                     {
                         
                     }

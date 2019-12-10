@@ -4,9 +4,9 @@ using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.ArchivingConsoleApp
 {
-    class ArchivingScript
+    public class ArchivingScript
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             //make sure only days, source Directory, and targetDirectory are entered into program
             if (args.Length != 3)
