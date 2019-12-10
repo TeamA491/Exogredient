@@ -52,6 +52,35 @@ namespace TeamA.Exogredient.Services
             return await _userDAO.CheckEmailExistenceAsync(email).ConfigureAwait(false);
         }
 
+        public static async Task<bool> CheckIPExistenceAsync(string ipAddress)
+        {
+            return await _ipDAO.CheckIPExistenceAsync(ipAddress).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> CreateIPAsync(string ipAddress)
+        {
+            IPAddressRecord record = new IPAddressRecord(ipAddress, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong);
+            return await _ipDAO.CreateAsync(record).ConfigureAwait(false);
+        }
+
+        public static async Task<IPAddressObject> GetIPAddressInfoAsync(string ipAddress)
+        {
+            return (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> UnlockIPAsync(string ipAddress)
+        {
+            IPAddressRecord record = new IPAddressRecord(ipAddress, timestampLocked: Constants.NoValueLong, registrationFailures: Constants.NoValueInt);
+            return await _ipDAO.UpdateAsync(record).ConfigureAwait(false);
+        }
+
+
+        public static async Task<bool> CheckIfIPLockedAsync(string ipAddress)
+        {
+            IPAddressObject ip = await GetIPAddressInfoAsync(ipAddress).ConfigureAwait(false);
+            return (ip.TimestampLocked != Constants.NoValueLong);
+        }
+
         /// <summary>
         /// Checks if a user is disabled in the data store.
         /// </summary>
@@ -60,49 +89,7 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
-            return (user.Disabled == 1);
-        }
-
-        /// <summary>
-        /// Checks if an IP address in the data store is still locked given the max lock time.
-        /// </summary>
-        /// <param name="ipAddress">IP address to check</param>
-        /// <param name="maxLockTime">Length that the ip address is locked.</param>
-        /// <returns>Returns true if the IP address is locked and false if not.</returns>
-        public static async Task<bool> CheckIPLockAsync(string ipAddress, TimeSpan maxLockTime)
-        {
-            IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
-
-            if (!await _ipDAO.CheckIPExistenceAsync(ipAddress).ConfigureAwait(false))
-            {
-                return false;
-            }
-            else
-            {
-                long timestamp = ip.TimestampLocked;
-
-                long maxLockSeconds = UtilityService.TimespanToSeconds(maxLockTime);
-                long currentUnix = UtilityService.CurrentUnixTime();
-
-                return (timestamp + maxLockSeconds < currentUnix ? true : false);
-            }
-        }
-
-        /// <summary>
-        /// Lock and IP address.
-        /// </summary>
-        /// <param name="ipAddress">IP address to be locked</param>
-        /// <returns>Returns true if the operation succeeded and false if it failed.</returns>
-        public static async Task<bool> LockIPAsync(string ipAddress)
-        {
-            // CHANGE: should we check existence here?
-            if (!await _ipDAO.CheckIPExistenceAsync(ipAddress).ConfigureAwait(false))
-            {
-                return false;
-            }
-            IPAddressRecord record = new IPAddressRecord(ipAddress, UtilityService.CurrentUnixTime());
-
-            return await _ipDAO.CreateAsync(record).ConfigureAwait(false);
+            return (user.Disabled == Constants.DisabledStatus);
         }
 
         /// <summary>
@@ -122,15 +109,11 @@ namespace TeamA.Exogredient.Services
         public static async Task<bool> CreateUserAsync(bool isTemp, string username, string firstName, string lastName, string email,
                                                        string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // CHANGE: should we check user existence here
-            if(!await CheckUserExistenceAsync(username).ConfigureAwait(false))
-            {
-                return false;
-            }
+            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
-            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : 0;
-
-            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt, tempTimestamp, "", 0, 0, 0, 0, 0);
+            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password,
+                                               disabled, userType, salt, tempTimestamp, Constants.NoValueString, Constants.NoValueLong,
+                                               Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
             return await _userDAO.CreateAsync(record).ConfigureAwait(false);
         }
@@ -162,7 +145,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> MakeTempPermAsync(string username)
         {
-            UserRecord record = new UserRecord(username, tempTimestamp: 0);
+            UserRecord record = new UserRecord(username, tempTimestamp: Constants.NoValueLong);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -176,7 +159,8 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> StoreEmailCodeAsync(string username, string emailCode, long emailCodeTimestamp)
         {
-            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp, emailCodeFailures: 0);
+            UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp,
+                                               emailCodeFailures: Constants.NoValueInt);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -188,7 +172,9 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> RemoveEmailCodeAsync(string username)
         {
-            UserRecord record = new UserRecord(username, emailCode: "", emailCodeTimestamp: 0, emailCodeFailures: 0);
+            UserRecord record = new UserRecord(username, emailCode: Constants.NoValueString,
+                                               emailCodeTimestamp: Constants.NoValueLong,
+                                               emailCodeFailures: Constants.NoValueInt);
 
             return await _userDAO.UpdateAsync(record).ConfigureAwait(false);
         }
@@ -197,23 +183,17 @@ namespace TeamA.Exogredient.Services
         /// Disable a user from login.
         /// </summary>
         /// <param name="username">Username of the user to disable.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
+        /// <returns>Returns true if the user was originally enabled, false otherwise.</returns>
         public static async Task<bool> DisableUserAsync(string username)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
-            // If the username doesn't exist, throw an exception.
-            if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
+            if (user.Disabled == Constants.DisabledStatus)
             {
-                return false;
-            }
-            if (user.Disabled == 1)
-            {
-                //throw new Exception("The username is already disabled!");
                 return false;
             }
 
-            UserRecord disabledUser = new UserRecord(username, disabled: 1);
+            UserRecord disabledUser = new UserRecord(username, disabled: Constants.DisabledStatus);
             await _userDAO.UpdateAsync(disabledUser).ConfigureAwait(false);
 
             return true;
@@ -223,22 +203,18 @@ namespace TeamA.Exogredient.Services
         /// Enable a disabled user to login.
         /// </summary>
         /// <param name="username">Username of a user to enable.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
+        /// <returns>Returns true if the user was originally disabled, false otherwise.</returns>
         public static async Task<bool> EnableUserAsync(string username)
         {
             UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
-            if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
+            if (user.Disabled == Constants.EnabledStatus)
             {
                 return false;
             }
-            if (user.Disabled == 0)
-            {
-                //throw new Exception("The username is already enabled!");
-                return false;
-            }
+
             // Enable the username.
-            UserRecord disabledUser = new UserRecord(username, disabled: 0);
+            UserRecord disabledUser = new UserRecord(username, disabled: Constants.EnabledStatus);
             await _userDAO.UpdateAsync(disabledUser).ConfigureAwait(false);
 
             return true;
@@ -249,26 +225,11 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="username">Username of the user to update.</param>
         /// <param name="password">The password to hash.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task ChangePasswordAsync(string username, string digest, string saltString)
+        /// <returns>Returns true if the operation is successful and false if it failed.</returns>
+        public static async Task<bool> ChangePasswordAsync(string username, string digest, string saltString)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
-
-            // Check if the username exists.
-            if (!await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false))
-            {
-                // TODO Create Custom Exception: For System
-                throw new Exception("The username doesn't exsit.");
-            }
-            // Check if the username is disabled.
-            if (user.Disabled == 1)
-            {
-                // TODO Create Custom Exception: For User
-                throw new Exception("This username is locked! To enable, contact the admin");
-            }
-
             UserRecord newPasswordUser = new UserRecord(username, password: digest, salt: saltString);
-            await _userDAO.UpdateAsync(newPasswordUser).ConfigureAwait(false);
+            return await _userDAO.UpdateAsync(newPasswordUser).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -277,20 +238,20 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task<bool> NotifySystemAdminAsync(string body)
+        public static async Task<bool> NotifySystemAdminAsync(string body, string sysAdminEmailAddress)
         {
-            string title = DateTime.UtcNow.ToString("MM-dd-yyyy");
+            // Creates a thread for each day, which exceptions maxed out.
+            string title = DateTime.UtcNow.ToString(Constants.NotifySysAdminSubjectFormatString);
 
             var message = new MimeMessage();
             var bodyBuilder = new BodyBuilder();
 
             message.From.Add(new MailboxAddress($"{Constants.SystemEmailAddress}"));
-            message.To.Add(new MailboxAddress($"{Constants.SystemAdminEmailAddress}"));
+            message.To.Add(new MailboxAddress($"{sysAdminEmailAddress}"));
 
             message.Subject = title;
 
             Random generator = new Random();
-            string emailCode = generator.Next(100000, 1000000).ToString();
 
             bodyBuilder.HtmlBody = body;
 
@@ -301,7 +262,7 @@ namespace TeamA.Exogredient.Services
                 ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
             };
 
-            await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.ConnectAsync(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
             await client.AuthenticateAsync($"{Constants.SystemEmailAddress}", $"{Constants.SystemEmailPassword}").ConfigureAwait(false);
             await client.SendAsync(message).ConfigureAwait(false);
             await client.DisconnectAsync(true).ConfigureAwait(false);
@@ -342,8 +303,8 @@ namespace TeamA.Exogredient.Services
 
             bool reset = false;
 
-            // If the last Login Time has passed the maxTimeBeforeFailureReset then reset their loginFailure number.
-            if (lastLoginFailTimestamp + maxSeconds < currentUnix)
+            // If the time has passed their max time before reset, reset their failures
+            if (lastLoginFailTimestamp + maxSeconds < currentUnix && lastLoginFailTimestamp != Constants.NoValueLong)
             {
                 reset = true;
                 record = new UserRecord(username, loginFailures: 0);
@@ -357,11 +318,11 @@ namespace TeamA.Exogredient.Services
             // Update the last login fail time.
             if (updatedLoginFailures >= maxNumberOfTries)
             {
-                record = new UserRecord(username, loginFailures: updatedLoginFailures, disabled: 1, lastLoginFailTimestamp: UtilityService.CurrentUnixTime());
+                record = new UserRecord(username, loginFailures: updatedLoginFailures, disabled: Constants.DisabledStatus, lastLoginFailTimestamp: currentUnix);
             }
             else
             {
-                record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: UtilityService.CurrentUnixTime());
+                record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: currentUnix);
             }
 
             await _userDAO.UpdateAsync(record).ConfigureAwait(false);
@@ -404,6 +365,48 @@ namespace TeamA.Exogredient.Services
             await _userDAO.UpdateAsync(record).ConfigureAwait(false);
 
             return true;
+        }
+
+        public static async Task<bool> IncrementRegistrationFailuresAsync(string ipAddress, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
+        {
+            IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
+            IPAddressRecord record;
+
+            long lastRegFailTimestamp = ip.LastRegFailTimestamp;
+            long maxSeconds = UtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = UtilityService.CurrentUnixTime();
+
+            // Need to check if the last maxtime + lastTime is less than now.
+            // if it is then reset the failure
+
+            bool reset = false;
+
+            // If the time has passed their max time before reset, reset their failures
+            if (lastRegFailTimestamp + maxSeconds < currentUnix && lastRegFailTimestamp != Constants.NoValueLong)
+            {
+                reset = true;
+                record = new IPAddressRecord(ipAddress, registrationFailures: 0);
+                await _ipDAO.UpdateAsync(record).ConfigureAwait(false);
+            }
+
+            // Increment the user's login Failure count.
+            int updatedRegistrationFailures = reset ? 1 : ip.RegistrationFailures + 1;
+
+            // Lock the ip if they have reached the max number of tries.
+            // Update the last reg fail time.
+            if (updatedRegistrationFailures >= maxNumberOfTries)
+            {
+                record = new IPAddressRecord(ipAddress, timestampLocked: currentUnix, registrationFailures: updatedRegistrationFailures, lastRegFailTimestamp: currentUnix);
+                await NotifySystemAdminAsync($"{ipAddress} was locked at {currentUnix}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+            }
+            else
+            {
+                record = new IPAddressRecord(ipAddress, registrationFailures: updatedRegistrationFailures, lastRegFailTimestamp: currentUnix);
+            }
+
+            await _ipDAO.UpdateAsync(record).ConfigureAwait(false);
+
+            return false;
         }
     }
 }

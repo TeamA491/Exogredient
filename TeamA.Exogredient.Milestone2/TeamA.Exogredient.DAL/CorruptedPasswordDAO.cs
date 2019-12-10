@@ -6,7 +6,7 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class CorruptedPasswordsDAO : IMasterNOSQLDAOReadOnly
+    public class CorruptedPasswordDAO : IMasterNOSQLDAOReadOnly
     {
         public async Task<List<string>> ReadAsync()
         {
@@ -23,11 +23,9 @@ namespace TeamA.Exogredient.DAL
 
                 while (result.Next())
                 {
-                    // TODO: flesh out columns. make columns into fields.
                     string temp = (string)result.Current[Constants.CorruptedPassPasswordField];
 
                     resultList.Add(temp);
-
                 }
 
                 return resultList;

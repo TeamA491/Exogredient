@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace TeamA.Exogredient.AppConstants
 {
+    /// <summary>
+    /// The constants, reaonly values, and other literal values used throughout our system.
+    /// </summary>
     public static class Constants
     {
         // ENVIRONMENT VARIABLES
@@ -13,6 +16,85 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string NOSQLConnection = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string SQLConnection = Environment.GetEnvironmentVariable("SQL_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
+        public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
+        public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
+
+        // AUTHORIZATION
+        public const int TOKEN_EXPIRATION_MIN = 20;
+
+        public const string MediaTyp = "typ";
+        public const string MediaJWT = "JWT";
+        public const string SigningAlg = "alg";
+        public const string AuthzSigningAlgorithm = "RS512";
+        public const string AuthzExpirationField = "exp";
+        public const string AuthzPublicKeyField = "pk";
+
+        public const string UserTypeKey = "userType";
+        public const string IdKey = "id";
+
+        public enum USER_TYPE
+        {
+            UNREGISTERED = 0,
+            REGISTERED = 1,
+            STORE_OWNER = 2,
+            ADMIN = 3,
+            SYS_ADMIN = 4,
+        };
+
+        // AUTHENTICATION / USER MANAGEMENT
+        public const string GoogleSMTP = "smtp.gmail.com";
+        public const int GoogleSMTPPort = 465;
+
+        public const string TwilioCallChannel = "call";
+
+        public const string EmailVerificationSubject = "Exogredient Account Verification";
+
+        public const int EmailCodeLength = 6;
+
+        // FLAT FILE LOGGING
+        public static readonly List<string> CsvVulnerabilities = new List<string>()
+        {
+            "=", "@", "+", "-"
+        };
+
+        public const string CsvProtection = @"\t";
+
+        // SECURITY SERVICE
+        public const int DefaultSaltLength = 8;
+        public const int DefaultHashIterations = 10000;
+        public const int DefaultHashLength = 32;
+
+        public const int ByteLength = 8;
+
+        // USER MANAGEMENT
+        public const string NotifySysAdminSubjectFormatString = "MM-dd-yyyy";
+
+        // UTILITY SERVICE
+        public const int HoursInADay = 24;
+        public const int MonthsInAYear = 12;
+        public const int MinutesInAnHour = 60;
+        public const int SecondsInAMinute = 60;
+        public const int SecondsInAnHour = 3600;
+        public const int FebruaryMonthValue = 2;
+        public const int LeapDayValue = 29;
+        public const int LeapYearOccurrenceYears = 4;
+        public const int LeapYearUnoccurenceYears = 100;
+        public const int LeapYearReoccurenceYears = 400;
+
+        public const int SecondsStartValue = 0;
+        public const int MinuteStartValue = 0;
+        public const int HourStartValue = 0;
+        public const int DayStartValue = 1;
+        public const int MonthStartValue = 1;
+
+        public const string GmailHost = "gmail.com";
+
+        public const int HexBaseValue = 16;
+
+        public const string WordsTxtPath = @"..\..\..\..\words.txt";
+
+        public const int MaxDigitValue = 9;
+        public const int MaxAlphaValue = 26;
 
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
@@ -32,12 +114,21 @@ namespace TeamA.Exogredient.AppConstants
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
+        public const long NoValueLong = 0;
+        public const int NoValueInt = 0;
+        public const string NoValueString = "";
+
+        public const int MaximumOperationRetries = 3;
+
         public const int LoggingRetriesAmount = 3;
         public const int MaxLogInAttempts = 18;
         public const int MaxRegistrationAttempts = 3;
         public const int MaxEmailCodeAttempts = 3;
         public const int MaxPhoneCodeAttempts = 3;
+        
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
+        public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);
+        public static readonly TimeSpan MaxIPLockTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan EmailCodeMaxValidTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan MaxTempUserTime = new TimeSpan(1, 0, 0);
 
@@ -49,6 +140,9 @@ namespace TeamA.Exogredient.AppConstants
             { ANSNoAngle, ANSNoAngleBrackets },
             { Numeric, Numbers }
         };
+
+        public const int MaximumUserTypeLength = 11;
+        public const int IPAddressLength = 15;
 
         public const int MaximumFirstNameCharacters = 200;
         public const int MinimumFirstNameCharacters = 1;
@@ -98,6 +192,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string EmailExistsLogMessage = "Email taken";
         public const string PhoneNumberExistsLogMessage = "Phone number taken";
         public const string UniqueIdExistsRegistrationUserMessage = "Your email, username, or phone number was invalid... please try again";
+
+        public const string IPLockedLogMessage = "IP locked";
+        public const string IPLockedUserMessage = "You cannot currently register, please try again later";
 
         public const string InvalidScopeLogMessage = "User not in scope";
         public const string InvalidScopeUserMassage = "You must in California to register";
@@ -227,9 +324,6 @@ namespace TeamA.Exogredient.AppConstants
             { 11, 30 }, { 12, 31 }
         };
 
-        public const int SecondsInAnHour = 3600;
-        public const int SecondsInAMinute = 60;
-
         // No < or > to protect from SQL injections.
         public static readonly List<char> ANSNoAngleBrackets = new List<char>()
         {
@@ -294,6 +388,50 @@ namespace TeamA.Exogredient.AppConstants
             {17, 'Q'}, {18, 'R'}, {19, 'S'}, {20, 'T'}, {21, 'U'}, {22, 'V'}, {23, 'W'}, {24, 'X'},
             {25, 'Y'}, {26, 'Z'}
         };
+
+
+        // EXCEPTION MESSAGES -- Authorization
+        public const string UserTypeIdNotProvided = "UserType or ID was not provided.";
+        public const string JWSthreeSegments = "JWS must have 3 segments separated by periods.";
+        public const string IncorrectEncryption = "Incorrect encryption algorithm.";
+        public const string PubKeyNotFound = "Public key not found in the JWS payload!";
+        public const string JWSNotVerified = "JWS could not be verified!";
+        public const string ExpirationNotSpecified = "Expiration time is not specified!";
+        public const string ExpirationNotNumeric = "Expiration time is not a number!";
+        public const string DictionaryMissingBrackets = "Dictionary doesn't have proper surrounding brackets.";
+        public const string InvalidCommaColon = "Invalid comma and / or colon formatting.";
+        public const string InvalidKeyValue = "Invalid key/value pair.";
+        public const string KeyValueNoDoubleQuotes = "Key or value isn't surrounded by double quotes.";
+        public const string KeyValueNotAlphaNum = "Key or value is not alpha-numeric (excluding white-space).";
+
+        // EXCEPTION MESSAGES -- Data Store Logging
+        public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
+
+        // EXCEPTION MESSAGES -- User Management
+        public const string UsernameDNE = "The username doesn't exsit.";
+        public const string UserLocked = "This user is locked!";
+
+        // EXCEPTION MESSAGES -- IPAddressDAO
+        public const string IPCreateInvalidArgument = "IPAddressDAO.CreateAsync record argument must be of type IPAddressRecord";
+        public const string IPRecordNoNull = "All columns in IPRecord must be not null.";
+        public const string IPUpdateInvalidArgument = "IPAddressDAO.UpdateAsync record argument must be of type IPAddressRecord";
+        public const string IPDeleteDNE = "IPAddressDAO.DeleteByIdsAsync ip did not exist";
+        public const string IPReadDNE = "IPAddressDAO.ReadByIdAsync ip did not exist";
+        public const string IPUpdateDNE = "IPAddressDAO.UpdateAsync ip did not exist";
+
+        // EXCEPTION MESSAGES -- LogDAO
+        public const string LogCreateInvalidArgument = "LogDAO.CreateAsync record argument must be of type LogRecord";
+        public const string LogFindInvalidArgument = "LogDAO.FindIdFieldAsync record argument must be of type LogRecord";
+        public const string LogFindDNE = "LogDAO.FindIdFieldAsync record did not exist in the collection";
+        public const string LogDeleteDNE = "LogDAO.DeleteAsync uniqueId did not exist in the collection";
+
+        // EXCEPTION MESSAGES -- UserDAO
+        public const string UserCreateInvalidArgument = "UserDAO.CreateAsync record argument must be of type UserRecord";
+        public const string UserRecordNoNull = "All columns in UserRecord must be not null.";
+        public const string UserUpdateInvalidArgument = "UserDAO.UpdateAsync record argument must be of type UserRecord";
+        public const string UserDeleteDNE = "UserDAO.DeleteByIdsAsync username did not exist";
+        public const string UserReadDNE = "UserDAO.ReadByIdAsync username did not exist";
+        public const string UserUpdateDNE = "UserDAO.UpdateAsync username did not exist";
 
     }
 }

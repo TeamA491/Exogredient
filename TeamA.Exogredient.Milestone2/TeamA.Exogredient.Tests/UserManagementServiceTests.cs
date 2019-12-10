@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -9,345 +11,434 @@ namespace TeamA.Exogredient.Tests
     public class UserManagementServiceTests
     { 
         [DataTestMethod]
-        [DataRow("Jason")]
-        public async Task UserManagementService_CheckUserExistenceAsync_UserExistsSuccessAsync(string username)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "23123123")]
+        public async Task UserManagementService_CheckUserExistenceAsync_UserExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange
-            // Create user 
+            // Arrange: Create user 
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
+
+            // Assert: Check that an existing user returns true.
             bool result = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup: delete user
+            // Cleanup: delete the created user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
         [DataRow("blahblah")]
         [DataRow("123123321")]
-        public async Task UserManagementService_CheckUserExistenceAsync_UserDoesNotExistsFailureAsync(string username)
+        public async Task UserManagementService_CheckUserExistenceAsync_UserDoesNotExistsFailure(string username)
         {
-            // check if user exists
-            // delete it if it does 
+            // Assert: Check that an non existing user returns false.
             bool result = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
-        [DataRow("5622537232")]
-        public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberExistsSuccessAsync(string phoneNumber)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678")]
+        public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange
-            // Create users with phonenumber above
+            // Arrange: Create users with the phonenumber inputted. 
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
+
+            // Assert: check that an existing phonenumber returns true.
             bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup 
-            // Delete Created user
+            // Cleanup: Delete Created user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
         [DataRow("0000000000")]
-        public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberDoesNotExistsFailureAsync(string phoneNumber)
+        public async Task UserManagementService_CheckPhoneNumberExistenceAsync_PhoneNumberDoesNotExistsFailure(string phoneNumber)
         {
-            // Arrange
-            // Check if phonenumber exists. if it does delete that user
-
+            // Act: Check that a nonexistent phonenumber returns false. 
             bool result = await UserManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
-        [DataRow("jasonExists@gmail.com")]
-        public async Task UserManagementService_CheckEmailExistenceAsync_EmailExistsSuccessAsync(string email)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        public async Task UserManagementService_CheckEmailExistenceAsync_EmailExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange
-            // Create user. 
+            // Arrange: Create user. 
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
+            // Act: check that an existing email returns true.
             bool result = await UserManagementService.CheckEmailExistenceAsync(email).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup 
-            // Delete that user
+            // Cleanup: Delete that user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
         [DataRow("JasonDoesNotExists@gmail.com")]
-        public async Task UserManagementService_CheckEmailExistenceAsync_EmailDoesNotExistsFailureAsync(string email)
+        public async Task UserManagementService_CheckEmailExistenceAsync_EmailDoesNotExistsFailure(string email)
         {
-            // Arrange
-            // check if that email exist
-            // if it does delete that user
-
+            // Act: check that a non existing email returns false.
             bool result = await UserManagementService.CheckEmailExistenceAsync(email).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
 
-        // TODO: insert actual diabled / enabled user into the database
         [DataTestMethod]
-        [DataRow("BadUser")]
-        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsDisabledSuccessAsync(string username)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 1, "Customer", "123123123")]
+        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsDisabledSuccess(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange 
-            // Create user
-            // Disable user
+            // Arrange: Create a disabled user.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
+            // Act: Check that the disabled is disabled.
             bool result = await UserManagementService.CheckIfUserDisabledAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
-            // Cleanup 
-            // delete that user
+            // Cleanup: Delete that user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
-        [DataRow("GoodUser")]
-        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsNotDisabledSuccessAsync(string username)
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsNotDisabledSuccess(bool isTemp, string username, string firstname, string lastname, string email,
+                                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange 
-            // Create user that is not diabled
-            
+            // Arrange: Create user that is not diabled
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
+            // Act: Check that the non disabled returns false.
             bool result = await UserManagementService.CheckIfUserDisabledAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
 
-            // Cleanup
-            // Delete user
+            // Cleanup: Delete that user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
-
-        // TODO: insert acutal ip results into the database
         [DataTestMethod]
-        [DataRow("ipaddress", 3, 0, 0)]
-        public async Task UserManagementService_CheckIPLockAsync_IpIsDisabledSuccessAsync(string ipAddress, int hours, int minutes, int seconds)
+        [DataRow("127.0.0.1")]
+        public async Task UserManagementService_CheckIfIPLockedAsync_IpIsDisabledSuccess(string ipAddress)
         {
-            // Arrange 
-            // Insert Ip into ip table
-
-            TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
+            // Arrange: Insert Ip into ip table.
+            bool lockResult = await UserManagementService.CreateIPAsync(ipAddress).ConfigureAwait(false);
+            Assert.IsTrue(lockResult);
 
             // Act
-            bool result = await UserManagementService.CheckIPLockAsync(ipAddress, maxLockTime).ConfigureAwait(false);
-            
-            // Assert
+            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
+
+            // Assert: Check that an IP that is inserted returns true.
             Assert.IsTrue(result);
         }
 
         [DataTestMethod]
-        [DataRow("ipaddress", 3, 0, 0)]
-        public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccessAsync(string username, int hours, int minutes, int seconds)
+        [DataRow("127.0.0.1")]
+        public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccess(string ipAddress)
         {
-            // Arrange
-            // Check if ip is in table 
-            // if it is selete it from it 
-
-            TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-            bool result = await UserManagementService.CheckIPLockAsync(username, maxLockTime).ConfigureAwait(false);
+            // Act:  Check that an non estant ip returns false.
+            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
-        public async Task UserManagementService_CreateUserAsync_CreateNonExistentUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        public async Task UserManagementService_CreateUserAsync_CreateNonExistentUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                                        string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            
-            // Act 
-            // Create the user 
-            bool result = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Act: Create the user.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
-            // Assert that user creation was successful 
-            Assert.IsTrue(result);
+            // Assert: that user creation was successful 
+            Assert.IsTrue(createResult);
 
-            // Read that user. and assert that it has all the correct columns 
+            // Read that user and assert that it has all the correct columns 
+            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            bool readResult;
+            if(user.TempTimestamp == 0 &&  user.Username == username && user.FirstName == firstName && user.LastName == lastName &&  user.Email == email &&
+                user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+            Assert.IsTrue(readResult);
 
-
-            // Cleanup 
-            // Delete user
+            // Cleanup: Delete that user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
         [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
-        public async Task UserManagementService_DeleteUserAsync_DeleteUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
+        public async Task UserManagementService_DeleteUserAsync_DeleteUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                                 string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create a user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create a user to be deleted
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
-            // Delete the user 
+            // Act: Delete the user 
             bool result = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
-
             Assert.IsTrue(result);
 
-            // Assert that the user is properly deleted from the table with CheckUserExistence
-
-
-            // Cleanup 
-            // Delete user
+            // Assert: that the user is properly deleted from the table with CheckUserExistence
+            bool existResult = await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
+            Assert.IsFalse(existResult);
         }
 
         [DataTestMethod]
         [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123")]
-        public async Task UserManagementService_MakeTempPerm_ChangeTempToPermSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
+        public async Task UserManagementService_MakeTempPerm_ChangeTempToPermSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create a temporary user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create a temporary user to be deleted.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
-            // Make the temporary user perm
+            // Act: Make the temporary user perm
             bool result = await UserManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
-
-            // Assert
             Assert.IsTrue(result);
 
-            // Assert that the data you read for that user does in fact have that field changed.
+            // Assert: that the user is infact permanent.
+            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
 
-            // Cleanup 
-            // Delete user
+            bool readResult;
+            // TempTimestamp == 0 when the user is permanent.
+            if (user.TempTimestamp == 0 && user.Username == username && user.FirstName == firstName && user.LastName == lastName && user.Email == email &&
+                user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+            Assert.IsTrue(readResult);
+
+            // Cleanup: Delete that user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
-        // TODO: update the email code timestamp
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123", "1233", 123123123123)]
-        public async Task UserManagementService_StoreEmailCode_StoreEmailCodeForUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 123123123123)]
+        public async Task UserManagementService_StoreEmailCode_StoreEmailCodeForUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
-            // Arrange 
-            // Create a temporary user to be deleted
+            // Arrange: Create a temporary user to be deleted
             await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
 
-            // Act 
+            // Act: Store an email code for a user.
             bool result = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
-
             Assert.IsTrue(result);
 
-            // Read the email code and check if it did infact change.
+            // Assert: Read the email code and check if it did infact change.
+            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            bool readResult;
+            if (user.TempTimestamp == 0 && user.Username == username && user.FirstName == firstName && user.LastName == lastName && user.Email == email &&
+                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+            Assert.IsTrue(readResult);
 
-            // Cleanup 
-            // Delete user
+            // Cleanup: Delete that user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
-        // TODO: update the email code timestamp
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", "yyyy-mm-dd")]
-        public async Task UserManagementService_RemoveEmailCode_StoreEmailCodeForUserSuccessAsync(bool isTemp, string username, string firstName, string lastName, string email,
-                                         string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, string emailCodeTimestamp)
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 10000000)]
+        public async Task UserManagementService_RemoveEmailCode_RemoveEmailCodeForUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
+                                         string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
-            // Arrange 
-            // Create a temporary user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create a user.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
+            // Arrange: Store an email code for that user.
+            bool storeResult = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
+            Assert.IsTrue(storeResult);
+
+            // Act: Remove the email code for that user.
             bool result = await UserManagementService.RemoveEmailCodeAsync(username).ConfigureAwait(false);
-
             Assert.IsTrue(result);
-            
+
             // Read that user and check if infact that email code is removed.
-            
-            // Cleanup 
-            // Delete user
+            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            bool readResult;
+            if (user.TempTimestamp == 0 && user.Username == username && user.FirstName == firstName && user.LastName == lastName && user.Email == email &&
+                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt &&
+                 user.EmailCode == "" && user.EmailCodeTimestamp == 0 && user.EmailCodeFailures == 0)
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+            Assert.IsTrue(readResult);
+
+            // Cleanup: Delete that user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
-        [DataRow("username")]
-        public async Task UserManagementService_DisableUserNameAsync_DisableExistingUserSuccessAsync(string username)
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 10000000)]
+        public async Task UserManagementService_DisableUserNameAsync_DisableExistingUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
+                                         string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create the user that will be disabled
+            // Arrange: Create the user that is not disabled
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
+            // Act: disable that user 
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
 
-            // Read that user and check if it was disabled
+            // Assert: Check that the user is disabled.
+            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            bool readResult;
+            // User is disabled if user.Disabled == 1
+            if (user.TempTimestamp == 0 && user.Username == username && user.FirstName == firstName && user.LastName == lastName && user.Email == email &&
+                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == 1 && user.UserType == userType && user.Salt == salt &&
+                 user.EmailCode == "" && user.EmailCodeTimestamp == 0 && user.EmailCodeFailures == 0)
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+            Assert.IsTrue(readResult);
 
             // Delete the created user 
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
 
         [DataTestMethod]
         [DataRow("username")]
-        public async Task UserManagementService_DisableUserNameAsync_DisableNonExistingUserFailureAsync(string username)
+        public async Task UserManagementService_DisableUserNameAsync_DisableNonExistingUserFailure(string username)
         {
-            // Act 
+            // Act: disabling a non existent user should return false.
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
         [DataTestMethod]
-        [DataRow("username")]
-        public async Task UserManagementService_DisableUserNameAsync_DisableADisabledUserFailureAsync(string username)
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 1, "Customer", "123123123", "1233", 10000000)]
+        public async Task UserManagementService_DisableUserAsync_DisableADisabledUserFailure(bool isTemp, string username, string firstName, string lastName, string email,
+                                         string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create a user that is Disabled
+            // Arrange: Create a user that is Disabled
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
-            // Make the temporary user perm
+            // Act: Disabling an already disabled user should return false.
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
+
+            // Cleanup: Delete the user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
-        [DataRow("username")]
-        public async Task UserManagementService_EnableUserNameAsync_EnableADisabledUserSuccessAsync(string username)
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 1, "Customer", "123123123", "1233", 10000000)]
+        public async Task UserManagementService_EnableUserAsync_EnableADisabledUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
+                                         string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create the user that will be disabled
+            // Arrange: Create a disabled user.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-   
-            bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
-            Assert.IsTrue(result);
-
-            // Act 
+            // Act: Perform an enable operation on a disabled user.
             bool enableResult = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
-
             Assert.IsTrue(enableResult);
-            // Cleanup 
-            // Delete that created user
+
+            // Cleanup: Delete that created user
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
-        [DataRow("username")]
-        public async Task UserManagementService_EnableUserNameAsync_EnableAEnabledUserFailureAsync(string username)
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 10000000)]
+        public async Task UserManagementService_EnableUserAsync_EnableAEnabledUserFailure(bool isTemp, string username, string firstName, string lastName, string email,
+                                         string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create a user that is enabled
+            // Arrange: Create a user that is enabled
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
-            // Make the temporary user perm
+            // Act: Enable and already enabled user should return false.
             bool result = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
+
+            // Cleanup: Delete that user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
-        // For ChangePasswordAsync we check user existence and if user is daibled. 
-        // is this the responsibility of the Manager?
-        public async Task UserManagementService_ChangePasswordAsync_ChangePasswordOfExistingUserSuccessAsync(string username, string password)
+        [DataTestMethod]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 10000000)]
+        public async Task UserManagementService_ChangePasswordAsync_ChangePasswordOfExistingUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
+                                         string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange 
-            // Create the user.
+            // Arrange: Create the user.
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
-            // Act 
-            // Change the user password 
-            // TODO: finish this
-            //await UserManagementService.ChangePasswordAsync(username, password).ConfigureAwait(false);
+            // Act: Change the user password digest.
+            bool passwordResult = await UserManagementService.ChangePasswordAsync(username, password, salt).ConfigureAwait(false);
+            Assert.IsTrue(passwordResult);
 
-            // Assert 
-            // Read the user and make sure his password now matches the change
+            // Assert: Read the user and make sure his password now matches the change.
+            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            bool readResult;
+            if (user.TempTimestamp == 0 && user.Username == username && user.FirstName == firstName && user.LastName == lastName && user.Email == email &&
+                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+            Assert.IsTrue(readResult);
+
+            // Cleanup: Delete that user.
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
         }
 
-        public async Task UserManagementService_NotifySystemAdminAsync_SendEmailToSystemAdminSuccessAsync(string body)
+        public async Task UserManagementService_NotifySystemAdminAsync_SendEmailToSystemAdminSuccess(string body)
         {
-
-            // Act
-            // Send message to system admin 
-            bool result = await UserManagementService.NotifySystemAdminAsync(body).ConfigureAwait(false);
-
-            // Assert
-            // TODO: how do we ensure that the system admin got the email?
-            Assert.IsTrue(result);
+            // Act: Check that a successfull message to system admin returns true.
+            bool notifyResult = await UserManagementService.NotifySystemAdminAsync(body, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+            Assert.IsTrue(notifyResult);
         }
     }
 }

@@ -9,20 +9,21 @@ namespace TeamA.Exogredient.Services
     public static class FlatFileLoggingService
     {
         public static async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
-                                                          string ipAddress, string errorType)
+                                                          string ipAddress, string errorType, string logFolder,
+                                                          string logFileType)
         {
             try
             {
-                Directory.CreateDirectory(Constants.LogFolder);
+                Directory.CreateDirectory(logFolder);
 
                 string[] splitResult = timestamp.Split(' ');
 
                 if (splitResult.Length != 3)
                 {
-                    throw new ArgumentException("Timestamp Format Incorrect");
+                    throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
 
-                string fileName = splitResult[2] + Constants.LogFileType;
+                string fileName = splitResult[2] + logFileType;
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
@@ -35,9 +36,11 @@ namespace TeamA.Exogredient.Services
                 {
                     string field = logRecord.Fields[i];
 
-                    if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                    string startsWith = field.Substring(0, 1);
+
+                    if (Constants.CsvVulnerabilities.Contains(startsWith))
                     {
-                        result += (@"\t" + field + ",");
+                        result += ($"{Constants.CsvProtection}" + field + ",");
                     }
                     else
                     {
@@ -63,7 +66,8 @@ namespace TeamA.Exogredient.Services
         }
 
         public static async Task<bool> DeleteFromFlatFileAsync(string timestamp, string operation, string identifier,
-                                                               string ipAddress, string errorType)
+                                                               string ipAddress, string errorType, string logFolder,
+                                                               string logFileType)
         {
             try
             {
@@ -71,12 +75,12 @@ namespace TeamA.Exogredient.Services
 
                 if (splitResult.Length != 3)
                 {
-                    throw new ArgumentException("Timestamp Format Incorrect");
+                    throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
 
-                string fileName = splitResult[2] + Constants.LogFileType;
+                string fileName = splitResult[2] + logFileType;
 
-                string path = Constants.LogFolder + @"\" + fileName;
+                string path = logFolder + @"\" + fileName;
 
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
@@ -94,9 +98,11 @@ namespace TeamA.Exogredient.Services
                     {
                         string field = logRecord.Fields[i];
 
-                        if (field.StartsWith("=") || field.StartsWith("@") || field.StartsWith("+") || field.StartsWith("-"))
+                        string startsWith = field.Substring(0, 1);
+
+                        if (Constants.CsvVulnerabilities.Contains(startsWith))
                         {
-                            lineToDelete += $@"\t{field},";
+                            lineToDelete += $"{Constants.CsvProtection}{field},";
                         }
                         else
                         {

@@ -12,7 +12,7 @@ namespace TeamA.Exogredient.Managers
         // Encrypted password, encrypted AES key, and aesIV are all in hex string format.
         public static async Task<Result<bool>> LogInAsync(string username, string ipAddress,
                                                           string encryptedPassword, string encryptedAESKey,
-                                                          string aesIV)
+                                                          string aesIV, int currentNumExceptions)
         {
             try
             {
@@ -20,11 +20,15 @@ namespace TeamA.Exogredient.Managers
 
                 if (!await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
+                    await UserManagementService.IncrementLoginFailuresAsync(username,
+                                                                            Constants.LogInTriesResetTime,
+                                                                            Constants.MaxLogInAttempts).ConfigureAwait(false);
+
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess, false, currentNumExceptions);
                 }
 
                 UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
@@ -35,7 +39,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UserDisableLogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.UserDisableUserMessage, authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.UserDisableUserMessage, authenticationSuccess, false, currentNumExceptions);
                 }
 
                 byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
@@ -68,7 +72,7 @@ namespace TeamA.Exogredient.Managers
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenticationSuccess, false, currentNumExceptions);
                 }
                 else
                 {
@@ -80,7 +84,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess);
+                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess, false, currentNumExceptions);
                 }
             }
             catch (Exception e)
@@ -88,7 +92,12 @@ namespace TeamA.Exogredient.Managers
                 await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
-                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false);
+                if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
+                {
+                    await UserManagementService.NotifySystemAdminAsync($"{Constants.LogInOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                }
+
+                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
             }
         }
     }

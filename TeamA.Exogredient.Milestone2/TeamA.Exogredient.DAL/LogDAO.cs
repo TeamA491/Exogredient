@@ -7,7 +7,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class DataStoreLoggingDAO : IMasterNOSQLDAO<string>
+    public class LogDAO : IMasterNOSQLDAO<string>
     {
         public async Task<bool> CreateAsync(INOSQLRecord record, string yyyymmdd)
         {
@@ -17,7 +17,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("DataStoreLoggingDAO.CreateAsync record argument must be of type LogRecord");
+                throw new ArgumentException(Constants.LogCreateInvalidArgument);
             }
 
             LogRecord logRecord = (LogRecord)record;
@@ -38,16 +38,11 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + yyyymmdd, ReuseExistingObject: true);
 
-                // HACK: hardcoded here for now
-                // Created anon type to represent json in document store.
-                var document = new
-                {
-                    timestamp = logRecord.Timestamp,
-                    operation = logRecord.Operation,
-                    identifier = logRecord.Identifier,
-                    ipAddress = logRecord.IPAddress,
-                    errorType = logRecord.ErrorType
-                };
+                string document = $@"{{""{Constants.LogsTimestampField}"": ""{logRecord.Timestamp}"", " +
+                                  $@"""{Constants.LogsOperationField}"": ""{logRecord.Operation}"", " +
+                                  $@"""{Constants.LogsIdentifierField}"": ""{logRecord.Identifier}"", " +
+                                  $@"""{Constants.LogsIPAddressField}"": ""{logRecord.IPAddress}"", " +
+                                  $@"""{Constants.LogsErrorTypeField}"": ""{logRecord.ErrorType}""}}";
 
                 await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
 
@@ -64,13 +59,27 @@ namespace TeamA.Exogredient.DAL
 
                 var collection = schema.GetCollection(Constants.LogsCollectionPrefix + yyyymmdd);
 
+                DocResult result = await collection.Find($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync().ConfigureAwait(false);
+
+                // Prepare string to be returned
+                string resultstring = "";
+
+                while (result.Next())
+                {
+                    resultstring = (string)result.Current[Constants.LogsIdField];
+                }
+
+                if (resultstring.Equals(""))
+                {
+                    throw new ArgumentException(Constants.LogDeleteDNE);
+                }
+
                 await collection.Remove($"{Constants.LogsIdField} = :id").Bind("id", uniqueId).ExecuteAsync().ConfigureAwait(false);
 
                 return true;
             }
         }
 
-        // TODO: Can't find id by identifier and timestamp... need operation
         public async Task<string> FindIdFieldAsync(INOSQLRecord record, string yyyymmdd)
         {
             try
@@ -79,7 +88,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("DataStoreLoggingDAO.FindIdFieldAsync record argument must be of type LogRecord");
+                throw new ArgumentException(Constants.LogFindInvalidArgument);
             }
 
             LogRecord logRecord = (LogRecord)record;
@@ -92,16 +101,19 @@ namespace TeamA.Exogredient.DAL
 
                 var documentParams = new DbDoc(new { timestamp = logRecord.Timestamp, operation = logRecord.Operation, identifier = logRecord.Identifier, ip = logRecord.IPAddress });
 
-                DocResult result = await collection.Find("timestamp = :timestamp && operation = :operation && identifier = :identifier && ip = :ip").Bind(documentParams).ExecuteAsync().ConfigureAwait(false);
+                DocResult result = await collection.Find($"{Constants.LogsTimestampField} = :timestamp && {Constants.LogsOperationField} = :operation && {Constants.LogsIdentifierField} = :identifier && {Constants.LogsIPAddressField} = :ip").Bind(documentParams).ExecuteAsync().ConfigureAwait(false);
 
                 // Prepare string to be returned
                 string resultstring = "";
 
                 while (result.Next())
                 {
-                    // TODO: flesh out columns. make columns into fields.
                     resultstring = (string)result.Current[Constants.LogsIdField];
+                }
 
+                if (resultstring.Equals(""))
+                {
+                    throw new ArgumentException(Constants.LogFindDNE);
                 }
 
                 return resultstring;
