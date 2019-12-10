@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.Managers
 {
     public class VerifyEmailCodeManager
     {
-        public static async Task<Result<bool>> VerifyEmailCodeAsync(string username, string inputCode, string ipAddress)
+        public static async Task<Result<bool>> VerifyEmailCodeAsync(string username, string inputCode, string ipAddress, int currentNumExceptions)
         {
             try
             {
@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.VerifyEmailOperation, username, ipAddress,
                                                   Constants.MaxEmailTriesReachedLogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.MaxEmailTriesReachedUserMessage, emailVerificationSuccess);
+                    return UtilityService.CreateResult(Constants.MaxEmailTriesReachedUserMessage, emailVerificationSuccess, false, currentNumExceptions);
                 }
 
                 long maxValidTimeSeconds = UtilityService.TimespanToSeconds(Constants.EmailCodeMaxValidTime);
@@ -34,7 +34,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.VerifyEmailOperation, username, ipAddress,
                                                   Constants.EmailCodeExpiredLogMessage).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.EmailCodeExpiredUserMessage, emailVerificationSuccess);
+                    return UtilityService.CreateResult(Constants.EmailCodeExpiredUserMessage, emailVerificationSuccess, false, currentNumExceptions);
                 }
 
                 if (user.EmailCode.Equals(inputCode))
@@ -43,7 +43,7 @@ namespace TeamA.Exogredient.Managers
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyEmailOperation, username, ipAddress).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.VerifyEmailSuccessUserMessage, emailVerificationSuccess);
+                    return UtilityService.CreateResult(Constants.VerifyEmailSuccessUserMessage, emailVerificationSuccess, false, currentNumExceptions);
                 }
                 else
                 {
@@ -53,7 +53,7 @@ namespace TeamA.Exogredient.Managers
 
                     await UserManagementService.IncrementEmailCodeFailuresAsync(username).ConfigureAwait(false);
 
-                    return UtilityService.CreateResult(Constants.WrongEmailCodeMessage, emailVerificationSuccess);
+                    return UtilityService.CreateResult(Constants.WrongEmailCodeMessage, emailVerificationSuccess, false, currentNumExceptions);
                 }
             }
             catch (Exception e)
@@ -61,7 +61,12 @@ namespace TeamA.Exogredient.Managers
                 await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.VerifyEmailOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
-                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false);
+                if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
+                {
+                    await UserManagementService.NotifySystemAdminAsync($"{Constants.VerifyEmailOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                }
+
+                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -137,18 +138,15 @@ namespace TeamA.Exogredient.Tests
 
         // TODO: insert acutal ip results into the database
         [DataTestMethod]
-        [DataRow("ipaddress", 3, 0, 0)]
+        [DataRow("ipaddress")]
         public async Task UserManagementService_CheckIPLockAsync_IpIsDisabledSuccessAsync(string ipAddress, int hours, int minutes, int seconds)
         {
             // Arrange: Insert Ip into ip table
             bool lockResult = await UserManagementService.LockIPAsync(ipAddress);
             Assert.IsTrue(lockResult);
 
-            // Set how the Ip is locked
-            TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-
-            // Act: Check that a locked IP returns true.
-            bool result = await UserManagementService.CheckIPLockAsync(ipAddress, maxLockTime).ConfigureAwait(false);
+            // Act
+            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
             
             // Assert
             Assert.IsTrue(result);
@@ -156,13 +154,11 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("ipaddress", 3, 0, 0)]
-        public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccessAsync(string username, int hours, int minutes, int seconds)
+        public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccessAsync(string ipAddress, int hours, int minutes, int seconds)
         {
             // Arrange:  Check if ip is in table 
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-
-            // Act: Check that a non existing IP returns false.
-            bool result = await UserManagementService.CheckIPLockAsync(username, maxLockTime).ConfigureAwait(false);
+            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
             Assert.IsFalse(result);
         }
 
@@ -437,7 +433,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act
             // Send message to system admin 
-            bool result = await UserManagementService.NotifySystemAdminAsync(body).ConfigureAwait(false);
+            bool result = await UserManagementService.NotifySystemAdminAsync(body, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
 
             // Assert
             // TODO: how do we ensure that the system admin got the email?

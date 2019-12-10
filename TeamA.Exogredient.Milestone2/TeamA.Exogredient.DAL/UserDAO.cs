@@ -18,7 +18,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("UserDAO.CreateAsync record argument must be of type UserRecord");
+                throw new ArgumentException(Constants.UserCreateInvalidArgument);
             }
 
             UserRecord userRecord = (UserRecord)record;
@@ -36,7 +36,7 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (pair.Value == null)
                         {
-                            throw new NoNullAllowedException("All columns in UserRecord must be not null.");
+                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
                         }
                     }
 
@@ -44,7 +44,7 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (pair.Value.Equals(-1))
                         {
-                            throw new NoNullAllowedException("All columns in UserRecord must be not null.");
+                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
                         }
                     }
 
@@ -92,6 +92,11 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (string username in idsOfRows)
                 {
+                    if (!await CheckUserExistenceAsync(username).ConfigureAwait(false))
+                    {
+                        throw new ArgumentException(Constants.UserDeleteDNE);
+                    }
+
                     string sqlString = $"DELETE {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
 
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -107,6 +112,11 @@ namespace TeamA.Exogredient.DAL
 
         public async Task<IDataObject> ReadByIdAsync(string id)
         {
+            if (!await CheckUserExistenceAsync(id).ConfigureAwait(false))
+            {
+                throw new ArgumentException(Constants.UserReadDNE);
+            }
+
             // TODO: check if user exists first
             UserObject result;
 
@@ -146,7 +156,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException("UserDAO.UpdateAsync record argument must be of type UserRecord");
+                throw new ArgumentException(Constants.UserUpdateInvalidArgument);
             }
 
             UserRecord userRecord = (UserRecord)record;
@@ -163,6 +173,13 @@ namespace TeamA.Exogredient.DAL
 
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
+                    if (pair.Key == Constants.UserDAOusernameColumn)
+                    {
+                        if (!await CheckUserExistenceAsync((string)pair.Value).ConfigureAwait(false))
+                        {
+                            throw new ArgumentException(Constants.UserUpdateDNE);
+                        }
+                    }
                     if (pair.Key != Constants.UserDAOusernameColumn)
                     {
                         if (pair.Value is int || pair.Value is long)

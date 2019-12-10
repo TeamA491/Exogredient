@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
@@ -21,35 +21,27 @@ namespace TeamA.Exogredient.Services
         /// <returns> byte array of the encrypted data </returns>
         public static byte[] EncryptAES(string plainData, byte[] key, byte[] IV)
         {
-            try
-            {
-                byte[] encryptedData;
+            byte[] encryptedData;
 
-                using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                // Create AES encryptor using the given key and IV.
+                ICryptoTransform encryptor = aes.CreateEncryptor(key, IV);
+                MemoryStream ms = new MemoryStream();
+
+                using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                 {
-                    // Create AES encryptor using the given key and IV.
-                    ICryptoTransform encryptor = aes.CreateEncryptor(key, IV);
-                    MemoryStream ms = new MemoryStream();
-
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (StreamWriter sw = new StreamWriter(cs))
                     {
-                        using (StreamWriter sw = new StreamWriter(cs))
-                        {
-                            // Write data to be encrypted to the crypto stream.
-                            sw.Write(plainData);
-                        }
-                        // Get the encrypted data from the memory stream in an array.
-                        encryptedData = ms.ToArray();
+                        // Write data to be encrypted to the crypto stream.
+                        sw.Write(plainData);
                     }
-
+                    // Get the encrypted data from the memory stream in an array.
+                    encryptedData = ms.ToArray();
                 }
-                return encryptedData;
+
             }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-                throw e;
-            }
+            return encryptedData;
         }
 
         // Reference:
@@ -63,33 +55,25 @@ namespace TeamA.Exogredient.Services
         /// <returns> the string of decrypted data </returns>
         public static string DecryptAES(byte[] encryptedData, byte[] key, byte[] IV)
         {
-            try
+            string decryptedData;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
             {
-                string decryptedData;
-                using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+                // Create AES decryptor using the given key and IV.
+                ICryptoTransform decryptor = aes.CreateDecryptor(key, IV);
+
+                // Pass the encrypted data to the memory stream.
+                MemoryStream ms = new MemoryStream(encryptedData);
+                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
                 {
-                    // Create AES decryptor using the given key and IV.
-                    ICryptoTransform decryptor = aes.CreateDecryptor(key, IV);
-
-                    // Pass the encrypted data to the memory stream.
-                    MemoryStream ms = new MemoryStream(encryptedData);
-                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    using (StreamReader sr = new StreamReader(cs))
                     {
-                        using (StreamReader sr = new StreamReader(cs))
-                        {
-                            // Read the decrypted data as string from the stream reader.
-                            decryptedData = sr.ReadToEnd();
-                        }
+                        // Read the decrypted data as string from the stream reader.
+                        decryptedData = sr.ReadToEnd();
                     }
-
                 }
-                return decryptedData;
+
             }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-                throw e;
-            }
+            return decryptedData;
         }
 
         // Reference:
@@ -102,23 +86,15 @@ namespace TeamA.Exogredient.Services
         /// <returns> a decrypted byte array </returns>
         public static byte[] EncryptRSA(byte[] plainData, byte[] publicKey)
         {
-            try
+            byte[] decryptedData;
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
-                byte[] decryptedData;
-                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
-                {
-                    // Pass the public key for encryption.
-                    rsa.ImportCspBlob(publicKey);
-                    // Encrypt the plain data.
-                    decryptedData = rsa.Encrypt(plainData, false);
-                }
-                return decryptedData;
+                // Pass the public key for encryption.
+                rsa.ImportCspBlob(publicKey);
+                // Encrypt the plain data.
+                decryptedData = rsa.Encrypt(plainData, false);
             }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-                throw e;
-            }
+            return decryptedData;
         }
 
         // Reference:
@@ -131,24 +107,16 @@ namespace TeamA.Exogredient.Services
         /// <returns> a decrypted byte array </returns>
         public static byte[] DecryptRSA(byte[] encryptedData, byte[] privateKey)
         {
-            try
+            byte[] decryptedData;
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
-                byte[] decryptedData;
-                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
-                {
-                    // Pass the private key for decryption.
-                    rsa.ImportCspBlob(privateKey);
-                    // Decrypt the encrypted data.
-                    decryptedData = rsa.Decrypt(encryptedData, false);
-                }
+                // Pass the private key for decryption.
+                rsa.ImportCspBlob(privateKey);
+                // Decrypt the encrypted data.
+                decryptedData = rsa.Decrypt(encryptedData, false);
+            }
 
-                return decryptedData;
-            }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-                throw e;
-            }
+            return decryptedData;
         }
 
         /// <summary>
@@ -174,13 +142,14 @@ namespace TeamA.Exogredient.Services
         /// <param name="iterations"> number of iterations </param>
         /// <param name="hashLength"> the length of the output hashcode </param>
         /// <returns> a string of derived key </returns>
-        public static string HashWithKDF(string password, byte[] salt, int iterations = 10000, int hashLength = 32)
+        public static string HashWithKDF(string password, byte[] salt, int iterations = Constants.DefaultHashIterations,
+                                         int hashLength = Constants.DefaultHashLength)
         {
 
             byte[] passwordBytes = UtilityService.HexStringToBytes(password);
             Pkcs5S2ParametersGenerator pbkdf = new Pkcs5S2ParametersGenerator(new Sha3Digest());
             pbkdf.Init(passwordBytes, salt, iterations);
-            KeyParameter derivedKey = (KeyParameter)pbkdf.GenerateDerivedMacParameters(hashLength * 8);
+            KeyParameter derivedKey = (KeyParameter)pbkdf.GenerateDerivedMacParameters(hashLength * Constants.ByteLength);
 
             return UtilityService.BytesToHexString(derivedKey.GetKey());
         }
@@ -208,7 +177,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="saltLength"> length of the salt in bytes </param>
         /// <returns> byte array of salt </returns>
-        public static byte[] GenerateSalt(int saltLength = 8)
+        public static byte[] GenerateSalt(int saltLength = Constants.DefaultSaltLength)
         {
             // Create a byte array for salt with the given salt length
             byte[] salt = new byte[saltLength];
@@ -245,6 +214,5 @@ namespace TeamA.Exogredient.Services
                 return aes.IV;
             }
         }
-
     }
 }
