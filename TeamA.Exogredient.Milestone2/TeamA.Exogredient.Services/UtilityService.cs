@@ -7,7 +7,6 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
-// TODO FIX AFTER ELI MERGES TO MASTER
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -402,15 +401,15 @@ namespace TeamA.Exogredient.Services
         /// <summary>
         /// Check whether a given string contains only characters represented in the data.
         /// </summary>
-        /// <param name="name">The string that we are checking.</param>
+        /// <param name="input">The string that we are checking.</param>
         /// <returns>Returns value of bool to represent whether all the characters
         /// in name meet the specification.</returns>
-        public static bool CheckCharacters(string name, List<char> data)
+        public static bool CheckCharacters(string input, List<char> data)
         {
             bool result = true;
 
             // Convert to lower, check whether the dat contains the character, and AND it to the result (1 false will make the result false).
-            foreach (char c in name.ToLower())
+            foreach (char c in input.ToLower())
             {
                 result = result && data.Contains(c);
             }
@@ -418,7 +417,6 @@ namespace TeamA.Exogredient.Services
             return result;
         }
 
-        // TODO WHY CHECKING FOR ..
         /// <summary>
         /// Check whether the email is in a valid format (minimally: contains an @ with text on
         /// either side, and that text does not contain "..").

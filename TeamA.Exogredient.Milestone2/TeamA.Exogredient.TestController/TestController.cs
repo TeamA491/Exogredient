@@ -18,12 +18,6 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
-            Object ll = (long)-1;
-
-
-
-
-
         }
     }
 }
