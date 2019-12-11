@@ -67,7 +67,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678")]
         public async Task UserManagementService_CheckEmailExistenceAsync_EmailExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
@@ -95,7 +95,7 @@ namespace TeamA.Exogredient.Tests
 
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 1, "Customer", "123123123")]
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 1, "Customer", "12345678")]
         public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsDisabledSuccess(bool isTemp, string username, string firstname, string lastname, string email,
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
@@ -113,7 +113,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678")]
         public async Task UserManagementService_CheckIfUserDisabledAsync_UserIsNotDisabledSuccess(bool isTemp, string username, string firstname, string lastname, string email,
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
@@ -138,6 +138,15 @@ namespace TeamA.Exogredient.Tests
             bool lockResult = await UserManagementService.CreateIPAsync(ipAddress).ConfigureAwait(false);
             Assert.IsTrue(lockResult);
 
+            // Arrange: Attempt to faile to register 3 times. 
+            // IPs: Are only locked this way.
+            for (int i = 0; i < 3; i++)
+            {
+                bool registerResult = await UserManagementService.IncrementRegistrationFailuresAsync(ipAddress, Constants.RegistrationTriesResetTime, Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                Assert.IsTrue(registerResult);
+            }
+
+
             // Act
             bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
 
@@ -149,13 +158,22 @@ namespace TeamA.Exogredient.Tests
         [DataRow("127.0.0.1")]
         public async Task UserManagementService_CheckIPLockAsync_IpIsNotDisabledSuccess(string ipAddress)
         {
-            // Act:  Check that an non estant ip returns false.
-            bool result = await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
-            Assert.IsFalse(result);
+            // Act:  Check that an non existent ip returns ArgumentExcpetions because ip does not exists.
+            bool result;
+            try
+            {
+                await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
+                result = false;
+            }
+            catch(ArgumentException ae)
+            {
+                result = true;
+            }
+            Assert.IsTrue(result);    
         }
 
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678")]
         public async Task UserManagementService_CreateUserAsync_CreateNonExistentUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                                        string phoneNumber, string password, int disabled, string userType, string salt)
         {
@@ -185,7 +203,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123")]
+        [DataRow(true, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "87654321")]
         public async Task UserManagementService_DeleteUserAsync_DeleteUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                                 string phoneNumber, string password, int disabled, string userType, string salt)
         {
@@ -203,7 +221,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", "0", "Customer", "123123123")]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "87654321")]
         public async Task UserManagementService_MakeTempPerm_ChangeTempToPermSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
@@ -237,7 +255,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 123123123123)]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678", "1233", 123123123123)]
         public async Task UserManagementService_StoreEmailCode_StoreEmailCodeForUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
@@ -268,7 +286,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 10000000)]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678", "1233", 10000000)]
         public async Task UserManagementService_RemoveEmailCode_RemoveEmailCodeForUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
@@ -305,7 +323,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "123123123", "1233", 10000000)]
+        [DataRow(false, "username", "mr.DROP", "TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678")]
         public async Task UserManagementService_DisableUserNameAsync_DisableExistingUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
