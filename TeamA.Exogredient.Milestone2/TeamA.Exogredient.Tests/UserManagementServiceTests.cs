@@ -4,6 +4,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DAL;
+using System.Collections.Generic;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -152,6 +154,12 @@ namespace TeamA.Exogredient.Tests
 
             // Assert: Check that an IP that is inserted returns true.
             Assert.IsTrue(result);
+
+            // Cleanup: Delete the IP.
+            IPAddressDAO ipDAO = new IPAddressDAO();
+            bool deleteResult = await ipDAO.DeleteByIdsAsync(new List<string>() { ipAddress });
+            Assert.IsTrue(deleteResult);
+
         }
 
         [DataTestMethod]
