@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
@@ -14,17 +13,6 @@ namespace TeamA.Exogredient.Services
     /// </summary>
     public static class UtilityService
     {
-        private static readonly CorruptedPasswordDAO _corruptedPasswordsDAO;
-
-        /// <summary>
-        /// Constructor initializes the CorruptedPasswordsDAO object to provide
-        /// the interface with the usertable.
-        /// </summary>
-        static UtilityService()
-        {
-            _corruptedPasswordsDAO = new CorruptedPasswordDAO();
-        }
-
         /// <summary>
         /// Returns the current time in Unix/Epoch.
         /// </summary>
@@ -542,17 +530,21 @@ namespace TeamA.Exogredient.Services
         /// <returns>Task (bool) indicating whether the string is contained in the index.</returns>
         public static async Task<bool> IsCorruptedPasswordAsync(string input)
         {
-            // Read all password hashed from the corrputed password dao.
-            List<string> passwordHashes = await _corruptedPasswordsDAO.ReadAsync().ConfigureAwait(false);
-
             // Hash the input with sha1.
             string passwordSha1 = SecurityService.HashWithSHA1(input);
 
-            foreach (string hash in passwordHashes)
+            string lineInput = "";
+
+            using (StreamReader reader = new StreamReader(Constants.CorruptedPasswordsPath))
             {
-                if (passwordSha1.Equals(hash))
+                // Asynchronously read every line from the text file and compare it to the input.
+                // If the input hash matches, return true. Return false if it was not found.
+                while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                 {
-                    return true;
+                    if (passwordSha1.Equals(lineInput.Trim()))
+                    {
+                        return true;
+                    }
                 }
             }
 

@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.UnitTestServices\TeamA.Exogredient.UnitTestServices.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />

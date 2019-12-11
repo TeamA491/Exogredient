@@ -7,15 +7,16 @@ using MimeKit;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.UnitTestServices
 {
-    public static class UserManagementService
+    public static class UserManagementServiceUT
     {
         private static readonly UnitTestUserDAO _userDAO;
         private static readonly UnitTestIPAddressDAO _ipDAO;
 
-        static UserManagementService()
+        static UserManagementServiceUT()
         {
             _userDAO = new UnitTestUserDAO();
             _ipDAO = new UnitTestIPAddressDAO();

@@ -18,11 +18,11 @@ namespace TeamA.Exogredient.UnitTestServices
     /// only certain operations. The JWS is encrypted and decrypted using the RSA
     /// algorithm.
     /// </summary>
-    public static class AuthorizationService
+    public static class AuthorizationServiceUT
     {
         private static readonly UnitTestUserDAO _userDAO;
 
-        static AuthorizationService()
+        static AuthorizationServiceUT()
         {
             _userDAO = new UnitTestUserDAO();
         }

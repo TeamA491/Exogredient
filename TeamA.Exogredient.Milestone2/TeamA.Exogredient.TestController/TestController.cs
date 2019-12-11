@@ -16,8 +16,13 @@ namespace TeamA.Exogredient.TestController
 {
     class TestController
     {
-        public async static Task Main(string[] args)
+        public async static Task Main()
         {
+            Console.WriteLine(DateTime.UtcNow.ToString("ss:ffff"));
+
+            Console.WriteLine(await UtilityService.IsCorruptedPasswordAsync("lsiaf72284kdf722h3i732h724h").ConfigureAwait(false));
+
+            Console.WriteLine(DateTime.UtcNow.ToString("ss:ffff"));
         }
     }
 }
