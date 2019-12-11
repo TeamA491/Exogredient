@@ -4,26 +4,39 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.SQLCreateConsoleApp
 {
+    /// <summary>
+    /// Class containg the script to create the sql tables in the *already existent mysql schema*.
+    /// </summary>
     public class SQLCreateScript
     {
         private static readonly string _connection = Constants.SQLConnection;
 
         private const string _schema = Constants.SQLSchemaName;
 
-        public static async Task Main(string[] args)
+        /// <summary>
+        /// Function to execute the necessary create table sql statements.
+        /// </summary>
+        /// <returns>Task</returns>
+        public static async Task Main()
         {
-            // Directions: Uncomment the line which corresponds to the table you want to create.
+            // Directions: Comment out the specific create function that you do not want to execute.
 
             await CreateUserTable().ConfigureAwait(false);
-            //await CreateIPTable().ConfigureAwait(false);
+            await CreateIPTable().ConfigureAwait(false);
         }
 
-        private static async Task CreateUserTable()
+        /// <summary>
+        /// Executes the CREATE TABLE statement for the User Table in the mysql schema.
+        /// </summary>
+        /// <returns>Task (bool)</returns>
+        private static async Task<bool> CreateUserTable()
         {
 
             MySqlConnection connection = new MySqlConnection(_connection);
 
             connection.Open();
+
+            // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_schema}`.`{Constants.UserDAOtableName}` (" +
                                $@"`{Constants.UserDAOusernameColumn}` VARCHAR({Constants.MaximumUsernameCharacters}) NOT NULL," +
                                $@"`{Constants.UserDAOfirstNameColumn}` VARCHAR({Constants.MaximumFirstNameCharacters}) NOT NULL," +
@@ -45,16 +58,25 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"UNIQUE INDEX `{Constants.UserDAOemailColumn}_UNIQUE` (`{Constants.UserDAOemailColumn}` ASC) VISIBLE," +
                                $@"UNIQUE INDEX `{Constants.UserDAOphoneNumberColumn}_UNIQUE` (`{Constants.UserDAOphoneNumberColumn}` ASC) VISIBLE);";
 
+            // Create the commmand object and execute/dispose it asynchronously.
             MySqlCommand command = new MySqlCommand(sqlString, connection);
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
+
+            return true;
         }
 
-        private static async Task CreateIPTable()
+        /// <summary>
+        /// Executes the CREATE TABLE statement for the IP Address table in the mysql schema.
+        /// </summary>
+        /// <returns>Task (bool)</returns>
+        private static async Task<bool> CreateIPTable()
         {
             MySqlConnection connection = new MySqlConnection(_connection);
 
             connection.Open();
+
+            // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_schema}`.`{Constants.IPAddressDAOtableName}` (" +
                                $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({Constants.IPAddressLength}) NOT NULL," +
                                $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
@@ -62,9 +84,12 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"`{Constants.IPAddressDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
                                $@"PRIMARY KEY(`{Constants.IPAddressDAOIPColumn}`));";
 
+            // Create the commmand object and execute/dispose it asynchronously.
             MySqlCommand command = new MySqlCommand(sqlString, connection);
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
+
+            return true;
         }
     }
 }

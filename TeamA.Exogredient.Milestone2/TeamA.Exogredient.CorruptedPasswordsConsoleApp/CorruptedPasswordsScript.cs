@@ -5,7 +5,9 @@ using TeamA.Exogredient.AppConstants;
 namespace TeamA.Exogredient.CorruptedPasswordsConsoleApp
 {
     /// <summary>
-    /// Class containg the main method to store corrupted passwords.
+    /// Class containg the script to create the corrupted password collection and schema,
+    /// while populating it with data from a text file containing corrupted passwords
+    /// hashed with SHA1.
     /// </summary>
     public class CorruptedPasswordsScript
     {

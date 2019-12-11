@@ -28,7 +28,7 @@ namespace TeamA.Exogredient.Managers
 
                 string verificationStatus = await AuthenticationService.VerifyPhoneCodeAsync(phoneNumber, inputCode).ConfigureAwait(false);
 
-                if (verificationStatus.Equals("approved"))
+                if (verificationStatus.Equals(Constants.TwilioAuthenticationApprovedString))
                 {
                     phoneVerificationSuccess = true;
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
@@ -41,7 +41,7 @@ namespace TeamA.Exogredient.Managers
 
                     return UtilityService.CreateResult(Constants.VerifyPhoneSuccessUserMessage, phoneVerificationSuccess, false, currentNumExceptions);
                 }
-                else if (verificationStatus.Equals("pending"))
+                else if (verificationStatus.Equals(Constants.TwilioAuthenticationPendingString))
                 {
                     await UserManagementService.IncrementPhoneCodeFailuresAsync(username).ConfigureAwait(false);
 
@@ -53,7 +53,7 @@ namespace TeamA.Exogredient.Managers
                 }
                 else
                 {
-                    // Expired
+                    // Failed
                     await UserManagementService.IncrementPhoneCodeFailuresAsync(username).ConfigureAwait(false);
 
                     await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
