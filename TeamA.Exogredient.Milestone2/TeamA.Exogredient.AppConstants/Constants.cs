@@ -165,6 +165,7 @@ namespace TeamA.Exogredient.AppConstants
         public const int HexBaseValue = 16;
 
         public const string WordsTxtPath = @"..\..\..\..\words.txt";
+        public const string CorruptedPasswordsPath = @"..\..\..\..\corrupted-passwords-small.txt";
 
         public const int MaxDigitValue = 9;
         public const int MinDigitValue = 1;

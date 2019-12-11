@@ -15,7 +15,7 @@ namespace TeamA.Exogredient.Tests
             // Arrange
             // Create user 
 
-            bool result = UserManagementService.CheckUserExistence(username);
+            bool result = UserManagementServiceUT.CheckUserExistence(username);
             Assert.IsTrue(result);
 
             // Cleanup: delete user
@@ -28,7 +28,7 @@ namespace TeamA.Exogredient.Tests
         {
             // check if user exists
             // delete it if it does 
-            bool result = UserManagementService.CheckUserExistence(username);
+            bool result = UserManagementServiceUT.CheckUserExistence(username);
             Assert.IsFalse(result);
         }
 
@@ -38,7 +38,7 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange
             // Create users with phonenumber above
-            bool result = UserManagementService.CheckPhoneNumberExistence(phoneNumber);
+            bool result = UserManagementServiceUT.CheckPhoneNumberExistence(phoneNumber);
             Assert.IsTrue(result);
 
             // Cleanup 
@@ -52,7 +52,7 @@ namespace TeamA.Exogredient.Tests
             // Arrange
             // Check if phonenumber exists. if it does delete that user
 
-            bool result = UserManagementService.CheckPhoneNumberExistence(phoneNumber);
+            bool result = UserManagementServiceUT.CheckPhoneNumberExistence(phoneNumber);
             Assert.IsFalse(result);
         }
 
@@ -63,7 +63,7 @@ namespace TeamA.Exogredient.Tests
             // Arrange
             // Create user. 
 
-            bool result = UserManagementService.CheckEmailExistence(email);
+            bool result = UserManagementServiceUT.CheckEmailExistence(email);
             Assert.IsTrue(result);
 
             // Cleanup 
@@ -78,7 +78,7 @@ namespace TeamA.Exogredient.Tests
             // check if that email exist
             // if it does delete that user
 
-            bool result = UserManagementService.CheckEmailExistence(email);
+            bool result = UserManagementServiceUT.CheckEmailExistence(email);
             Assert.IsFalse(result);
         }
 
@@ -92,7 +92,7 @@ namespace TeamA.Exogredient.Tests
             // Create user
             // Disable user
 
-            bool result = UserManagementService.CheckIfUserDisabled(username);
+            bool result = UserManagementServiceUT.CheckIfUserDisabled(username);
             Assert.IsTrue(result);
 
             // Cleanup 
@@ -107,7 +107,7 @@ namespace TeamA.Exogredient.Tests
             // Create user that is not diabled
             
 
-            bool result = UserManagementService.CheckIfUserDisabled(username);
+            bool result = UserManagementServiceUT.CheckIfUserDisabled(username);
             Assert.IsFalse(result);
 
             // Cleanup
@@ -124,7 +124,7 @@ namespace TeamA.Exogredient.Tests
             // Insert Ip into ip table
 
             // Act
-            bool result = UserManagementService.CheckIfIPLocked(ipAddress);
+            bool result = UserManagementServiceUT.CheckIfIPLocked(ipAddress);
             
             // Assert
             Assert.IsTrue(result);
@@ -139,7 +139,7 @@ namespace TeamA.Exogredient.Tests
             // if it is selete it from it 
 
             TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
-            bool result = UserManagementService.CheckIfIPLocked(ipAddress);
+            bool result = UserManagementServiceUT.CheckIfIPLocked(ipAddress);
             Assert.IsFalse(result);
         }
 
@@ -151,7 +151,7 @@ namespace TeamA.Exogredient.Tests
             
             // Act 
             // Create the user 
-            bool result = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            bool result = UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
             // Assert that user creation was successful 
             Assert.IsTrue(result);
@@ -170,11 +170,11 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a user to be deleted
-            UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
             // Act 
             // Delete the user 
-            bool result = UserManagementService.DeleteUser(username);
+            bool result = UserManagementServiceUT.DeleteUser(username);
 
             Assert.IsTrue(result);
 
@@ -192,11 +192,11 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a temporary user to be deleted
-            UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
             // Act 
             // Make the temporary user perm
-            bool result = UserManagementService.MakeTempPerm(username);
+            bool result = UserManagementServiceUT.MakeTempPerm(username);
 
             // Assert
             Assert.IsTrue(result);
@@ -215,10 +215,10 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a temporary user to be deleted
-            UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
             // Act 
-            bool result = UserManagementService.StoreEmailCode(username, emailCode, emailCodeTimestamp);
+            bool result = UserManagementServiceUT.StoreEmailCode(username, emailCode, emailCodeTimestamp);
 
             Assert.IsTrue(result);
 
@@ -236,10 +236,10 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange 
             // Create a temporary user to be deleted
-            UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
             // Act 
-            bool result = UserManagementService.RemoveEmailCode(username);
+            bool result = UserManagementServiceUT.RemoveEmailCode(username);
 
             Assert.IsTrue(result);
             
@@ -257,7 +257,7 @@ namespace TeamA.Exogredient.Tests
             // Create the user that will be disabled
 
             // Act 
-            bool result = UserManagementService.DisableUser(username);
+            bool result = UserManagementServiceUT.DisableUser(username);
             Assert.IsFalse(result);
 
             // Read that user and check if it was disabled
@@ -271,7 +271,7 @@ namespace TeamA.Exogredient.Tests
         public void UserManagementService_DisableUserName_DisableNonExistingUserFailure(string username)
         {
             // Act 
-            bool result = UserManagementService.DisableUser(username);
+            bool result = UserManagementServiceUT.DisableUser(username);
             Assert.IsFalse(result);
         }
 
@@ -284,7 +284,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Make the temporary user perm
-            bool result = UserManagementService.DisableUser(username);
+            bool result = UserManagementServiceUT.DisableUser(username);
             Assert.IsFalse(result);
         }
 
@@ -296,11 +296,11 @@ namespace TeamA.Exogredient.Tests
             // Create the user that will be disabled
 
    
-            bool result = UserManagementService.DisableUser(username);
+            bool result = UserManagementServiceUT.DisableUser(username);
             Assert.IsTrue(result);
 
             // Act 
-            bool enableResult = UserManagementService.EnableUser(username);
+            bool enableResult = UserManagementServiceUT.EnableUser(username);
 
             Assert.IsTrue(enableResult);
             // Cleanup 
@@ -316,7 +316,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act 
             // Make the temporary user perm
-            bool result = UserManagementService.EnableUser(username);
+            bool result = UserManagementServiceUT.EnableUser(username);
             Assert.IsFalse(result);
         }
 
@@ -341,7 +341,7 @@ namespace TeamA.Exogredient.Tests
 
             // Act
             // Send message to system admin 
-            bool result = UserManagementService.NotifySystemAdmin(body, Constants.SystemAdminEmailAddress);
+            bool result = UserManagementServiceUT.NotifySystemAdmin(body, Constants.SystemAdminEmailAddress);
 
             // Assert
             // TODO: how do we ensure that the system admin got the email?
