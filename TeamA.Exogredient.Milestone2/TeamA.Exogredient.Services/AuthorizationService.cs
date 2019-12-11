@@ -8,6 +8,8 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 
 // NOTE JWS TOKEN MUST BE IN THE AUTHORIZATION HEADER FOR EACH REQUEST
+// TODO MAKE NEW HASH METHOD - VIRTUAL
+// TODO MAKE NEW SIGN METHOD - VIRTUAL
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -38,8 +40,12 @@ namespace TeamA.Exogredient.Services
         /// Jose_Header.JWS_Payload.JWS_Signature
         /// </remarks>
         /// <param name="payload">The data to be encrypted.</param>
+        /// <param name="publicKey">An optional public key to be used instead of the one
+        /// loaded from the environment. The public key will be sent along with the token payload.</param>
+        /// <param name="privateKey">An optional private key to be used instead of the one
+        /// loaded from the environment.</param>
         /// <returns>The JWS.</returns>
-        public static string GenerateJWS(Dictionary<string, string> payload)
+        public static string GenerateJWS(Dictionary<string, string> payload, string publicKey = "", string privateKey = "")
         {
             // Make sure we have the proper parameters inside the dictionary
             if (!payload.ContainsKey(Constants.UserTypeKey) || !payload.ContainsKey(Constants.IdKey))
@@ -47,19 +53,26 @@ namespace TeamA.Exogredient.Services
 
             // Create the header and convert it to a Base64 string
             Dictionary<string, string> joseHeader = new Dictionary<string, string>{
-                { "typ", Constants.MediaJWT },  // Media type
-                { Constants.SigningAlg, Constants.AuthzSigningAlgorithm }  // Signing algorithm type
+                { "typ", "JWT" },  // Media type
+                { "alg", SIGNING_ALGORITHM }  // Signing algorithm type
             };
 
             // If the expiration date wasn't already specified, then create one
-            if (!payload.ContainsKey(Constants.AuthzExpirationField))
+            if (!payload.ContainsKey(EXPIRATION_FIELD))
             {
                 // Add a 20 min expiration
-                payload.Add(Constants.AuthzExpirationField, GetNewExpirationDate().ToString());
+                payload.Add(EXPIRATION_FIELD, UtilityService.GetEpochFromNow().ToString());
             }
 
             // Add the public key to the payload
-            payload.Add(Constants.AuthzPublicKeyField, Constants.AuthzPublicKey);
+            if (string.IsNullOrEmpty(publicKey))
+            {
+                payload.Add(PUBLIC_KEY_FIELD, Constants.AuthzPublicKey);
+            }
+            else
+            {
+                payload.Add(PUBLIC_KEY_FIELD, publicKey);
+            }
 
             // Base64 encode the header and payload
             string encodedHeader = DictionaryToString(joseHeader).ToBase64();
@@ -69,15 +82,21 @@ namespace TeamA.Exogredient.Services
             string stringToSign = encodedHeader + '.' + encodedPayload;
 
             RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-            RSA.FromXmlString(Constants.AuthzPrivateKey);
+            if (string.IsNullOrEmpty(privateKey))
+            {
+                RSA.FromXmlString(Constants.AuthzPrivateKey);
+            }
+            else
+            {
+                RSA.FromXmlString(privateKey);
+            }
 
             // This object will let us create a signature
             RSAPKCS1SignatureFormatter RSAFormatter = new RSAPKCS1SignatureFormatter(RSA);
 
             // TODO MAKE MORE EXTENSIBLE TO OTHER HASHING ALGORITHMS
-            // TODO MAYBE MAKE HASH SERVICE?
-            RSAFormatter.SetHashAlgorithm("SHA1");  // We care more about speed here, so we use SHA1
-            SHA1Managed SHhash = new SHA1Managed();
+            RSAFormatter.SetHashAlgorithm("SHA512");  // We care more about speed here, so we use SHA512
+            SHA512Managed SHhash = new SHA512Managed();
 
             // Hash the encoded values using RSA512
             byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(stringToSign));
@@ -116,11 +135,11 @@ namespace TeamA.Exogredient.Services
         /// <summary>
         /// Decrypts a JWS in order to see the encrypted payload.
         /// </summary>
-        /// <param name="token">The token to decrypt.</param>
+        /// <param name="jws">The token to decrypt.</param>
         /// <returns>The contents inside the decrypted token.</returns>
-        public static Dictionary<string, string> DecryptJWS(string token)
+        public static Dictionary<string, string> DecryptJWS(string jws)
         {
-            string[] segments = token.Split('.');
+            string[] segments = jws.Split('.');
 
             // Make sure we have the proper JWS format of 3 tokens delimited by periods
             if (segments.Length != 3)
@@ -145,16 +164,15 @@ namespace TeamA.Exogredient.Services
             if (!payloadJSON.ContainsKey(PUBLIC_KEY_FIELD))
                 throw new InvalidTokenException("Public key not found in the JWS payload!");
 
-            string publicKey = payloadJSON[Constants.AuthzPublicKeyField];
+            string publicKey = payloadJSON[PUBLIC_KEY_FIELD];
             RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
             RSA.FromXmlString(publicKey);
 
             // Create this object in order to verify that the JWS was untampered with
             RSAPKCS1SignatureDeformatter RSADeformatter = new RSAPKCS1SignatureDeformatter(RSA);
-            RSADeformatter.SetHashAlgorithm("SHA1");
-            SHA1Managed SHhash = new SHA1Managed();
+            RSADeformatter.SetHashAlgorithm("SHA512");
+            SHA512Managed SHhash = new SHA512Managed();
 
-            // Sign the hash with the private key
             string strToVerify = encodedHeader + '.' + encodedPayload;
             // Hash the encoded values using RSA512
             byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(strToVerify));
@@ -178,15 +196,19 @@ namespace TeamA.Exogredient.Services
         /// Refreshes a token to be active for 20 more minutes.
         /// </summary>
         /// <param name="jws">The token that needs to be refreshed.</param>
+        /// <param name="publicKey">An optional public key to be used instead of the one
+        /// loaded from the environment. The public key will be sent along with the token payload.</param>
+        /// <param name="privateKey">An optional private key to be used instead of the one
+        /// loaded from the environment.</param>
         /// <returns>A new token that has been refreshed and active for 20 more minutes.</returns>
-        public static string RefreshJWS(string jws)
+        public static string RefreshJWS(string jws, int minutes = Constants.TOKEN_EXPIRATION_MIN, string publicKey = "", string privateKey = "")
         {
             Dictionary<string, string> payload = DecryptJWS(jws);
 
             // Refresh the token for an additional 20 minutes
-            payload[EXPIRATION_FIELD] = GetNewExpirationDate().ToString();
+            payload[EXPIRATION_FIELD] = UtilityService.GetEpochFromNow(minutes).ToString();
 
-            return GenerateJWS(payload);
+            return GenerateJWS(payload, publicKey, privateKey);
         }
 
         /// <summary>
@@ -199,17 +221,17 @@ namespace TeamA.Exogredient.Services
             Dictionary<string, string> payload = DecryptJWS(jws);
 
             // Check if the expiration key exists first
-            if (!payload.ContainsKey(Constants.AuthzExpirationField))
-                throw new ArgumentException(Constants.ExpirationNotSpecified);
+            if (!payload.ContainsKey(EXPIRATION_FIELD))
+                throw new ArgumentException("Expiration time is not specified!");
 
             long expTime;
-            bool isNumeric = long.TryParse(payload[Constants.AuthzExpirationField], out expTime);
+            bool isNumeric = long.TryParse(payload[EXPIRATION_FIELD], out expTime);
 
-            // Make sure we are dealing with number first
+            // Make sure we are dealing with a number first
             if (!isNumeric)
-                throw new ArgumentException(Constants.ExpirationNotNumeric);
+                throw new ArgumentException("Expiration time is not a number!");
 
-            return GetEpochTime() > expTime;
+            return UtilityService.CurrentUnixTime() > expTime;
         }
 
         /// <summary>
@@ -271,7 +293,7 @@ namespace TeamA.Exogredient.Services
             // Check for condition (1)
             if (dictStr.Length < 2 || dictStr[0] != '{' || dictStr[dictStr.Length - 1] != '}')
             {
-                throw new ArgumentException(Constants.DictionaryMissingBrackets);
+                throw new ArgumentException("Dictionary doesn't have proper surrounding brackets.");
             }
 
             // Remove the first and last brackets
@@ -296,7 +318,7 @@ namespace TeamA.Exogredient.Services
             // NOTE: If a comma or colon appears in the key or value, then it violates condition (4)
             if (colonCount - 1 != commaCount)
             {
-                throw new ArgumentException(Constants.InvalidCommaColon);
+                throw new ArgumentException("Invalid comma and / or colon formatting.");
             }
 
             // Determine key/value pairs and their correctness
@@ -309,7 +331,7 @@ namespace TeamA.Exogredient.Services
                 // If we don't have a key and value pair, then it's not correct
                 if (p.Length != 2)
                 {
-                    throw new ArgumentException(Constants.InvalidKeyValue);
+                    throw new ArgumentException("Invalid key/value pair.");
                 }
 
                 string key = p[0];
@@ -321,38 +343,19 @@ namespace TeamA.Exogredient.Services
 
                 if (!keyHasQuotes || !valHasQuotes)
                 {
-                    throw new ArgumentException(Constants.KeyValueNoDoubleQuotes);
+                    throw new ArgumentException("Key or value isn't surrounded by double quotes.");
                 }
 
                 // Check for condition (4)
                 if (!(p[0].IsAlphaNumeric() && p[1].IsAlphaNumeric()))
                 {
-                    throw new ArgumentException(Constants.KeyValueNotAlphaNum);
+                    throw new ArgumentException("Key or value is not alpha-numeric (excluding white-space).");
                 }
 
                 dict.Add(key, val);
             }
 
             return dict;
-        }
-
-        /// <summary>
-        /// Gets the current epoch time.
-        /// </summary>
-        /// <returns>A long representing the current epoch time.</returns>
-        private static long GetEpochTime()
-        {
-            return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
-        }
-
-        /// <summary>
-        /// Gets the new UTC epoch time for which the token would expire.
-        /// </summary>
-        /// <returns>Epoch time representing `x` minutes from now.</returns>
-        private static long GetNewExpirationDate()
-        {
-            DateTime curTime = DateTime.UtcNow;
-            return ((DateTimeOffset)curTime.AddMinutes(Constants.TOKEN_EXPIRATION_MIN)).ToUnixTimeSeconds();
         }
 
         /// <summary>
