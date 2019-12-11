@@ -16,34 +16,13 @@ namespace TeamA.Exogredient.TestController
 {
     class TestController
     {
-        public async static Task Main(string[] args)
+        public async static Task Main()
         {
-            string password = "password";
-            string passHex = UtilityService.ToHexString(password);
-            byte[] passBytes = UtilityService.HexStringToBytes(passHex);
+            Console.WriteLine(DateTime.UtcNow.ToString("ss:ffff"));
 
-            byte[] pubBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
+            Console.WriteLine(await UtilityService.IsCorruptedPasswordAsync("lsiaf72284kdf722h3i732h724h").ConfigureAwait(false));
 
-            byte[] encryptedBytes = SecurityService.EncryptRSA(passBytes, pubBytes);
-
-            byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
-
-            //await UserManagementService.CreateIPAsync("127.0.0.1").ConfigureAwait(false);
-            //await UserManagementService.IncrementRegistrationFailuresAsync("127.0.0.1", Constants.RegistrationTriesResetTime, Constants.MaxRegistrationAttempts).ConfigureAwait(false);
-
-            //var task = Task.Run(() => VerifyPhoneCodeManager.VerifyPhoneCodeAsync("eli", "0432", "ip", "9499815506", false));
-
-            //if (task.Wait(TimeSpan.FromSeconds(30)))
-            //    Console.WriteLine(task.Result);
-            //else
-            //    Console.WriteLine("Timed out");
-
-            //Console.WriteLine(Encoding.UTF8.GetString(res));
-
-            //await AuthenticationService.SendCallVerificationAsync("eli", "9499815506").ConfigureAwait(false);
-            //string result = await AuthenticationService.VerifyPhoneCodeAsync("9499815506", "2247").ConfigureAwait(false);
-
-            //Console.WriteLine(result);
+            Console.WriteLine(DateTime.UtcNow.ToString("ss:ffff"));
         }
     }
 }

@@ -7,11 +7,11 @@ using TeamA.Exogredient.AppConstants;
 namespace TeamA.Exogredient.Tests
 {
     [TestClass]
-    public class StringUtilityServiceTests
+    public class UtilityServiceTests
     {
         [DataTestMethod]
         [DataRow("A3D1FF2CB29F5FDC", new byte[] { 163, 209, 255, 44, 178, 159, 95, 220 })]
-        public void SecurityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
+        public void UtilityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
         {
             // Act
             byte[] actual = UtilityService.HexStringToBytes(hexString);
@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow(new byte[] { 104, 101, 108, 108, 111 }, "68656C6C6F")]
-        public void StringUtilityService_BytesToHexString_GenerateCorrectHexString(byte[] bytes, string expected)
+        public void UtilityService_BytesToHexString_GenerateCorrectHexString(byte[] bytes, string expected)
         {
             // Act
             string actual = UtilityService.BytesToHexString(bytes);
@@ -33,7 +33,7 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("testing", "74657374696E67")]
-        public void StringUtilityService_ToHexString_GenerateCorrectHexString(string original, string expected)
+        public void UtilityService_ToHexString_GenerateCorrectHexString(string original, string expected)
         {
             // Act
             string actual = UtilityService.ToHexString(original);
@@ -45,7 +45,7 @@ namespace TeamA.Exogredient.Tests
         [DataTestMethod]
         [DataRow("Jason", 5, -1)]
         [DataRow("David", 2000, 1)]
-        public void StringUtilityService_CheckLength_WithinLengthSuccess(string name, int length, int min)
+        public void UtilityService_CheckLength_WithinLengthSuccess(string name, int length, int min)
         {
             // if min = -1 we are not checking withing a range/ the string has to be equal to length.
 
@@ -60,7 +60,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("Jason", 4, -1)]
         [DataRow("David", 3, 1)]
         [DataRow("aBc", 7, 4)]
-        public void StringUtilityService_CheckLength_NotWithinLengthFail(string name, int length, int min)
+        public void UtilityService_CheckLength_NotWithinLengthFail(string name, int length, int min)
         {
             // if min = -1 we are not checking withing a range/ the string has to be equal to length.
 
@@ -74,7 +74,7 @@ namespace TeamA.Exogredient.Tests
         [DataTestMethod]
         [DataRow("asdsa12312#!@#")]
         [DataRow("...fas313ads[];'{}312")]
-        public void StringUtilityService_CheckCharacters_OnlyANSCharactersSuccess(string name)
+        public void UtilityService_CheckCharacters_OnlyANSCharactersSuccess(string name)
         {
             // Act
             bool result = UtilityService.CheckCharacters(name, Constants.CharSetsData[Constants.ANSNoAngle]);
@@ -85,7 +85,7 @@ namespace TeamA.Exogredient.Tests
 
         [DataTestMethod]
         [DataRow("123123123")]
-        public void StringUtilityService_CheckCharacters_OnlyNumericCharactersSuccess(string name)
+        public void UtilityService_CheckCharacters_OnlyNumericCharactersSuccess(string name)
         {
             // Act
             bool result = UtilityService.CheckCharacters(name, Constants.CharSetsData[Constants.Numeric]);
@@ -98,7 +98,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("a@A")]
         [DataRow("lmao123sda@gmail.com")]
         [DataRow("dasda.dsa#!@yahoo.com")]
-        public void StringUtilityService_EmailFormatValidityCheck_ValidEmailFormatSuccess(string email)
+        public void UtilityService_EmailFormatValidityCheck_ValidEmailFormatSuccess(string email)
         {
             // Act
             bool result = UtilityService.CheckEmailFormatValidity(email);
@@ -112,7 +112,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("lmao123sda@gmail.com")]
         [DataRow("dasda.dsa#!@yahoo.com")]
         [DataRow("LoveThisClass123+lmaojk@gmail.com")]
-        public void StringUtilityService_CanonicalizingEmail_CanonicalizingEmailSuccess(string email)
+        public void UtilityService_CanonicalizingEmail_CanonicalizingEmailSuccess(string email)
         {
 
             // Act
@@ -138,7 +138,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("ImTryingToHidexogredientasdasd")]
         [DataRow("EXOGREDIENT")]
         [DataRow("eXoGrEdIeNt")]
-        public void StringUtilityService_ContainsContextSpecificWords_HasContextSuccess(string plaintextPassword)
+        public void UtilityService_ContainsContextSpecificWords_HasContextSuccess(string plaintextPassword)
         {
             // Act
             bool result = UtilityService.ContainsContextSpecificWords(plaintextPassword);
@@ -152,7 +152,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("ashdfsakdffreeadf")]
         [DataRow("servicesthese")]
         [DataRow("POLICY")]
-        public async Task StringUtilityService_ContainsDictionaryWordsAsync_HasDicionaryAsyncSuccess(string plaintextPassword)
+        public async Task UtilityService_ContainsDictionaryWordsAsync_HasDicionaryAsyncSuccess(string plaintextPassword)
         {
             // Act
             bool result = await UtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false);
@@ -168,7 +168,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("password")]
         [DataRow("password1")]
         [DataRow("abc123")]
-        public async Task StringUtilityService_IsCorruptedPassword_IsCorruptedAsyncSuccess(string plaintextPassword)
+        public async Task UtilityService_IsCorruptedPassword_IsCorruptedAsyncSuccess(string plaintextPassword)
         {
             // Act
             bool result = await UtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false);
@@ -194,7 +194,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("::s:::::::::::::::")]
         [DataRow("\"\"\"\"\"\"\"\"\"\"\"\"\"\"")]
         [DataRow("912")]
-        public void StringUtilityService_ContainsRepetitionOrSequence_HasPatternSuccess(string plaintextPassword)
+        public void UtilityService_ContainsRepetitionOrSequence_HasPatternSuccess(string plaintextPassword)
         {
             // Act
             bool result = UtilityService.ContainsRepetitionOrSequence(plaintextPassword);
@@ -210,7 +210,7 @@ namespace TeamA.Exogredient.Tests
         [DataRow("121212121223232323")]
         [DataRow("thisshouldnotcontainreptitions")]
         [DataRow("34895019")]
-        public void StringUtilityService_ContainsRepetitionOrSequence_NoReptitionFailure(string plaintextPassword)
+        public void UtilityService_ContainsRepetitionOrSequence_NoReptitionFailure(string plaintextPassword)
         {
             // Act
             bool result = UtilityService.ContainsRepetitionOrSequence(plaintextPassword);
@@ -219,19 +219,5 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
         }
-
-        [DataTestMethod]
-        [DataRow("A3D1FF2CB29F5FDC", new byte[] { 163, 209, 255, 44, 178, 159, 95, 220 })]
-        public void StringUtilityService_HexStringToBytes_GenerateCorrectByteArray(string hexString, byte[] expected)
-        {
-            //Arrange
-
-            //Act
-            byte[] actual = UtilityService.HexStringToBytes(hexString);
-
-            //Assert
-            Assert.IsTrue(expected.SequenceEqual(actual));
-        }
-
     }
 }

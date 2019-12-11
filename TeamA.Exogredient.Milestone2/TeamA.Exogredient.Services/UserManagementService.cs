@@ -389,7 +389,7 @@ namespace TeamA.Exogredient.Services
 
             await _userDAO.UpdateAsync(record).ConfigureAwait(false);
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -482,7 +482,7 @@ namespace TeamA.Exogredient.Services
 
             await _ipDAO.UpdateAsync(record).ConfigureAwait(false);
 
-            return false;
+            return true;
         }
     }
 }
