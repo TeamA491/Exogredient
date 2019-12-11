@@ -364,7 +364,8 @@ namespace TeamA.Exogredient.Services
 
             bool reset = false;
 
-            // If the time has passed their max time before reset, reset their failures
+            // If the time has passed their max time before reset, reset their failures. Don't reset if
+            // they have no last login fail timestamp.
             if (lastLoginFailTimestamp + maxSeconds < currentUnix && lastLoginFailTimestamp != Constants.NoValueLong)
             {
                 reset = true;
@@ -453,7 +454,8 @@ namespace TeamA.Exogredient.Services
 
             bool reset = false;
 
-            // If the time has passed their max time before reset, reset their failures
+            // If the time has passed their max time before reset, reset their failures. Don't reset
+            // if they have no last registration fail timestamp.
             if (lastRegFailTimestamp + maxSeconds < currentUnix && lastRegFailTimestamp != Constants.NoValueLong)
             {
                 reset = true;
