@@ -134,7 +134,7 @@ namespace TeamA.Exogredient.DAL
                     }
 
                     // Construct the sql string for deleteing where the ip column equals the @IPADDRESS parameter.
-                    string sqlString = $"DELETE {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS;";
+                    string sqlString = $"DELETE FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS;";
 
                     // Get the command object inside a using statement to properly dispose/close.
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))

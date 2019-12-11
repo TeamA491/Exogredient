@@ -103,6 +103,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserTypeKey = "userType";
         public const string IdKey = "id";
 
+        public const string SHA1 = "SHA1";
+
         public enum USER_TYPE
         {
             UNREGISTERED = 0,
@@ -163,6 +165,7 @@ namespace TeamA.Exogredient.AppConstants
         public const int HexBaseValue = 16;
 
         public const string WordsTxtPath = @"..\..\..\..\words.txt";
+        public const string CorruptedPasswordsPath = @"..\..\..\..\corrupted-passwords-small.txt";
 
         public const int MaxDigitValue = 9;
         public const int MinDigitValue = 1;
