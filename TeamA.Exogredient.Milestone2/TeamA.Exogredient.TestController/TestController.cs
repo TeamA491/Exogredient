@@ -28,12 +28,8 @@ namespace TeamA.Exogredient.TestController
 
             byte[] res = SecurityService.DecryptRSA(encryptedBytes, UtilityService.HexStringToBytes(Constants.PrivateKey));
 
-            LogRecord record = new LogRecord("fail", "fail", "fail", "fail", "fail");
-            LogDAO ldao = new LogDAO();
-
-            string result = await AuthenticationService.VerifyPhoneCodeAsync("9498675309", "7865");
-
-            Console.WriteLine(result);
+            //await UserManagementService.CreateIPAsync("127.0.0.1").ConfigureAwait(false);
+            //await UserManagementService.IncrementRegistrationFailuresAsync("127.0.0.1", Constants.RegistrationTriesResetTime, Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
             //var task = Task.Run(() => VerifyPhoneCodeManager.VerifyPhoneCodeAsync("eli", "0432", "ip", "9499815506", false));
 

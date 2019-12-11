@@ -48,6 +48,13 @@ namespace TeamA.Exogredient.DAL
                 {
                     // Check for null values in the data (string == null, numeric == -1), and throw a NoNullAllowedException
                     // if one is found.
+                    if (pair.Value is int)
+                    {
+                        if ((int)pair.Value == -1)
+                        {
+                            throw new NoNullAllowedException(Constants.IPRecordNoNull);
+                        }
+                    }
                     if (pair.Value is string)
                     {
                         if (pair.Value == null)
@@ -55,9 +62,9 @@ namespace TeamA.Exogredient.DAL
                             throw new NoNullAllowedException(Constants.IPRecordNoNull);
                         }
                     }
-                    if (pair.Value is int || pair.Value is long)
+                    if (pair.Value is long)
                     {
-                        if (pair.Value.Equals(-1))
+                        if ((long)pair.Value == -1)
                         {
                             throw new NoNullAllowedException(Constants.IPRecordNoNull);
                         }
@@ -237,16 +244,26 @@ namespace TeamA.Exogredient.DAL
                     // Again, use parameters to prevent against sql injections.
                     if (pair.Key != Constants.IPAddressDAOIPColumn)
                     {
-                        if (pair.Value is int || pair.Value is long)
+                        if (pair.Value is int)
                         {
-                            if (!pair.Value.Equals(-1))
+                            if ((int)pair.Value != -1)
                             {
                                 sqlString += $"{pair.Key} = @PARAM{count},";
                             }
                         }
-                        else if (pair.Value != null)
+                        if (pair.Value is string)
                         {
-                            sqlString += $"{pair.Key} = @PARAM{count},";
+                            if (pair.Value != null)
+                            {
+                                sqlString += $"{pair.Key} = @PARAM{count},";
+                            }
+                        }
+                        if (pair.Value is long)
+                        {
+                            if ((long)pair.Value != -1)
+                            {
+                                sqlString += $"{pair.Key} = @PARAM{count},";
+                            }
                         }
                     }
 
@@ -266,7 +283,27 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (pair.Key != Constants.IPAddressDAOIPColumn)
                         {
-                            command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                            if (pair.Value is int)
+                            {
+                                if ((int)pair.Value != -1)
+                                {
+                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                                }
+                            }
+                            if (pair.Value is string)
+                            {
+                                if (pair.Value != null)
+                                {
+                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                                }
+                            }
+                            if (pair.Value is long)
+                            {
+                                if ((long)pair.Value != -1)
+                                {
+                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                                }
+                            }
                         }
 
                         count++;
