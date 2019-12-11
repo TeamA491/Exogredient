@@ -190,6 +190,10 @@ namespace TeamA.Exogredient.Tests
 
             // The result should be true.
             Assert.IsTrue(result);
+
+            //Clean up
+
+            await userDAO.DeleteByIdsAsync(new List<string> { username });
         }
 
         // The specified user's data gets read successfully.
@@ -523,7 +527,7 @@ namespace TeamA.Exogredient.Tests
             //Act
 
             // Check if the email exists, and set the result accordingly.
-            bool emailExistence = await userDAO.CheckPhoneNumberExistenceAsync(email);
+            bool emailExistence = await userDAO.CheckEmailExistenceAsync(email);
 
             //Assert
 
