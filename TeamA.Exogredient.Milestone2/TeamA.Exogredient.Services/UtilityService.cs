@@ -7,7 +7,6 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
-// TODO FIX AFTER ELI MERGES TO MASTER
 namespace TeamA.Exogredient.Services
 {
     public static class UtilityService
@@ -23,9 +22,24 @@ namespace TeamA.Exogredient.Services
             _corruptedPasswordsDAO = new CorruptedPasswordDAO();
         }
 
+        /// <summary>
+        /// Gets the current UTC epoch time.
+        /// </summary>
+        /// <returns>A long representing the current epoch time.</returns>
         public static long CurrentUnixTime()
         {
             return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+        }
+
+        /// <summary>
+        /// Gets the new UTC epoch time for which the token would expire.
+        /// </summary>
+        /// <param name="min">How many minutes from now, to get a UTC time.</param>
+        /// <returns>Epoch time representing `x` minutes from now.</returns>
+        public static long GetEpochFromNow(int min = Constants.TOKEN_EXPIRATION_MIN)
+        {
+            DateTime curTime = DateTime.UtcNow;
+            return ((DateTimeOffset)curTime.AddMinutes(min)).ToUnixTimeSeconds();
         }
 
         public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred, int numExceptions)
