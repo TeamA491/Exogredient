@@ -103,6 +103,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserTypeKey = "userType";
         public const string IdKey = "id";
 
+        public const string SHA1 = "SHA1";
+
         public enum USER_TYPE
         {
             UNREGISTERED = 0,
