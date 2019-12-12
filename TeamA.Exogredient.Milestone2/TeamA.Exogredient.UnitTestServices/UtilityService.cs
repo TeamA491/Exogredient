@@ -10,9 +10,12 @@ using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.UnitTestServices
 {
+    /// <summary>
+    /// This object provides general utility functions for our system, mainly to operate on strings.
+    /// </summary>
     public static class UtilityService
     {
-        private static readonly UnitTestCorruptedPasswordsDAO _corruptedPasswordsDAO;
+        private static readonly UnitTestCorruptedPasswordDAO _corruptedPasswordsDAO;
 
         /// <summary>
         /// Constructor initializes the CorruptedPasswordsDAO object to provide
@@ -20,14 +23,28 @@ namespace TeamA.Exogredient.UnitTestServices
         /// </summary>
         static UtilityService()
         {
-            _corruptedPasswordsDAO = new UnitTestCorruptedPasswordsDAO();
+            _corruptedPasswordsDAO = new UnitTestCorruptedPasswordDAO();
         }
 
+        /// <summary>
+        /// Returns the current time in Unix/Epoch.
+        /// </summary>
+        /// <returns>The unix time value (long)</returns>
         public static long CurrentUnixTime()
         {
             return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         }
 
+        /// <summary>
+        /// Creates a result object from the <paramref name="message"/>, with the <paramref name="data"/>,
+        /// whether an <paramref name="exceptionOccurred"/>, and storing the <paramref name="numExceptions"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the data in the object.</typeparam>
+        /// <param name="message">The message to store in the result (string)</param>
+        /// <param name="data">The data to store in the result (T)</param>
+        /// <param name="exceptionOccurred">The fact of whether an exception occurred (bool)</param>
+        /// <param name="numExceptions">The number of exceptions that have occurred within a logical execution (int)</param>
+        /// <returns>The resulting Result(T)</returns>
         public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred, int numExceptions)
         {
             Result<T> result = new Result<T>(message)
@@ -40,14 +57,21 @@ namespace TeamA.Exogredient.UnitTestServices
             return result;
         }
 
+        /// <summary>
+        /// Turns a timspan object into a number of seconds.
+        /// </summary>
+        /// <param name="span">The time span (TimeSpan)</param>
+        /// <returns>The number of seconds (long)</returns>
         public static long TimespanToSeconds(TimeSpan span)
         {
             long result = 0;
 
+            // Get the hours, minutes, and seconds of the time span.
             int inputHours = span.Hours;
             int inputMinutes = span.Minutes;
             int inputSeconds = span.Seconds;
 
+            // Sum all seconds.
             for (int i = 0; i < inputHours; i++)
             {
                 result += Constants.SecondsInAnHour;
@@ -63,27 +87,42 @@ namespace TeamA.Exogredient.UnitTestServices
             return result;
         }
 
-        // Change To Epoch Time
-        public static bool CurrentTimePastDatePlusTimespan(TimeSpan span, int lockedHour, int lockedMinute,
-                                                           int lockedSecond, int lockedMonth, int lockedDay, int lockedYear)
+        /// <summary>
+        /// Evaluates whether the current time is passed the time represented by the <paramref name="hour"/>,
+        /// <paramref name="minute"/>, <paramref name="second"/>, <paramref name="month"/>, <paramref name="day"/>,
+        /// and <paramref name="year"/> summed with the time span.
+        /// </summary>
+        /// <param name="span">The time span part of the equation (TimSpan)</param>
+        /// <param name="hour">The hour part of the equation (int)</param>
+        /// <param name="minute">The minute part of the equation (int)</param>
+        /// <param name="second">The second part of the equation (int)</param>
+        /// <param name="month">The month part of the equation (int)</param>
+        /// <param name="day">The day part of the equation (int)</param>
+        /// <param name="year">The year part of the equation (int)</param>
+        /// <returns>bool whether or not the current time is pas the arguments summed together</returns>
+        public static bool CurrentTimePastDatePlusTimespan(TimeSpan span, int hour, int minute,
+                                                           int second, int month, int day, int year)
         {
+            // The hours, minutes, and seconds contained within the time span.
             int inputHours = span.Hours;
             int inputMinutes = span.Minutes;
             int inputSeconds = span.Seconds;
 
-            int resultHour = lockedHour;
-            int resultMinute = lockedMinute;
-            int resultSecond = lockedSecond;
-            int resultMonth = lockedMonth;
-            int resultDay = lockedDay;
-            int resultYear = lockedYear;
+            // Calculate the result (start at the input and add the time span)
+            int resultHour = hour;
+            int resultMinute = minute;
+            int resultSecond = second;
+            int resultMonth = month;
+            int resultDay = day;
+            int resultYear = year;
 
-            
-            // Hours
+
+            // Sum the input hours to the result.
             for (int i = 0; i < inputHours; i++)
             {
                 resultHour++;
 
+                // If the hours went over the hours in a day, increment the day and reset the hour value.
                 if (resultHour >= Constants.HoursInADay)
                 {
                     resultHour = Constants.HourStartValue;
@@ -91,16 +130,20 @@ namespace TeamA.Exogredient.UnitTestServices
                     resultDay++;
                 }
 
+                // If the day went over the days in the current month, increment the month and reset the day value.
                 if (resultDay > Constants.MonthDays[resultMonth])
                 {
+                    // If the month is february, the year is divisible by the leap year occurrence (4), and the day is the leap day value (29),
+                    // the month may not be incremented (i.e it is a leap year and the day is valid for february).
                     if (resultMonth == Constants.FebruaryMonthValue &&
                         resultYear % Constants.LeapYearOccurrenceYears == 0 &&
                         resultDay == Constants.LeapDayValue)
                     {
+                        // If the month is divisible by the unoccurence amount of years (100) and not the reoccurence amount of years (400),
+                        // it is not a leap year so increment the month.
                         if (resultYear % Constants.LeapYearUnoccurenceYears == 0 &&
                             resultYear % Constants.LeapYearReoccurenceYears != 0)
                         {
-                            // Not a leap year.
                             resultDay = Constants.DayStartValue;
 
                             resultMonth++;
@@ -118,6 +161,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     }
                 }
 
+                // If the month went over the amount of months in a year, increment the year and reset the month value.
                 if (resultMonth > Constants.MonthsInAYear)
                 {
                     resultMonth = Constants.MonthStartValue;
@@ -126,11 +170,12 @@ namespace TeamA.Exogredient.UnitTestServices
                 }
             }
 
-            // Minutes
+            // Sum the input minutes to the result.
             for (int i = 0; i < inputMinutes; i++)
             {
                 resultMinute++;
 
+                // If the minute went over the minutes in an hour, increment the hour and reset the minute value.
                 if (resultMinute >= Constants.MinutesInAnHour)
                 {
                     resultMinute = Constants.MinuteStartValue;
@@ -138,6 +183,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     resultHour++;
                 }
 
+                // If the hours went over the hours in a day, increment the day and reset the hour value.
                 if (resultHour >= Constants.HoursInADay)
                 {
                     resultHour = Constants.HourStartValue;
@@ -145,16 +191,20 @@ namespace TeamA.Exogredient.UnitTestServices
                     resultDay++;
                 }
 
+                // If the day went over the days in the current month, increment the month and reset the day value.
                 if (resultDay > Constants.MonthDays[resultMonth])
                 {
+                    // If the month is february, the year is divisible by the leap year occurrence (4), and the day is the leap day value (29),
+                    // the month may not be incremented (i.e it is a leap year and the day is valid for february).
                     if (resultMonth == Constants.FebruaryMonthValue &&
                         resultYear % Constants.LeapYearOccurrenceYears == 0 &&
                         resultDay == Constants.LeapDayValue)
                     {
+                        // If the month is divisible by the unoccurence amount of years (100) and not the reoccurence amount of years (400),
+                        // it is not a leap year so increment the month.
                         if (resultYear % Constants.LeapYearUnoccurenceYears == 0 &&
                             resultYear % Constants.LeapYearReoccurenceYears != 0)
                         {
-                            // Not a leap year.
                             resultDay = Constants.DayStartValue;
 
                             resultMonth++;
@@ -172,6 +222,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     }
                 }
 
+                // If the month went over the amount of months in a year, increment the year and reset the month value.
                 if (resultMonth > Constants.MonthsInAYear)
                 {
                     resultMonth = Constants.MonthStartValue;
@@ -180,11 +231,12 @@ namespace TeamA.Exogredient.UnitTestServices
                 }
             }
 
-            // Seconds
+            // Sum the input seconds to the result.
             for (int i = 0; i < inputSeconds; i++)
             {
                 resultSecond++;
 
+                // If the second went over the seconds in a minute, increment the minute and reset the second value.
                 if (resultSecond >= Constants.SecondsInAMinute)
                 {
                     resultSecond = Constants.SecondsStartValue;
@@ -192,6 +244,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     resultMinute++;
                 }
 
+                // If the minute went over the minutes in an hour, increment the hour and reset the minute value.
                 if (resultMinute >= Constants.MinutesInAnHour)
                 {
                     resultMinute = Constants.MinuteStartValue;
@@ -199,6 +252,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     resultHour++;
                 }
 
+                // If the hours went over the hours in a day, increment the day and reset the hour value.
                 if (resultHour >= Constants.HoursInADay)
                 {
                     resultHour = Constants.HourStartValue;
@@ -206,16 +260,20 @@ namespace TeamA.Exogredient.UnitTestServices
                     resultDay++;
                 }
 
+                // If the day went over the days in the current month, increment the month and reset the day value.
                 if (resultDay > Constants.MonthDays[resultMonth])
                 {
+                    // If the month is february, the year is divisible by the leap year occurrence (4), and the day is the leap day value (29),
+                    // the month may not be incremented (i.e it is a leap year and the day is valid for february).
                     if (resultMonth == Constants.FebruaryMonthValue &&
                         resultYear % Constants.LeapYearOccurrenceYears == 0 &&
                         resultDay == Constants.LeapDayValue)
                     {
+                        // If the month is divisible by the unoccurence amount of years (100) and not the reoccurence amount of years (400),
+                        // it is not a leap year so increment the month.
                         if (resultYear % Constants.LeapYearUnoccurenceYears == 0 &&
                             resultYear % Constants.LeapYearReoccurenceYears != 0)
                         {
-                            // Not a leap year.
                             resultDay = Constants.DayStartValue;
 
                             resultMonth++;
@@ -233,6 +291,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     }
                 }
 
+                // If the month went over the amount of months in a year, increment the year and reset the month value.
                 if (resultMonth > Constants.MonthsInAYear)
                 {
                     resultMonth = Constants.MonthStartValue;
@@ -241,7 +300,7 @@ namespace TeamA.Exogredient.UnitTestServices
                 }
             }
 
-            // Compare datetimes
+            // Compare the result datetime to the current datetime
             DateTime resultTime = new DateTime(resultYear, resultMonth, resultDay, resultHour, resultMinute, resultSecond, DateTimeKind.Utc);
 
             int compareResult = DateTime.Compare(resultTime, DateTime.UtcNow);
@@ -263,6 +322,8 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns> byte array of the hex string </returns>
         public static byte[] HexStringToBytes(string hexString)
         {
+            // TODO VALIDATE INPUT
+
             // The length of the byte array of the hex string is hexString.Length / 2
             byte[] bytes = new byte[hexString.Length / 2];
             char[] charArray = hexString.ToCharArray();
@@ -282,7 +343,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <summary>
         /// Convert a byte array to a hex string.
         /// </summary>
-        /// <param name="bytes"></param>
+        /// <param name="bytes">The bytes to convert (byte[])</param>
         /// <returns> hex string of the byte array </returns>
         public static string BytesToHexString(byte[] bytes)
         {
@@ -290,6 +351,11 @@ namespace TeamA.Exogredient.UnitTestServices
             return BitConverter.ToString(bytes).Replace("-", "");
         }
 
+        /// <summary>
+        /// Convert a byte array to a UTF8 string.
+        /// </summary>
+        /// <param name="bytes">The bytes to convert (byte[])</param>
+        /// <returns>The utf-8 string (string)</returns>
         public static string BytesToUTF8String(this byte[] bytes)
         {
             return Encoding.UTF8.GetString(bytes);
@@ -302,8 +368,11 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns> hex string of the string </returns>
         public static string ToHexString(string s)
         {
+            // TODO VALIDATE INPUT HERE
+
             // Convert the string into a ASCII byte array
             byte[] bytes = Encoding.ASCII.GetBytes(s);
+
             // Convert the byte array to hex string
             return BytesToHexString(bytes);
         }
@@ -313,32 +382,35 @@ namespace TeamA.Exogredient.UnitTestServices
         /// </summary>
         /// <param name="name">The string the user wants to check length of.</param>
         /// <param name="length">The length that the string must be equal to.</param>
-        /// <param name="min">A optional parameter. If this is set then, name's length can be a 
+        /// <param name="min">A optional parameter. If this is set then, name's length can be a
         /// range from min to length (inclusive).</param>
         /// <returns>Returns value of bool to represent whether the name met the required constraints.</returns>
         public static bool CheckLength(string name, int length, int min = -1)
         {
+            // If the min was left default, compare the length literaly.
             if (min == -1)
             {
                 return name.Length == length;
             }
             else
             {
+                // Otherwise, treat the length as the max value of a range.
                 return name.Length >= min && name.Length <= length;
             }
         }
 
         /// <summary>
-        /// Check whether a given string contains only Alphanumeric and Special characters.
+        /// Check whether a given string contains only characters represented in the data.
         /// </summary>
-        /// <param name="name">The string that we are checking.</param>
+        /// <param name="input">The string that we are checking.</param>
         /// <returns>Returns value of bool to represent whether all the characters
         /// in name meet the specification.</returns>
-        public static bool CheckCharacters(string name, List<char> data)
+        public static bool CheckCharacters(string input, List<char> data)
         {
             bool result = true;
 
-            foreach (char c in name.ToLower())
+            // Convert to lower, check whether the dat contains the character, and AND it to the result (1 false will make the result false).
+            foreach (char c in input.ToLower())
             {
                 result = result && data.Contains(c);
             }
@@ -357,13 +429,16 @@ namespace TeamA.Exogredient.UnitTestServices
         {
             string[] splitResult = email.Split('@');
 
+            // If the email contained an @, continue.
             if (splitResult.Length == 2)
             {
                 string first = splitResult[0];
                 string second = splitResult[1];
 
+                // If either side of the @ had at least 1 character, continue.
                 if (first.Length >= 1 && second.Length >= 1)
                 {
+                    // If .. is containd on other side return false, otherwise return true.
                     if (first.Contains("..") || second.Contains(".."))
                     {
                         return false;
@@ -378,20 +453,16 @@ namespace TeamA.Exogredient.UnitTestServices
             return false;
         }
 
+        // TODO WHY ONLY CHECKING FOR GMAIL
         /// <summary>
-        /// Breaks email address up into two parts, the local-part 
-        /// and the domain.
-        /// First we convert to lowercase.
-        /// Then we check if the domain is "gmail.com".
-        /// If it is, then the local-part is checked for "+[anything]", ".", and """", 
-        /// and they are then removed.
-        /// Finally all double quotes are removed
+        /// Removes the superfluous elements of an email so it can be properly checked for uniqueness.
         /// </summary>
         /// <param name="email">The email we are checking.</param>
-        /// <returns>Returns value of string to represent the 
+        /// <returns>Returns value of string to represent the
         /// canonicalized email.</returns>
         public static string CanonicalizeEmail(string email)
         {
+            // Split the email into the username and domain parts.
             string[] splitResult = email.Split('@');
             string username = splitResult[0].ToLower();
             string domain = splitResult[1].ToLower();
@@ -405,7 +476,6 @@ namespace TeamA.Exogredient.UnitTestServices
 
                 // Remove plus and everything after.
                 int plusIndex = transposedUsername.IndexOf("+");
-
                 if (plusIndex != -1)
                 {
                     transposedUsername = transposedUsername.Remove(plusIndex);
@@ -418,13 +488,20 @@ namespace TeamA.Exogredient.UnitTestServices
             return transposedUsername + "@" + domain;
         }
 
-        public static bool ContainsContextSpecificWords(string plaintextPassword)
+        /// <summary>
+        /// Checks if the string <paramref name="input"/> contains context specific
+        /// words from our application.
+        /// </summary>
+        /// <param name="input">The string to test (string)</param>
+        /// <returns>bool indicating whether the input contains context specific words.</returns>
+        public static bool ContainsContextSpecificWords(string input)
         {
-            string lowerPassword = plaintextPassword.ToLower();
+            // Lowercase the string, any combination of capitals and lowercase is considered context specific.
+            string lower = input.ToLower();
 
             foreach (string word in Constants.ContextSpecificWords)
             {
-                if (lowerPassword.Contains(word))
+                if (lower.Contains(word))
                 {
                     return true;
                 }
@@ -434,17 +511,22 @@ namespace TeamA.Exogredient.UnitTestServices
         }
 
 
-        // Check if password contains an english word, upper or lowercase, among the top 9000 most popular
-        // words that are over 3 characters in length. Done 2nd because fastest IO test.
-        public static async Task<bool> ContainsDictionaryWordsAsync(string plaintextPassword)
+        /// <summary>
+        /// Asynchronously check if string <paramref name="input"/> contains an english word, upper or lowercase,
+        /// among the top 9000 most popular words that are over 3 characters in length.
+        /// </summary>
+        /// <param name="input">The input string to test (string)</param>
+        /// <returns>Task (bool) indicating whether the string contains an english word.</returns>
+        public static async Task<bool> ContainsDictionaryWordsAsync(string input)
         {
             string lineInput = "";
 
             using (StreamReader reader = new StreamReader(Constants.WordsTxtPath))
             {
+                // Asynchronously read every word from the text file.
                 while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                 {
-                    if (plaintextPassword.Contains(lineInput))
+                    if (input.Contains(lineInput))
                     {
                         return true;
                     }
@@ -454,12 +536,18 @@ namespace TeamA.Exogredient.UnitTestServices
             return false;
         }
 
-        // Check if password has been corrupted in previous breaches. Done second to last because
-        // it is the slowest IO check.
-        public static bool IsCorruptedPassword(string plaintextPassword)
+        /// <summary>
+        /// Asynchronously check if string <paramref name="input"/> has been corrupted in previous password breaches.
+        /// </summary>
+        /// <param name="input">The string to test (string)</param>
+        /// <returns>Task (bool) indicating whether the string is contained in the index.</returns>
+        public static bool IsCorruptedPassword(string input)
         {
+            // Read all password hashed from the corrputed password dao.
             List<string> passwordHashes = _corruptedPasswordsDAO.Read();
-            string passwordSha1 = SecurityService.HashWithSHA1(plaintextPassword);
+
+            // Hash the input with sha1.
+            string passwordSha1 = SecurityService.HashWithSHA1(input);
 
             foreach (string hash in passwordHashes)
             {
@@ -472,47 +560,64 @@ namespace TeamA.Exogredient.UnitTestServices
             return false;
         }
 
-        // NOTE: does not account for 901. but will return tru for 012
-        public static bool ContainsRepetitionOrSequence(string plaintextPassword)
+        /// <summary>
+        /// Checks whether the string <paramref name="input"/> contains repetition or sequences of characters (same case).
+        /// NOTE: currently accounts for 012, but not 901.
+        /// </summary>
+        /// <param name="input">The input string to test (string)</param>
+        /// <returns>bool whether the input contains a repetition or sequence of characters</returns>
+        public static bool ContainsRepetitionOrSequence(string input)
         {
-            // Repetition and sequence checking.
+            // The starting pattern count, 1 character is a pattern of 1.
             int patternCount = 1;
 
+            // Flags for detecting if, based on the previous characters, we are currently in a repetition,
+            // increasing sequence, or decreasing sequence.
             bool repetition = false;
             bool increasingSequence = false;
             bool decreasingSequence = false;
 
+            // The previous character that was check, initialized to a random character.
             char previousCharacter = '\b';
 
+            // Flag indicating whether this is the first character in the loop.
             bool first = true;
 
-            foreach (char character in plaintextPassword)
+            foreach (char character in input)
             {
                 if (first)
                 {
+                    // If it is the first, it is no longer the first and the previous character can be properly initialized.
                     first = false;
                     previousCharacter = character;
                 }
                 else
                 {
-                    // Continue flags, or stop them.
                     if (repetition || increasingSequence || decreasingSequence)
                     {
+                        // We are in a pattern. We may now continue the flags and increase the count, or stop the
+                        // flags and reset the count.
                         if (repetition)
                         {
+                            // Check if the repetition is continuing. If so increment the count.
                             if (character == previousCharacter)
                             {
                                 patternCount++;
                             }
                             else
                             {
+                                // Otherwise, reset the flag and count.
                                 repetition = false;
                                 patternCount = 1;
                             }
                         }
                         else if (increasingSequence)
                         {
+                            // Position of the previous character in the sequence.
                             int previousPosition = 0;
+
+                            // Determine if the previous char was a number, uppercase letter, or lowercase letter.
+                            // Find its corresponding position based on the result.
                             bool number = false;
                             bool upperLetter = false;
                             bool lowerLetter = false;
@@ -530,19 +635,26 @@ namespace TeamA.Exogredient.UnitTestServices
                             else if (Constants.Numbers.Contains(previousCharacter))
                             {
                                 number = true;
-                                // Characters represented by sequential numbers in every utf-16
+
+                                // Characters represented by sequential numbers in every utf-16. Subtracting the character 0 finds
+                                // its value if it is a number. Its value is its position in the sequence.
                                 previousPosition = previousCharacter - '0';
                             }
 
+                            // Since this is an increasing sequence, the next position is the previous position + 1.
                             int nextPosition = previousPosition + 1;
 
                             if (number)
                             {
+                                // If the next position went past the max digit value, the next position should be the beginning of
+                                // the sequence.
                                 if (nextPosition > Constants.MaxDigitValue)
                                 {
-                                    nextPosition = 1;
+                                    nextPosition = Constants.MinDigitValue;
                                 }
 
+                                // If the next position is the character we are currently at, continue the pattern. Otherwise reset
+                                // the flag and the count.
                                 if (Constants.Numbers[nextPosition] == character)
                                 {
                                     patternCount++;
@@ -555,11 +667,15 @@ namespace TeamA.Exogredient.UnitTestServices
                             }
                             else if (upperLetter)
                             {
+                                // If the next position went past the max alpha value, the next position should be the beginning of
+                                // the sequence.
                                 if (nextPosition > Constants.MaxAlphaValue)
                                 {
-                                    nextPosition = 1;
+                                    nextPosition = Constants.MinAlphaValue;
                                 }
 
+                                // If the next position is the character we are currently at, continue the pattern. Otherwise reset
+                                // the flag and the count.
                                 if (Constants.PositionsToLettersUpper[nextPosition] == character)
                                 {
                                     patternCount++;
@@ -572,11 +688,15 @@ namespace TeamA.Exogredient.UnitTestServices
                             }
                             else if (lowerLetter)
                             {
+                                // If the next position went past the max alpha value, the next position should be the beginning of
+                                // the sequence.
                                 if (nextPosition > Constants.MaxAlphaValue)
                                 {
                                     nextPosition = 1;
                                 }
 
+                                // If the next position is the character we are currently at, continue the pattern. Otherwise reset
+                                // the flag and the count.
                                 if (Constants.PositionsToLettersLower[nextPosition] == character)
                                 {
                                     patternCount++;
@@ -590,7 +710,9 @@ namespace TeamA.Exogredient.UnitTestServices
                         }
                         else if (decreasingSequence)
                         {
+                            // Same process as above, except the next position is the previous position - 1.
                             int previousPosition = 0;
+
                             bool number = false;
                             bool upperLetter = false;
                             bool lowerLetter = false;
@@ -608,7 +730,6 @@ namespace TeamA.Exogredient.UnitTestServices
                             else if (Constants.Numbers.Contains(previousCharacter))
                             {
                                 number = true;
-                                // Characters represented by sequential numbers in every utf-16
                                 previousPosition = previousCharacter - '0';
                             }
 
@@ -616,7 +737,7 @@ namespace TeamA.Exogredient.UnitTestServices
 
                             if (number)
                             {
-                                if (nextPosition == 0)
+                                if (nextPosition < Constants.MinDigitValue)
                                 {
                                     nextPosition = Constants.MaxDigitValue;
                                 }
@@ -633,7 +754,7 @@ namespace TeamA.Exogredient.UnitTestServices
                             }
                             else if (upperLetter)
                             {
-                                if (nextPosition == 0)
+                                if (nextPosition < Constants.MinAlphaValue)
                                 {
                                     nextPosition = Constants.MaxAlphaValue;
                                 }
@@ -650,7 +771,7 @@ namespace TeamA.Exogredient.UnitTestServices
                             }
                             else if (lowerLetter)
                             {
-                                if (nextPosition == 0)
+                                if (nextPosition < Constants.MinAlphaValue)
                                 {
                                     nextPosition = Constants.MaxAlphaValue;
                                 }
@@ -670,6 +791,7 @@ namespace TeamA.Exogredient.UnitTestServices
                     else
                     {
                         // Set flags for first instance of a pattern.
+
                         if (previousCharacter == character)
                         {
                             patternCount++;
@@ -683,6 +805,7 @@ namespace TeamA.Exogredient.UnitTestServices
 
                                 if (Constants.LettersLower.Contains(previousCharacter))
                                 {
+                                    // Both the previous character and current are lowercase letters. Check for sequences.
                                     previousPosition = Constants.LettersLowerToPositions[previousCharacter];
 
                                     int nextPositionIncrease = previousPosition + 1;
@@ -690,10 +813,10 @@ namespace TeamA.Exogredient.UnitTestServices
 
                                     if (nextPositionIncrease > Constants.MaxAlphaValue)
                                     {
-                                        nextPositionIncrease = 1;
+                                        nextPositionIncrease = Constants.MinAlphaValue;
                                     }
 
-                                    if (nextPositionDecrease == 0)
+                                    if (nextPositionDecrease < Constants.MinAlphaValue)
                                     {
                                         nextPositionDecrease = Constants.MaxAlphaValue;
                                     }
@@ -717,6 +840,8 @@ namespace TeamA.Exogredient.UnitTestServices
 
                                 if (Constants.LettersUpper.Contains(previousCharacter))
                                 {
+                                    // Both the previous character and current are upercase letters. Check for sequences.
+
                                     previousPosition = Constants.LettersUpperToPositions[previousCharacter];
 
                                     int nextPositionIncrease = previousPosition + 1;
@@ -724,10 +849,10 @@ namespace TeamA.Exogredient.UnitTestServices
 
                                     if (nextPositionIncrease > Constants.MaxAlphaValue)
                                     {
-                                        nextPositionIncrease = 1;
+                                        nextPositionIncrease = Constants.MinAlphaValue;
                                     }
 
-                                    if (nextPositionDecrease == 0)
+                                    if (nextPositionDecrease < Constants.MinAlphaValue)
                                     {
                                         nextPositionDecrease = Constants.MaxAlphaValue;
                                     }
@@ -751,6 +876,8 @@ namespace TeamA.Exogredient.UnitTestServices
 
                                 if (Constants.Numbers.Contains(previousCharacter))
                                 {
+                                    // Both the previous character and current are numbers. Check for sequences.
+
                                     previousPosition = previousCharacter - '0';
 
                                     int nextPositionIncrease = previousPosition + 1;
@@ -758,10 +885,10 @@ namespace TeamA.Exogredient.UnitTestServices
 
                                     if (nextPositionIncrease > Constants.MaxDigitValue)
                                     {
-                                        nextPositionIncrease = 1;
+                                        nextPositionIncrease = Constants.MinDigitValue;
                                     }
 
-                                    if (nextPositionDecrease < 1)
+                                    if (nextPositionDecrease < Constants.MinDigitValue)
                                     {
                                         nextPositionDecrease = Constants.MaxDigitValue;
                                     }
@@ -782,7 +909,7 @@ namespace TeamA.Exogredient.UnitTestServices
                         }
                     }
 
-                    // Constant check at end of each iteration to possibly return false from this function.
+                    // Constant check at end of each iteration to possibly return true from this function.
                     if (patternCount == Constants.MaxRepetitionOrSequence)
                     {
                         return true;
@@ -793,6 +920,7 @@ namespace TeamA.Exogredient.UnitTestServices
                 }
             }
 
+            // If nothing found, return false.
             return false;
         }
     }

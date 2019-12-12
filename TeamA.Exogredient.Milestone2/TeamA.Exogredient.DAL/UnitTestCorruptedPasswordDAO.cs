@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class UnitTestCorruptedPasswordsDAO
+    public class UnitTestCorruptedPasswordDAO
     {
         private readonly List<string> corruptedPassword;
 
-        public UnitTestCorruptedPasswordsDAO()
+        public UnitTestCorruptedPasswordDAO()
         {
             corruptedPassword = new List<string>()
             {

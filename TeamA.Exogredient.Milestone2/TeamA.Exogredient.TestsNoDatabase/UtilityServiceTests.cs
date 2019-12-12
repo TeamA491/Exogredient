@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.UnitTestServices;
 using TeamA.Exogredient.AppConstants;
 
-namespace TeamA.Exogredient.Tests
+namespace TeamA.Exogredient.TestsNoDatabase
 {
     [TestClass]
     public class UtilityServiceTests

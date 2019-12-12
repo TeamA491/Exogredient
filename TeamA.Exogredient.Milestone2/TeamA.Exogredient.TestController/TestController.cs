@@ -18,6 +18,8 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main(string[] args)
         {
+            int i = 1;
+            Console.WriteLine(i.ToString().Equals("1"));
         }
     }
 }

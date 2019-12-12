@@ -328,48 +328,6 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
         }
 
-        /*
-        [DataTestMethod]
-        public void SecurityService_EncryptRSA_CorrectEncryption()
-        {
-            //Arrange
-
-            //Act
-            byte[] encryptedData = SecurityService.EncryptRSA(_originalPlainData, _setOnePublicKey);
-
-            //Assert
-            Assert.IsTrue(_setOneEncryption.SequenceEqual(encryptedData));
-        }
-        */
-
-        /*
-        [DataTestMethod]
-        public void SecurityService_EncryptRSA_DifferentPlainDataGeneratesDifferentEncryption()
-        {
-            //Arrange
-
-            //Act
-            byte[] encryptedData = SecurityService.EncryptRSA(_alteredPlainData, _setOnePublicKey);
-
-            //Assert
-            Assert.IsFalse(_setOneEncryption.SequenceEqual(encryptedData));
-        }
-        */
-
-        /*
-        [DataTestMethod]
-        public void SecurityService_EncryptRSA_DifferentPublicKeyGeneratesDifferentEncryption()
-        {
-            //Arrange
-
-            //Act
-            byte[] encryptedData = SecurityService.EncryptRSA(_originalPlainData, _setTwoPublicKey);
-
-            //Assert
-            Assert.IsFalse(_setOneEncryption.SequenceEqual(encryptedData));
-        }
-        */
-
         // Given the encrypted data and private key used for the encryption,
         // RSA decryption should generate the correct plaindata using the correct public key.
         [DataTestMethod]
@@ -695,68 +653,5 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(a.Length == b.Length);
 
         }
-
-        /*
-        [DataTestMethod]
-        [DataRow("test", "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08")]
-        public void SecurityService_HashWithHMACSHA256_ActualHashMatchesExpectedHash(string data, string expected)
-        {
-            //Arrange
-            string hexData = StringUtilityService.ToHexString(data);
-
-            //Act
-            string actual = SecurityService.HashWithHMACSHA256(hexData);
-
-            //Assert
-            Assert.IsTrue(actual.Equals(expected));
-        }
-
-        [DataTestMethod]
-        [DataRow("test")]
-        public void SecurityService_HashWithHMACSHA256_SameStringGeneratesSameHash(string data)
-        {
-            //Arrange
-            string hexData = StringUtilityService.ToHexString(data);
-
-            //Act
-            string string1 = SecurityService.HashWithHMACSHA256(hexData);
-            string string2 = SecurityService.HashWithHMACSHA256(hexData);
-
-            //Assert
-            Assert.IsTrue(string1.Equals(string2));
-        }
-
-        [DataTestMethod]
-        [DataRow("test1", "test2")]
-        public void SecurityService_HashWithHMACSHA256_DifferentStringsGenerateDifferentHashes(string data1, string data2)
-        {
-            //Arrange
-            string hexData1 = StringUtilityService.ToHexString(data1);
-            string hexData2 = StringUtilityService.ToHexString(data2);
-
-            //Act
-            string string1 = SecurityService.HashWithHMACSHA256(hexData1);
-            string string2 = SecurityService.HashWithHMACSHA256(hexData2);
-
-            //Assert
-            Assert.IsFalse(string1.Equals(string2));
-        }
-
-        [DataTestMethod]
-        [DataRow("short", "loooooooooooooooooooooooooooooooooong")]
-        public void SecurityService_HashWithHMACSHA256_DifferentStringLengthsGenerateSameHashLength(string data1, string data2)
-        {
-            //Arrange
-            string hexData1 = StringUtilityService.ToHexString(data1);
-            string hexData2 = StringUtilityService.ToHexString(data2);
-
-            //Act
-            string string1 = SecurityService.HashWithHMACSHA256(hexData1);
-            string string2 = SecurityService.HashWithHMACSHA256(hexData2);
-
-            //Assert
-            Assert.IsFalse(string1.Length == string2.Length);
-        }
-        */
     }
 }
