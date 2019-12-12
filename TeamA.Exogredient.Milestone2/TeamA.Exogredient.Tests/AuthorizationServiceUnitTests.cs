@@ -50,7 +50,7 @@ namespace TeamA.Exogredient.Tests
             expectedExpirationTime = UtilityService.GetEpochFromNow(1);
 
             // Assert
-            Assert.AreEqual(payload[Constants.AuthzExpirationField], expectedExpirationTime);
+            Assert.AreEqual(int.Parse(payload[Constants.AuthzExpirationField]), expectedExpirationTime);
         }
 
         [TestMethod]
@@ -83,12 +83,12 @@ namespace TeamA.Exogredient.Tests
                                                                                 
 
             // Assert
-            Assert.IsTrue(AuthorizationService.TokenIsExpired(expiredToken));
+            Assert.IsFalse(AuthorizationService.TokenIsExpired(expiredToken));
         }
 
         [TestMethod]
         [DataRow(0, "login")]
-        [DataRow(0, "signup")]
+        [DataRow(0, "register")]
         [DataRow(1, "search")]
         [DataRow(1, "upload")]
         [DataRow(2, "claimBusiness")]
