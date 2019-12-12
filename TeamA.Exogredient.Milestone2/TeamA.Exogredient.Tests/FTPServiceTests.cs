@@ -11,21 +11,32 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class FTPServiceTests
     {
+
         [TestMethod]
         public async Task FTPService_Send_SendValidCredentials()
         {
             // Arrange
             DateTime currentTime = DateTime.Now;
+
+            // Create the target. 
+            Directory.CreateDirectory(@"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy"));
+            
+
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
             string ftpUrl = Constants.FTPUrl;
-            string userName = Constants.FTPUsername;
-            string password = Constants.FTPpassword;
+            string userName = "Archiver";
+            string password = "onlyicanpass5%";
             
             // Act
-            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
+            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password);
             
             // Assert
             Assert.IsTrue(results);
+
+
+            // Cleanup 
+            Directory.Delete(@"C:\_ArchiveFiles\", true);
+
         }
 
         [TestMethod]
@@ -43,7 +54,7 @@ namespace TeamA.Exogredient.Tests
             // Act
             try
             {
-                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
+                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password);
             }
             catch(WebException e)
             {
@@ -74,7 +85,7 @@ namespace TeamA.Exogredient.Tests
             // Act
             try
             {
-                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
+                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password);
             }
             catch(ArgumentException e)
             {
