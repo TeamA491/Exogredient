@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
@@ -57,13 +56,23 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("Doesn't Exist")]
+        [DataRow("Timestamp", "Operation", "Identifier", "IPAddress", "errorType", "20190101")]
         public async Task LogDAO_FindIdFieldAsync_SuccessFindNonExistentId(string timestamp, string operation, string identifier, string ipAddress, string errorType, string date)
         {
+            bool result;
+            // Act: finding a field that doesn't exists throws an argument exception.
+            try
+            {
+                LogRecord record = new LogRecord(timestamp, operation, identifier, ipAddress, errorType);
+                await logDAO.FindIdFieldAsync(record, date);
+                result = false;
+            }
+            catch(ArgumentException)
+            {
+                result = true;
+            }
 
+            Assert.IsTrue(result);
         }
-
-
-
     }
 }
