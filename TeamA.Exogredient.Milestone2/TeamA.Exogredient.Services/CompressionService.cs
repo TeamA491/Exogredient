@@ -1,17 +1,30 @@
 ﻿using System.IO;
 using System.Diagnostics;
 using TeamA.Exogredient.AppConstants;
+using System;
 
 namespace TeamA.Exogredient.Services
 {
+    /// <summary>
+    /// The Compression service is used to compress 
+    /// all files in a directory. 
+    /// </summary>
     public static class CompressionService
     {
+        /// <summary>
+        /// The compress function uses 7zip.exe to compress a directory
+        /// and store the archive in a new location.
+        /// </summary>
+        /// <param name="sevenZipPath"> The file path to 7z.exe</param>
+        /// <param name="sourceDirectory"> The directory that is meant to be archived</param>
+        /// <param name="targetDirectory"> The directory where archive file should be stored.</param>
+        /// <returns></returns>
         public static bool Compress(string sevenZipPath, string sourceDirectory, string targetDirectory)
         {
             // Check to make sure source Directory exists
             if (!(Directory.Exists(sourceDirectory) && Directory.Exists(targetDirectory) && File.Exists(sevenZipPath)))
             {
-                return false;
+                throw new ArgumentException("Invalid source Directory or 7zip file path.");
             }
 
             // Set the name of the compressed target file 
@@ -34,7 +47,14 @@ namespace TeamA.Exogredient.Services
             activeSevenZipProcess.WaitForExit();
 
             // Check to see if archive was successfully created
-            return File.Exists(targetFile);
+            if (!File.Exists(targetFile))
+            {
+                throw new Exception("Archive failed to create.");
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

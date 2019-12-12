@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="2.4.1" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.5.2" />
+    <PackageReference Include="Twilio" Version="5.36.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
+  </ItemGroup>
+</Project>

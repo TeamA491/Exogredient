@@ -19,6 +19,77 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
 
+        // STRING UTILITY HELPER DATA STRUCTURES
+        public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
+        {
+            { 1, 31 }, { 2, 28 }, { 3, 31 }, { 4, 30 }, { 5, 31 },
+            { 6, 30 }, { 7, 31 }, { 8, 31 }, { 9, 30 }, { 10, 31 },
+            { 11, 30 }, { 12, 31 }
+        };
+
+        // No < or > to protect from SQL injections.
+        public static readonly List<char> ANSNoAngleBrackets = new List<char>()
+        {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '~', '`', '@', '#', '$', '%', '^', '&', '!', '*', '(', ')', '_', '-', '+', '=', '{',
+            '[', '}', ']', '|', '\\', '"', '\'', ':', ';', '?', '/', '.', ','
+        };
+
+        public static readonly List<string> ContextSpecificWords = new List<string>()
+        {
+            "exogredient"
+        };
+
+        public static readonly List<char> LettersLower = new List<char>()
+        {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        };
+
+        public static readonly List<char> LettersUpper = new List<char>()
+        {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        };
+
+        public static readonly List<char> Numbers = new List<char>()
+        {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        };
+
+        public static readonly IDictionary<char, int> LettersLowerToPositions = new Dictionary<char, int>()
+        {
+            {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8},
+            {'i', 9}, {'j', 10}, {'k', 11}, {'l', 12}, {'m', 13}, {'n', 14}, {'o', 15}, {'p', 16},
+            {'q', 17}, {'r', 18}, {'s', 19}, {'t', 20}, {'u', 21}, {'v', 22}, {'w', 23}, {'x', 24},
+            {'y', 25}, {'z', 26}
+        };
+
+        public static readonly IDictionary<char, int> LettersUpperToPositions = new Dictionary<char, int>()
+        {
+            {'A', 1}, {'B', 2}, {'C', 3}, {'D', 4}, {'E', 5}, {'F', 6}, {'G', 7}, {'H', 8},
+            {'I', 9}, {'J', 10}, {'K', 11}, {'L', 12}, {'M', 13}, {'N', 14}, {'O', 15}, {'P', 16},
+            {'Q', 17}, {'R', 18}, {'S', 19}, {'T', 20}, {'U', 21}, {'V', 22}, {'W', 23}, {'X', 24},
+            {'Y', 25}, {'Z', 26}
+        };
+
+        public static readonly IDictionary<int, char> PositionsToLettersLower = new Dictionary<int, char>()
+        {
+            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'}, {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
+            {9, 'i'}, {10, 'j'}, {11, 'k'}, {12, 'l'}, {13, 'm'}, {14, 'n'}, {15, 'o'}, {16, 'p'},
+            {17, 'q'}, {18, 'r'}, {19, 's'}, {20, 't'}, {21, 'u'}, {22, 'v'}, {23, 'w'}, {24, 'x'},
+            {25, 'y'}, {26, 'z'}
+        };
+
+        public static readonly IDictionary<int, char> PositionsToLettersUpper = new Dictionary<int, char>()
+        {
+            {1, 'A'}, {2, 'B'}, {3, 'C'}, {4, 'D'}, {5, 'E'}, {6, 'F'}, {7, 'G'}, {8, 'H'},
+            {9, 'I'}, {10, 'J'}, {11, 'K'}, {12, 'L'}, {13, 'M'}, {14, 'N'}, {15, 'O'}, {16, 'P'},
+            {17, 'Q'}, {18, 'R'}, {19, 'S'}, {20, 'T'}, {21, 'U'}, {22, 'V'}, {23, 'W'}, {24, 'X'},
+            {25, 'Y'}, {26, 'Z'}
+        };
+
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
 
@@ -31,6 +102,8 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string UserTypeKey = "userType";
         public const string IdKey = "id";
+
+        public const string SHA1 = "SHA1";
 
         public enum USER_TYPE
         {
@@ -109,9 +182,13 @@ namespace TeamA.Exogredient.AppConstants
         public const int HexBaseValue = 16;
 
         public const string WordsTxtPath = @"..\..\..\..\words.txt";
+        public const string CorruptedPasswordsPath = @"..\..\..\..\corrupted-passwords-small.txt";
 
         public const int MaxDigitValue = 9;
+        public const int MinDigitValue = 1;
+
         public const int MaxAlphaValue = 26;
+        public const int MinAlphaValue = 1;
 
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
@@ -136,6 +213,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string NoValueString = "";
 
         public const int MaximumOperationRetries = 3;
+
+        public const int MaxRepetitionOrSequence = 3;
 
         public const int LoggingRetriesAmount = 3;
         public const int MaxLogInAttempts = 18;
@@ -184,7 +263,9 @@ namespace TeamA.Exogredient.AppConstants
         public const int MinimumPasswordCharacters = 12;
         public const string PasswordCharacterType = ANSNoAngle;
 
-        public const string TwilioExpiredReturnString = "expired";
+        public const string TwilioAuthenticationFailString = "fail";
+        public const string TwilioAuthenticationApprovedString = "approved";
+        public const string TwilioAuthenticationPendingString = "pending";
 
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
@@ -332,80 +413,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string ArchivePrefixArgument = "a -t7z ";
         public const string ArchivePostfixArgument = " -sdel";
         public const string SevenZipFileExtension = ".7z";
-
-        // STRING UTILITY HELPER DATA STRUCTURES
-        public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
-        {
-            { 1, 31 }, { 2, 28 }, { 3, 31 }, { 4, 30 }, { 5, 31 },
-            { 6, 30 }, { 7, 31 }, { 8, 31 }, { 9, 30 }, { 10, 31 },
-            { 11, 30 }, { 12, 31 }
-        };
-
-        // No < or > to protect from SQL injections.
-        public static readonly List<char> ANSNoAngleBrackets = new List<char>()
-        {
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '~', '`', '@', '#', '$', '%', '^', '&', '!', '*', '(', ')', '_', '-', '+', '=', '{',
-            '[', '}', ']', '|', '\\', '"', '\'', ':', ';', '?', '/', '.', ','
-        };
-
-        public const int MaxRepetitionOrSequence = 3;
-
-        public static readonly List<string> ContextSpecificWords = new List<string>()
-        {
-            "exogredient"
-        };
-
-        public static readonly List<char> LettersLower = new List<char>()
-        {
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-        };
-
-        public static readonly List<char> LettersUpper = new List<char>()
-        {
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-        };
-
-        public static readonly List<char> Numbers = new List<char>()
-        {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-        };
-
-        public static readonly IDictionary<char, int> LettersLowerToPositions = new Dictionary<char, int>()
-        {
-            {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8},
-            {'i', 9}, {'j', 10}, {'k', 11}, {'l', 12}, {'m', 13}, {'n', 14}, {'o', 15}, {'p', 16},
-            {'q', 17}, {'r', 18}, {'s', 19}, {'t', 20}, {'u', 21}, {'v', 22}, {'w', 23}, {'x', 24},
-            {'y', 25}, {'z', 26}
-        };
-
-        public static readonly IDictionary<char, int> LettersUpperToPositions = new Dictionary<char, int>()
-        {
-            {'A', 1}, {'B', 2}, {'C', 3}, {'D', 4}, {'E', 5}, {'F', 6}, {'G', 7}, {'H', 8},
-            {'I', 9}, {'J', 10}, {'K', 11}, {'L', 12}, {'M', 13}, {'N', 14}, {'O', 15}, {'P', 16},
-            {'Q', 17}, {'R', 18}, {'S', 19}, {'T', 20}, {'U', 21}, {'V', 22}, {'W', 23}, {'X', 24},
-            {'Y', 25}, {'Z', 26}
-        };
-
-        public static readonly IDictionary<int, char> PositionsToLettersLower = new Dictionary<int, char>()
-        {
-            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'}, {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
-            {9, 'i'}, {10, 'j'}, {11, 'k'}, {12, 'l'}, {13, 'm'}, {14, 'n'}, {15, 'o'}, {16, 'p'},
-            {17, 'q'}, {18, 'r'}, {19, 's'}, {20, 't'}, {21, 'u'}, {22, 'v'}, {23, 'w'}, {24, 'x'},
-            {25, 'y'}, {26, 'z'}
-        };
-
-        public static readonly IDictionary<int, char> PositionsToLettersUpper = new Dictionary<int, char>()
-        {
-            {1, 'A'}, {2, 'B'}, {3, 'C'}, {4, 'D'}, {5, 'E'}, {6, 'F'}, {7, 'G'}, {8, 'H'},
-            {9, 'I'}, {10, 'J'}, {11, 'K'}, {12, 'L'}, {13, 'M'}, {14, 'N'}, {15, 'O'}, {16, 'P'},
-            {17, 'Q'}, {18, 'R'}, {19, 'S'}, {20, 'T'}, {21, 'U'}, {22, 'V'}, {23, 'W'}, {24, 'X'},
-            {25, 'Y'}, {26, 'Z'}
-        };
-
+        public const string FTPUrl = @"ftp://52.250.120.151:21/";
+        public const string FTPUsername = "Archiver";
 
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";
