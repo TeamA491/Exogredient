@@ -279,7 +279,8 @@ namespace TeamA.Exogredient.Services
         /// Asynchronously change the password digest associated with a user in the data store.
         /// </summary>
         /// <param name="username">Username of the user to update.</param>
-        /// <param name="password">The password to hash.</param>
+        /// <param name="digest">The digest of password.</param>
+        /// <param name="saltString">Salt used to produce the digest.</param>
         /// <returns>Returns true if the operation is successful and false if it failed.</returns>
         public static async Task<bool> ChangePasswordAsync(string username, string digest, string saltString)
         {
@@ -291,7 +292,8 @@ namespace TeamA.Exogredient.Services
         /// Asynchronously uses gmail smtp to send an email to the system administrator.
         /// Email subject is the current day in UTC.
         /// </summary>
-        /// <param name="message">The message to send.</param>
+        /// <param name="body">The message to send.</param>
+        /// <param name="sysAdminEmailAddress">The email of system admin</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> NotifySystemAdminAsync(string body, string sysAdminEmailAddress)
         {
