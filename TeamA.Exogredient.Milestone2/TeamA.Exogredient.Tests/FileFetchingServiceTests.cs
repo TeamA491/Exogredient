@@ -106,5 +106,35 @@ namespace TeamA.Exogredient.Tests
             //assert 
             Assert.IsTrue(result);
         }
+        [TestMethod]
+        public void FileFetchingService_FetchLogs_InvalidDaysInput()
+        {
+            //arrage
+            DateTime currentTime = DateTime.Now;
+            string sourceDirectory = @"C:\_LogFiles\TF3";
+            string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
+            bool result;
+            //Pass a negative amount of days. 
+            int days = -1;
+
+            // If source directory doesn't exist create it.
+            if (!Directory.Exists(sourceDirectory))
+            {
+                Directory.CreateDirectory(sourceDirectory);
+            }
+
+            // Act
+            try
+            {
+                result = FileFetchingService.FetchLogs(sourceDirectory, targetDirectory, days);
+            }
+            catch(ArgumentException e)
+            {
+                result = false;
+            }
+
+            // Assert
+            Assert.IsFalse(result);
+        }
     }
 }

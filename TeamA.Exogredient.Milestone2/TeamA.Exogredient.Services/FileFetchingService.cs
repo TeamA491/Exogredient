@@ -35,6 +35,10 @@ namespace TeamA.Exogredient.Services
                 Directory.Delete(targetDirectory, true);
                 Directory.CreateDirectory(targetDirectory);
             }
+            if(days < 0)
+            {
+                throw new ArgumentException("Days cannot be less than 0.");
+            }
 
             // Gather file paths for logs in the source Directory
             string[] logFilePaths = Directory.GetFiles(sourceDirectory);
