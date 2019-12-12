@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text;
+using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using TeamA.Exogredient.DataHelpers;
-using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.AppConstants;
 
 // NOTE JWS TOKEN MUST BE IN THE AUTHORIZATION HEADER FOR EACH REQUEST
@@ -22,6 +22,7 @@ namespace TeamA.Exogredient.Services
     public static class AuthorizationService
     {
         private const string SIGNING_ALGORITHM = "RS512";
+        private const string HASHING_ALGORITHM = "SHA512";
         private const string EXPIRATION_FIELD = "exp";
         private const string PUBLIC_KEY_FIELD = "pk";
 
@@ -47,6 +48,8 @@ namespace TeamA.Exogredient.Services
         /// <returns>The JWS.</returns>
         public static string GenerateJWS(Dictionary<string, string> payload, string publicKey = "", string privateKey = "")
         {
+            // TODO CHECK PUBLIC KEY AND PRIVATE KEY, CHECK THEIR LENGTHS AND IF THEY INCLUDE ----BEGIN... ---END... ETC
+
             // Make sure we have the proper parameters inside the dictionary
             if (!payload.ContainsKey(Constants.UserTypeKey) || !payload.ContainsKey(Constants.IdKey))
                 throw new ArgumentException("UserType or ID was not provided.");
@@ -95,7 +98,7 @@ namespace TeamA.Exogredient.Services
             RSAPKCS1SignatureFormatter RSAFormatter = new RSAPKCS1SignatureFormatter(RSA);
 
             // TODO MAKE MORE EXTENSIBLE TO OTHER HASHING ALGORITHMS
-            RSAFormatter.SetHashAlgorithm("SHA512");  // We care more about speed here, so we use SHA512
+            RSAFormatter.SetHashAlgorithm(HASHING_ALGORITHM);  // We care more about speed here, so we use SHA512
             SHA512Managed SHhash = new SHA512Managed();
 
             // Hash the encoded values using RSA512
@@ -170,7 +173,7 @@ namespace TeamA.Exogredient.Services
 
             // Create this object in order to verify that the JWS was untampered with
             RSAPKCS1SignatureDeformatter RSADeformatter = new RSAPKCS1SignatureDeformatter(RSA);
-            RSADeformatter.SetHashAlgorithm("SHA512");
+            RSADeformatter.SetHashAlgorithm(HASHING_ALGORITHM);
             SHA512Managed SHhash = new SHA512Managed();
 
             string strToVerify = encodedHeader + '.' + encodedPayload;
@@ -240,8 +243,20 @@ namespace TeamA.Exogredient.Services
         /// <param name="userRole">The role of the current user.</param>
         /// <param name="operation">The operation the user is trying to access.</param>
         /// <returns>Whether the user can perform the operation.</returns>
-        public static bool HasPermission(string userRole, string operation)
+        public static bool UserHasPermissionForOperation(int userRole, string operation)
         {
+            // Make sure the operation exists
+            if (!Constants.UserOperations.ContainsKey(operation))
+                return false;
+
+            // Make sure the user type exists in the enum
+            if (!Enum.IsDefined(typeof(Constants.USER_TYPE), userRole))
+                return false;
+
+            // Check if the operation requires a higher user role
+            if (Constants.UserOperations[operation] > userRole)
+                return false;
+
             return true;
         }
 
