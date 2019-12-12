@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -10,7 +11,7 @@ namespace TeamA.Exogredient.Tests
     public class LoggingUnitTests
     {
         // Flat file log directory
-        private readonly string _logDirectory = @"C:\Logs";
+        private readonly string _logDirectory = Constants.LogFolder;
 
         [TestInitialize]
         public void init()
@@ -66,7 +67,7 @@ namespace TeamA.Exogredient.Tests
         {
             try
             {
-                File.Delete(_logDirectory + @"\20191125.CSV");
+                File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
             }
             catch
             { }
@@ -75,7 +76,7 @@ namespace TeamA.Exogredient.Tests
             {
                 await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
-                bool result = File.Exists(_logDirectory + @"\20191125.CSV");
+                bool result = File.Exists(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
 
                 Assert.IsTrue(result);
             }
@@ -93,9 +94,10 @@ namespace TeamA.Exogredient.Tests
         public async Task FlatFileLoggingService_LogToFlatFileAsync_CsvProtection(string timestamp, string operation, string identifier,
                                                                                   string ipAddress, string errorType)
         {
+            LogRecord logRecord = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
             try
             {
-                File.Delete(_logDirectory + @"\20191125.CSV");
+                File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
             }
             catch
             { }
@@ -105,19 +107,152 @@ namespace TeamA.Exogredient.Tests
                 await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = false;
-                bool lineRead = false;
 
                 string lineInput = "";
 
-                using (StreamReader reader = new StreamReader(_logDirectory + @"\20191125.CSV"))
+                using (StreamReader reader = new StreamReader(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}"))
                 {
+                    // Construct the line to delete
+                    string lineToFind = "";
+
+                    for (int i = 0; i < logRecord.Fields.Count; i++)
+                    {
+                        string field = logRecord.Fields[i];
+
+                        string startsWith = field.Substring(0, 1);
+
+                        // If the field starts with a csv vulnerability, re-add the padding to the beginning.
+                        if (Constants.CsvVulnerabilities.Contains(startsWith))
+                        {
+                            lineToFind += $"{Constants.CsvProtection}{field},";
+                        }
+                        else
+                        {
+                            lineToFind += $"{field},";
+                        }
+                    }
+
+                    // Get rid of last comma.
+                    lineToFind = lineToFind.Substring(0, lineToFind.Length - 1);
+
                     while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                     {
-                        
+                        if (lineInput.Equals(lineToFind))
+                        {
+                            result = true;
+                        }
                     }
                 }
 
                 Assert.IsTrue(result);
+            }
+            catch
+            {
+                Assert.Fail();
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "1", "1")]
+        public async Task FlatFileLoggingService_DeleteFromFlatFileAsync_DeleteSuccessful(string timestamp, string operation, string identifier,
+                                                                                          string ipAddress, string errorType)
+        {
+            LogRecord logRecord = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+            try
+            {
+                File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
+            }
+            catch
+            { }
+
+            try
+            {
+                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+
+                Assert.IsTrue(File.Exists(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}"));
+
+                bool result = false;
+
+                string lineInput = "";
+
+                using (StreamReader reader = new StreamReader(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}"))
+                {
+                    // Construct the line to delete
+                    string lineToFind = "";
+
+                    for (int i = 0; i < logRecord.Fields.Count; i++)
+                    {
+                        string field = logRecord.Fields[i];
+
+                        string startsWith = field.Substring(0, 1);
+
+                        // If the field starts with a csv vulnerability, re-add the padding to the beginning.
+                        if (Constants.CsvVulnerabilities.Contains(startsWith))
+                        {
+                            lineToFind += $"{Constants.CsvProtection}{field},";
+                        }
+                        else
+                        {
+                            lineToFind += $"{field},";
+                        }
+                    }
+
+                    // Get rid of last comma.
+                    lineToFind = lineToFind.Substring(0, lineToFind.Length - 1);
+
+                    while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
+                    {
+                        if (lineInput.Equals(lineToFind))
+                        {
+                            result = true;
+                        }
+                    }
+                }
+
+                Assert.IsTrue(result);
+
+                result = false;
+
+                await FlatFileLoggingService.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+
+                using (StreamReader reader = new StreamReader(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}"))
+                {
+                    // Construct the line to delete
+                    string lineToFind = "";
+
+                    for (int i = 0; i < logRecord.Fields.Count; i++)
+                    {
+                        string field = logRecord.Fields[i];
+
+                        string startsWith = field.Substring(0, 1);
+
+                        // If the field starts with a csv vulnerability, re-add the padding to the beginning.
+                        if (Constants.CsvVulnerabilities.Contains(startsWith))
+                        {
+                            lineToFind += $"{Constants.CsvProtection}{field},";
+                        }
+                        else
+                        {
+                            lineToFind += $"{field},";
+                        }
+                    }
+
+                    // Get rid of last comma.
+                    lineToFind = lineToFind.Substring(0, lineToFind.Length - 1);
+
+                    while ((lineInput = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
+                    {
+                        if (lineInput.Equals(lineToFind))
+                        {
+                            result = true;
+                        }
+                    }
+                }
+
+                Assert.IsFalse(result);
             }
             catch
             {
