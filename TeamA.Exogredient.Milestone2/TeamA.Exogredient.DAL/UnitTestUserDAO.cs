@@ -7,10 +7,13 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
+    /// <summary>
+    /// DAO for the data store containing User information.
+    /// </summary>
     public class UnitTestUserDAO
     {
+        // Datastore for User.
         readonly Dictionary<string, UserRecord> User;
-
 
         public UnitTestUserDAO()
         {
@@ -18,13 +21,13 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Create a user.
+        /// Asynchronously creates the <paramref name="record"/> in the data store.
         /// </summary>
-        /// <param name="record"> a record object that contains the user's information </param>
-        /// <returns> true or throw exception </returns>
+        /// <param name="record">The record to insert (ISQLRecord)</param>
+        /// <returns>(bool) whether the function executed without exception.</returns>
         public bool Create(ISQLRecord record)
         {
-            // Cast the record object to UserRecord.
+            // Try casting the record to a UserRecord, throw an argument exception if it fails.
             UserRecord userRecord;
             try
             {
@@ -35,39 +38,52 @@ namespace TeamA.Exogredient.DAL
                 throw new ArgumentException(Constants.UserCreateInvalidArgument);
             }
 
-            // Get the data of the user.
+            // Get the data stored in the record.
             IDictionary<string, object> recordData = userRecord.GetData();
 
             foreach (KeyValuePair<string, object> pair in recordData)
             {
+                // Check for null values in the data (string == null, numeric == -1), and throw a NoNullAllowedException
+                // if one is found.
+                if (pair.Value is int)
+                {
+                    if ((int)pair.Value == -1)
+                    {
+                        throw new NoNullAllowedException(Constants.UserRecordNoNull);
+                    }
+                }
                 if (pair.Value is string)
                 {
                     if (pair.Value == null)
                     {
-                        // If the data is string and null, throw an exception.
                         throw new NoNullAllowedException(Constants.UserRecordNoNull);
                     }
                 }
-
-                if (pair.Value is int || pair.Value is long)
+                if (pair.Value is long)
                 {
-                    if (pair.Value.Equals(-1))
+                    if ((long)pair.Value == -1)
                     {
-                        // If the data is int and -1, throw an exception.
                         throw new NoNullAllowedException(Constants.UserRecordNoNull);
                     }
                 }
             }
 
+            // Add the user record to the datastore.
             User.Add((string)recordData[Constants.UserDAOusernameColumn], userRecord);
 
             return true;
         }
 
+        /// <summary>
+        /// Delete all the objects referenced by the <paramref name="idsOfRows"/>.
+        /// </summary>
+        /// <param name="idsOfRows">The list of ids of rows to delete (List(string))</param>
+        /// <returns>(bool) whether the function executed without exception.</returns>
         public bool DeleteByIds(List<string> idsOfRows)
         {
             foreach (string username in idsOfRows)
             {
+                // If the username doesn't exist, throw an exception.
                 if (!CheckUserExistence(username))
                 {
                     throw new ArgumentException(Constants.UserDeleteDNE);
@@ -78,15 +94,23 @@ namespace TeamA.Exogredient.DAL
             return true;
         }
 
+        /// <summary>
+        /// Read the information in the adata store pointed to by the <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The id of the row to read (string)</param>
+        /// <returns>Task (IDataObject) the information represented as an object</returns>
         public IDataObject ReadById(string id)
         {
+            // If the username doesn't exist, throw an exception.
             if (!CheckUserExistence(id))
             {
                 throw new ArgumentException(Constants.UserDeleteDNE);
             }
 
+            // Get the data of the user.
             IDictionary<string, object> data = User[id].GetData();
 
+            // Return the data in UserObject.
             return new UserObject((string)data[Constants.UserDAOusernameColumn], (string)data[Constants.UserDAOfirstNameColumn],
                                   (string)data[Constants.UserDAOlastNameColumn], (string)data[Constants.UserDAOemailColumn],
                                   (string)data[Constants.UserDAOphoneNumberColumn], (string)data[Constants.UserDAOpasswordColumn],
@@ -97,8 +121,14 @@ namespace TeamA.Exogredient.DAL
                                   (int)data[Constants.UserDAOemailCodeFailuresColumn], (int)data[Constants.UserDAOphoneCodeFailuresColumn]);
         }
 
+        /// <summary>
+        /// Update the <paramref name="record"/> in the data store based on the values that are not null inside it.
+        /// </summary>
+        /// <param name="record">The record containing the information to update (ISQLRecord)</param>
+        /// <returns>(bool) whether the function executed without exception.</returns>
         public bool Update(ISQLRecord record)
         {
+            // Try casting the record to a UserRecord, throw an argument exception if it fails.
             UserRecord userRecord;
             try
             {
@@ -109,50 +139,64 @@ namespace TeamA.Exogredient.DAL
                 throw new ArgumentException(Constants.UserUpdateInvalidArgument);
             }
 
+            // Get the data of the new record.
             IDictionary<string, object> newRecordData = userRecord.GetData();
-            if(!CheckUserExistence( (string)newRecordData[Constants.UserDAOusernameColumn]))
+            // Get the username to update.
+            string username = (string)newRecordData[Constants.UserDAOusernameColumn];
+
+            // If the username doesn't exist, throw an exception.
+            if (!CheckUserExistence(username))
             {
                 throw new ArgumentException(Constants.UserUpdateDNE);
             }
-            IDictionary<string, object> existingRecordData = User[(string)newRecordData[Constants.UserDAOusernameColumn]].GetData();
+
+            // Get the existing data of the user.
+            IDictionary<string, object> existingRecordData = User[username].GetData();
 
             foreach (KeyValuePair<string, object> pair in newRecordData)
             {
-                if (pair.Value is int && (int)pair.Value != -1)
+                // Update only the values where the record value is not null (string == null, numeric == -1).
+                if (pair.Value is int)
                 {
-                    existingRecordData[pair.Key] = pair.Value;
+                    if ((int)pair.Value != -1)
+                    {
+                        existingRecordData[pair.Key] = pair.Value;
+                    }
                 }
-                else if (pair.Value is long && (long)pair.Value != (long)-1)
+                if (pair.Value is string)
                 {
-                    existingRecordData[pair.Key] = pair.Value;
+                    if (pair.Value != null)
+                    {
+                        existingRecordData[pair.Key] = pair.Value;
+                    }
                 }
-                else if (!(pair.Value is int || pair.Value is long) && pair.Value != null)
+                if (pair.Value is long)
                 {
-                    existingRecordData[pair.Key] = pair.Value;
+                    if ((long)pair.Value != -1)
+                    {
+                        existingRecordData[pair.Key] = pair.Value;
+                    }
                 }
             }
 
             return true;
         }
 
+        /// <summary>
+        /// Check if the <paramref name="username"/> exists.
+        /// </summary>
+        /// <param name="username"> username to be checked </param>
+        /// <returns> true if username exists, otherwise false </returns>
         public bool CheckUserExistence(string username)
         {
             return User.ContainsKey(username);
         }
 
-        /*
-        public bool CheckDataExistence(string colName, object data)
-        {
-            Dictionary<string, UserRecord>.ValueCollection users = User.Values;
-
-            foreach (UserRecord user in users)
-            {
-                if (user.GetData()[colName].Equals(data)) return true;
-            }
-            return false;
-        }
-        */
-
+        /// <summary>
+        /// Check if the <paramref name="phoneNumber"/> exists.
+        /// </summary>
+        /// <param name="phoneNumber"> phone number to be checked </param>
+        /// <returns> true if phone number exists, otherwise false </returns>
         public bool CheckPhoneNumberExistence(string phoneNumber)
         {
             Dictionary<string, UserRecord>.ValueCollection users = User.Values;
@@ -164,6 +208,11 @@ namespace TeamA.Exogredient.DAL
             return false;
         }
 
+        /// <summary>
+        /// Check if the <paramref name="email"/> exists.
+        /// </summary>
+        /// <param name="email"> email to be checked </param>
+        /// <returns> true if email exists, otherwise false </returns>
         public bool CheckEmailExistence(string email)
         {
             Dictionary<string, UserRecord>.ValueCollection users = User.Values;

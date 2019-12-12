@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DataHelpers
 {
@@ -49,6 +51,25 @@ namespace TeamA.Exogredient.DataHelpers
 
             ErrorType = errorType;
             Fields.Add(errorType);
+        }
+
+        public override bool Equals(object obj)
+        {
+            LogRecord logRecord;
+            try
+            {
+                logRecord = (LogRecord)obj;
+            }
+            catch
+            {
+                throw new ArgumentException();
+            }
+
+            return (Timestamp.Equals(logRecord.Timestamp) &&
+                   Operation.Equals(logRecord.Operation) &&
+                   Identifier.Equals(logRecord.Identifier) &&
+                   IPAddress.Equals(logRecord.IPAddress) &&
+                   ErrorType.Equals(logRecord.ErrorType));
         }
     }
 }

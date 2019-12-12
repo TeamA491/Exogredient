@@ -5,11 +5,12 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
 
-namespace TeamA.Exogredient.Tests
+namespace TeamA.Exogredient.TestsNoDatabase
 {
     [TestClass]
     public class UserDAOTestsNoDataBase
     {
+        string NonExistingUsername = "nonexistingusername";
         private bool DataEquals(UserRecord userRecord, UserObject userObject)
         {
             IDictionary<string,object> recordData = userRecord.GetData();
@@ -170,7 +171,7 @@ namespace TeamA.Exogredient.Tests
             try
             {
                 // Delete the user. 
-                userDAO.DeleteByIds(new List<string> { "nonExistingUser" });
+                userDAO.DeleteByIds(new List<string> { NonExistingUsername });
             }
             catch (ArgumentException)
             {
@@ -240,7 +241,7 @@ namespace TeamA.Exogredient.Tests
             try
             {
                 // Read the user's data.
-                UserObject userObject = (UserObject) userDAO.ReadById("nonExistingUser");
+                UserObject userObject = (UserObject) userDAO.ReadById(NonExistingUsername);
             }
             catch (ArgumentException)
             {
@@ -318,7 +319,7 @@ namespace TeamA.Exogredient.Tests
             // Different username with new data.
             string newString = "new";
             int newNumber = 1;
-            UserRecord updatedUserRecord = new UserRecord("wrongUsername", newString, newString, newString,
+            UserRecord updatedUserRecord = new UserRecord(NonExistingUsername, newString, newString, newString,
                            newString, newString, newNumber, newString, newString,
                           newNumber, newString, newNumber, newNumber,
                            newNumber, newNumber, newNumber);
@@ -394,7 +395,7 @@ namespace TeamA.Exogredient.Tests
             //Act
 
             // Check if the user exists, and set the result accordingly.
-            bool userExistence = userDAO.CheckUserExistence("nonExistingUser");
+            bool userExistence = userDAO.CheckUserExistence(NonExistingUsername);
 
             //Assert
 
