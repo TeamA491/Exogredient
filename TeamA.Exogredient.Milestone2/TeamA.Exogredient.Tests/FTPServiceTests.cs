@@ -13,7 +13,7 @@ namespace TeamA.Exogredient.Tests
     {
 
         [TestMethod]
-        public async Task FTPService_Send_SendValidCredentials()
+        public async Task FTPService_Send_SendValidCredentialsAsync()
         {
             // Arrange
             DateTime currentTime = DateTime.Now;
@@ -52,7 +52,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public async Task FTPService_Send_SendInvalidCredentials()
+        public async Task FTPService_Send_SendInvalidCredentialsAsync()
         {
             // Arrange
             DateTime currentTime = DateTime.Now;
@@ -95,40 +95,20 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public async Task FTPService_Send_SendWithoutTargetFile()
+        public async Task FTPService_Send_SendWithoutTargetFileAsync()
         {
-            // Arrange
-            DateTime currentTime = DateTime.Now;
-            string targetDirectory = @"C:\_ArchiveFiles\TF3\" + currentTime.ToString("ddMMyy");
-            
-            // Create test directories. 
-            if (!Directory.Exists(@"C:\_ArchiveFiles\TF3\"))
-            {
-                Directory.CreateDirectory(@"C:\_ArchiveFiles\TF3\");
-                if (!Directory.Exists(targetDirectory))
-                {
-                    Directory.CreateDirectory(targetDirectory);
-                }
-            }
-            
-            // Create dummy archive file. 
-            string targetFile = targetDirectory + Constants.SevenZipFileExtension;
-            if (!File.Exists(targetFile))
-            {
-                File.Create(targetFile);
-            }
+ 
             string ftpUrl = Constants.FTPUrl;
             string userName = Constants.FTPUsername;
             string password = Constants.FTPpassword;
             bool results;
 
             // Delete the file we want to send to remote to test SendWithoutTargetFile.
-            File.Delete(targetFile);
 
             // Act
             try
             {
-                results = await FTPService.SendAsync(ftpUrl, "", "", userName, password).ConfigureAwait(false);
+                results = await FTPService.SendAsync(ftpUrl, "", "", userName, password);
             }
             catch(ArgumentException e)
             {
