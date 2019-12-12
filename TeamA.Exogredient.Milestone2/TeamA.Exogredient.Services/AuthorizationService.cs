@@ -78,8 +78,8 @@ namespace TeamA.Exogredient.Services
             }
 
             // Base64 encode the header and payload
-            string encodedHeader = DictionaryToString(joseHeader).ToBase64();
-            string encodedPayload = DictionaryToString(payload).ToBase64();
+            string encodedHeader = DictionaryToString(joseHeader).ToBase64URL();
+            string encodedPayload = DictionaryToString(payload).ToBase64URL();
 
             // The signature will be the hash of the header and payload
             string stringToSign = encodedHeader + '.' + encodedPayload;
@@ -104,7 +104,7 @@ namespace TeamA.Exogredient.Services
             // Hash the encoded values using RSA512
             byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(stringToSign));
             // Sign the hash with the private key
-            string signature = RSAFormatter.CreateSignature(hashedString).ToBase64();
+            string signature = RSAFormatter.CreateSignature(hashedString).ToBase64URL();
 
             // Release resources
             SHhash.Dispose();
@@ -153,11 +153,11 @@ namespace TeamA.Exogredient.Services
             string encodedSignature = segments[2];
 
             // Convert header back to dictionary format
-            string decodedHeader = segments[0].FromBase64();
+            string decodedHeader = segments[0].FromBase64URL();
             Dictionary<string, string> headerJSON = StringToDictionary(decodedHeader);
 
             // Convert payload back to dictionary format
-            string decodedPayload = segments[1].FromBase64();
+            string decodedPayload = segments[1].FromBase64URL();
             Dictionary<string, string> payloadJSON = StringToDictionary(decodedPayload);
 
             // Make sure that we are using the correct encryption algorithm in the header
@@ -312,11 +312,11 @@ namespace TeamA.Exogredient.Services
             }
 
             // Remove the first and last brackets
-            dictStr = dictStr.Remove(0, 1)
-                             .Remove(dictStr.Length - 1, 1);
+            dictStr = dictStr.Remove(0, 1);
+            dictStr = dictStr.Remove(dictStr.Length - 1, 1);
 
             // String should look like this now:
-            // "key1:value1,key2:value2"
+            // "\"key1\":\"value1\",\"key2\":\"value2\""
 
             // Count the commas and colons in the string...
             int commaCount = 0, colonCount = 0;
@@ -361,8 +361,16 @@ namespace TeamA.Exogredient.Services
                     throw new ArgumentException("Key or value isn't surrounded by double quotes.");
                 }
 
+                // Remove the double quote at the beginning
+                key = key.Remove(0, 1);
+                val = val.Remove(0, 1);
+
+                // Remove the double quote at the end
+                key = key.Remove(key.Length - 1);
+                val = val.Remove(val.Length - 1);
+
                 // Check for condition (4)
-                if (!(p[0].IsAlphaNumeric() && p[1].IsAlphaNumeric()))
+                if (!(key.IsAlphaNumeric() && val.IsAlphaNumeric()))
                 {
                     throw new ArgumentException("Key or value is not alpha-numeric (excluding white-space).");
                 }
@@ -434,9 +442,12 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="str">The string to be converted.</param>
         /// <returns>A Base64 representation of the string.</returns>
-        private static string ToBase64(this string str)
+        public static string ToBase64URL(this string str)
         {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+            string b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+            // Make sure it's URL safe
+            b64 = b64.Replace('+', '-').Replace('/', '_').TrimEnd('=');
+            return b64;
         }
 
         /// <summary>
@@ -444,9 +455,9 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="bytes">The bytes array to be converted.</param>
         /// <returns>A Base64 representation of the bytes array.</returns>
-        private static string ToBase64(this byte[] bytes)
+        public static string ToBase64URL(this byte[] bytes)
         {
-            return Convert.ToBase64String(bytes);
+            return Convert.ToBase64String(bytes).ToBase64URL();
         }
 
         /// <summary>
@@ -456,8 +467,29 @@ namespace TeamA.Exogredient.Services
         /// <returns>The original representation of the string.</returns>
         private static string FromBase64(this string str)
         {
-            byte[] bytes = Convert.FromBase64String(str);
-            return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            string oldStr = str.Replace('_', '/').Replace('-', '+');
+
+            // Base64URL encoded string must be a multiple of 4
+            // otherwise it's missing padding at the end
+            int missingPadding = str.Length % 4;
+            if (missingPadding == 1)
+                oldStr += "===";        // Missing 3 characters
+            else if (missingPadding == 2)
+                oldStr += "==";         // Missing 2 characters
+            else if (missingPadding == 3)
+                oldStr += "=";          // Missing 1 character
+
+            return Convert.FromBase64String(oldStr).FromBytes();
+        }
+
+        public static byte[] ToBytes(this string s)
+        {
+            return Encoding.UTF8.GetBytes(s);
+        }
+
+        public static string FromBytes(this byte[] b)
+        {
+            return Encoding.UTF8.GetString(b);
         }
     }
 
