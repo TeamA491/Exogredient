@@ -29,7 +29,7 @@ namespace TeamA.Exogredient.Services
 
             if (!File.Exists(archiveFilePath))
             {
-                throw new ArgumentException("Archive File not found.");
+                throw new ArgumentException(Constants.FTPfileNotFound);
             }
 
             byte[] fileBytes = File.ReadAllBytes(archiveFilePath);
@@ -61,7 +61,7 @@ namespace TeamA.Exogredient.Services
                 response = (FtpWebResponse)e.Response;
                 if(response != null)
                 {
-                    throw new WebException("Invalid credentials");
+                    throw new WebException(Constants.FTPinvalidCredentials);
                 }
             }
             return true;

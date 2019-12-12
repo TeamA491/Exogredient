@@ -13,7 +13,8 @@ namespace TeamA.Exogredient.ArchivingConsoleApp
             // Make sure only days, source Directory, and targetDirectory are entered into program
             if (args.Length != 4)
             {
-                System.Console.WriteLine("Need to enter days, source Directory, and target Directory for archiving");
+                await UserManagementService.NotifySystemAdminAsync(Constants.InvalidArgs, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                return;
             }
 
             DateTime currentTime = DateTime.Now;
@@ -24,26 +25,30 @@ namespace TeamA.Exogredient.ArchivingConsoleApp
             {
                  days = Convert.ToInt32(args[1]);
             }
-            catch(Exception e)
+            catch
             {
-                throw new Exception("First argument must be an integer");
+                await UserManagementService.NotifySystemAdminAsync(Constants.FirstArgumentNotInt, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                return;
             }
 
-            string sourceDir = "";
+            string sourceDir;
+
             if (Directory.Exists(args[2]))
             {
                 sourceDir = args[2];
             }
             else
             {
-                throw new Exception("Source Directory does not exist");
+                await UserManagementService.NotifySystemAdminAsync(Constants.SourceDirectoryDNE, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                return;
             }
+
             if (Directory.Exists(args[3]))
             {
                 targetDirectory = args[3];
             }
 
-            targetDirectory += currentTime.ToString("ddMMyy");
+            targetDirectory += currentTime.ToString(Constants.NamingFormatString);
             bool result = false;
 
             // FetchLogs will return true if files of the proper age are found in the source directory. 
