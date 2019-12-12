@@ -20,7 +20,7 @@ namespace TeamA.Exogredient.Tests
         };
 
         [TestMethod]
-        public void AuthorizationService_GenerateJWS()
+        public void AuthorizationService_GenerateJWS_SuccessGenerateJWS()
         {
             // Arrange
             string jwsToken;
@@ -33,7 +33,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public void AuthorizationService_DecryptJWS()
+        public void AuthorizationService_DecryptJWS_SuccessDecryptJWS()
         {
             // Arrange
             Dictionary<string, string> payload;
@@ -48,7 +48,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public void AuthorizationService_RefreshJWS()
+        public void AuthorizationService_RefreshJWS_SuccessTokenRefreshed()
         {
             // Arrange
             string refreshedToken;
@@ -68,7 +68,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public void AuthorizationService_TokenIsExpired()
+        public void AuthorizationService_TokenIsExpired_SuccessExpired()
         {
             // Arrange
             string expiredToken;
@@ -76,6 +76,22 @@ namespace TeamA.Exogredient.Tests
             // Act
             expiredToken = AuthorizationService.RefreshJWS(GeneratedJWSToken,  // Token to refresh
                                                            -20,                // Set back 20 minutes
+                                                           PublicKeyTest,      // Custom public key
+                                                           PrivateKeyTest);    // Custom private key
+
+            // Assert
+            Assert.IsTrue(AuthorizationService.TokenIsExpired(expiredToken));
+        }
+
+        [TestMethod]
+        public void AuthorizationService_TokenIsExpired_FalseExpired()
+        {
+            // Arrange
+            string expiredToken;
+
+            // Act
+            expiredToken = AuthorizationService.RefreshJWS(GeneratedJWSToken,  // Token to refresh
+                                                           20,                 // Set back 20 minutes
                                                            PublicKeyTest,      // Custom public key
                                                            PrivateKeyTest);    // Custom private key
 
@@ -93,7 +109,8 @@ namespace TeamA.Exogredient.Tests
         [DataRow(3, "createUser")]
         [DataRow(3, "deleteUser")]
         [DataRow(4, "createSysAdmin")]
-        public void AuthorizationService_UserHasPermissionForOperation(int userRole, string operation)
+        [DataRow(4, "search")]
+        public void AuthorizationService_UserHasPermissionForOperation_SuccessHasPermission(int userRole, string operation)
         {
             // Arrange
             bool hasPermission;
@@ -103,6 +120,23 @@ namespace TeamA.Exogredient.Tests
 
             // Assert
             Assert.IsTrue(hasPermission);
+        }
+
+        [TestMethod]
+        [DataRow(0, "search")]
+        [DataRow(1, "claimBusiness")]
+        [DataRow(5, "search")]
+        [DataRow(-1, "register")]
+        public void AuthorizationService_UserHasPermissionForOperation_FailHasPermission(int userRole, string operation)
+        {
+            // Arrange
+            bool hasPermission;
+
+            // Act
+            hasPermission = AuthorizationService.UserHasPermissionForOperation(userRole, operation);
+
+            // Assert
+            Assert.IsFalse(hasPermission);
         }
     }
 }
