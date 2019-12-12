@@ -44,10 +44,11 @@ namespace TeamA.Exogredient.Tests
         [TestMethod]
         public void FileFetchingService_FetchLogs_NoLogFilesinSourceDirectory()
         {
+            // Arrange
             DateTime currentTime = DateTime.Now;
             string sourceDirectory = @"C:\ajdshfkjahds";
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
-
+            bool result;
             // If source Directory exists delete it and recreate so it has no logs files.
             if (Directory.Exists(sourceDirectory))
             {
@@ -59,9 +60,18 @@ namespace TeamA.Exogredient.Tests
             {
                 Directory.CreateDirectory(sourceDirectory);
             }
-            //act
-            bool result = FileFetchingService.FetchLogs(sourceDirectory,targetDirectory,30);
-            //assert
+
+            // Act
+            try
+            {
+                result = FileFetchingService.FetchLogs(sourceDirectory, targetDirectory, 30);
+            }
+            catch(Exception e)
+            {
+                result = false;
+            }
+
+            // Assert
             Assert.IsFalse(result);
         }
 
@@ -95,6 +105,36 @@ namespace TeamA.Exogredient.Tests
 
             //assert 
             Assert.IsTrue(result);
+        }
+        [TestMethod]
+        public void FileFetchingService_FetchLogs_InvalidDaysInput()
+        {
+            //arrage
+            DateTime currentTime = DateTime.Now;
+            string sourceDirectory = @"C:\_LogFiles\TF3";
+            string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
+            bool result;
+            //Pass a negative amount of days. 
+            int days = -1;
+
+            // If source directory doesn't exist create it.
+            if (!Directory.Exists(sourceDirectory))
+            {
+                Directory.CreateDirectory(sourceDirectory);
+            }
+
+            // Act
+            try
+            {
+                result = FileFetchingService.FetchLogs(sourceDirectory, targetDirectory, days);
+            }
+            catch(ArgumentException e)
+            {
+                result = false;
+            }
+
+            // Assert
+            Assert.IsFalse(result);
         }
     }
 }

@@ -38,9 +38,18 @@ namespace TeamA.Exogredient.Tests
             string sourceDirectory = @"C:\_LogFiles\adfadfasdf";
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
             string sevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+            bool result;
 
             // act
-            bool result = CompressionService.Compress(sevenZipPath, sourceDirectory, targetDirectory);
+            try
+            {
+                result = CompressionService.Compress(sevenZipPath, sourceDirectory, targetDirectory);
+            }
+            catch(Exception e)
+            {
+                result = false;
+            }
+                
 
             // assert 
             Assert.IsFalse(result);
