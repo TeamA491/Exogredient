@@ -154,11 +154,6 @@ namespace TeamA.Exogredient.TestsNoDatabase
             // Assert: Check that an IP that is inserted returns true.
             Assert.IsTrue(result);
 
-            // Cleanup: Delete the IP.
-            UnitTestIPAddressDAO ipDAO = new UnitTestIPAddressDAO();
-            bool deleteResult = ipDAO.DeleteByIds(new List<string>() { ipAddress });
-            Assert.IsTrue(deleteResult);
-
         }
 
         [DataTestMethod]
