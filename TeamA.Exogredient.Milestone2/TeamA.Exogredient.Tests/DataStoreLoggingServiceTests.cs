@@ -47,9 +47,9 @@ namespace TeamA.Exogredient.Tests
 
         public async Task DataStoreLoggingService_DeleteLogFromDataStoreAsync_SuccessfullDeleteNonExistent(string timestamp, string operation, string identifier, string ipAddress, string errorType)
         {
-            // Act: Deleting non existent log should throw and error.
+            // Act: Deleting non existent log return false.
             bool deleteResult = await DataStoreLoggingService.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType);
-            Assert.IsTrue(deleteResult);
+            Assert.IsFalse(deleteResult);
         }
 
     }
