@@ -5,8 +5,20 @@ using System;
 
 namespace TeamA.Exogredient.Services
 {
+    /// <summary>
+    /// The Compression service is used to compress 
+    /// all files in a directory. 
+    /// </summary>
     public static class CompressionService
     {
+        /// <summary>
+        /// The compress function uses 7zip.exe to compress a directory
+        /// and store the archive in a new location.
+        /// </summary>
+        /// <param name="sevenZipPath"> The file path to 7z.exe</param>
+        /// <param name="sourceDirectory"> The directory that is meant to be archived</param>
+        /// <param name="targetDirectory"> The directory where archive file should be stored.</param>
+        /// <returns></returns>
         public static bool Compress(string sevenZipPath, string sourceDirectory, string targetDirectory)
         {
             // Check to make sure source Directory exists

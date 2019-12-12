@@ -1,34 +1,64 @@
 ﻿using System;
 using System.IO;
 using TeamA.Exogredient.Services;
+using TeamA.Exogredient.AppConstants;
+using System.Threading.Tasks;
 
 namespace TeamA.Exogredient.ArchivingConsoleApp
 {
     public class ArchivingScript
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            //make sure only days, source Directory, and targetDirectory are entered into program
-            if (args.Length != 3)
+            // Make sure only days, source Directory, and targetDirectory are entered into program
+            if (args.Length != 4)
             {
                 System.Console.WriteLine("Need to enter days, source Directory, and target Directory for archiving");
             }
 
             DateTime currentTime = DateTime.Now;
-            int days = Convert.ToInt32(args[0]);
-            string sourceDir = "";
-            if (Directory.Exists(args[1]))
+            int days;
+            string targetDirectory = "";
+            
+            try
             {
-                sourceDir = args[1];
+                 days = Convert.ToInt32(args[1]);
+            }
+            catch(Exception e)
+            {
+                throw new Exception("First argument must be an integer");
             }
 
-            string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
-            string sevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+            string sourceDir = "";
+            if (Directory.Exists(args[2]))
+            {
+                sourceDir = args[2];
+            }
+            else
+            {
+                throw new Exception("Source Directory does not exist");
+            }
+            if (Directory.Exists(args[3]))
+            {
+                targetDirectory = args[3];
+            }
 
+            targetDirectory += currentTime.ToString("ddMMyy");
+            bool result = false;
+
+            // FetchLogs will return true if files of the proper age are found in the source directory. 
             if (FileFetchingService.FetchLogs(sourceDir, targetDirectory, days))
             {
-                string targetFile = targetDirectory + ".7z";
-                CompressionService.Compress(sevenZipPath, sourceDir, targetDirectory);
+               if(CompressionService.Compress(Constants.SevenZipPath, sourceDir, targetDirectory))
+                {
+                  result = await FTPService.SendAsync(Constants.FTPUrl, "", targetDirectory, Constants.FTPUsername, Constants.FTPpassword).ConfigureAwait(false);
+                }
+            }
+            
+            // Notify system admin if Archiving fails to run successfully. 
+            if(result == false)
+            {
+                await UserManagementService.NotifySystemAdminAsync("Archiving failed on" + currentTime, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
             }
         }
     }

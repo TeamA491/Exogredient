@@ -3,6 +3,8 @@ using TeamA.Exogredient.Services;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
+using System.Net;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -12,55 +14,74 @@ namespace TeamA.Exogredient.Tests
         [TestMethod]
         public async Task FTPService_Send_SendValidCredentials()
         {
-            //arrange
+            // Arrange
             DateTime currentTime = DateTime.Now;
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
-            string ftpUrl = "ftp://*******/";
-            string userName = "*****";
-            string password = "*****";
-            //act
+            string ftpUrl = Constants.FTPUrl;
+            string userName = Constants.FTPUsername;
+            string password = Constants.FTPpassword;
+            
+            // Act
             bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
-            //assert
+            
+            // Assert
             Assert.IsTrue(results);
         }
 
         [TestMethod]
         public async Task FTPService_Send_SendInvalidCredentials()
         {
-            //arrange
+            // Arrange
             DateTime currentTime = DateTime.Now;
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
-            string ftpUrl = "ftp://******/";
-            string userName = "******";
+            string ftpUrl = Constants.FTPUrl;
+            string userName = Constants.FTPUsername;
+            bool results;
             // Attempting to transfer file with wrong password to ftp server
             string password = "********";
-            //act
 
-            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
-            //assert
+            // Act
+            try
+            {
+                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
+            }
+            catch(WebException e)
+            {
+                results = false;
+            }
+            // Assert
             Assert.IsFalse(results);
         }
 
         [TestMethod]
         public async Task FTPService_Send_SendWithoutTargetFile()
         {
+            // Arrange
             DateTime currentTime = DateTime.Now;
             string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
 
-            string ftpUrl = "ftp://********";
-            string userName = "******";
-
+            string ftpUrl = Constants.FTPUrl;
+            string userName = Constants.FTPUsername;
+            bool results;
+            
             // Attempting to transfer file with wrong password to ftp server
-            string password = "*******";
-            string targetFilePath = targetDirectory + ".7z";
+            string password = Constants.FTPpassword;
+            string targetFilePath = targetDirectory + Constants.SevenZipFileExtension;
 
             // Delete the file we want to send to remote to test SendWithoutTargetFile.
             File.Delete(targetFilePath);
 
-            //act
-            bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
+            // Act
+            try
+            {
+                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password).ConfigureAwait(false);
+            }
+            catch(ArgumentException e)
+            {
+                results = false;
+            }
 
-            //assert
+            // Assert
             Assert.IsFalse(results);
         }
 

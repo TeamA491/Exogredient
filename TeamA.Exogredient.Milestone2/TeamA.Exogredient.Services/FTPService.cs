@@ -6,8 +6,22 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
+    /// <summary>
+    /// FTP service is used to transfer a file from one machine to a 
+    /// FTP server. 
+    /// </summary>
     public static class FTPService
     {
+        /// <summary>
+        /// The SendAsync function takes a file from the local machine 
+        /// and tries to send it to a FTP server. 
+        /// </summary>
+        /// <param name="ftpURL">The url of the FTP server.</param>
+        /// <param name="ftpFolder">The destination folder in the FTP server. </param>
+        /// <param name="sourceDirectory"> The directory in which the desired file is located</param>
+        /// <param name="userName"> Crendential for FTP server. </param>
+        /// <param name="password"> Credential for FTP server. </param>
+        /// <returns>A boolean that confirms if sending was successful.</returns>
         public static async Task<bool> SendAsync(string ftpURL, string ftpFolder, string sourceDirectory, string userName, string password)
         {
             // File to send on local machine.
@@ -24,6 +38,9 @@ namespace TeamA.Exogredient.Services
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpURL + ftpFolder + Path.GetFileName(archiveFilePath));
             request.Method = WebRequestMethods.Ftp.UploadFile;
 
+            // Create a variable for FTP responses.
+            FtpWebResponse response = null;
+
             // Entering in FTP user credentials.
             request.Credentials = new NetworkCredential(userName, password);
 
@@ -32,12 +49,21 @@ namespace TeamA.Exogredient.Services
             request.UsePassive = true;
             request.UseBinary = false;
             request.EnableSsl = false;
-
-            using (Stream requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false))
+            try
             {
-                await requestStream.WriteAsync(fileBytes, 0, fileBytes.Length).ConfigureAwait(false);
+                using (Stream requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false))
+                {
+                    await requestStream.WriteAsync(fileBytes, 0, fileBytes.Length).ConfigureAwait(false);
+                }
             }
-
+            catch(WebException e)
+            {
+                response = (FtpWebResponse)e.Response;
+                if(response != null)
+                {
+                    throw new WebException("Invalid credentials");
+                }
+            }
             return true;
         }
     }

@@ -3,8 +3,20 @@ using System.IO;
 
 namespace TeamA.Exogredient.Services
 {
+    /// <summary>
+    /// The File Fetching service moves desired files from one directory to 
+    /// another. 
+    /// </summary>
     public static class FileFetchingService
     {
+        /// <summary>
+        /// The purpose of the File Fetching Service is to move files
+        /// of a certain age to a new directory.
+        /// </summary>
+        /// <param name="sourceDirectory"> The file path of the directory containing files that must be moved.</param>
+        /// <param name="targetDirectory"> The path of a directory the files are to be moved to.</param>
+        /// <param name="days"> The amount of days a file must exist in order to be moved.</param>
+        /// <returns>A boolean that confirms if files were moved correctly.</returns>
         public static bool FetchLogs(string sourceDirectory, string targetDirectory, int days)
         {
             // Check to make sure source Directory exists.

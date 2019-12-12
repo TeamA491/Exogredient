@@ -396,6 +396,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string ArchivePrefixArgument = "a -t7z ";
         public const string ArchivePostfixArgument = " -sdel";
         public const string SevenZipFileExtension = ".7z";
+        public const string FTPUrl = "ftp://52.250.120.151";
+        public const string FTPUsername = "Archiver";
 
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";
