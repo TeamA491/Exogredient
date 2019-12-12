@@ -526,7 +526,7 @@ namespace TeamA.Exogredient.Tests
             //Act
 
             // Check if the email exists, and set the result accordingly.
-            bool emailExistence = await userDAO.CheckPhoneNumberExistenceAsync(email).ConfigureAwait(false);
+            bool emailExistence = await userDAO.CheckEmailExistenceAsync(email).ConfigureAwait(false);
 
             //Assert
 
