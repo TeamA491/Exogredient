@@ -17,11 +17,19 @@ namespace TeamA.Exogredient.Tests
         private bool DataEquals(IPAddressRecord ipRecord, IPAddressObject ipObject)
         {
             IDictionary<string, object> recordData = ipRecord.GetData();
+            Console.WriteLine(recordData[Constants.IPAddressDAOIPColumn]);
+            Console.WriteLine(recordData[Constants.IPAddressDAOtimestampLockedColumn]);
+            Console.WriteLine(recordData[Constants.IPAddressDAOregistrationFailuresColumn]);
+            Console.WriteLine(recordData[Constants.IPAddressDAOlastRegFailTimestampColumn]);
+            Console.WriteLine(ipObject.IP);
+            Console.WriteLine(ipObject.TimestampLocked);
+            Console.WriteLine(ipObject.RegistrationFailures);
+            Console.WriteLine(ipObject.LastRegFailTimestamp);
 
-            if (recordData[Constants.IPAddressDAOIPColumn].Equals(ipObject.IP) &&
-                recordData[Constants.IPAddressDAOtimestampLockedColumn].Equals(ipObject.TimestampLocked) &&
-                recordData[Constants.IPAddressDAOregistrationFailuresColumn].Equals(ipObject.RegistrationFailures) &&
-                recordData[Constants.IPAddressDAOlastRegFailTimestampColumn].Equals(ipObject.LastRegFailTimestamp))
+            if (((string)recordData[Constants.IPAddressDAOIPColumn]).Equals(ipObject.IP) &&
+                ((long)recordData[Constants.IPAddressDAOtimestampLockedColumn]).Equals(ipObject.TimestampLocked) &&
+                ((int)recordData[Constants.IPAddressDAOregistrationFailuresColumn]).Equals(ipObject.RegistrationFailures) &&
+                ((long)recordData[Constants.IPAddressDAOlastRegFailTimestampColumn]).Equals(ipObject.LastRegFailTimestamp))
             {
                 return true;
             }
@@ -79,7 +87,7 @@ namespace TeamA.Exogredient.Tests
                 await ipDAO.CreateAsync(ipRecord).ConfigureAwait(false);
                 await ipDAO.CreateAsync(ipRecord).ConfigureAwait(false);
             }
-            catch(ArgumentException)
+            catch(Exception)
             {
                 // Catch the exception and set the result to true.
                 result = true;
@@ -247,7 +255,7 @@ namespace TeamA.Exogredient.Tests
             // Read the IP. 
             IPAddressObject ipObject = (IPAddressObject)await ipDAO.ReadByIdAsync(ip);
             // Check if the IP was updated correctly and set the result to true. 
-            bool result = DataEquals(ipRecord, ipObject);
+            bool result = DataEquals(updatedRecord, ipObject);
 
             // Assert
 

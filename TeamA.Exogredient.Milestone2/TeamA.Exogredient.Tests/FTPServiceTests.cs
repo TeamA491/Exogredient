@@ -13,19 +13,31 @@ namespace TeamA.Exogredient.Tests
     {
 
         [TestMethod]
-        public async Task FTPService_Send_SendValidCredentials()
+        public async Task FTPService_Send_SendValidCredentialsAsync()
         {
             // Arrange
             DateTime currentTime = DateTime.Now;
-
-            // Create the target. 
-            Directory.CreateDirectory(@"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy"));
+            string targetDirectory = @"C:\_ArchiveFiles\TF1\" + currentTime.ToString("ddMMyy");
             
-
-            string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
+            // Create a base archive directory with another directory inside of it(named after date). 
+            if (!Directory.Exists(@"C:\_ArchiveFiles\TF1\"))
+            {
+                Directory.CreateDirectory(@"C:\_ArchiveFiles\TF1\");
+                if (!Directory.Exists(targetDirectory))
+                {
+                    Directory.CreateDirectory(targetDirectory);
+                }
+            }
+            // List the path to archive file. 
+            string targetFile = targetDirectory + Constants.SevenZipFileExtension;
+            if (!File.Exists(targetFile))
+            {
+                File.Create(targetFile);
+            }
+            // Set up FTP credentials
             string ftpUrl = Constants.FTPUrl;
-            string userName = "Archiver";
-            string password = "onlyicanpass5%";
+            string userName = Constants.FTPUsername;
+            string password = Constants.FTPpassword;
             
             // Act
             bool results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password);
@@ -35,16 +47,31 @@ namespace TeamA.Exogredient.Tests
 
 
             // Cleanup 
-            Directory.Delete(@"C:\_ArchiveFiles\", true);
+            //Directory.Delete(@"C:\_ArchiveFiles\TF1", true);
 
         }
 
         [TestMethod]
-        public async Task FTPService_Send_SendInvalidCredentials()
+        public async Task FTPService_Send_SendInvalidCredentialsAsync()
         {
             // Arrange
             DateTime currentTime = DateTime.Now;
-            string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
+            string targetDirectory = @"C:\_ArchiveFiles\TF2\" + currentTime.ToString("ddMMyy");
+            // Create a test folder with another directory inside named after the date. 
+            if (!Directory.Exists(@"C:\_ArchiveFiles\TF2\"))
+            {
+                Directory.CreateDirectory(@"C:\_ArchiveFiles\TF2\");
+                if (!Directory.Exists(targetDirectory))
+                {
+                    Directory.CreateDirectory(targetDirectory);
+                }
+            }
+            // Create variable for archive file inside directories. 
+            string targetFile = targetDirectory + Constants.SevenZipFileExtension;
+            if (!File.Exists(targetFile))
+            {
+                File.Create(targetFile);
+            }
             string ftpUrl = Constants.FTPUrl;
             string userName = Constants.FTPUsername;
             bool results;
@@ -62,30 +89,26 @@ namespace TeamA.Exogredient.Tests
             }
             // Assert
             Assert.IsFalse(results);
+            
+            // Cleanup
+            //Directory.Delete(@"C:\_ArchiveFiles\TF2\", true);
         }
 
         [TestMethod]
-        public async Task FTPService_Send_SendWithoutTargetFile()
+        public async Task FTPService_Send_SendWithoutTargetFileAsync()
         {
-            // Arrange
-            DateTime currentTime = DateTime.Now;
-            string targetDirectory = @"C:\_ArchiveFiles\" + currentTime.ToString("ddMMyy");
-
+ 
             string ftpUrl = Constants.FTPUrl;
             string userName = Constants.FTPUsername;
-            bool results;
-            
-            // Attempting to transfer file with wrong password to ftp server
             string password = Constants.FTPpassword;
-            string targetFilePath = targetDirectory + Constants.SevenZipFileExtension;
+            bool results;
 
             // Delete the file we want to send to remote to test SendWithoutTargetFile.
-            File.Delete(targetFilePath);
 
             // Act
             try
             {
-                results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password);
+                results = await FTPService.SendAsync(ftpUrl, "", "", userName, password);
             }
             catch(ArgumentException e)
             {
@@ -94,6 +117,9 @@ namespace TeamA.Exogredient.Tests
 
             // Assert
             Assert.IsFalse(results);
+            
+            // Cleanup
+            //Directory.Delete(@"C:\_ArchiveFiles\TF3\", true);
         }
 
     }
