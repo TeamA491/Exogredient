@@ -8,8 +8,6 @@ using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
 
 // NOTE JWS TOKEN MUST BE IN THE AUTHORIZATION HEADER FOR EACH REQUEST
-// TODO MAKE NEW HASH METHOD - VIRTUAL
-// TODO MAKE NEW SIGN METHOD - VIRTUAL
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -26,10 +24,17 @@ namespace TeamA.Exogredient.Services
         private const string EXPIRATION_FIELD = "exp";
         private const string PUBLIC_KEY_FIELD = "pk";
 
+        private static readonly byte[] keyPair;
         private static readonly UserDAO _userDAO;
 
         static AuthorizationService()
         {
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048))
+            {
+                // Holds both the private key and public key
+                keyPair = rsa.ExportCspBlob(true);
+            }
+
             _userDAO = new UserDAO();
         }
 
@@ -41,12 +46,8 @@ namespace TeamA.Exogredient.Services
         /// Jose_Header.JWS_Payload.JWS_Signature
         /// </remarks>
         /// <param name="payload">The data to be encrypted.</param>
-        /// <param name="publicKey">An optional public key to be used instead of the one
-        /// loaded from the environment. The public key will be sent along with the token payload.</param>
-        /// <param name="privateKey">An optional private key to be used instead of the one
-        /// loaded from the environment.</param>
         /// <returns>The JWS.</returns>
-        public static string GenerateJWS(Dictionary<string, string> payload, string publicKey = "", string privateKey = "")
+        public static string GenerateJWS(Dictionary<string, string> payload)
         {
             // TODO CHECK PUBLIC KEY AND PRIVATE KEY, CHECK THEIR LENGTHS AND IF THEY INCLUDE ----BEGIN... ---END... ETC
 
@@ -67,16 +68,6 @@ namespace TeamA.Exogredient.Services
                 payload.Add(EXPIRATION_FIELD, UtilityService.GetEpochFromNow().ToString());
             }
 
-            // Add the public key to the payload
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                payload.Add(PUBLIC_KEY_FIELD, Constants.AuthzPublicKey);
-            }
-            else
-            {
-                payload.Add(PUBLIC_KEY_FIELD, publicKey);
-            }
-
             // Base64 encode the header and payload
             string encodedHeader = DictionaryToString(joseHeader).ToBase64URL();
             string encodedPayload = DictionaryToString(payload).ToBase64URL();
@@ -84,33 +75,41 @@ namespace TeamA.Exogredient.Services
             // The signature will be the hash of the header and payload
             string stringToSign = encodedHeader + '.' + encodedPayload;
 
-            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-            if (string.IsNullOrEmpty(privateKey))
-            {
-                RSA.FromXmlString(Constants.AuthzPrivateKey);
-            }
-            else
-            {
-                RSA.FromXmlString(privateKey);
-            }
-
-            // This object will let us create a signature
-            RSAPKCS1SignatureFormatter RSAFormatter = new RSAPKCS1SignatureFormatter(RSA);
-
-            // TODO MAKE MORE EXTENSIBLE TO OTHER HASHING ALGORITHMS
-            RSAFormatter.SetHashAlgorithm(HASHING_ALGORITHM);  // We care more about speed here, so we use SHA512
-            SHA512Managed SHhash = new SHA512Managed();
-
-            // Hash the encoded values using RSA512
-            byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(stringToSign));
-            // Sign the hash with the private key
-            string signature = RSAFormatter.CreateSignature(hashedString).ToBase64URL();
-
-            // Release resources
-            SHhash.Dispose();
-            RSA.Dispose();
+            // Create the signature
+            string signature = GetPKCSSignature(stringToSign).ToBase64URL();
 
             return string.Format("{0}.{1}.{2}", encodedHeader, encodedPayload, signature);
+        }
+
+        /// <summary>
+        /// Generates the signature, for the third part of the JWS token.
+        /// </summary>
+        /// <param name="data">The data to sign.</param>
+        /// <param name="privateKey">The private key to sign it with.</param>
+        /// <returns></returns>
+        public static string GetPKCSSignature(string data)
+        {
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+            {
+                // Hash the data
+                byte[] hash;
+                using (SHA512 sha256 = SHA512.Create())
+                {
+                    hash = sha256.ComputeHash(data.ToBytes());
+                }
+
+                // Set the private key
+                rsa.ImportCspBlob(keyPair);
+
+                // Prepare to sign the hash
+                RSAPKCS1SignatureFormatter RSAFormatter = new RSAPKCS1SignatureFormatter(rsa);
+                RSAFormatter.SetHashAlgorithm(HASHING_ALGORITHM);
+
+                // Create the signature from the hash
+                byte[] signedHash = RSAFormatter.CreateSignature(hash);
+
+                return signedHash.FromBytes();
+            }
         }
 
         /// <summary>
@@ -150,7 +149,6 @@ namespace TeamA.Exogredient.Services
 
             string encodedHeader = segments[0];
             string encodedPayload = segments[1];
-            string encodedSignature = segments[2];
 
             // Convert header back to dictionary format
             string decodedHeader = segments[0].FromBase64URL();
@@ -164,34 +162,47 @@ namespace TeamA.Exogredient.Services
             if (headerJSON["alg"] != SIGNING_ALGORITHM)
                 throw new InvalidTokenException("Incorrect encryption algorithm.");
 
-            if (!payloadJSON.ContainsKey(PUBLIC_KEY_FIELD))
-                throw new InvalidTokenException("Public key not found in the JWS payload!");
-
-            string publicKey = payloadJSON[PUBLIC_KEY_FIELD];
-            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-            RSA.FromXmlString(publicKey);
-
-            // Create this object in order to verify that the JWS was untampered with
-            RSAPKCS1SignatureDeformatter RSADeformatter = new RSAPKCS1SignatureDeformatter(RSA);
-            RSADeformatter.SetHashAlgorithm(HASHING_ALGORITHM);
-            SHA512Managed SHhash = new SHA512Managed();
-
             string strToVerify = encodedHeader + '.' + encodedPayload;
-            // Hash the encoded values using RSA512
-            byte[] hashedString = SHhash.ComputeHash(Encoding.UTF8.GetBytes(strToVerify));
 
-            // Release resources
-            SHhash.Dispose();
-            RSA.Dispose();
-
-            // Verify that the JWS is correct and untampered with
-            if (RSADeformatter.VerifySignature(hashedString, System.Convert.FromBase64String(encodedSignature)))
-            {
+            // Make sure the signature is correct
+            if (VerifyPKCSSignature(strToVerify))
                 return payloadJSON;
-            }
             else
-            {
                 throw new InvalidTokenException("JWS could not be verified!");
+        }
+
+        /// <summary>
+        /// Verifies that a JWS signature is correct and untampered with.
+        /// </summary>
+        /// <param name="data">The signature to check.</param>
+        /// <param name="publicKey">The public key to use.</param>
+        /// <returns></returns>
+        public static bool VerifyPKCSSignature(string data)
+        {
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+            {
+                // Hash the data
+                byte[] hash;
+                using (SHA512 sha256 = SHA512.Create())
+                {
+                    hash = sha256.ComputeHash(data.ToBytes());
+                }
+
+                // Set the public key
+                rsa.ImportCspBlob(keyPair);
+
+                // Prepare to sign the hash
+                RSAPKCS1SignatureFormatter RSAFormatter = new RSAPKCS1SignatureFormatter(rsa);
+                RSAFormatter.SetHashAlgorithm(HASHING_ALGORITHM);
+
+                // Create the signature from the hash
+                byte[] signedHash = RSAFormatter.CreateSignature(hash);
+
+                // Prepare to verify the signed hash
+                RSAPKCS1SignatureDeformatter RSADeformatter = new RSAPKCS1SignatureDeformatter(rsa);
+                RSADeformatter.SetHashAlgorithm(HASHING_ALGORITHM);
+
+                return RSADeformatter.VerifySignature(hash, signedHash);
             }
         }
 
@@ -204,14 +215,14 @@ namespace TeamA.Exogredient.Services
         /// <param name="privateKey">An optional private key to be used instead of the one
         /// loaded from the environment.</param>
         /// <returns>A new token that has been refreshed and active for 20 more minutes.</returns>
-        public static string RefreshJWS(string jws, int minutes = Constants.TOKEN_EXPIRATION_MIN, string publicKey = "", string privateKey = "")
+        public static string RefreshJWS(string jws, int minutes = Constants.TOKEN_EXPIRATION_MIN)
         {
             Dictionary<string, string> payload = DecryptJWS(jws);
 
             // Refresh the token for an additional 20 minutes
             payload[EXPIRATION_FIELD] = UtilityService.GetEpochFromNow(minutes).ToString();
 
-            return GenerateJWS(payload, publicKey, privateKey);
+            return GenerateJWS(payload);
         }
 
         /// <summary>
@@ -465,7 +476,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="str">The string to decode.</param>
         /// <returns>The original representation of the string.</returns>
-        private static string FromBase64(this string str)
+        private static string FromBase64URL(this string str)
         {
             string oldStr = str.Replace('_', '/').Replace('-', '+');
 
