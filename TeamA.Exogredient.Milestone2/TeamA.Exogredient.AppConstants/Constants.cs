@@ -114,6 +114,15 @@ namespace TeamA.Exogredient.AppConstants
             SYS_ADMIN = 4,
         };
 
+        // ARCHIVING 
+        public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+        public const string ArchivePrefixArgument = "a -t7z ";
+        public const string ArchivePostfixArgument = " -sdel";
+        public const string SevenZipFileExtension = ".7z";
+        public const string FTPUrl = @"ftp://52.250.120.151:21/";
+        public const string FTPUsername = "Archiver";
+        public const string NamingFormatString = "ddMMyy";
+
         // AUTHENTICATION / USER MANAGEMENT
         public const string GoogleSMTP = "smtp.gmail.com";
         public const int GoogleSMTPPort = 465;
@@ -391,14 +400,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
 
-        // ARCHIVING 
-        public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
-        public const string ArchivePrefixArgument = "a -t7z ";
-        public const string ArchivePostfixArgument = " -sdel";
-        public const string SevenZipFileExtension = ".7z";
-        public const string FTPUrl = @"ftp://52.250.120.151:21/";
-        public const string FTPUsername = "Archiver";
-
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";
         public const string JWSthreeSegments = "JWS must have 3 segments separated by periods.";
@@ -441,6 +442,19 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDeleteDNE = "UserDAO.DeleteByIdsAsync username did not exist";
         public const string UserReadDNE = "UserDAO.ReadByIdAsync username did not exist";
         public const string UserUpdateDNE = "UserDAO.UpdateAsync username did not exist";
+
+        // EXCEPTION MESSAGES -- Archiving
+        public const string SourceDirectoryDNE = "Archiving failed on because source directory did not exist";
+        public const string FirstArgumentNotInt = "Archiving failed because first argument must be an integer";
+        public const string InvalidArgs = "Arvhiving failed because needed to enter days, source Directory, and target Directory for archiving";
+        public const string FileFetchingDirectoryDNE = "File fetching source Directory does not exist.";
+        public const string DaysLessThanZero = "File fetching days cannot be less than 0.";
+        public const string FileFetchingNoLogs = "File fetching no logs to archive in the source directory.";
+        public const string FileFetchingLogsNotMoved = "File fetching files were not moved to the target directory";
+        public const string CompressionInvalidArguments = "Invalid compression source Directory or 7zip file path.";
+        public const string CompressionFailed = "Compression archive failed to create.";
+        public const string FTPfileNotFound = "FTP archive File not found.";
+        public const string FTPinvalidCredentials = "Invalid ftp credentials";
 
     }
 }

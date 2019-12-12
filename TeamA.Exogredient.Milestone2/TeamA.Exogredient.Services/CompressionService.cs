@@ -24,7 +24,7 @@ namespace TeamA.Exogredient.Services
             // Check to make sure source Directory exists
             if (!(Directory.Exists(sourceDirectory) && Directory.Exists(targetDirectory) && File.Exists(sevenZipPath)))
             {
-                throw new ArgumentException("Invalid source Directory or 7zip file path.");
+                throw new ArgumentException(Constants.CompressionInvalidArguments);
             }
 
             // Set the name of the compressed target file 
@@ -49,7 +49,7 @@ namespace TeamA.Exogredient.Services
             // Check to see if archive was successfully created
             if (!File.Exists(targetFile))
             {
-                throw new Exception("Archive failed to create.");
+                throw new Exception(Constants.CompressionFailed);
             }
             else
             {

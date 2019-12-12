@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
@@ -22,7 +23,7 @@ namespace TeamA.Exogredient.Services
             // Check to make sure source Directory exists.
             if (!Directory.Exists(sourceDirectory))
             {
-                throw new ArgumentException("Source Directory does not exist.");
+                throw new ArgumentException(Constants.FileFetchingDirectoryDNE);
             }
 
             // Create a folder that will get compressed and send later on. Delete already existing folder with same name. 
@@ -37,7 +38,7 @@ namespace TeamA.Exogredient.Services
             }
             if(days < 0)
             {
-                throw new ArgumentException("Days cannot be less than 0.");
+                throw new ArgumentException(Constants.DaysLessThanZero);
             }
 
             // Gather file paths for logs in the source Directory
@@ -46,7 +47,7 @@ namespace TeamA.Exogredient.Services
             // Return false if no log files found
             if (logFilePaths.Length == 0)
             {
-                throw new ArgumentException("No logs to archive in the source directory.");
+                throw new ArgumentException(Constants.FileFetchingNoLogs);
             }
 
             // Identify files older than _days amount of days and move them to the target directory. 
@@ -66,7 +67,7 @@ namespace TeamA.Exogredient.Services
             string[] newLogFilePaths = Directory.GetFiles(targetDirectory);
             if (newLogFilePaths.Length == 0)
             {
-                throw new Exception("Files were not moved to the target directory");
+                throw new Exception(Constants.FileFetchingLogsNotMoved);
             }
             else
             {
