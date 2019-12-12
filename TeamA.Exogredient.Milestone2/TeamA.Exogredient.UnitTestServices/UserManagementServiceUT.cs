@@ -7,6 +7,7 @@ using MimeKit;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.Services;
 
 namespace TeamA.Exogredient.UnitTestServices
 {
@@ -14,7 +15,7 @@ namespace TeamA.Exogredient.UnitTestServices
     /// This object provides functions to manage users, anonymous or otherwise,
     /// in our system.
     /// </summary>
-    public static class UserManagementService
+    public static class UserManagementServiceUT
     {
         private static readonly UnitTestUserDAO _userDAO;
         private static readonly UnitTestIPAddressDAO _ipDAO;
@@ -22,7 +23,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <summary>
         /// Initiates the object and its dependencies.
         /// </summary>
-        static UserManagementService()
+        static UserManagementServiceUT()
         {
             _userDAO = new UnitTestUserDAO();
             _ipDAO = new UnitTestIPAddressDAO();

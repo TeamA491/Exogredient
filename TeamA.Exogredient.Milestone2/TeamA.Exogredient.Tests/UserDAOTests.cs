@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Tests
             }
         }
 
-        // Given the user information, successfully create the user. 
+        // Given the user information, successfully create the user.
         [TestMethod]
         [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_CreateAsync_SuccessfulCreation
@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.Tests
                            phoneNumber, password, disabled, userType, salt,
                           tempTimestamp, emailCode, emailCodeTimestamp,loginFailures,
                            lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
-          
+
             //Act
 
             // Create the user.
@@ -79,7 +79,7 @@ namespace TeamA.Exogredient.Tests
             await userDAO.DeleteByIdsAsync(new List<string>{ username }).ConfigureAwait(false);
         }
 
-        // Creating a duplicated user throws an exception and fails. 
+        // Creating a duplicated user throws an exception and fails.
         [TestMethod]
         [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_CreateAsync_UnsuccessfulCreation
@@ -110,7 +110,7 @@ namespace TeamA.Exogredient.Tests
                 // Catch exception and set the result true.
                 result = true;
             }
-            
+
             //Assert
 
             // Result should be true.
@@ -144,7 +144,7 @@ namespace TeamA.Exogredient.Tests
 
             // Delete the user.
             await userDAO.DeleteByIdsAsync(new List<string>{ username }).ConfigureAwait(false);
-            // Check if the user exists and set the result accordingly. 
+            // Check if the user exists and set the result accordingly.
             bool result = await userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false);
 
             //Assert
@@ -177,7 +177,7 @@ namespace TeamA.Exogredient.Tests
             //Act
             try
             {
-                // Delete the user. 
+                // Delete the user.
                 await userDAO.DeleteByIdsAsync(new List<string> { "nonExistingUser" }).ConfigureAwait(false);
             }
             catch (ArgumentException)
@@ -263,7 +263,7 @@ namespace TeamA.Exogredient.Tests
                 // Catch exception and set the result true.
                 result = true;
             }
-            
+
             //Assert
 
             // Result should be true.
@@ -303,7 +303,7 @@ namespace TeamA.Exogredient.Tests
 
             //Act
 
-            // Update the user. 
+            // Update the user.
             await userDAO.UpdateAsync(updatedUserRecord).ConfigureAwait(false);
             // Read the updated user's data.
             UserObject userObject= (UserObject)await userDAO.ReadByIdAsync(username).ConfigureAwait(false);
@@ -353,7 +353,7 @@ namespace TeamA.Exogredient.Tests
             //Act
             try
             {
-                // Update the user. 
+                // Update the user.
                 await userDAO.UpdateAsync(updatedUserRecord).ConfigureAwait(false);
             }
             catch(ArgumentException)
@@ -361,7 +361,7 @@ namespace TeamA.Exogredient.Tests
                 // Catch exception and set the result true.
                 result = true;
             }
-            
+
             //Assert
 
             // The result should be true.
@@ -439,7 +439,7 @@ namespace TeamA.Exogredient.Tests
             await userDAO.DeleteByIdsAsync(new List<string> { username }).ConfigureAwait(false);
         }
 
-        // Given an existing phone number, return true. 
+        // Given an existing phone number, return true.
         [TestMethod]
         [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_CheckPhoneNumberExistenceAsync_PhoneNumberExists(string username, string firstName, string lastName,
@@ -473,7 +473,7 @@ namespace TeamA.Exogredient.Tests
         }
 
 
-        // Given a non-existing phone number, return false. 
+        // Given a non-existing phone number, return false.
         [TestMethod]
         [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_CheckPhoneNumberExistenceAsync_PhoneNumberNonExists(string username, string firstName, string lastName,

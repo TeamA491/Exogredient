@@ -16,13 +16,11 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_CheckUserExistence_UserExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange: Create user 
+            // Arrange: Create user
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt);
             Assert.IsTrue(createResult);
 
-
-            // Assert: Check that an existing user returns true.
-            bool result = UserManagementService.CheckUserExistence(username);
+            bool result = UserManagementServiceUT.CheckUserExistence(username);
             Assert.IsTrue(result);
 
             // Cleanup: delete the created user.
@@ -35,8 +33,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
         [DataRow("123123321")]
         public void UserManagementService_CheckUserExistence_UserDoesNotExistsFailure(string username)
         {
-            // Assert: Check that an non existing user returns false.
-            bool result = UserManagementService.CheckUserExistence(username);
+            // check if user exists
+            // delete it if it does
+            bool result = UserManagementServiceUT.CheckUserExistence(username);
             Assert.IsFalse(result);
         }
 
@@ -45,12 +44,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_CheckPhoneNumberExistence_PhoneNumberExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange: Create users with the phonenumber inputted. 
-            bool createResult = UserManagementService.CreateUser(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt);
-            Assert.IsTrue(createResult);
-
-            // Assert: check that an existing phonenumber returns true.
-            bool result = UserManagementService.CheckPhoneNumberExistence(phoneNumber);
+            // Arrange
+            // Create users with phonenumber above
+            bool result = UserManagementServiceUT.CheckPhoneNumberExistence(phoneNumber);
             Assert.IsTrue(result);
 
             // Cleanup: Delete Created user.
@@ -62,8 +58,10 @@ namespace TeamA.Exogredient.TestsNoDatabase
         [DataRow("0000000000")]
         public void UserManagementService_CheckPhoneNumberExistence_PhoneNumberDoesNotExistsFailure(string phoneNumber)
         {
-            // Act: Check that a nonexistent phonenumber returns false. 
-            bool result = UserManagementService.CheckPhoneNumberExistence(phoneNumber);
+            // Arrange
+            // Check if phonenumber exists. if it does delete that user
+
+            bool result = UserManagementServiceUT.CheckPhoneNumberExistence(phoneNumber);
             Assert.IsFalse(result);
         }
 
@@ -72,12 +70,11 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_CheckEmailExistence_EmailExistsSuccess(bool isTemp, string username, string firstname, string lastname, string email,
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange: Create user. 
+            // Arrange: Create user.
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: check that an existing email returns true.
-            bool result = UserManagementService.CheckEmailExistence(email);
+            bool result = UserManagementServiceUT.CheckEmailExistence(email);
             Assert.IsTrue(result);
 
             // Cleanup: Delete that user
@@ -89,8 +86,11 @@ namespace TeamA.Exogredient.TestsNoDatabase
         [DataRow("JasonDoesNotExists@gmail.com")]
         public void UserManagementService_CheckEmailExistence_EmailDoesNotExistsFailure(string email)
         {
-            // Act: check that a non existing email returns false.
-            bool result = UserManagementService.CheckEmailExistence(email);
+            // Arrange
+            // check if that email exist
+            // if it does delete that user
+
+            bool result = UserManagementServiceUT.CheckEmailExistence(email);
             Assert.IsFalse(result);
         }
 
@@ -104,8 +104,7 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: Check that the disabled is disabled.
-            bool result = UserManagementService.CheckIfUserDisabled(username);
+            bool result = UserManagementServiceUT.CheckIfUserDisabled(username);
             Assert.IsTrue(result);
 
             // Cleanup: Delete that user.
@@ -122,8 +121,7 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstname, lastname, email, phoneNumber, password, isDisabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: Check that the non disabled returns false.
-            bool result = UserManagementService.CheckIfUserDisabled(username);
+            bool result = UserManagementServiceUT.CheckIfUserDisabled(username);
             Assert.IsFalse(result);
 
             // Cleanup: Delete that user.
@@ -139,7 +137,7 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool lockResult = UserManagementService.CreateIP(ipAddress);
             Assert.IsTrue(lockResult);
 
-            // Arrange: Attempt to faile to register 3 times. 
+            // Arrange: Attempt to faile to register 3 times.
             // IPs: Are only locked this way.
             for (int i = 0; i < 3; i++)
             {
@@ -149,9 +147,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
 
 
             // Act
-            bool result = UserManagementService.CheckIfIPLocked(ipAddress);
+            bool result = UserManagementServiceUT.CheckIfIPLocked(ipAddress);
 
-            // Assert: Check that an IP that is inserted returns true.
+            // Assert
             Assert.IsTrue(result);
 
             // Cleanup: Delete the IP.
@@ -165,18 +163,13 @@ namespace TeamA.Exogredient.TestsNoDatabase
         [DataRow("127.0.0.9")]
         public void UserManagementService_CheckIPLock_IpIsNotDisabledSuccess(string ipAddress)
         {
-            // Act:  Check that an non existent ip returns ArgumentExcpetions because ip does not exists.
-            bool result;
-            try
-            {
-                UserManagementService.CheckIfIPLocked(ipAddress);
-                result = false;
-            }
-            catch (ArgumentException ae)
-            {
-                result = true;
-            }
-            Assert.IsTrue(result);
+            // Arrange
+            // Check if ip is in table
+            // if it is selete it from it
+
+            TimeSpan maxLockTime = new TimeSpan(hours, minutes, seconds);
+            bool result = UserManagementServiceUT.CheckIfIPLocked(ipAddress);
+            Assert.IsFalse(result);
         }
 
         [DataTestMethod]
@@ -184,29 +177,19 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_CreateUser_CreateNonExistentUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                                        string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Act: Create the user.
-            bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
-            // Assert: that user creation was successful 
-            Assert.IsTrue(createResult);
+            // Act
+            // Create the user
+            bool result = UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
-            // Read that user and assert that it has all the correct columns 
-            UserObject user = UserManagementService.GetUserInfo(username);
-            bool readResult;
-            if (user.TempTimestamp == 0 && user.Username == username && user.FirstName == firstName && user.LastName == lastName && user.Email == email &&
-                user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
-            {
-                readResult = true;
-            }
-            else
-            {
-                readResult = false;
-            }
-            Assert.IsTrue(readResult);
+            // Assert that user creation was successful
+            Assert.IsTrue(result);
 
-            // Cleanup: Delete that user
-            bool deleteResult = UserManagementService.DeleteUser(username);
-            Assert.IsTrue(deleteResult);
+            // Read that user. and assert that it has all the correct columns
+
+
+            // Cleanup
+            // Delete user
         }
 
         [DataTestMethod]
@@ -214,12 +197,14 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_DeleteUser_DeleteUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                                 string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange: Create a user to be deleted
-            bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
-            Assert.IsTrue(createResult);
+            // Arrange
+            // Create a user to be deleted
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
-            // Act: Delete the user 
-            bool result = UserManagementService.DeleteUser(username);
+            // Act
+            // Delete the user
+            bool result = UserManagementServiceUT.DeleteUser(username);
+
             Assert.IsTrue(result);
 
             // Assert: that the user is properly deleted from the table with CheckUserExistence
@@ -232,12 +217,15 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_MakeTempPerm_ChangeTempToPermSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Arrange: Create a temporary user to be deleted.
-            bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
-            Assert.IsTrue(createResult);
+            // Arrange
+            // Create a temporary user to be deleted
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
-            // Act: Make the temporary user perm
-            bool result = UserManagementService.MakeTempPerm(username);
+            // Act
+            // Make the temporary user perm
+            bool result = UserManagementServiceUT.MakeTempPerm(username);
+
+            // Assert
             Assert.IsTrue(result);
 
             // Assert: that the user is infact permanent.
@@ -266,11 +254,13 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_StoreEmailCode_StoreEmailCodeForUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
-            // Arrange: Create a temporary user to be deleted
-            UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
+            // Arrange
+            // Create a temporary user to be deleted
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
-            // Act: Store an email code for a user.
-            bool result = UserManagementService.StoreEmailCode(username, emailCode, emailCodeTimestamp);
+            // Act
+            bool result = UserManagementServiceUT.StoreEmailCode(username, emailCode, emailCodeTimestamp);
+
             Assert.IsTrue(result);
 
             // Assert: Read the email code and check if it did infact change.
@@ -297,13 +287,12 @@ namespace TeamA.Exogredient.TestsNoDatabase
         public void UserManagementService_RemoveEmailCode_RemoveEmailCodeForUserSuccess(bool isTemp, string username, string firstName, string lastName, string email,
                                          string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
-            // Arrange: Create a user.
-            bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
-            Assert.IsTrue(createResult);
+            // Arrange
+            // Create a temporary user to be deleted
+            UserManagementServiceUT.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
 
-            // Arrange: Store an email code for that user.
-            bool storeResult = UserManagementService.StoreEmailCode(username, emailCode, emailCodeTimestamp);
-            Assert.IsTrue(storeResult);
+            // Act
+            bool result = UserManagementServiceUT.RemoveEmailCode(username);
 
             // Act: Remove the email code for that user.
             bool result = UserManagementService.RemoveEmailCode(username);
@@ -338,9 +327,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: disable that user 
-            bool result = UserManagementService.DisableUser(username);
-            Assert.IsTrue(result);
+            // Act
+            bool result = UserManagementServiceUT.DisableUser(username);
+            Assert.IsFalse(result);
 
             // Assert: Check that the user is disabled.
             UserObject user = UserManagementService.GetUserInfo(username);
@@ -358,7 +347,7 @@ namespace TeamA.Exogredient.TestsNoDatabase
             }
             Assert.IsTrue(readResult);
 
-            // Delete the created user 
+            // Delete the created user
             bool deleteResult = UserManagementService.DeleteUser(username);
             Assert.IsTrue(deleteResult);
         }
@@ -368,19 +357,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
         [DataRow("username")]
         public void UserManagementService_DisableUserName_DisableNonExistingUserFailure(string username)
         {
-            // Act: disabling a non existent user should throw an ArgumentException because the user doesn't exists.
-            bool result;
-            try
-            {
-                UserManagementService.DisableUser(username);
-                result = false;
-            }
-            catch (ArgumentException ae)
-            {
-                result = true;
-            }
-
-            Assert.IsTrue(result);
+            // Act
+            bool result = UserManagementServiceUT.DisableUser(username);
+            Assert.IsFalse(result);
         }
 
         [DataTestMethod]
@@ -392,8 +371,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: Disabling an already disabled user should return false.
-            bool result = UserManagementService.DisableUser(username);
+            // Act
+            // Make the temporary user perm
+            bool result = UserManagementServiceUT.DisableUser(username);
             Assert.IsFalse(result);
 
             // Cleanup: Delete the user.
@@ -410,8 +390,13 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: Perform an enable operation on a disabled user.
-            bool enableResult = UserManagementService.EnableUser(username);
+
+            bool result = UserManagementServiceUT.DisableUser(username);
+            Assert.IsTrue(result);
+
+            // Act
+            bool enableResult = UserManagementServiceUT.EnableUser(username);
+
             Assert.IsTrue(enableResult);
 
             // Assert: Check that the user is enabled.
@@ -444,8 +429,9 @@ namespace TeamA.Exogredient.TestsNoDatabase
             bool createResult = UserManagementService.CreateUser(isTemp, username, firstName, lastName, email, phoneNumber, password, disabled, userType, salt);
             Assert.IsTrue(createResult);
 
-            // Act: Enable and already enabled user should return false.
-            bool result = UserManagementService.EnableUser(username);
+            // Act
+            // Make the temporary user perm
+            bool result = UserManagementServiceUT.EnableUser(username);
             Assert.IsFalse(result);
 
             // Cleanup: Delete that user.
@@ -487,9 +473,14 @@ namespace TeamA.Exogredient.TestsNoDatabase
 
         public void UserManagementService_NotifySystemAdmin_SendEmailToSystemAdminSuccess(string body)
         {
-            // Act: Check that a successfull message to system admin returns true.
-            bool notifyResult = UserManagementService.NotifySystemAdmin(body, Constants.SystemAdminEmailAddress);
-            Assert.IsTrue(notifyResult);
+
+            // Act
+            // Send message to system admin
+            bool result = UserManagementServiceUT.NotifySystemAdmin(body, Constants.SystemAdminEmailAddress);
+
+            // Assert
+            // TODO: how do we ensure that the system admin got the email?
+            Assert.IsTrue(result);
         }
     }
 }

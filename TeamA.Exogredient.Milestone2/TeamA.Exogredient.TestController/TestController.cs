@@ -16,7 +16,7 @@ namespace TeamA.Exogredient.TestController
 {
     class TestController
     {
-        public async static Task Main(string[] args)
+        public async static Task Main()
         {
             int i = 1;
             Console.WriteLine(i.ToString().Equals("1"));

@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
+using System;
+using TeamA.Exogredient.DataHelpers;
+using System.Text;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -108,29 +111,18 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("a@A")]
-        [DataRow("lmao123sda@gmail.com")]
-        [DataRow("dasda.dsa#!@yahoo.com")]
-        [DataRow("LoveThisClass123+lmaojk@gmail.com")]
-        public void UtilityService_CanonicalizingEmail_CanonicalizingEmailSuccess(string email)
+        [DataRow("a@A", "a@a")]
+        [DataRow("lmao123sda@gmail.com", "lmao123sda@gmail.com")]
+        [DataRow("l.ma.o123sda@gmail.com", "lmao123sda@gmail.com")]
+        [DataRow("dasda.dsa#!@yahoo.com", "dasda.dsa#!@yahoo.com")]
+        [DataRow("LoveThisClass123+lmaojk@gmail.com", "lovethisclass123@gmail.com")]
+        public void UtilityService_CanonicalizingEmail_CanonicalizingEmailSuccess(string email, string expectedEmail)
         {
-
             // Act
-            string canonicalizedEmail = UtilityService.CanonicalizeEmail(email);
+            string actualEmail = UtilityService.CanonicalizeEmail(email);
 
-
-            // Check if act matches with expected value.
-            bool result = false;
-
-            if (canonicalizedEmail.Equals("a@a") || canonicalizedEmail.Equals("lmao123sda@gmail.com") ||
-                canonicalizedEmail.Equals("dasda.dsa#!@yahoo.com") || canonicalizedEmail.Equals("lovethisclass123@gmail.com"))
-            {
-                result = true;
-            }
-
-
-            // Assert
-            Assert.IsTrue(result);
+            // Assert: Check if act matches with expected value.
+            Assert.AreEqual(expectedEmail, actualEmail);
         }
 
         [DataTestMethod]
@@ -219,5 +211,70 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
         }
+
+        [TestMethod]
+        public void UtilityService_CurrentUnixTime_CurrentTimeMatchSuccess()
+        {
+            // Arrange:
+            long expectedTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+
+            // Act: 
+            long actualTime = UtilityService.CurrentUnixTime();
+
+            // Assert:
+            Assert.AreEqual(expectedTime, actualTime);
+        }
+
+        [DataTestMethod]
+        [DataRow("message", "data", true, 1)]
+        public void UtilityService_CreateResult_CreateAccurateResult(string message, string data, bool exceptionOccured, int numException)
+        {
+            // Act
+            Result<string> resultObject = UtilityService.CreateResult<string>(message, data, exceptionOccured, numException);
+
+            // Assert: Check that the result we created matches the inputs. 
+            bool result;
+            if(resultObject.Message == message && resultObject.Data == data && 
+                resultObject.ExceptionOccurred == exceptionOccured && resultObject.NumExceptions == numException)
+            {
+                result = true;
+            }
+            else
+            {
+                result = false;
+            }
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        [DataRow(1, 3, 5)]
+        public void UtilityService_TimespanToSeconds_ConvertToSecondsSuccessfull(int hours, int minutes, int seconds)
+        {
+            // Arrange: Get the expected seconds for the timespan object
+            long expectedSeconds =(long) (new TimeSpan(hours, minutes, seconds)).TotalSeconds;
+
+            TimeSpan ts = new TimeSpan(hours, minutes, seconds);
+            // Act: Get the seconds for timespan object using the function.
+            long actualSeconds = UtilityService.TimespanToSeconds(ts);
+
+            // Assert:
+            Assert.AreEqual(expectedSeconds, actualSeconds);
+        }
+
+        [TestMethod]
+        public void UtilityService_BytesToUTF8String_ConvertSuccessfull()
+        {
+            // Arrange:
+            string expectedString = "HelloWorld";
+            byte[] bytes = Encoding.UTF8.GetBytes(expectedString);
+
+            // Act:
+            string actualString = UtilityService.BytesToUTF8String(bytes);
+
+            // Assert:
+            Assert.AreEqual(expectedString, actualString);
+        }
+
+
     }
 }
