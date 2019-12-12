@@ -102,9 +102,8 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                throw new ArgumentException(Constants.LogCreateInvalidArgument);
+                throw new ArgumentException(Constants.LogFindInvalidArgument);
             }
-
             foreach(KeyValuePair<int,LogRecord> pair in Logs[groupName])
             {
                 if (pair.Value.Equals(logRecord))
