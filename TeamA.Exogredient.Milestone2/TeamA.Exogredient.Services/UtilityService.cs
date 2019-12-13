@@ -23,6 +23,16 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
+        /// Gets the new UTC epoch time for which the token would expire.
+        /// </summary>
+        /// <param name="min">How many minutes from now, to get a UTC time.</param>
+        /// <returns>Epoch time representing `x` minutes from now.</returns>
+        public static long GetEpochFromNow(int min = Constants.TOKEN_EXPIRATION_MIN)
+        {
+            DateTime curTime = DateTime.UtcNow;
+            return ((DateTimeOffset)curTime.AddMinutes(min)).ToUnixTimeSeconds();
+        }
+
         /// Creates a result object from the <paramref name="message"/>, with the <paramref name="data"/>,
         /// whether an <paramref name="exceptionOccurred"/>, and storing the <paramref name="numExceptions"/>.
         /// </summary>

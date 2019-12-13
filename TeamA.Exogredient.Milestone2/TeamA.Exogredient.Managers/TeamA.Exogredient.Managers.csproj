@@ -9,4 +9,7 @@
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="AuthorizationManager 2.cs" />
+  </ItemGroup>
 </Project>

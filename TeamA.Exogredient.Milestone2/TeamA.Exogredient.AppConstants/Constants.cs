@@ -114,6 +114,22 @@ namespace TeamA.Exogredient.AppConstants
             SYS_ADMIN = 4,
         };
 
+        public static readonly Dictionary<string, int> UserOperations = new Dictionary<string, int>
+        {
+            // Format:
+            // <operation> : <user level allowed>
+            // NOTE: Users with a higher user number are allowed to access
+            // the operations that lower leveled users can
+            { "login", 0 },
+            { "register", 0 },
+            { "search", 1 },
+            { "upload", 1 },
+            { "claimBusiness", 2 },
+            { "createAd", 2 },
+            { "createUser", 3 },
+            { "deleteUser", 3 },
+            { "createSysAdmin", 4 },
+        };
         // ARCHIVING 
         public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
         public const string ArchivePrefixArgument = "a -t7z ";

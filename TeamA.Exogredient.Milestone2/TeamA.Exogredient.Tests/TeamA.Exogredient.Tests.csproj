@@ -21,4 +21,7 @@
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="AuthorizationServiceUnitTests 2.cs" />
+  </ItemGroup>
 </Project>
