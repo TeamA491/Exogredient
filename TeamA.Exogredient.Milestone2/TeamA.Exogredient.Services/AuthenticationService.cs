@@ -99,14 +99,14 @@ namespace TeamA.Exogredient.Services
 
             // Generate a code the length of what's defined in the constant file.
             Random generator = new Random();
-            string emailCode = generator.Next((int)Math.Pow(10, Constants.EmailCodeLength),
-                                              (int)Math.Pow(10, Constants.EmailCodeLength + 1)).ToString();
+            string emailCode = generator.Next((int)Math.Pow(10, Constants.EmailCodeLength - 1),
+                                              (int)Math.Pow(10, Constants.EmailCodeLength)).ToString();
 
             // Timestamp the email code was generated at.
             long emailCodeTimestamp = UtilityService.CurrentUnixTime();
 
             // Store the code and timestamp in the data store.
-            await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
+            await UserManagementService.StoreEmailCodeAsync(username, emailCode.ToString(), emailCodeTimestamp).ConfigureAwait(false);
 
             // Html body for the email code.
             bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
