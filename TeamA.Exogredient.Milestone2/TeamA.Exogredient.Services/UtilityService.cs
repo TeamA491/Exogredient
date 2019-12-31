@@ -507,7 +507,6 @@ namespace TeamA.Exogredient.Services
             return false;
         }
 
-
         /// <summary>
         /// Asynchronously check if string <paramref name="input"/> contains an english word, upper or lowercase,
         /// among the top 9000 most popular words that are over 3 characters in length.
@@ -923,6 +922,248 @@ namespace TeamA.Exogredient.Services
 
             // If nothing found, return false.
             return false;
+        }
+
+        /// <summary>
+        /// Converts a string to UTF8 bytes
+        /// </summary>
+        /// <param name="s">The string to convert</param>
+        /// <returns>UTF8 Bytes array</returns>
+        public static byte[] ToBytes(this string s)
+        {
+            return Encoding.UTF8.GetBytes(s);
+        }
+
+        /// <summary>
+        /// Converts a UTF8 bytes array back to a string
+        /// </summary>
+        /// <param name="b">The byte array to convert</param>
+        /// <returns>The original string representation</returns>
+        public static string FromBytes(this byte[] b)
+        {
+            return Encoding.UTF8.GetString(b);
+        }
+
+        /// <summary>
+        /// Extension function to convert a bytes array to a Base64 encoding.
+        /// </summary>
+        /// <param name="bytes">The bytes array to be converted.</param>
+        /// <returns>A Base64 representation of the bytes array.</returns>
+        public static string ToBase64URL(this byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes).ToBase64URL();
+        }
+
+        /// <summary>
+        /// Converts a Base64 encoded string back to it's original format.
+        /// </summary>
+        /// <param name="str">The string to decode.</param>
+        /// <returns>The original representation of the string.</returns>
+        public static string FromBase64URL(this string str)
+        {
+            string oldStr = str.Replace('_', '/').Replace('-', '+');
+
+            // Base64URL encoded string must be a multiple of 4
+            // otherwise it's missing padding at the end
+            int missingPadding = str.Length % 4;
+            if (missingPadding == 1)
+                oldStr += "===";        // Missing 3 characters
+            else if (missingPadding == 2)
+                oldStr += "==";         // Missing 2 characters
+            else if (missingPadding == 3)
+                oldStr += "=";          // Missing 1 character
+
+            return Convert.FromBase64String(oldStr).FromBytes();
+        }
+
+        /// <summary>
+        /// Extension function to convert a string to alpha numeric.
+        /// </summary>
+        /// <remarks>
+        /// This implementation ignores whitespace characters.
+        /// </remarks>
+        /// <param name="str">The string to be converted.</param>
+        /// <returns>An alpha numeric representation</returns>
+        public static string ToAlphaNumeric(this string str)
+        {
+            if (str == null)
+                return "";
+
+            // Traverse the string backwards, because when we delete
+            // characters from the string going forward, there will be an offset
+            // and the for loop will eventually go out of bounds of the string
+            for (int i = str.Length - 1; i >= 0; i--)
+            {
+                bool isCharacter = char.IsLetter(str[i]);
+                bool isNumber = char.IsNumber(str[i]);
+
+                // Check if the char is a valid character, valid number, or space
+                // and delete the character if not
+                if (!isCharacter && !isNumber && str[i] != ' ')
+                    str = str.Remove(i, 1);
+            }
+
+            return str;
+        }
+
+        /// <summary>
+        /// Determines whether a string is alpha-numeric or not.
+        /// </summary>
+        /// <remarks>
+        /// This implementation ignores whitespace characters.
+        /// </remarks>
+        /// <param name="str">The string to check.</param>
+        /// <returns>Whether the string is alpha-numeric or not.</returns>
+        public static bool IsAlphaNumeric(this string str)
+        {
+            if (str == null)
+                return false;
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                bool isCharacter = char.IsLetter(str[i]);
+                bool isNumber = char.IsNumber(str[i]);
+
+                // Check if the char is a valid character, valid number, or space
+                if (!isCharacter && !isNumber && str[i] != ' ')
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Extension function to convert a string to a Base64 encoding.
+        /// </summary>
+        /// <param name="str">The string to be converted.</param>
+        /// <returns>A Base64 representation of the string.</returns>
+        public static string ToBase64URL(this string str)
+        {
+            string b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+            // Make sure it's URL safe
+            b64 = b64.Replace('+', '-').Replace('/', '_').TrimEnd('=');
+            return b64;
+        }
+
+        /// <summary>
+        /// Converts a dictionary to a JSON string representation.
+        /// </summary>
+        /// <remarks>
+        /// All string values are converted to be Alpha-Numeric. This is the avoid
+        /// errors and security issues with serializing a dictionary.
+        /// </remarks>
+        /// <param name="dict">The dictionary to represent as a string.</param>
+        /// <returns>A JSON string representation of the dictionary.</returns>
+        public static string DictionaryToString(Dictionary<string, string> dict)
+        {
+            List<string> body = new List<string>();  // Holds all the key value pairs in string representation
+
+            // Construct a List of serialized key/value pairs
+            foreach (KeyValuePair<string, string> entry in dict)
+            {
+                // Create a string representation of the key/value pair
+                string serializedKeyVal = string.Format("\"{0}\":\"{1}\"",
+                                                        entry.Key.ToAlphaNumeric(),
+                                                        entry.Value.ToAlphaNumeric());
+
+                body.Add(serializedKeyVal);
+            }
+
+            // Construct the final JSON string in valid form
+            return "{" + string.Join(",", body) + "}";
+        }
+
+        /// <summary>
+        /// Converts a JSON string to a dictionary.
+        /// </summary>
+        /// <param name="dictStr">The string to parse into a dictionary.</param>
+        /// <returns>Dictionary representation of the string.</returns>
+        public static Dictionary<string, string> StringToDictionary(string dictStr)
+        {
+            // The passed in string is assumed to be in proper JSON format, with each
+            // key/value pair being alpha-numeric
+            // Example: "{\"key1\":\"value1\",\"key2\":\"value2\"}"
+            // .... Defining a proper format for the string:
+            // ........ (1) Has correct surrounding brackets.
+            // ........ (2) Correct comma count and placements.
+            // ........ (3) Each key and value have double quotes around them.
+            // ........ (4) Each key and value are alpha-numeric.
+            // If all conditions are not true, an error will be thrown.
+
+            // Check for condition (1)
+            if (dictStr.Length < 2 || dictStr[0] != '{' || dictStr[dictStr.Length - 1] != '}')
+            {
+                throw new ArgumentException("Dictionary doesn't have proper surrounding brackets.");
+            }
+
+            // Remove the first and last brackets
+            dictStr = dictStr.Remove(0, 1);
+            dictStr = dictStr.Remove(dictStr.Length - 1, 1);
+
+            // String should look like this now:
+            // "\"key1\":\"value1\",\"key2\":\"value2\""
+
+            // Count the commas and colons in the string...
+            int commaCount = 0, colonCount = 0;
+            foreach (char c in dictStr)
+            {
+                if (c == ',') commaCount++;
+                if (c == ':') colonCount++;
+            }
+
+            // Check for condition (2)
+            // For every comma, there are 2 key/value pairs...
+            // For every key/value pair, there is 1 colon to separate the key and value
+            // So that means ((colonCount - 1) = commaCount) in a valid JSON string
+            // NOTE: If a comma or colon appears in the key or value, then it violates condition (4)
+            if (colonCount - 1 != commaCount)
+            {
+                throw new ArgumentException("Invalid comma and / or colon formatting.");
+            }
+
+            // Determine key/value pairs and their correctness
+            string[] pairs = dictStr.Split(',');
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            foreach (string pair in pairs)
+            {
+                string[] p = pair.Split(':');
+                // If we don't have a key and value pair, then it's not correct
+                if (p.Length != 2)
+                {
+                    throw new ArgumentException("Invalid key/value pair.");
+                }
+
+                string key = p[0];
+                string val = p[1];
+
+                // Check for condition (3)
+                bool keyHasQuotes = key.Length > 2 && key[0] == '"' && key[key.Length - 1] == '"';
+                bool valHasQuotes = val.Length > 2 && val[0] == '"' && val[val.Length - 1] == '"';
+
+                if (!keyHasQuotes || !valHasQuotes)
+                {
+                    throw new ArgumentException("Key or value isn't surrounded by double quotes.");
+                }
+
+                // Remove the double quote at the beginning
+                key = key.Remove(0, 1);
+                val = val.Remove(0, 1);
+
+                // Remove the double quote at the end
+                key = key.Remove(key.Length - 1);
+                val = val.Remove(val.Length - 1);
+
+                // Check for condition (4)
+                if (!(key.IsAlphaNumeric() && val.IsAlphaNumeric()))
+                {
+                    throw new ArgumentException("Key or value is not alpha-numeric (excluding white-space).");
+                }
+
+                dict.Add(key, val);
+            }
+
+            return dict;
         }
     }
 }

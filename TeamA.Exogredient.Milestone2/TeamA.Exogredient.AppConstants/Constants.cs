@@ -27,6 +27,7 @@ namespace TeamA.Exogredient.AppConstants
             { 11, 30 }, { 12, 31 }
         };
 
+        // TODO: CONVERT THESE TO ARRAYS
         // No < or > to protect from SQL injections.
         public static readonly List<char> ANSNoAngleBrackets = new List<char>()
         {
@@ -93,9 +94,9 @@ namespace TeamA.Exogredient.AppConstants
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
 
-        public const string MediaTyp = "typ";
+        public const string MediaType = "typ";
         public const string MediaJWT = "JWT";
-        public const string SigningAlg = "alg";
+        public const string SigningAlgKey = "alg";
         public const string AuthzSigningAlgorithm = "RS512";
         public const string AuthzExpirationField = "exp";
         public const string AuthzPublicKeyField = "pk";
@@ -104,6 +105,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string IdKey = "id";
 
         public const string SHA1 = "SHA1";
+
+        public const string SIGNING_ALGORITHM = "RS512";
+        public const string HASHING_ALGORITHM = "SHA512";
+        public const string EXPIRATION_FIELD = "exp";
+        public const string PUBLIC_KEY_FIELD = "pk";
 
         public enum USER_TYPE
         {
@@ -130,6 +136,7 @@ namespace TeamA.Exogredient.AppConstants
             { "deleteUser", 3 },
             { "createSysAdmin", 4 },
         };
+
         // ARCHIVING 
         public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
         public const string ArchivePrefixArgument = "a -t7z ";
