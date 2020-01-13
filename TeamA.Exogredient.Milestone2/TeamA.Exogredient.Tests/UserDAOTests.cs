@@ -18,8 +18,7 @@ namespace TeamA.Exogredient.Tests
             IDictionary<string, object> recordData = userRecord.GetData();
 
             if (recordData[Constants.UserDAOusernameColumn].Equals(userObject.Username) &&
-                recordData[Constants.UserDAOfirstNameColumn].Equals(userObject.FirstName) &&
-                recordData[Constants.UserDAOlastNameColumn].Equals(userObject.LastName) &&
+                recordData[Constants.UserDAOnameColumn].Equals(userObject.Name) &&
                 recordData[Constants.UserDAOemailColumn].Equals(userObject.Email) &&
                 recordData[Constants.UserDAOphoneNumberColumn].Equals(userObject.PhoneNumber) &&
                 recordData[Constants.UserDAOpasswordColumn].Equals(userObject.Password) &&
@@ -44,9 +43,9 @@ namespace TeamA.Exogredient.Tests
 
         // Given the user information, successfully create the user.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_CreateAsync_SuccessfulCreation
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email,string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -54,10 +53,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user record.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp,loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp,loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
 
             //Act
 
@@ -81,9 +80,9 @@ namespace TeamA.Exogredient.Tests
 
         // Creating a duplicated user throws an exception and fails.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_CreateAsync_UnsuccessfulCreation
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -91,10 +90,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user record.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             // Set the result to false by default.
             bool result = false;
 
@@ -124,9 +123,9 @@ namespace TeamA.Exogredient.Tests
 
         // The specified user gets deleted succssfully.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_DeleteByIdsAsync_SuccessfulDeletion
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -134,10 +133,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act
@@ -155,9 +154,9 @@ namespace TeamA.Exogredient.Tests
 
         // Given a non-existing user, deletion fails.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_DeleteByIdsAsync_UnsuccessfulDeletion
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -165,10 +164,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             // Set the result to false by default.
@@ -197,9 +196,9 @@ namespace TeamA.Exogredient.Tests
 
         // The specified user's data gets read successfully.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_ReadByIdAsync_SuccessfulRead
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -207,10 +206,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
 
@@ -234,9 +233,9 @@ namespace TeamA.Exogredient.Tests
 
         // Given a non-existing user, read fails.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_ReadByIdAsync_UnsuccessfulRead
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -244,10 +243,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
             bool result = false;
 
@@ -277,9 +276,9 @@ namespace TeamA.Exogredient.Tests
 
         // Update the user successfully.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_UpdateAsync_SuccessfulUpdate
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -287,19 +286,19 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             // Same username with new data.
             string newString = "new";
             int newNumber = 1;
-            UserRecord updatedUserRecord = new UserRecord(username, newString, newString, newString,
-                           newString, newString, newNumber, newString, newString,
-                          newNumber, newString, newNumber, newNumber,
-                           newNumber, newNumber, newNumber);
+            UserRecord updatedUserRecord = new UserRecord(username, newString, newString,
+                                                          newString, newString, newNumber, newString, newString,
+                                                          newNumber, newString, newNumber, newNumber,
+                                                          newNumber, newNumber, newNumber);
 
             //Act
 
@@ -323,9 +322,9 @@ namespace TeamA.Exogredient.Tests
 
         // Update the user unsuccessfully.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
         public async Task UserDAO_UpdateAsync_UnsuccessfulUpdate
-            (string username, string firstName, string lastName,
+            (string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -333,19 +332,19 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             // Different username with new data.
             string newString = "new";
             int newNumber = 1;
-            UserRecord updatedUserRecord = new UserRecord("wrongUsername", newString, newString, newString,
-                           newString, newString, newNumber, newString, newString,
-                          newNumber, newString, newNumber, newNumber,
-                           newNumber, newNumber, newNumber);
+            UserRecord updatedUserRecord = new UserRecord("wrongUsername", newString, newString,
+                                                          newString, newString, newNumber, newString, newString,
+                                                          newNumber, newString, newNumber, newNumber,
+                                                          newNumber, newNumber, newNumber);
 
             // Set the result to false by default.
             bool result = false;
@@ -375,8 +374,8 @@ namespace TeamA.Exogredient.Tests
 
         // Given an exsiting user, return true.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
-        public async Task UserDAO_CheckUserExistenceAsync_UserExists(string username, string firstName, string lastName,
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        public async Task UserDAO_CheckUserExistenceAsync_UserExists(string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -384,10 +383,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act
@@ -408,8 +407,8 @@ namespace TeamA.Exogredient.Tests
 
         // Given a non-exsiting user, return false.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
-        public async Task UserDAO_CheckUserExistenceAsync_UserNonExists(string username, string firstName, string lastName,
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        public async Task UserDAO_CheckUserExistenceAsync_UserNonExists(string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -417,10 +416,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act
@@ -441,8 +440,8 @@ namespace TeamA.Exogredient.Tests
 
         // Given an existing phone number, return true.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
-        public async Task UserDAO_CheckPhoneNumberExistenceAsync_PhoneNumberExists(string username, string firstName, string lastName,
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        public async Task UserDAO_CheckPhoneNumberExistenceAsync_PhoneNumberExists(string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -450,10 +449,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act
@@ -475,8 +474,8 @@ namespace TeamA.Exogredient.Tests
 
         // Given a non-existing phone number, return false.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
-        public async Task UserDAO_CheckPhoneNumberExistenceAsync_PhoneNumberNonExists(string username, string firstName, string lastName,
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        public async Task UserDAO_CheckPhoneNumberExistenceAsync_PhoneNumberNonExists(string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -484,10 +483,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act
@@ -508,8 +507,8 @@ namespace TeamA.Exogredient.Tests
 
         // Given an existing email, return true.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
-        public async Task UserDAO_CheckEmailExistenceAsync_EmailExists(string username, string firstName, string lastName,
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        public async Task UserDAO_CheckEmailExistenceAsync_EmailExists(string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -517,10 +516,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act
@@ -541,8 +540,8 @@ namespace TeamA.Exogredient.Tests
 
         // Given a non-existing email, return false.
         [TestMethod]
-        [DataRow("UserDAOTest", "firstname", "lastname", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
-        public async Task UserDAO_CheckEmailExistenceAsync_EmailNonExists(string username, string firstName, string lastName,
+        [DataRow("UserDAOTest", "name", "email", "1234567890", "password", 0, "usertype", "salt", 0, "ecode", 0, 0, 0, 0, 0)]
+        public async Task UserDAO_CheckEmailExistenceAsync_EmailNonExists(string username, string name,
              string email, string phoneNumber, string password, int disabled, string userType, string salt,
              long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
              long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
@@ -550,10 +549,10 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Create a user for the test.
-            UserRecord userRecord = new UserRecord(username, firstName, lastName, email,
-                           phoneNumber, password, disabled, userType, salt,
-                          tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
-                           lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
+            UserRecord userRecord = new UserRecord(username, name, email,
+                                                   phoneNumber, password, disabled, userType, salt,
+                                                   tempTimestamp, emailCode, emailCodeTimestamp, loginFailures,
+                                                   lastLoginFailTimestamp, emailCodeFailures, phoneCodeFailures);
             await userDAO.CreateAsync(userRecord).ConfigureAwait(false);
 
             //Act

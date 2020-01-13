@@ -377,7 +377,7 @@ namespace TeamA.Exogredient.Managers
                 string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 await AuthenticationService.SendEmailVerificationAsync(username, canonicalizedEmail).ConfigureAwait(false);
-                await UserManagementService.CreateUserAsync(true, username, firstName, lastName, canonicalizedEmail,
+                await UserManagementService.CreateUserAsync(true, username, firstName + " " + lastName, canonicalizedEmail,
                                                             phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
                                                             saltHex).ConfigureAwait(false);
 

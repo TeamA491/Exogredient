@@ -15,9 +15,7 @@ namespace TeamA.Exogredient.DataHelpers
         /// as identification.
         /// </summary>
         /// <param name="username">The username of the user to be stored in the table (string)</param>
-        /// <param name="firstName">The first name of the user to be stored in the table,
-        /// if left default it will not be changed during an update (string)</param>
-        /// <param name="lastName">The last name of the user to be stored in the table,
+        /// <param name="name">The name of the user to be stored in the table,
         /// if left default it will not be changed during an update (string)</param>
         /// <param name="email">The email address of the user to be stored in the table,
         /// if left default it will not be changed during an update (string)</param>
@@ -45,14 +43,13 @@ namespace TeamA.Exogredient.DataHelpers
         /// if left default it will not be changed during an update (int)</param>
         /// <param name="phoneCodeFailures">The amount of phone code failures currently for the user if not NOVALUE to be stored in the table,
         /// if left default it will not be changed during an update (string)</param>
-        public UserRecord(string username, string firstName = null, string lastName = null, string email = null,
+        public UserRecord(string username, string name = null, string email = null,
                           string phoneNumber = null, string password = null, int disabled = -1, string userType = null, string salt = null,
                           long tempTimestamp = -1, string emailCode = null, long emailCodeTimestamp = -1, int loginFailures = -1,
                           long lastLoginFailTimestamp = -1, int emailCodeFailures = -1, int phoneCodeFailures = -1)
         {
             _data.Add(Constants.UserDAOusernameColumn, username);
-            _data.Add(Constants.UserDAOfirstNameColumn, firstName);
-            _data.Add(Constants.UserDAOlastNameColumn, lastName);
+            _data.Add(Constants.UserDAOnameColumn, name);
             _data.Add(Constants.UserDAOemailColumn, email);
             _data.Add(Constants.UserDAOphoneNumberColumn, phoneNumber);
             _data.Add(Constants.UserDAOpasswordColumn, password);

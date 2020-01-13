@@ -15,7 +15,7 @@ namespace TeamA.Exogredient.Tests
         {
             try
             {
-                await UserManagementService.CreateUserAsync(false, "eli", "test", "test", "test", phoneNumber, "test", 0, "test", "test").ConfigureAwait(false);
+                await UserManagementService.CreateUserAsync(false, "eli", "test", "test", phoneNumber, "test", 0, "test", "test").ConfigureAwait(false);
             }
             catch
             { }
@@ -33,7 +33,7 @@ namespace TeamA.Exogredient.Tests
         {
             try
             {
-                await UserManagementService.CreateUserAsync(false, "eli", "test", "test", emailAddress, "test", "test", 0, "test", "test").ConfigureAwait(false);
+                await UserManagementService.CreateUserAsync(false, "eli", "test", emailAddress, "test", "test", 0, "test", "test").ConfigureAwait(false);
             }
             catch
             { }

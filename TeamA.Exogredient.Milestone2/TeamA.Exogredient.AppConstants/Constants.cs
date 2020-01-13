@@ -15,9 +15,11 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string SystemEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string NOSQLConnection = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string SQLConnection = Environment.GetEnvironmentVariable("SQL_CONNECTION", EnvironmentVariableTarget.User);
+        public static readonly string MapSQLConnection = SQLConnection;
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
+
 
         // STRING UTILITY HELPER DATA STRUCTURES
         public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
@@ -373,13 +375,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string TokenFile = "token.txt";
 
         // SQL SCHEMA
-        public const string SQLSchemaName = "exogredient";
+        public const string ExogredientSQLSchemaName = "exogredient";
+        public const string MapSQLSchemaName = "mapping_table";
 
         // USER TABLE
         public const string UserDAOtableName = "user";
         public const string UserDAOusernameColumn = "username";                                  // VARCHAR(200)
-        public const string UserDAOfirstNameColumn = "first_name";                               // VARCHAR(200)
-        public const string UserDAOlastNameColumn = "last_name";                                 // VARCHAR(200)
+        public const string UserDAOnameColumn = "name";                                          // VARCHAR(401)
         public const string UserDAOemailColumn = "email";                                        // VARCHAR(200)
         public const string UserDAOphoneNumberColumn = "phone_number";                           // VARCHAR(10)
         public const string UserDAOpasswordColumn = "password";                                  // VARCHAR(2000)
@@ -394,12 +396,37 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDAOemailCodeFailuresColumn = "email_code_failures";              // INT
         public const string UserDAOphoneCodeFailuresColumn = "phone_code_failures";              // INT
 
+        // RECORD HELPER DATA STRUCTURES
+        public static readonly IDictionary<string, bool> IsColumnMasked = new Dictionary<string, bool>()
+        {
+            {UserDAOusernameColumn, false},
+            {UserDAOnameColumn, true},
+            {UserDAOemailColumn, true},
+            {UserDAOphoneNumberColumn, true},
+            {UserDAOpasswordColumn, false},
+            {UserDAOdisabledColumn, false},
+            {UserDAOuserTypeColumn, false},
+            {UserDAOsaltColumn, false},
+            {UserDAOtempTimestampColumn, false},
+            {UserDAOemailCodeColumn, false},
+            {UserDAOemailCodeTimestampColumn, false},
+            {UserDAOloginFailuresColumn, false},
+            {UserDAOlastLoginFailTimestampColumn, false},
+            {UserDAOemailCodeFailuresColumn, false},
+            {UserDAOphoneCodeFailuresColumn, false}
+        };
+
         // IP ADDRESS TABLE
         public const string IPAddressDAOtableName = "ip_address";
         public const string IPAddressDAOIPColumn = "ip";                                         // VARCHAR(15)
         public const string IPAddressDAOtimestampLockedColumn = "timestamp_locked";              // BIGINT -- unix
         public const string IPAddressDAOregistrationFailuresColumn = "registration_failures";    // INT
         public const string IPAddressDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT -- unix
+
+        // MAP TABLE
+        public const string MapDAOTableName = "map";
+        public const string MapDAOHashColumn = "hash";
+        public const string MapDAOActualColumn = "actual";
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";

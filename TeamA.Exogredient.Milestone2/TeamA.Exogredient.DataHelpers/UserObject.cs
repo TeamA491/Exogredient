@@ -6,8 +6,7 @@
     public class UserObject : IDataObject
     {
         public string Username { get; }
-        public string FirstName { get; }
-        public string LastName { get; }
+        public string Name { get; }
         public string Email { get; }
         public string PhoneNumber { get; }
         public string Password { get; }
@@ -26,8 +25,7 @@
         /// Constructs a UserObject by initializing its public fields.
         /// </summary>
         /// <param name="username">The username stored in the table (string)</param>
-        /// <param name="firstName">The first name stored in the table (string)</param>
-        /// <param name="lastName">The last name stored in the table (string)</param>
+        /// <param name="name">The name stored in the table (string)</param>
         /// <param name="email">The email address stored in the table (string)</param>
         /// <param name="phoneNumber">The phone number stored in the table (string)</param>
         /// <param name="password">The password digest stored in the table (string)</param>
@@ -41,14 +39,13 @@
         /// <param name="lastLoginFailTimestamp">The timestamp of the user's last login failure stored in the table (long)</param>
         /// <param name="emailCodeFailures">The amount of failures the user has for entering their email code stored in the table (int)</param>
         /// <param name="phoneCodeFailures">The amount of failures the user has for entering their phone code stored in the table (int)</param>
-        public UserObject(string username, string firstName, string lastName, string email,
+        public UserObject(string username, string name, string email,
                           string phoneNumber, string password, int disabled, string userType, string salt,
                           long tempTimestamp, string emailCode, long emailCodeTimestamp, int loginFailures,
                           long lastLoginFailTimestamp, int emailCodeFailures, int phoneCodeFailures)
         {
             Username = username;
-            FirstName = firstName;
-            LastName = lastName;
+            Name = name;
             Email = email;
             PhoneNumber = phoneNumber;
             Password = password;

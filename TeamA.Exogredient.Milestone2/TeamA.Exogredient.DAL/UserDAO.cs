@@ -186,8 +186,7 @@ namespace TeamA.Exogredient.DAL
                     DataRow row = dataTable.Rows[0];
 
                     // Construct the UserObject by casting the values of the columns to their proper data types.
-                    result = new UserObject((string)row[Constants.UserDAOusernameColumn], (string)row[Constants.UserDAOfirstNameColumn],
-                                            (string)row[Constants.UserDAOlastNameColumn], (string)row[Constants.UserDAOemailColumn],
+                    result = new UserObject((string)row[Constants.UserDAOusernameColumn], (string)row[Constants.UserDAOnameColumn], (string)row[Constants.UserDAOemailColumn],
                                             (string)row[Constants.UserDAOphoneNumberColumn], (string)row[Constants.UserDAOpasswordColumn],
                                             (bool)row[Constants.UserDAOdisabledColumn] ? Constants.DisabledStatus : Constants.EnabledStatus, (string)row[Constants.UserDAOuserTypeColumn],
                                             (string)row[Constants.UserDAOsaltColumn], (long)row[Constants.UserDAOtempTimestampColumn],
