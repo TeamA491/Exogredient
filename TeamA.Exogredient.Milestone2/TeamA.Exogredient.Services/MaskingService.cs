@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
 
@@ -18,13 +20,73 @@ namespace TeamA.Exogredient.Services
             return (MapObject)await _mapDAO.ReadByIdAsync(hashInput).ConfigureAwait(false);
         }
 
-        public async Task<bool> Mask(string plainInput)
+        public async Task<IMaskableRecord> Mask(IMaskableRecord record)
         {
-            string result = SecurityService.HashWithHMACSHA256(SecurityService.HashWithHMACSHA256(plainInput));
+            List<Tuple<object, bool>> info = record.GetMaskInformation();
 
-            MapRecord record = new MapRecord(result, plainInput);
+            object[] parameters = new object[info.Count];
 
-            return await _mapDAO.CreateAsync(record).ConfigureAwait(false);
+            for (int i = 0; i < info.Count; i++)
+            {
+                Tuple<object, bool> data = info[i];
+
+                if (data.Item2)
+                {
+                    bool computeHash = true;
+
+                    if (data.Item1 is int)
+                    {
+                        if ((int)data.Item1 == -1)
+                        {
+                            computeHash = false;
+                        }
+                    }
+                    if (data.Item1 is string)
+                    {
+                        if (data.Item1 == null)
+                        {
+                            computeHash = false;
+                        }
+                    }
+                    if (data.Item1 is long)
+                    {
+                        if ((long)data.Item1 == -1)
+                        {
+                            computeHash = false;
+                        }
+                    }
+
+                    if (computeHash)
+                    {
+                        string input = data.Item1.ToString();
+
+                        string inputHex = UtilityService.ToHexString(input);
+
+                        string hash = SecurityService.HashWithHMACSHA256(SecurityService.HashWithHMACSHA256(inputHex));
+
+                        MapRecord mapRecord = new MapRecord(hash, input);
+
+                        if (!await _mapDAO.CheckHashExistenceAsync(hash).ConfigureAwait(false))
+                        {
+                            await _mapDAO.CreateAsync(mapRecord).ConfigureAwait(false);
+                        }
+
+                        parameters[i] = hash;
+                    }
+                    else
+                    {
+                        parameters[i] = data.Item1;
+                    }
+                }
+                else
+                {
+                    parameters[i] = data.Item1;
+                }
+            }
+
+            IMaskableRecord resultRecord = (IMaskableRecord)record.GetType().GetConstructor(record.GetParameterTypes()).Invoke(parameters);
+
+            return resultRecord;
         }
     }
 }

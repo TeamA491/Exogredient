@@ -5,5 +5,7 @@
     /// LogRecord, etc.
     /// </summary>
     public interface INOSQLRecord
-    { }
+    {
+        bool IsEqual(object obj);
+    }
 }

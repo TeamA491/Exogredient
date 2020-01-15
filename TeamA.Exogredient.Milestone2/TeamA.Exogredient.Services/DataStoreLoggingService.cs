@@ -46,9 +46,13 @@ namespace TeamA.Exogredient.Services
                 // Create the log record to be stored, mostly just the parameters to this function apart from the timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
+                MaskingService maskingService = new MaskingService(new MapDAO());
+
+                LogRecord resultRecord = (LogRecord)await maskingService.Mask(logRecord).ConfigureAwait(false);
+
                 // The name of the collection/table should be a derivative of the "yyyyMMdd" part of the timestamp.
                 // Asynchronously call the Log DAO's function to create the log record in the collection denoted by the name (second parameter).
-                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]).ConfigureAwait(false);
+                return await _dsLoggingDAO.CreateAsync(resultRecord, splitResult[2]).ConfigureAwait(false);
             }
             catch
             {
@@ -83,8 +87,12 @@ namespace TeamA.Exogredient.Services
                 // i.e no unique operation should have the same timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
+                MaskingService maskingService = new MaskingService(new MapDAO());
+
+                LogRecord resultRecord = (LogRecord)await maskingService.Mask(logRecord).ConfigureAwait(false);
+
                 // Asynchronously find the id field of the log in the data store, passing the collection/table name.
-                string id = await _dsLoggingDAO.FindIdFieldAsync(logRecord, splitResult[2]).ConfigureAwait(false);
+                string id = await _dsLoggingDAO.FindIdFieldAsync(resultRecord, splitResult[2]).ConfigureAwait(false);
 
                 // Asynchronously delete the log by id in the data store.
                 await _dsLoggingDAO.DeleteAsync(id, splitResult[2]).ConfigureAwait(false);

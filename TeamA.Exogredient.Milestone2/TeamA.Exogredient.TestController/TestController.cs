@@ -18,8 +18,13 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main()
         {
-            int i = 1;
-            Console.WriteLine(i.ToString().Equals("1"));
+            UserRecord record = new UserRecord("eli123", "eli gomez", "elithegolfer@gmail.com", "949-981-5506", "lskdajf;lsadjf", 1, "test", "sldjfsldfkj", 1, "123", 1, 1, 1, 1, 1);
+
+            MaskingService ms = new MaskingService(new MapDAO());
+
+            UserRecord maskedRecord = (UserRecord)await ms.Mask(record).ConfigureAwait(false);
+
+            Console.WriteLine(UtilityService.BytesToUTF8String(UtilityService.HexStringToBytes((string)maskedRecord.GetData()["name"])));
         }
     }
 }
