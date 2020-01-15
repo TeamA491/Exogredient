@@ -377,9 +377,13 @@ namespace TeamA.Exogredient.Managers
                 string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 await AuthenticationService.SendEmailVerificationAsync(username, canonicalizedEmail).ConfigureAwait(false);
-                await UserManagementService.CreateUserAsync(true, username, firstName + " " + lastName, canonicalizedEmail,
-                                                            phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
-                                                            saltHex).ConfigureAwait(false);
+
+                // Create user record object to represent a user.
+                UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
+                                                    saltHex, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+                
+                // Create that user.
+                await UserManagementService.CreateUserAsync(true, user).ConfigureAwait(false);
 
                 await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress).ConfigureAwait(false);
