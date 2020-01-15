@@ -106,7 +106,7 @@ namespace TeamA.Exogredient.DAL
             }
             foreach(KeyValuePair<int,LogRecord> pair in Logs[groupName])
             {
-                if (pair.Value.Equals(logRecord))
+                if (pair.Value.IsEqual(logRecord))
                 {
                     // If the log matches the given LogRecord, return its unique ID.
                     return pair.Key.ToString();

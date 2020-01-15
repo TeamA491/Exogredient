@@ -9,7 +9,7 @@ namespace TeamA.Exogredient.DataHelpers
     /// and flat file. Logs keep track of operations performed by users and possible
     /// errors that occurred.
     /// </summary>
-    public class LogRecord : INOSQLRecord
+    public class LogRecord : INOSQLRecord, IMaskableRecord
     {
         public string Timestamp { get; }
 
@@ -53,7 +53,7 @@ namespace TeamA.Exogredient.DataHelpers
             Fields.Add(errorType);
         }
 
-        public override bool Equals(object obj)
+        public bool IsEqual(object obj)
         {
             LogRecord logRecord;
             try
@@ -66,10 +66,35 @@ namespace TeamA.Exogredient.DataHelpers
             }
 
             return (Timestamp.Equals(logRecord.Timestamp) &&
-                   Operation.Equals(logRecord.Operation) &&
-                   Identifier.Equals(logRecord.Identifier) &&
-                   IPAddress.Equals(logRecord.IPAddress) &&
-                   ErrorType.Equals(logRecord.ErrorType));
+                    Operation.Equals(logRecord.Operation) &&
+                    Identifier.Equals(logRecord.Identifier) &&
+                    IPAddress.Equals(logRecord.IPAddress) &&
+                    ErrorType.Equals(logRecord.ErrorType));
+        }
+
+        public List<Tuple<object, bool>> GetMaskInformation()
+        {
+            List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
+            {
+                new Tuple<object, bool>(Timestamp, Constants.LogsCollectionIsColumnMasked[Constants.LogsTimestampField]),
+                new Tuple<object, bool>(Operation, Constants.LogsCollectionIsColumnMasked[Constants.LogsOperationField]),
+                new Tuple<object, bool>(Identifier, Constants.LogsCollectionIsColumnMasked[Constants.LogsIdentifierField]),
+                new Tuple<object, bool>(IPAddress, Constants.LogsCollectionIsColumnMasked[Constants.LogsIPAddressField]),
+                new Tuple<object, bool>(ErrorType, Constants.LogsCollectionIsColumnMasked[Constants.LogsErrorTypeField])
+            };
+
+            return result;
+        }
+
+        public Type[] GetParameterTypes()
+        {
+            Type[] result = new Type[5]
+            {
+                typeof(string), typeof(string), typeof(string),
+                typeof(string), typeof(string)
+            };
+
+            return result;
         }
     }
 }

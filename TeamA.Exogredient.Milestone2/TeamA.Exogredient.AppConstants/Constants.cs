@@ -15,7 +15,7 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string SystemEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string NOSQLConnection = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string SQLConnection = Environment.GetEnvironmentVariable("SQL_CONNECTION", EnvironmentVariableTarget.User);
-        public static readonly string MapSQLConnection = SQLConnection;
+        public static readonly string MapSQLConnection = "server = localhost; user=root;database=mapping_table;port=3306;password=password";
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
@@ -397,7 +397,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDAOphoneCodeFailuresColumn = "phone_code_failures";              // INT
 
         // RECORD HELPER DATA STRUCTURES
-        public static readonly IDictionary<string, bool> IsColumnMasked = new Dictionary<string, bool>()
+        public static readonly IDictionary<string, bool> UserDAOIsColumnMasked = new Dictionary<string, bool>()
         {
             {UserDAOusernameColumn, false},
             {UserDAOnameColumn, true},
@@ -423,6 +423,15 @@ namespace TeamA.Exogredient.AppConstants
         public const string IPAddressDAOregistrationFailuresColumn = "registration_failures";    // INT
         public const string IPAddressDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT -- unix
 
+        // RECORD HELPER DATA STRUCTURES
+        public static readonly IDictionary<string, bool> IPAddressDAOIsColumnMasked = new Dictionary<string, bool>()
+        {
+            {IPAddressDAOIPColumn, true},
+            {IPAddressDAOtimestampLockedColumn, false},
+            {IPAddressDAOregistrationFailuresColumn, false},
+            {IPAddressDAOlastRegFailTimestampColumn, false}
+        };
+
         // MAP TABLE
         public const string MapDAOTableName = "map";
         public const string MapDAOHashColumn = "hash";
@@ -442,6 +451,16 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIdentifierField = "identifier";
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
+
+        // RECORD HELPER DATA STRUCTURES
+        public static readonly IDictionary<string, bool> LogsCollectionIsColumnMasked = new Dictionary<string, bool>()
+        {
+            {LogsTimestampField, false},
+            {LogsOperationField, false},
+            {LogsIdentifierField, false},
+            {LogsIPAddressField, true},
+            {LogsErrorTypeField, false}
+        };
 
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";

@@ -40,16 +40,16 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.UserDAOtableName}` (" +
-                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({(Constants.IsColumnMasked[Constants.UserDAOusernameColumn] ? Constants.DefaultHashLength : Constants.MaximumUsernameCharacters)}) NOT NULL," +
-                               $@"`{Constants.UserDAOnameColumn}` VARCHAR({(Constants.IsColumnMasked[Constants.UserDAOnameColumn] ? Constants.DefaultHashLength : (Constants.MaximumFirstNameCharacters + Constants.MaximumLastNameCharacters + 1))}) NOT NULL," +
-                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({(Constants.IsColumnMasked[Constants.UserDAOemailColumn] ? Constants.DefaultHashLength : Constants.MaximumEmailCharacters)}) NOT NULL," +
-                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({(Constants.IsColumnMasked[Constants.UserDAOphoneNumberColumn] ? Constants.DefaultHashLength : Constants.PhoneNumberCharacterLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn] ? Constants.DefaultHashLength : Constants.MaximumUsernameCharacters)}) NOT NULL," +
+                               $@"`{Constants.UserDAOnameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOnameColumn] ? Constants.DefaultHashLength : (Constants.MaximumFirstNameCharacters + Constants.MaximumLastNameCharacters + 1))}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn] ? Constants.DefaultHashLength : Constants.MaximumEmailCharacters)}) NOT NULL," +
+                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneNumberColumn] ? Constants.DefaultHashLength : Constants.PhoneNumberCharacterLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOpasswordColumn}` VARCHAR({Constants.DefaultHashLength}) NOT NULL," +
                                $@"`{Constants.UserDAOdisabledColumn}` TINYINT(1) NOT NULL," +
-                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({(Constants.IsColumnMasked[Constants.UserDAOuserTypeColumn] ? Constants.DefaultHashLength : Constants.MaximumUserTypeLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOuserTypeColumn] ? Constants.DefaultHashLength : Constants.MaximumUserTypeLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOsaltColumn}` VARCHAR({Constants.DefaultSaltLength}) NOT NULL," +
                                $@"`{Constants.UserDAOtempTimestampColumn}` BIGINT NOT NULL," +
-                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({(Constants.IsColumnMasked[Constants.UserDAOemailCodeColumn] ? Constants.DefaultHashLength : Constants.EmailCodeLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeColumn] ? Constants.DefaultHashLength : Constants.EmailCodeLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOemailCodeTimestampColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.UserDAOloginFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.UserDAOlastLoginFailTimestampColumn}` BIGINT NOT NULL," +

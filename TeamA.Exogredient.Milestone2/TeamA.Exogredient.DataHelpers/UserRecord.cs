@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DataHelpers
@@ -6,7 +7,7 @@ namespace TeamA.Exogredient.DataHelpers
     /// <summary>
     /// This object represents a record that is meant to be stored in the User table.
     /// </summary>
-    public class UserRecord : ISQLRecord
+    public class UserRecord : ISQLRecord, IMaskableRecord
     {
         private readonly IDictionary<string, object> _data = new Dictionary<string, object>();
 
@@ -72,6 +73,44 @@ namespace TeamA.Exogredient.DataHelpers
         public IDictionary<string, object> GetData()
         {
             return _data;
+        }
+
+        public List<Tuple<object, bool>> GetMaskInformation()
+        {
+            List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
+            {
+                new Tuple<object, bool>(_data[Constants.UserDAOusernameColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOnameColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOnameColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOemailColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOphoneNumberColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneNumberColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOpasswordColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOpasswordColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOdisabledColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOdisabledColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOuserTypeColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOuserTypeColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOsaltColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOsaltColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOtempTimestampColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOtempTimestampColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOemailCodeColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOemailCodeTimestampColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeTimestampColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOloginFailuresColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOloginFailuresColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOlastLoginFailTimestampColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOlastLoginFailTimestampColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOemailCodeFailuresColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeFailuresColumn]),
+                new Tuple<object, bool>(_data[Constants.UserDAOphoneCodeFailuresColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneCodeFailuresColumn])
+            };
+
+            return result;
+        }
+
+        public Type[] GetParameterTypes()
+        {
+            Type[] result = new Type[15]
+            {
+                typeof(string), typeof(string), typeof(string),
+                typeof(string), typeof(string), typeof(int),
+                typeof(string), typeof(string), typeof(long),
+                typeof(string), typeof(long), typeof(int),
+                typeof(long), typeof(int), typeof(int)
+            };
+
+            return result;
         }
     }
 }
