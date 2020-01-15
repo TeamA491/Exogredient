@@ -18,7 +18,11 @@ namespace TeamA.Exogredient.Tests
                                                                                           string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
             // Arrange: Create user 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
 
@@ -47,7 +51,12 @@ namespace TeamA.Exogredient.Tests
                                                                                                              string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
             // Arrange: Create users with the phonenumber inputted. 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Assert: check that an existing phonenumber returns true.
@@ -73,8 +82,12 @@ namespace TeamA.Exogredient.Tests
         public async Task UserManagementService_CheckEmailExistenceAsync_EmailExistsSuccess(bool isTemp, string username, string name, string email,
                                                                                             string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
-            // Arrange: Create user. 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: check that an existing email returns true.
@@ -102,7 +115,12 @@ namespace TeamA.Exogredient.Tests
                                                                                                string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
             // Arrange: Create a disabled user.
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Check that the disabled is disabled.
@@ -120,7 +138,12 @@ namespace TeamA.Exogredient.Tests
                                                                                                   string phoneNumber, string password, int isDisabled, string userType, string salt)
         {
             // Arrange: Create user that is not diabled
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, isDisabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Check that the non disabled returns false.
@@ -185,17 +208,21 @@ namespace TeamA.Exogredient.Tests
         public async Task UserManagementService_CreateUserAsync_CreateNonExistentUserSuccess(bool isTemp, string username, string name, string email,
                                                                                              string phoneNumber, string password, int disabled, string userType, string salt)
         {
-            // Act: Create the user.
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
 
             // Assert: that user creation was successful 
             Assert.IsTrue(createResult);
 
             // Read that user and assert that it has all the correct columns 
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
             bool readResult;
-            if (user.TempTimestamp == 0 && user.Username == username && user.Name == name && user.Email == email &&
-                user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            if (userObj.TempTimestamp == 0 && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == disabled && userObj.UserType == userType && userObj.Salt == salt)
             {
                 readResult = true;
             }
@@ -216,7 +243,12 @@ namespace TeamA.Exogredient.Tests
                                                                                   string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create a user to be deleted
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Delete the user 
@@ -234,20 +266,24 @@ namespace TeamA.Exogredient.Tests
                                                                                      string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create a temporary user to be deleted.
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
-            Assert.IsTrue(createResult);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Make the temporary user perm
             bool result = await UserManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Assert: that the user is infact permanent.
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
 
             bool readResult;
             // TempTimestamp == 0 when the user is permanent.
-            if (user.TempTimestamp == 0 && user.Username == username && user.Name == name && user.Email == email &&
-                user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            if (userObj.TempTimestamp == 0 && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == disabled && userObj.UserType == userType && userObj.Salt == salt)
             {
                 readResult = true;
             }
@@ -268,17 +304,21 @@ namespace TeamA.Exogredient.Tests
                                                                                             string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
             // Arrange: Create a temporary user to be deleted
-            await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             // Act: Store an email code for a user.
             bool result = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Assert: Read the email code and check if it did infact change.
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
             bool readResult;
-            if (user.TempTimestamp == 0 && user.Username == username && user.Name == name && user.Email == email &&
-                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            if (userObj.TempTimestamp == 0 && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                 userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == disabled && userObj.UserType == userType && userObj.Salt == salt)
             {
                 readResult = true;
             }
@@ -299,8 +339,12 @@ namespace TeamA.Exogredient.Tests
                                          string phoneNumber, string password, int disabled, string userType, string salt, string emailCode, long emailCodeTimestamp)
         {
             // Arrange: Create a user.
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
-            Assert.IsTrue(createResult);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Arrange: Store an email code for that user.
             bool storeResult = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
@@ -311,11 +355,11 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Read that user and check if infact that email code is removed.
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
             bool readResult;
-            if (user.TempTimestamp == 0 && user.Username == username && user.Name == name && user.Email == email &&
-                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt &&
-                 user.EmailCode == "" && user.EmailCodeTimestamp == 0 && user.EmailCodeFailures == 0)
+            if (userObj.TempTimestamp == 0 && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                 userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == disabled && userObj.UserType == userType && userObj.Salt == salt &&
+                 userObj.EmailCode == "" && userObj.EmailCodeTimestamp == 0 && userObj.EmailCodeFailures == 0)
             {
                 readResult = true;
             }
@@ -336,20 +380,24 @@ namespace TeamA.Exogredient.Tests
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create the user that is not disabled
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
-            Assert.IsTrue(createResult);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: disable that user 
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Assert: Check that the user is disabled.
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
             bool readResult;
             // User is disabled if user.Disabled == Constants.DisabledStatus
-            if (user.TempTimestamp == Constants.NoValueLong && user.Username == username && user.Name == name && user.Email == email &&
-                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == Constants.DisabledStatus && user.UserType == userType && user.Salt == salt &&
-                 user.EmailCode == Constants.NoValueString && user.EmailCodeTimestamp == Constants.NoValueLong && user.EmailCodeFailures == Constants.NoValueInt)
+            if (userObj.TempTimestamp == Constants.NoValueLong && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                 userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == Constants.DisabledStatus && userObj.UserType == userType && userObj.Salt == salt &&
+                 userObj.EmailCode == Constants.NoValueString && userObj.EmailCodeTimestamp == Constants.NoValueLong && userObj.EmailCodeFailures == Constants.NoValueInt)
             {
                 readResult = true;
             }
@@ -390,8 +438,12 @@ namespace TeamA.Exogredient.Tests
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create a user that is Disabled
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
-            Assert.IsTrue(createResult);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Disabling an already disabled user should return false.
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
@@ -408,20 +460,24 @@ namespace TeamA.Exogredient.Tests
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create a disabled user.
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
-            Assert.IsTrue(createResult);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Perform an enable operation on a disabled user.
             bool enableResult = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(enableResult);
 
             // Assert: Check that the user is enabled.
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
             bool readResult;
             // User is disabled if user.Disabled == Constants.DisabledStatus
-            if (user.TempTimestamp == Constants.NoValueLong && user.Username == username && user.Name == name && user.Email == email &&
-                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == Constants.EnabledStatus && user.UserType == userType && user.Salt == salt &&
-                 user.EmailCode == Constants.NoValueString && user.EmailCodeTimestamp == Constants.NoValueLong && user.EmailCodeFailures == Constants.NoValueInt)
+            if (userObj.TempTimestamp == Constants.NoValueLong && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                 userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == Constants.EnabledStatus && userObj.UserType == userType && userObj.Salt == salt &&
+                 userObj.EmailCode == Constants.NoValueString && userObj.EmailCodeTimestamp == Constants.NoValueLong && userObj.EmailCodeFailures == Constants.NoValueInt)
             {
                 readResult = true;
             }
@@ -442,7 +498,12 @@ namespace TeamA.Exogredient.Tests
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create a user that is enabled
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Enable and already enabled user should return false.
@@ -460,18 +521,22 @@ namespace TeamA.Exogredient.Tests
                                          string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // Arrange: Create the user.
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, username, name, email, phoneNumber, password, disabled, userType, salt).ConfigureAwait(false);
-            Assert.IsTrue(createResult);
+            // Arrange: Create user 
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Change the user password digest.
             bool passwordResult = await UserManagementService.ChangePasswordAsync(username, password, salt).ConfigureAwait(false);
             Assert.IsTrue(passwordResult);
 
             // Assert: Read the user and make sure his password now matches the change.
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
             bool readResult;
-            if (user.TempTimestamp == 0 && user.Username == username && user.Name == name && user.Email == email &&
-                 user.PhoneNumber == phoneNumber && user.Password == password && user.Disabled == disabled && user.UserType == userType && user.Salt == salt)
+            if (userObj.TempTimestamp == 0 && userObj.Username == username && userObj.Name == name && userObj.Email == email &&
+                 userObj.PhoneNumber == phoneNumber && userObj.Password == password && userObj.Disabled == disabled && userObj.UserType == userType && userObj.Salt == salt)
             {
                 readResult = true;
             }

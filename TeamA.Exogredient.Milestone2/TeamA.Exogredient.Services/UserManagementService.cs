@@ -160,18 +160,13 @@ namespace TeamA.Exogredient.Services
         /// <param name="userType">Used to specify the user's type.</param>
         /// <param name="salt">Used to specify the salt associated with the user's password digest.</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task<bool> CreateUserAsync(bool isTemp, string username, string name, string email,
-                                                       string phoneNumber, string password, int disabled, string userType, string salt)
+        public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record)
         {
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
             long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
-            // Email code, email code timestamp, login failures, last login failure timestamp, email code failures,
-            // and phone code failures initialized to have no value.
-            UserRecord record = new UserRecord(username, name, email, phoneNumber, password,
-                                               disabled, userType, salt, tempTimestamp, Constants.NoValueString, Constants.NoValueLong,
-                                               Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+            record.GetData()["temp_timestamp"] = tempTimestamp;
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
@@ -179,6 +174,18 @@ namespace TeamA.Exogredient.Services
 
             return await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
         }
+
+        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records)
+        {
+            MaskingService maskingService = new MaskingService(new MapDAO());
+            foreach (UserRecord user in records)
+            {
+                    UserRecord resultRecord = (UserRecord)await maskingService.Mask(user).ConfigureAwait(false);
+                    await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
+            }
+            return true;
+        }
+
 
         /// <summary>
         /// Asynchronously deletes a user from the data store.

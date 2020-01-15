@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Managers
 
                 if (await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false))
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                  Constants.IPLockedLogMessage).ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidScopeLogMessage).ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidFirstNameLengthLogMessage).ConfigureAwait(false);
 
@@ -85,7 +85,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidFirstNameCharactersLogMessage).ConfigureAwait(false);
 
@@ -100,7 +100,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidLastNameLengthLogMessage).ConfigureAwait(false);
 
@@ -114,7 +114,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidLastNameCharactersLogMessage).ConfigureAwait(false);
 
@@ -129,7 +129,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailLengthLogMessage).ConfigureAwait(false);
 
@@ -143,7 +143,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailCharactersLogMessage).ConfigureAwait(false);
 
@@ -157,7 +157,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailFormatMessage).ConfigureAwait(false);
 
@@ -173,7 +173,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.EmailExistsLogMessage).ConfigureAwait(false);
 
@@ -188,7 +188,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidUsernameLengthLogMessage).ConfigureAwait(false);
 
@@ -202,7 +202,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidUsernameCharactersLogMessage).ConfigureAwait(false);
 
@@ -216,7 +216,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameExistsLogMessage).ConfigureAwait(false);
 
@@ -230,7 +230,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPhoneNumberLengthLogMessage).ConfigureAwait(false);
 
@@ -244,7 +244,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPhoneNumberCharactersLogMessage).ConfigureAwait(false);
 
@@ -258,7 +258,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PhoneNumberExistsLogMessage).ConfigureAwait(false);
 
@@ -286,7 +286,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
 
@@ -301,7 +301,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
 
@@ -315,7 +315,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
 
@@ -330,7 +330,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
@@ -345,7 +345,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
@@ -360,7 +360,7 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
 
@@ -377,18 +377,24 @@ namespace TeamA.Exogredient.Managers
                 string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 await AuthenticationService.SendEmailVerificationAsync(username, canonicalizedEmail).ConfigureAwait(false);
-                await UserManagementService.CreateUserAsync(true, username, firstName + " " + lastName, canonicalizedEmail,
-                                                            phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
-                                                            saltHex).ConfigureAwait(false);
 
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                // Create user record object to represent a user.
+
+                // Email code, email code timestamp, login failures, last login failure timestamp, email code failures, and phone code failures initialized to have no value.
+                UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
+                                                    saltHex, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+                
+                // Create that user.
+                await UserManagementService.CreateUserAsync(true, user).ConfigureAwait(false);
+
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress).ConfigureAwait(false);
 
                 return UtilityService.CreateResult(Constants.RegistrationSuccessUserMessage, registrationSuccess, false, currentNumExceptions);
             }
             catch (Exception e)
             {
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
