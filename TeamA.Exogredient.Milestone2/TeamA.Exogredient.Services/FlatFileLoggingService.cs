@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
@@ -44,15 +45,19 @@ namespace TeamA.Exogredient.Services
                 // Create the log record to be stored, mostly just the parameters to this function apart from the timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
+                MaskingService maskingService = new MaskingService(new MapDAO());
+
+                LogRecord resultRecord = (LogRecord)await maskingService.Mask(logRecord).ConfigureAwait(false);
+
                 // Construct the path to the file.
                 string path = Constants.LogFolder + @"\" + fileName;
 
                 // Construct the line to insert.
                 string result = "";
 
-                for (int i = 0; i < logRecord.Fields.Count; i++)
+                for (int i = 0; i < resultRecord.Fields.Count; i++)
                 {
-                    string field = logRecord.Fields[i];
+                    string field = resultRecord.Fields[i];
 
                     // Find the 1 character string that the field starts with.
                     string startsWith = field.Substring(0, 1);
@@ -121,6 +126,10 @@ namespace TeamA.Exogredient.Services
                 // i.e no unique operation should have the same timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
+                MaskingService maskingService = new MaskingService(new MapDAO());
+
+                LogRecord resultRecord = (LogRecord)await maskingService.Mask(logRecord).ConfigureAwait(false);
+
                 // Temporary file.
                 string tempFile = Path.GetTempFileName();
 
@@ -133,9 +142,9 @@ namespace TeamA.Exogredient.Services
                     // Construct the line to delete
                     string lineToDelete = "";
 
-                    for (int i = 0; i < logRecord.Fields.Count; i++)
+                    for (int i = 0; i < resultRecord.Fields.Count; i++)
                     {
-                        string field = logRecord.Fields[i];
+                        string field = resultRecord.Fields[i];
 
                         string startsWith = field.Substring(0, 1);
 
