@@ -379,6 +379,8 @@ namespace TeamA.Exogredient.Managers
                 await AuthenticationService.SendEmailVerificationAsync(username, canonicalizedEmail).ConfigureAwait(false);
 
                 // Create user record object to represent a user.
+
+                // Email code, email code timestamp, login failures, last login failure timestamp, email code failures, and phone code failures initialized to have no value.
                 UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
                                                     saltHex, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
                 

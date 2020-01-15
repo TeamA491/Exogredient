@@ -166,14 +166,6 @@ namespace TeamA.Exogredient.Services
             // the timestamp has no value.
             long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
-            // Email code, email code timestamp, login failures, last login failure timestamp, email code failures,
-            // and phone code failures initialized to have no value.
-
-
-            //UserRecord record = new UserRecord(username, name, email, phoneNumber, password,
-            //                                   disabled, userType, salt, tempTimestamp, Constants.NoValueString, Constants.NoValueLong,
-            //                                   Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
-
             record.GetData()["temp_timestamp"] = tempTimestamp;
 
             MaskingService maskingService = new MaskingService(new MapDAO());
@@ -182,6 +174,18 @@ namespace TeamA.Exogredient.Services
 
             return await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
         }
+
+        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records)
+        {
+            MaskingService maskingService = new MaskingService(new MapDAO());
+            foreach (UserRecord user in records)
+            {
+                    UserRecord resultRecord = (UserRecord)await maskingService.Mask(user).ConfigureAwait(false);
+                    await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
+            }
+            return true;
+        }
+
 
         /// <summary>
         /// Asynchronously deletes a user from the data store.
