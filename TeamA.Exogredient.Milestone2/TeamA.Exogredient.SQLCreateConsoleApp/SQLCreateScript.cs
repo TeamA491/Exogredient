@@ -20,9 +20,9 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         /// <returns>Task</returns>
         public static async Task Main()
         {
-            // Directions: Comment out the specific create function that you do not want to execute.
+            // Directions: Uncomment the specific create function that you do not want to execute.
 
-            await CreateUserTable().ConfigureAwait(false);
+            //await CreateUserTable().ConfigureAwait(false);
             //await CreateIPTable().ConfigureAwait(false);
             //await CreateMapTable().ConfigureAwait(false);
         }

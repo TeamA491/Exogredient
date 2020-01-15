@@ -139,19 +139,17 @@ namespace TeamA.Exogredient.Services
         {
             return new byte[] { };
         }
-        
+
         /// <summary>
         /// Hash a string data with HMAC SHA256.
         /// </summary>
         /// <param name="data"> a string to be hashed </param>
         /// <returns> a string of hash code </returns>
-        public static string HashWithHMACSHA256(string data)
+        public static string HashWithSHA256(string data)
         {
-            byte[] dataBytes = UtilityService.HexStringToBytes(data);
-            using (HMACSHA256 hmac = new HMACSHA256())
+            using (SHA256CryptoServiceProvider sha256 = new SHA256CryptoServiceProvider())
             {
-                byte[] hashBytes = hmac.ComputeHash(dataBytes);
-                return UtilityService.BytesToHexString(hashBytes);
+                return UtilityService.BytesToHexString(sha256.ComputeHash(Encoding.ASCII.GetBytes(data)));
             }
         }
 

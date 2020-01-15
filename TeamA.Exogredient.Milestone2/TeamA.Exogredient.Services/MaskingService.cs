@@ -60,9 +60,7 @@ namespace TeamA.Exogredient.Services
                     {
                         string input = data.Item1.ToString();
 
-                        string inputHex = UtilityService.ToHexString(input);
-
-                        string hash = SecurityService.HashWithHMACSHA256(SecurityService.HashWithHMACSHA256(inputHex));
+                        string hash = SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
 
                         MapRecord mapRecord = new MapRecord(hash, input);
 
