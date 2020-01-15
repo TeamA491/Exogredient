@@ -27,7 +27,7 @@ namespace TeamA.Exogredient.Managers
                                                                             Constants.MaxLogInAttempts).ConfigureAwait(false);
 
                     // Log the action.
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Managers
                 if (user.Disabled == 1)
                 {
                     // Log the action.
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UserDisableLogMessage).ConfigureAwait(false);
 
@@ -89,7 +89,7 @@ namespace TeamA.Exogredient.Managers
                     }
 
                     // Log the action.
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
                     // Return the result of the successful login.
@@ -103,7 +103,7 @@ namespace TeamA.Exogredient.Managers
                                                                             Constants.LogInTriesResetTime,
                                                                             Constants.MaxLogInAttempts).ConfigureAwait(false);
                     // Log the action.
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
@@ -115,7 +115,7 @@ namespace TeamA.Exogredient.Managers
             catch (Exception e)
             {
                 // Log the exception.
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
                 // If the current number of consecutive exceptions has reached the maximum number of retries.

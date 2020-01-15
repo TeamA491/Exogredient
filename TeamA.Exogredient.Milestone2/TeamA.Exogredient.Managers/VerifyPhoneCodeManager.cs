@@ -19,7 +19,7 @@ namespace TeamA.Exogredient.Managers
 
                 if (user.PhoneCodeFailures >= Constants.MaxPhoneCodeAttempts)
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyPhoneOperation, username, ipAddress,
                                                   Constants.MaxPhoneTriesReachedLogMessage).ConfigureAwait(false);
 
@@ -31,7 +31,7 @@ namespace TeamA.Exogredient.Managers
                 if (verificationStatus.Equals(Constants.TwilioAuthenticationApprovedString))
                 {
                     phoneVerificationSuccess = true;
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyPhoneOperation, username, ipAddress).ConfigureAwait(false);
 
                     if (duringRegistration)
@@ -45,7 +45,7 @@ namespace TeamA.Exogredient.Managers
                 {
                     await UserManagementService.IncrementPhoneCodeFailuresAsync(username).ConfigureAwait(false);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyPhoneOperation, username, ipAddress,
                                                   Constants.WrongPhoneCodeMessage).ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ namespace TeamA.Exogredient.Managers
                     // Failed
                     await UserManagementService.IncrementPhoneCodeFailuresAsync(username).ConfigureAwait(false);
 
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyPhoneOperation, username, ipAddress,
                                                   Constants.PhoneCodeExpiredLogMessage).ConfigureAwait(false);
 
@@ -65,7 +65,7 @@ namespace TeamA.Exogredient.Managers
             }
             catch (Exception e)
             {
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.VerifyPhoneOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)

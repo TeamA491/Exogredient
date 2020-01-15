@@ -2,9 +2,9 @@
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
 
-namespace TeamA.Exogredient.Managers
+namespace TeamA.Exogredient.Services
 {
-    public static class LoggingManager
+    public static class LoggingService
     {
         // timestamp is in format of "HH:mm:ss:ff UTC yyyyMMdd"
 
