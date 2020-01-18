@@ -114,11 +114,15 @@ namespace TeamA.Exogredient.Services
                                 Environment.SetEnvironmentVariable("COUNT", (count + 1).ToString());
                             }
 
-                            MapRecord mapRecord = new MapRecord(hash, input);
-
                             if (!await _mapDAO.CheckHashExistenceAsync(hash).ConfigureAwait(false))
                             {
+                                MapRecord mapRecord = new MapRecord(hash, input, 1);
                                 await _mapDAO.CreateAsync(mapRecord).ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hash).ConfigureAwait(false);
+                                await UpdateOccurrencesAsync(hash, mapObj.Occurrences + 1).ConfigureAwait(false);
                             }
 
                             parameters[i] = hash;
@@ -143,6 +147,35 @@ namespace TeamA.Exogredient.Services
             else
             {
                 return record;
+            }
+        }
+
+        public async Task<bool> UpdateOccurrencesAsync(string hashInput, int occurrences)
+        {
+            MapRecord map = new MapRecord(hashInput, occurrences: occurrences);
+
+            return await _mapDAO.UpdateAsync(map).ConfigureAwait(false);
+        }
+
+        public async Task<bool> DecrementOccurrencesAsync(string hashInput)
+        {
+            if (!await _mapDAO.CheckHashExistenceAsync(hashInput).ConfigureAwait(false))
+            {
+                // TODO: exception message
+                throw new ArgumentException();
+            }
+
+            MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hashInput).ConfigureAwait(false);
+
+            if (mapObj.Occurrences - 1 == 0)
+            {
+                return await _mapDAO.DeleteByIdsAsync(new List<string>() { hashInput }).ConfigureAwait(false);
+            }
+            else
+            {
+                MapRecord record = new MapRecord(hashInput, occurrences: mapObj.Occurrences - 1);
+
+                return await _mapDAO.UpdateAsync(record).ConfigureAwait(false);
             }
         }
     }

@@ -436,6 +436,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapDAOTableName = "map";
         public const string MapDAOHashColumn = "hash";
         public const string MapDAOActualColumn = "actual";
+        public const string MapDAOoccurrencesColumn = "occurrences";
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";

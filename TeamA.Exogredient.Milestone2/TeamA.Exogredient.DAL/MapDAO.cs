@@ -9,7 +9,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class MapDAO : IMasterSQLCRD<string>
+    public class MapDAO : IMasterSQLDAO<string>
     {
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
@@ -144,11 +144,129 @@ namespace TeamA.Exogredient.DAL
                     DataRow row = dataTable.Rows[0];
 
                     // Construct the MapObject by casting the values of the columns to their proper data types.
-                    result = new MapObject((string)row[Constants.MapDAOHashColumn], (string)row[Constants.MapDAOActualColumn]);
+                    result = new MapObject((string)row[Constants.MapDAOHashColumn], (string)row[Constants.MapDAOActualColumn], (int)row[Constants.MapDAOoccurrencesColumn]);
                 }
             }
 
             return result;
+        }
+
+        public async Task<bool> UpdateAsync(ISQLRecord record)
+        {
+            // Try casting the record to a MapRecord, throw an argument exception if it fails.
+            try
+            {
+                MapRecord temp = (MapRecord)record;
+            }
+            catch
+            {
+                // TODO: exception message
+                throw new ArgumentException();
+            }
+
+            // Get the record data.
+            MapRecord userRecord = (MapRecord)record;
+            IDictionary<string, object> recordData = userRecord.GetData();
+
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                // Construct the sql string to update the table name where..
+                string sqlString = $"UPDATE {Constants.MapDAOTableName} SET ";
+
+                // Loop through the record data.
+                int count = 0;
+                foreach (KeyValuePair<string, object> pair in recordData)
+                {
+                    // Check if the value at the username column is contained within the table, throw an argument
+                    // exception if it doesn't exist.
+                    if (pair.Key == Constants.MapDAOHashColumn)
+                    {
+                        if (!await CheckHashExistenceAsync((string)pair.Value).ConfigureAwait(false))
+                        {
+                            // TODO: exception message
+                            throw new ArgumentException();
+                        }
+                    }
+
+                    // Update only the values where the record value is not null (string == null, numeric == -1).
+                    // Again, use parameters to prevent against sql injections.
+                    if (pair.Key != Constants.MapDAOHashColumn)
+                    {
+                        if (pair.Value is int)
+                        {
+                            if ((int)pair.Value != -1)
+                            {
+                                sqlString += $"{pair.Key} = @PARAM{count},";
+                            }
+                        }
+                        if (pair.Value is string)
+                        {
+                            if (pair.Value != null)
+                            {
+                                sqlString += $"{pair.Key} = @PARAM{count},";
+                            }
+                        }
+                        if (pair.Value is long)
+                        {
+                            if ((long)pair.Value != -1)
+                            {
+                                sqlString += $"{pair.Key} = @PARAM{count},";
+                            }
+                        }
+                    }
+
+                    count++;
+                }
+
+                // Remove the last comma and identify the record by its username column.
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += $" WHERE {Constants.MapDAOHashColumn} = '{recordData[Constants.MapDAOHashColumn]}';";
+
+                // Get the command inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    // Loop through the record data again to add values to the parameters.
+                    count = 0;
+                    foreach (KeyValuePair<string, object> pair in recordData)
+                    {
+                        if (pair.Key != Constants.MapDAOHashColumn)
+                        {
+                            if (pair.Value is int)
+                            {
+                                if ((int)pair.Value != -1)
+                                {
+                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                                }
+                            }
+                            if (pair.Value is string)
+                            {
+                                if (pair.Value != null)
+                                {
+                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                                }
+                            }
+                            if (pair.Value is long)
+                            {
+                                if ((long)pair.Value != -1)
+                                {
+                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                                }
+                            }
+                        }
+
+                        count++;
+                    }
+
+                    // Execute the non query asynchronously.
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                }
+
+                return true;
+            }
         }
 
         public async Task<bool> CheckHashExistenceAsync(string hash)

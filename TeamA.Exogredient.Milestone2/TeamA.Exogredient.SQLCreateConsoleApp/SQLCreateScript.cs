@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
 
@@ -24,7 +25,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             //await CreateUserTable().ConfigureAwait(false);
             //await CreateIPTable().ConfigureAwait(false);
-            //await CreateMapTable().ConfigureAwait(false);
+            await CreateMapTable().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -103,12 +104,17 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             string sqlString = @$"CREATE TABLE `{_mapSchema}`.`{Constants.MapDAOTableName}` (" +
                                $@"`{Constants.MapDAOHashColumn}` VARCHAR({Constants.DefaultHashLength}) NOT NULL," +
                                $@"`{Constants.MapDAOActualColumn}` LONGTEXT NOT NULL," +
-                               $@"PRIMARY KEY(`{Constants.MapDAOHashColumn}`));";
+                               $@"`{Constants.MapDAOoccurrencesColumn}` INT NOT NULL," +
+                               $@"PRIMARY KEY(`{Constants.MapDAOHashColumn}`));" +
+                               $@"INSERT INTO `{_mapSchema}`.`{Constants.MapDAOTableName}` (`{Constants.MapDAOHashColumn}`, `{Constants.MapDAOActualColumn}`, `{Constants.MapDAOoccurrencesColumn}`) VALUES('0', '1', '1');" +
+                               $@"INSERT INTO `{_mapSchema}`.`{Constants.MapDAOTableName}` (`{Constants.MapDAOHashColumn}`, `{Constants.MapDAOActualColumn}`, `{Constants.MapDAOoccurrencesColumn}`) VALUES('1', '0', '1');";
 
             // Create the commmand object and execute/dispose it asynchronously.
             MySqlCommand command = new MySqlCommand(sqlString, connection);
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
+
+            Environment.SetEnvironmentVariable("COUNT", (2).ToString());
 
             return true;
         }
