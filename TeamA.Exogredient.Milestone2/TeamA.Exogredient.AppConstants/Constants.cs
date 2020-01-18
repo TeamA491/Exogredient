@@ -218,6 +218,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string UpdatePasswordOperation = "Update Password";
         public const string SingleUserCreateOperation = "Single User Create";
         public const string BulkUserCreateOperation = "Buld User Create";
+        public const string UpdateSingleUserOperation = "Single User Update";
+        public const string BulkUserUpdateOperation = "Bulk User Update";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
