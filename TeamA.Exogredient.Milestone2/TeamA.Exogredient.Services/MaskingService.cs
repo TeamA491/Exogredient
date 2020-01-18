@@ -100,32 +100,34 @@ namespace TeamA.Exogredient.Services
 
                         if (computeHash)
                         {
-                            string hash;
                             string input = data.Item1.ToString();
+                            string hashString;
 
                             if (data.Item1 is string)
                             {
-                                hash = SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
+                                string hash = SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
+                                parameters[i] = hash;
+                                hashString = hash;
                             }
                             else
                             {
                                 int count = Int32.Parse(Environment.GetEnvironmentVariable("COUNT", EnvironmentVariableTarget.User));
-                                hash = count.ToString();
+                                int hash = count;
                                 Environment.SetEnvironmentVariable("COUNT", (count + 1).ToString());
+                                parameters[i] = hash;
+                                hashString = hash.ToString();
                             }
 
-                            if (!await _mapDAO.CheckHashExistenceAsync(hash).ConfigureAwait(false))
+                            if (!await _mapDAO.CheckHashExistenceAsync(hashString).ConfigureAwait(false))
                             {
-                                MapRecord mapRecord = new MapRecord(hash, input, 1);
+                                MapRecord mapRecord = new MapRecord(hashString, input, 1);
                                 await _mapDAO.CreateAsync(mapRecord).ConfigureAwait(false);
                             }
                             else
                             {
-                                MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hash).ConfigureAwait(false);
-                                await UpdateOccurrencesAsync(hash, mapObj.Occurrences + 1).ConfigureAwait(false);
+                                MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hashString).ConfigureAwait(false);
+                                await UpdateOccurrencesAsync(hashString, mapObj.Occurrences + 1).ConfigureAwait(false);
                             }
-
-                            parameters[i] = hash;
                         }
                         else
                         {
@@ -177,6 +179,30 @@ namespace TeamA.Exogredient.Services
 
                 return await _mapDAO.UpdateAsync(record).ConfigureAwait(false);
             }
+        }
+
+        public async Task<bool> DecrementMaskedObjectOccurrencesAsync(IUnMaskableObject obj)
+        {
+            if (!obj.IsUnMasked())
+            {
+                List<Tuple<object, bool>> info = obj.GetMaskInformation();
+
+                for (int i = 0; i < info.Count; i++)
+                {
+                    Tuple<object, bool> data = info[i];
+
+                    if (data.Item2)
+                    {
+                        await DecrementOccurrencesAsync(data.Item1.ToString()).ConfigureAwait(false);
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
