@@ -161,8 +161,15 @@ namespace TeamA.Exogredient.Services
         /// <param name="userType">Used to specify the user's type.</param>
         /// <param name="salt">Used to specify the salt associated with the user's password digest.</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record)
+        public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record, string adminName, string adminIp)
         {
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if(admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+
             // Check for user existence.
             bool result = await CheckUserExistenceAsync((string)record.GetData()["username"]);
             if (!result)
@@ -177,15 +184,28 @@ namespace TeamA.Exogredient.Services
             record.GetData()["temp_timestamp"] = tempTimestamp;
 
             MaskingService maskingService = new MaskingService(new MapDAO());
-
             UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
 
+            // Log the action.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserCreateOperation, adminName, adminIp);
+
+
             return await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
+
+
         }
 
-        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records)
+        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records, string adminName, string adminIp)
         {
-            if(Constants.ProjectStatus != Constants.StatusDev)
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if (admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+
+            // Disable this function if project is not in development.
+            if (Constants.ProjectStatus != Constants.StatusDev)
             {
                 throw new Exception(Constants.NotInDevelopment);
             }
@@ -208,6 +228,10 @@ namespace TeamA.Exogredient.Services
                     UserRecord resultRecord = (UserRecord)await maskingService.Mask(user).ConfigureAwait(false);
                     await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
             }
+
+            // Log the bulk create operation.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserCreateOperation, adminName, adminIp);
+
             return true;
         }
 
