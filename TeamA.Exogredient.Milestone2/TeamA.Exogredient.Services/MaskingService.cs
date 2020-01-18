@@ -10,9 +10,9 @@ namespace TeamA.Exogredient.Services
     {
         private readonly MapDAO _mapDAO;
 
-        public MaskingService(MapDAO dao)
+        public MaskingService(MapDAO mdao)
         {
-            _mapDAO = dao;
+            _mapDAO = mdao;
         }
 
         public async Task<IUnMaskableObject> UnMaskAsync(IUnMaskableObject obj)
@@ -181,11 +181,11 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task<bool> DecrementMaskedObjectOccurrencesAsync(IUnMaskableObject obj)
+        public async Task<bool> DecrementMappingForDelete(IUnMaskableObject maskedObject)
         {
-            if (!obj.IsUnMasked())
+            if (!maskedObject.IsUnMasked())
             {
-                List<Tuple<object, bool>> info = obj.GetMaskInformation();
+                List<Tuple<object, bool>> info = maskedObject.GetMaskInformation();
 
                 for (int i = 0; i < info.Count; i++)
                 {
@@ -200,6 +200,53 @@ namespace TeamA.Exogredient.Services
             else
             {
                 return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DecrementMappingForUpdate(IMaskableRecord updateRecord, IUnMaskableObject maskedObject)
+        {
+            List<Tuple<object, bool>> recordInfo = updateRecord.GetMaskInformation();
+            List<Tuple<object, bool>> objectInfo = maskedObject.GetMaskInformation();
+
+            for (int i = 0; i < recordInfo.Count; i++)
+            {
+                Tuple<object, bool> recordData = recordInfo[i];
+                Tuple<object, bool> objectData = objectInfo[i];
+
+                if (recordData.Item2)
+                {
+                    // Masked Column
+                    bool beingUpdated = true;
+
+                    if (recordData.Item1 is int)
+                    {
+                        if ((int)recordData.Item1 == -1)
+                        {
+                            beingUpdated = false;
+                        }
+                    }
+                    if (recordData.Item1 is string)
+                    {
+                        if (recordData.Item1 == null)
+                        {
+                            beingUpdated = false;
+                        }
+                    }
+                    if (recordData.Item1 is long)
+                    {
+                        if ((long)recordData.Item1 == -1)
+                        {
+                            beingUpdated = false;
+                        }
+                    }
+
+                    if (beingUpdated)
+                    {
+                        await DecrementOccurrencesAsync(objectData.Item1.ToString()).ConfigureAwait(false);
+                    }
+                }
             }
 
             return true;
