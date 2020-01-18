@@ -85,7 +85,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            IPAddressRecord resultRecord = (IPAddressRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            IPAddressRecord resultRecord = (IPAddressRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             // Asynchronously call the create method via the IP DAO with the record.
             return await _ipDAO.CreateAsync(resultRecord).ConfigureAwait(false);
@@ -99,7 +99,11 @@ namespace TeamA.Exogredient.Services
         public static async Task<IPAddressObject> GetIPAddressInfoAsync(string ipAddress)
         {
             // Cast the return result of asynchronously reading by the ip address into the IP object.
-            return (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
+            IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
+
+            MaskingService maskingService = new MaskingService(new MapDAO());
+            
+            return (IPAddressObject)await maskingService.UnMaskAsync(ip).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -114,7 +118,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            IPAddressRecord resultRecord = (IPAddressRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            IPAddressRecord resultRecord = (IPAddressRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             // Asynchronously call the update funciton of the IP DAO with the record.
             return await _ipDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
@@ -141,7 +145,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the user is disabled and false if not.</returns>
         public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             return (user.Disabled == Constants.DisabledStatus);
         }
@@ -170,7 +174,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             return await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
         }
@@ -180,7 +184,7 @@ namespace TeamA.Exogredient.Services
             MaskingService maskingService = new MaskingService(new MapDAO());
             foreach (UserRecord user in records)
             {
-                    UserRecord resultRecord = (UserRecord)await maskingService.Mask(user).ConfigureAwait(false);
+                    UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(user).ConfigureAwait(false);
                     await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
             }
             return true;
@@ -205,7 +209,11 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<UserObject> GetUserInfoAsync(string username)
         {
-            return (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            UserObject rawUser = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
+            return (UserObject)await maskingService.UnMaskAsync(rawUser).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -220,7 +228,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             return await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
         }
@@ -239,7 +247,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             return await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
         }
@@ -258,7 +266,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             return await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
         }
@@ -270,7 +278,9 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the user was originally enabled, false otherwise.</returns>
         public static async Task<bool> DisableUserAsync(string username)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             // If already disabled, just return false.
             if (user.Disabled == Constants.DisabledStatus)
@@ -280,9 +290,7 @@ namespace TeamA.Exogredient.Services
 
             UserRecord record = new UserRecord(username, disabled: Constants.DisabledStatus);
 
-            MaskingService maskingService = new MaskingService(new MapDAO());
-
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
 
@@ -296,7 +304,9 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the user was originally disabled, false otherwise.</returns>
         public static async Task<bool> EnableUserAsync(string username)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             // If already enabled, return false.
             if (user.Disabled == Constants.EnabledStatus)
@@ -307,9 +317,7 @@ namespace TeamA.Exogredient.Services
             // Enable the username.
             UserRecord record = new UserRecord(username, disabled: Constants.EnabledStatus);
 
-            MaskingService maskingService = new MaskingService(new MapDAO());
-
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
 
@@ -329,7 +337,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             return await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
         }
@@ -387,7 +395,7 @@ namespace TeamA.Exogredient.Services
 
             MaskingService maskingService = new MaskingService(new MapDAO());
 
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
 
@@ -405,8 +413,10 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> IncrementLoginFailuresAsync(string username, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
             MaskingService maskingService = new MaskingService(new MapDAO());
+
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
+
             UserRecord record;
             UserRecord resultRecord;
 
@@ -425,7 +435,7 @@ namespace TeamA.Exogredient.Services
                 reset = true;
                 record = new UserRecord(username, loginFailures: 0);
 
-                resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+                resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
                 await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
             }
@@ -444,7 +454,7 @@ namespace TeamA.Exogredient.Services
                 record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: currentUnix);
             }
 
-            resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
 
@@ -458,7 +468,9 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> IncrementEmailCodeFailuresAsync(string username)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             // Get the current failure count.
             int currentFailures = user.EmailCodeFailures;
@@ -466,9 +478,7 @@ namespace TeamA.Exogredient.Services
             // Create user record to insert into update.
             UserRecord record = new UserRecord(username, emailCodeFailures: currentFailures + 1);
 
-            MaskingService maskingService = new MaskingService(new MapDAO());
-
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             // Increment the failure count for that user.
             await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
@@ -483,7 +493,9 @@ namespace TeamA.Exogredient.Services
         /// <returns>Task (bool) whether the function executed without exception</returns>
         public static async Task<bool> IncrementPhoneCodeFailuresAsync(string username)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             // Get the current failure count.
             int currentFailures = user.PhoneCodeFailures;
@@ -491,9 +503,7 @@ namespace TeamA.Exogredient.Services
             // Create user record to insert into update.
             UserRecord record = new UserRecord(username, phoneCodeFailures: currentFailures + 1);
 
-            MaskingService maskingService = new MaskingService(new MapDAO());
-
-            UserRecord resultRecord = (UserRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             // Increment the failure count for that user.
             await _userDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
@@ -510,8 +520,10 @@ namespace TeamA.Exogredient.Services
         /// <returns>Task (bool) whether the funciton executed without exception</returns>
         public static async Task<bool> IncrementRegistrationFailuresAsync(string ipAddress, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
         {
-            IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
             MaskingService maskingService = new MaskingService(new MapDAO());
+
+            IPAddressObject ip = await GetIPAddressInfoAsync(ipAddress).ConfigureAwait(false);
+
             IPAddressRecord record;
             IPAddressRecord resultRecord;
 
@@ -530,7 +542,7 @@ namespace TeamA.Exogredient.Services
                 reset = true;
                 record = new IPAddressRecord(ipAddress, registrationFailures: 0);
 
-                resultRecord = (IPAddressRecord)await maskingService.Mask(record).ConfigureAwait(false);
+                resultRecord = (IPAddressRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
                 await _ipDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
             }
@@ -552,7 +564,7 @@ namespace TeamA.Exogredient.Services
                 record = new IPAddressRecord(ipAddress, registrationFailures: updatedRegistrationFailures, lastRegFailTimestamp: currentUnix);
             }
 
-            resultRecord = (IPAddressRecord)await maskingService.Mask(record).ConfigureAwait(false);
+            resultRecord = (IPAddressRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
             await _ipDAO.UpdateAsync(resultRecord).ConfigureAwait(false);
 

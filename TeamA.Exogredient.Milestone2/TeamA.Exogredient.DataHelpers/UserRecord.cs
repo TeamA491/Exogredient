@@ -10,6 +10,7 @@ namespace TeamA.Exogredient.DataHelpers
     public class UserRecord : ISQLRecord, IMaskableRecord
     {
         private readonly IDictionary<string, object> _data = new Dictionary<string, object>();
+        private bool _masked = false;
 
         /// <summary>
         /// Constructs a UserRecord, the username is the minimum field required as it serves
@@ -75,6 +76,30 @@ namespace TeamA.Exogredient.DataHelpers
             return _data;
         }
 
+        public void SetToMasked()
+        {
+            _masked = true;
+        }
+
+        public bool IsMasked()
+        {
+            return _masked;
+        }
+
+        public Type[] GetParameterTypes()
+        {
+            Type[] result = new Type[15]
+            {
+                typeof(string), typeof(string), typeof(string),
+                typeof(string), typeof(string), typeof(int),
+                typeof(string), typeof(string), typeof(long),
+                typeof(string), typeof(long), typeof(int),
+                typeof(long), typeof(int), typeof(int)
+            };
+
+            return result;
+        }
+
         public List<Tuple<object, bool>> GetMaskInformation()
         {
             List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
@@ -94,20 +119,6 @@ namespace TeamA.Exogredient.DataHelpers
                 new Tuple<object, bool>(_data[Constants.UserDAOlastLoginFailTimestampColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOlastLoginFailTimestampColumn]),
                 new Tuple<object, bool>(_data[Constants.UserDAOemailCodeFailuresColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeFailuresColumn]),
                 new Tuple<object, bool>(_data[Constants.UserDAOphoneCodeFailuresColumn], Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneCodeFailuresColumn])
-            };
-
-            return result;
-        }
-
-        public Type[] GetParameterTypes()
-        {
-            Type[] result = new Type[15]
-            {
-                typeof(string), typeof(string), typeof(string),
-                typeof(string), typeof(string), typeof(int),
-                typeof(string), typeof(string), typeof(long),
-                typeof(string), typeof(long), typeof(int),
-                typeof(long), typeof(int), typeof(int)
             };
 
             return result;

@@ -10,6 +10,7 @@ namespace TeamA.Exogredient.DataHelpers
     public class IPAddressRecord : ISQLRecord, IMaskableRecord
     {
         private readonly IDictionary<string, object> _data = new Dictionary<string, object>();
+        private bool _masked = false;
 
         /// <summary>
         /// Constructs an IPAddressRecord, the ip address is the minimum field required as it serves
@@ -40,17 +41,14 @@ namespace TeamA.Exogredient.DataHelpers
             return _data;
         }
 
-        public List<Tuple<object, bool>> GetMaskInformation()
+        public void SetToMasked()
         {
-            List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
-            {
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOIPColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn]),
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOtimestampLockedColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOtimestampLockedColumn]),
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOregistrationFailuresColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOregistrationFailuresColumn]),
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOlastRegFailTimestampColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOlastRegFailTimestampColumn])
-            };
+            _masked = true;
+        }
 
-            return result;
+        public bool IsMasked()
+        {
+            return _masked;
         }
 
         public Type[] GetParameterTypes()
@@ -59,6 +57,19 @@ namespace TeamA.Exogredient.DataHelpers
             {
                 typeof(string), typeof(long), typeof(int),
                 typeof(long)
+            };
+
+            return result;
+        }
+
+        public List<Tuple<object, bool>> GetMaskInformation()
+        {
+            List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
+            {
+                new Tuple<object, bool>(_data[Constants.IPAddressDAOIPColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn]),
+                new Tuple<object, bool>(_data[Constants.IPAddressDAOtimestampLockedColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOtimestampLockedColumn]),
+                new Tuple<object, bool>(_data[Constants.IPAddressDAOregistrationFailuresColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOregistrationFailuresColumn]),
+                new Tuple<object, bool>(_data[Constants.IPAddressDAOlastRegFailTimestampColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOlastRegFailTimestampColumn])
             };
 
             return result;

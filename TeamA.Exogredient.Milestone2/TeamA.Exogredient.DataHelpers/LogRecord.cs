@@ -11,16 +11,13 @@ namespace TeamA.Exogredient.DataHelpers
     /// </summary>
     public class LogRecord : INOSQLRecord, IMaskableRecord
     {
+        private bool _masked = false;
+
         public string Timestamp { get; }
-
         public string Operation { get; }
-
         public string Identifier { get; }
-
         public string IPAddress { get; }
-
         public string ErrorType { get; }
-
         public List<string> Fields { get; }
 
         /// <summary>
@@ -51,6 +48,16 @@ namespace TeamA.Exogredient.DataHelpers
 
             ErrorType = errorType;
             Fields.Add(errorType);
+        }
+
+        public void SetToMasked()
+        {
+            _masked = true;
+        }
+
+        public bool IsMasked()
+        {
+            return _masked;
         }
 
         public bool IsEqual(object obj)

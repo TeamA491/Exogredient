@@ -47,7 +47,7 @@ namespace TeamA.Exogredient.Services
 
                 MaskingService maskingService = new MaskingService(new MapDAO());
 
-                LogRecord resultRecord = (LogRecord)await maskingService.Mask(logRecord).ConfigureAwait(false);
+                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord).ConfigureAwait(false);
 
                 // Construct the path to the file.
                 string path = Constants.LogFolder + @"\" + fileName;
@@ -128,7 +128,7 @@ namespace TeamA.Exogredient.Services
 
                 MaskingService maskingService = new MaskingService(new MapDAO());
 
-                LogRecord resultRecord = (LogRecord)await maskingService.Mask(logRecord).ConfigureAwait(false);
+                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord).ConfigureAwait(false);
 
                 // Temporary file.
                 string tempFile = Path.GetTempFileName();

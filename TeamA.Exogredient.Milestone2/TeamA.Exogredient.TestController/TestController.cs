@@ -18,20 +18,24 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main()
         {
-            //UserRecord record = new UserRecord("eli123", "eli gomez", "elithegolfer@gmail.com", "949-981-5506", "lskdajf;lsadjf", 1, "test", "sldjfsldfkj", 1, "123", 1, 1, 1, 1, 1);
+            MaskingService ms = new MaskingService(new MapDAO());
 
-            //MaskingService ms = new MaskingService(new MapDAO());
+            //UserRecord record = new UserRecord("eli123", "eli gomez", "elithegolfer@gmail.com", "949-981-5506", "lskdajf;lsadjf", 1, "test", "sldkd", 1, "123", 1, 1, 1, 1, 1);
 
-            //UserRecord maskedRecord = (UserRecord)await ms.Mask(record).ConfigureAwait(false);
+            //UserRecord maskedRecord = (UserRecord)await ms.MaskAsync(record).ConfigureAwait(false);
+
+            //UserDAO dao = new UserDAO();
+            //await dao.CreateAsync(maskedRecord).ConfigureAwait(false);
 
             //Console.WriteLine(UtilityService.BytesToUTF8String(UtilityService.HexStringToBytes((string)maskedRecord.GetData()["name"])));
 
-            string password = "test";
-            string salt = "644EB06BF0F7A319";
+            UserObject obj = await UserManagementService.GetUserInfoAsync("eli123").ConfigureAwait(false);
 
-            string hex = SecurityService.HashWithKDF(UtilityService.ToHexString(password), UtilityService.HexStringToBytes(salt));
+            Console.WriteLine(obj.Email);
 
-            Console.WriteLine(hex);
+            UserObject unmasked = (UserObject)await ms.UnMaskAsync(obj).ConfigureAwait(false);
+
+            Console.WriteLine(unmasked.Email);
         }
     }
 }

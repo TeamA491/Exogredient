@@ -15,76 +15,135 @@ namespace TeamA.Exogredient.Services
             _mapDAO = dao;
         }
 
-        public async Task<MapObject> UnMask(string hashInput)
+        public async Task<IUnMaskableObject> UnMaskAsync(IUnMaskableObject obj)
         {
-            return (MapObject)await _mapDAO.ReadByIdAsync(hashInput).ConfigureAwait(false);
-        }
-
-        public async Task<IMaskableRecord> Mask(IMaskableRecord record)
-        {
-            List<Tuple<object, bool>> info = record.GetMaskInformation();
-
-            object[] parameters = new object[info.Count];
-
-            for (int i = 0; i < info.Count; i++)
+            if (!obj.IsUnMasked())
             {
-                Tuple<object, bool> data = info[i];
+                List<Tuple<object, bool>> info = obj.GetMaskInformation();
 
-                if (data.Item2)
+                object[] parameters = new object[info.Count];
+
+                for (int i = 0; i < info.Count; i++)
                 {
-                    bool computeHash = true;
+                    Tuple<object, bool> data = info[i];
 
-                    if (data.Item1 is int)
+                    if (data.Item2)
                     {
-                        if ((int)data.Item1 == -1)
+                        if (data.Item1 is string)
                         {
-                            computeHash = false;
+                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
+
+                            parameters[i] = map.Actual;
                         }
-                    }
-                    if (data.Item1 is string)
-                    {
-                        if (data.Item1 == null)
+                        else
                         {
-                            computeHash = false;
+                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
+
+                            parameters[i] = Int32.Parse(map.Actual);
                         }
-                    }
-                    if (data.Item1 is long)
-                    {
-                        if ((long)data.Item1 == -1)
-                        {
-                            computeHash = false;
-                        }
-                    }
-
-                    if (computeHash)
-                    {
-                        string input = data.Item1.ToString();
-
-                        string hash = SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
-
-                        MapRecord mapRecord = new MapRecord(hash, input);
-
-                        if (!await _mapDAO.CheckHashExistenceAsync(hash).ConfigureAwait(false))
-                        {
-                            await _mapDAO.CreateAsync(mapRecord).ConfigureAwait(false);
-                        }
-
-                        parameters[i] = hash;
                     }
                     else
                     {
                         parameters[i] = data.Item1;
                     }
                 }
-                else
-                {
-                    parameters[i] = data.Item1;
-                }
+
+                IUnMaskableObject resultObject = (IUnMaskableObject)obj.GetType().GetConstructor(obj.GetParameterTypes()).Invoke(parameters);
+
+                resultObject.SetToUnMasked();
+
+                return resultObject;
             }
+            else
+            {
+                return obj;
+            }
+        }
 
-            IMaskableRecord resultRecord = (IMaskableRecord)record.GetType().GetConstructor(record.GetParameterTypes()).Invoke(parameters);
+        public async Task<IMaskableRecord> MaskAsync(IMaskableRecord record)
+        {
+            if (!record.IsMasked())
+            {
+                List<Tuple<object, bool>> info = record.GetMaskInformation();
 
-            return resultRecord;
+                object[] parameters = new object[info.Count];
+
+                for (int i = 0; i < info.Count; i++)
+                {
+                    Tuple<object, bool> data = info[i];
+
+                    if (data.Item2)
+                    {
+                        bool computeHash = true;
+
+                        if (data.Item1 is int)
+                        {
+                            if ((int)data.Item1 == -1)
+                            {
+                                computeHash = false;
+                            }
+                        }
+                        if (data.Item1 is string)
+                        {
+                            if (data.Item1 == null)
+                            {
+                                computeHash = false;
+                            }
+                        }
+                        if (data.Item1 is long)
+                        {
+                            if ((long)data.Item1 == -1)
+                            {
+                                computeHash = false;
+                            }
+                        }
+
+                        if (computeHash)
+                        {
+                            string hash;
+                            string input = data.Item1.ToString();
+
+                            if (data.Item1 is string)
+                            {
+                                hash = SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
+                            }
+                            else
+                            {
+                                int count = Int32.Parse(Environment.GetEnvironmentVariable("COUNT", EnvironmentVariableTarget.User));
+                                hash = count.ToString();
+                                Environment.SetEnvironmentVariable("COUNT", (count + 1).ToString());
+                            }
+
+                            MapRecord mapRecord = new MapRecord(hash, input);
+
+                            if (!await _mapDAO.CheckHashExistenceAsync(hash).ConfigureAwait(false))
+                            {
+                                await _mapDAO.CreateAsync(mapRecord).ConfigureAwait(false);
+                            }
+
+                            parameters[i] = hash;
+                        }
+                        else
+                        {
+                            parameters[i] = data.Item1;
+                        }
+                    }
+                    else
+                    {
+                        parameters[i] = data.Item1;
+                    }
+                }
+
+                IMaskableRecord resultRecord = (IMaskableRecord)record.GetType().GetConstructor(record.GetParameterTypes()).Invoke(parameters);
+
+                resultRecord.SetToMasked();
+
+                return resultRecord;
+            }
+            else
+            {
+                return record;
+            }
         }
     }
 }

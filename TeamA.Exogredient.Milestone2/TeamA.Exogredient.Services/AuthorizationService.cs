@@ -119,7 +119,11 @@ namespace TeamA.Exogredient.Services
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
         public static async Task<string> CreateTokenAsync(string username)
         {
-            UserObject user = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+            UserObject rawUser = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
+
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
+            UserObject user = (UserObject)await maskingService.UnMaskAsync(rawUser).ConfigureAwait(false);
 
             // Get the user type of the username.
             string userType = user.UserType;
