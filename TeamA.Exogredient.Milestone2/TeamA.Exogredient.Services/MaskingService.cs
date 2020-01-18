@@ -113,7 +113,7 @@ namespace TeamA.Exogredient.Services
                             {
                                 int count = Int32.Parse(Environment.GetEnvironmentVariable("COUNT", EnvironmentVariableTarget.User));
                                 int hash = count;
-                                Environment.SetEnvironmentVariable("COUNT", (count + 1).ToString());
+                                Environment.SetEnvironmentVariable("COUNT", (count + 1).ToString(), EnvironmentVariableTarget.User);
                                 parameters[i] = hash;
                                 hashString = hash.ToString();
                             }

@@ -25,7 +25,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             //await CreateUserTable().ConfigureAwait(false);
             //await CreateIPTable().ConfigureAwait(false);
-            await CreateMapTable().ConfigureAwait(false);
+            //await CreateMapTable().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
 
-            Environment.SetEnvironmentVariable("COUNT", (2).ToString());
+            Environment.SetEnvironmentVariable("COUNT", (2).ToString(), EnvironmentVariableTarget.User);
 
             return true;
         }
