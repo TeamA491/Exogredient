@@ -241,6 +241,46 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
+        /// <summary>
+        /// Makes changes to a single user record.
+        /// </summary>
+        /// <param name="userRecord">User that needs to be updated.</param>
+        /// <returns> Returns true if operation was successful and false otherwise.</returns>
+        public static async Task<bool> UpdateUserAsync(ISQLRecord userRecord, string adminName, string adminIp)
+        {
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if (admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.UpdateSingleUserOperation, adminName, adminIp);
+
+            return await _userDAO.UpdateAsync(userRecord).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Makes changes to multiple user records. 
+        /// </summary>
+        /// <param name="userRecords"> A collection of records that need to be updated.</param>
+        /// <returns> Returns true if successful and false otherwise.</returns>
+        public static async Task<bool> BulkUpdateUsersAsync(IEnumerable<ISQLRecord> userRecords, string adminName, string adminIp)
+        {
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if (admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+
+            foreach (ISQLRecord record in userRecords)
+            {
+                await _userDAO.UpdateAsync(record).ConfigureAwait(false);
+            }
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserUpdateOperation, adminName, adminIp);
+
+            return true;
+        }
 
         /// <summary>
         /// Asynchronously deletes a user from the data store.
