@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
 
@@ -56,7 +56,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Assert: check that an existing phonenumber returns true.
@@ -87,7 +87,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: check that an existing email returns true.
@@ -120,7 +120,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Check that the disabled is disabled.
@@ -143,7 +143,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Check that the non disabled returns false.
@@ -213,7 +213,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
 
             // Assert: that user creation was successful 
             Assert.IsTrue(createResult);
@@ -248,7 +248,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Delete the user 
@@ -271,7 +271,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Make the temporary user perm
             bool result = await UserManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
@@ -309,7 +309,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             // Act: Store an email code for a user.
             bool result = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
             Assert.IsTrue(result);
@@ -344,7 +344,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Arrange: Store an email code for that user.
             bool storeResult = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
@@ -385,7 +385,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: disable that user 
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
@@ -443,7 +443,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Disabling an already disabled user should return false.
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
@@ -465,7 +465,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Perform an enable operation on a disabled user.
             bool enableResult = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
@@ -503,7 +503,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Enable and already enabled user should return false.
@@ -526,7 +526,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Change the user password digest.
             bool passwordResult = await UserManagementService.ChangePasswordAsync(username, password, salt).ConfigureAwait(false);

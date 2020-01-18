@@ -385,7 +385,7 @@ namespace TeamA.Exogredient.Managers
                                                     saltHex, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
                 
                 // Create that user.
-                await UserManagementService.CreateUserAsync(true, user).ConfigureAwait(false);
+                await UserManagementService.CreateUserAsync(true, user, "system", "localhost").ConfigureAwait(false);
 
                 await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress).ConfigureAwait(false);
