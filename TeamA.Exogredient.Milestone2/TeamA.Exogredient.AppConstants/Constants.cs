@@ -217,7 +217,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string SendEmailCodeOperation = "Send Email Code";
         public const string UpdatePasswordOperation = "Update Password";
         public const string SingleUserCreateOperation = "Single User Create";
-        public const string BulkUserCreateOperation = "Buld User Create";
+        public const string BulkUserCreateOperation = "Bulk User Create";
+        public const string SingleUserDeleteOperation = "Single Delete Create";
+        public const string BulkUserDeleteOperation = "Bulk User Delete";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";

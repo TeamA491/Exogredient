@@ -191,6 +191,7 @@ namespace TeamA.Exogredient.Services
 
             UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
+
             // Log the action.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserCreateOperation, adminName, adminIp);
 
@@ -245,11 +246,63 @@ namespace TeamA.Exogredient.Services
         /// Asynchronously deletes a user from the data store.
         /// </summary>
         /// <param name="username">Username to be deleted.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task<bool> DeleteUserAsync(string username)
+        /// <returns>Returns true if the operation is successful and false if it failed.</returns>
+        public static async Task<bool> DeleteUserAsync(string username, string adminName, string adminIp)
         {
-            // Create a list of the username to pass to the Delet By IDs function.
+
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if (admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+
+            // Check for user existence.
+            if (!await CheckUserExistenceAsync(username).ConfigureAwait(false))
+            {
+                throw new ArgumentException(Constants.UsernameDNE);
+            }
+
+            //MaskingService maskingService = new MaskingService(new MapDAO());
+
+            //UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(username).ConfigureAwait(false);
+
+            // Log the action.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserDeleteOperation, adminName, adminIp);
+
+            // Create a list of the username to pass to the Delete By IDs function.
             return await _userDAO.DeleteByIdsAsync(new List<string>() { username }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously deletes multiple user from the data store.
+        /// </summary>
+        /// <param name="username">Username to be deleted.</param>
+        /// <returns>Returns true if the operation is successful and false if it failed.</returns>
+        public static async Task<bool> BulkDeleteUserAsync(List<string> username, string adminName, string adminIp)
+        {
+
+            // Check for user existence for every username.
+            foreach (string user in username)
+            {
+                if (!await CheckUserExistenceAsync(user).ConfigureAwait(false))
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+            }
+
+            // Mask personal information about the user before inserting into data store.
+            //MaskingService maskingService = new MaskingService(new MapDAO());
+            foreach (string user in username)
+            {
+                //UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(user).ConfigureAwait(false);
+                await _userDAO.DeleteByIdsAsync(username).ConfigureAwait(false);
+            }
+
+            // Log the bulk create operation.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserDeleteOperation, adminName, adminIp);
+
+            return true;
         }
 
         /// <summary>
