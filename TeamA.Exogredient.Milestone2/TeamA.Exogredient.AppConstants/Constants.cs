@@ -221,6 +221,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string SingleUserDeleteOperation = "Single Delete Create";
         public const string BulkUserDeleteOperation = "Bulk User Delete";
 
+        public const string UpdateSingleUserOperation = "Single User Update";
+        public const string BulkUserUpdateOperation = "Bulk User Update";
+
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
