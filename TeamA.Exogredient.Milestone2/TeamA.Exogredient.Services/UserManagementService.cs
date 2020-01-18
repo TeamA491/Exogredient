@@ -191,12 +191,12 @@ namespace TeamA.Exogredient.Services
 
             UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
+            await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
 
             // Log the action.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserCreateOperation, adminName, adminIp);
 
-
-            return await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
+            return true;
 
 
         }
@@ -263,15 +263,18 @@ namespace TeamA.Exogredient.Services
                 throw new ArgumentException(Constants.UsernameDNE);
             }
 
-            //MaskingService maskingService = new MaskingService(new MapDAO());
+            MaskingService maskingService = new MaskingService(new MapDAO());
+            UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(username).ConfigureAwait(false);
 
-            //UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(username).ConfigureAwait(false);
+            await maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
+
+            // Create a list of the username to pass to the Delete By IDs function.
+            await _userDAO.DeleteByIdsAsync(new List<string>() { username }).ConfigureAwait(false);
 
             // Log the action.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserDeleteOperation, adminName, adminIp);
 
-            // Create a list of the username to pass to the Delete By IDs function.
-            return await _userDAO.DeleteByIdsAsync(new List<string>() { username }).ConfigureAwait(false);
+            return true;
         }
 
         /// <summary>
@@ -291,13 +294,16 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            // Mask personal information about the user before inserting into data store.
-            //MaskingService maskingService = new MaskingService(new MapDAO());
+            MaskingService maskingService = new MaskingService(new MapDAO());
+
             foreach (string user in username)
             {
-                //UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(user).ConfigureAwait(false);
-                await _userDAO.DeleteByIdsAsync(username).ConfigureAwait(false);
+                UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(user).ConfigureAwait(false);
+
+                await maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
             }
+
+            await _userDAO.DeleteByIdsAsync(username).ConfigureAwait(false);
 
             // Log the bulk create operation.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserDeleteOperation, adminName, adminIp);

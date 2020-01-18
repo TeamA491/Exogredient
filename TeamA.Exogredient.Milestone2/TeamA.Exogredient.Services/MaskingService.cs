@@ -181,7 +181,7 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task<bool> DecrementMappingForDelete(IUnMaskableObject maskedObject)
+        public async Task<bool> DecrementMappingForDeleteAsync(IUnMaskableObject maskedObject)
         {
             if (!maskedObject.IsUnMasked())
             {
@@ -205,7 +205,7 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
-        public async Task<bool> DecrementMappingForUpdate(IMaskableRecord updateRecord, IUnMaskableObject maskedObject)
+        public async Task<bool> DecrementMappingForUpdateAsync(IMaskableRecord updateRecord, IUnMaskableObject maskedObject)
         {
             List<Tuple<object, bool>> recordInfo = updateRecord.GetMaskInformation();
             List<Tuple<object, bool>> objectInfo = maskedObject.GetMaskInformation();

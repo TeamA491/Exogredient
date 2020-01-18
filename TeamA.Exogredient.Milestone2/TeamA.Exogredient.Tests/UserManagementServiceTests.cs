@@ -31,7 +31,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: delete the created user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -64,7 +64,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete Created user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -95,7 +95,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -128,7 +128,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -151,7 +151,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -233,7 +233,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -252,7 +252,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(createResult);
 
             // Act: Delete the user 
-            bool result = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool result = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Assert: that the user is properly deleted from the table with CheckUserExistence
@@ -294,7 +294,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -329,7 +329,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -370,7 +370,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -408,7 +408,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Delete the created user 
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -450,7 +450,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
             // Cleanup: Delete the user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -488,7 +488,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that created user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -511,7 +511,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -547,7 +547,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 

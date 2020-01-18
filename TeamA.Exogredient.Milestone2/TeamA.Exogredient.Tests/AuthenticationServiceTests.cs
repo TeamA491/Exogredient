@@ -30,7 +30,7 @@ namespace TeamA.Exogredient.Tests
 
             Assert.IsTrue(result);
 
-            await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
         }
 
         [DataTestMethod]
@@ -51,7 +51,7 @@ namespace TeamA.Exogredient.Tests
 
             Assert.IsTrue(result);
 
-            await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
         }
     }
 }
