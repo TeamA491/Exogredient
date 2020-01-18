@@ -9,6 +9,7 @@ using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.DAL;
 
+
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -162,6 +163,13 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record)
         {
+            // Check for user existence.
+            bool result = await CheckUserExistenceAsync((string)record.GetData()["username"]);
+            if (!result)
+            {
+                throw new ArgumentException(Constants.UsernameDNE);
+            }
+
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
             long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
@@ -177,6 +185,23 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records)
         {
+            if(Constants.ProjectStatus != Constants.StatusDev)
+            {
+                throw new Exception(Constants.NotInDevelopment);
+            }
+
+            // Check for user existence for every record
+            bool result;
+            foreach(UserRecord user in records)
+            {
+                result = await CheckUserExistenceAsync((string)user.GetData()["username"]);
+                if (!result)
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+            }
+            
+            // Mask personal information about the user before inserting into data store.
             MaskingService maskingService = new MaskingService(new MapDAO());
             foreach (UserRecord user in records)
             {
