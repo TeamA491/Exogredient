@@ -9,6 +9,7 @@ using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.DAL;
 
+
 namespace TeamA.Exogredient.Services
 {
     /// <summary>
@@ -102,7 +103,7 @@ namespace TeamA.Exogredient.Services
             IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(ipAddress).ConfigureAwait(false);
 
             MaskingService maskingService = new MaskingService(new MapDAO());
-            
+
             return (IPAddressObject)await maskingService.UnMaskAsync(ip).ConfigureAwait(false);
         }
 
@@ -164,8 +165,22 @@ namespace TeamA.Exogredient.Services
         /// <param name="userType">Used to specify the user's type.</param>
         /// <param name="salt">Used to specify the salt associated with the user's password digest.</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record)
+        public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record, string adminName, string adminIp)
         {
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if(admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+
+            // Check for user existence.
+            bool result = await CheckUserExistenceAsync((string)record.GetData()["username"]);
+            if (!result)
+            {
+                throw new ArgumentException(Constants.UsernameDNE);
+            }
+
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
             long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
@@ -176,17 +191,52 @@ namespace TeamA.Exogredient.Services
 
             UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(record).ConfigureAwait(false);
 
+            // Log the action.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserCreateOperation, adminName, adminIp);
+
+
             return await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
+
+
         }
 
-        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records)
+        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records, string adminName, string adminIp)
         {
+            // Check that the User of function is an admin.
+            UserObject admin = (UserObject)await GetUserInfoAsync(adminName);
+            if (admin.UserType != Constants.AdminUserType)
+            {
+                throw new ArgumentException(Constants.MustBeAdmin);
+            }
+
+            // Disable this function if project is not in development.
+            if (Constants.ProjectStatus != Constants.StatusDev)
+            {
+                throw new Exception(Constants.NotInDevelopment);
+            }
+
+            // Check for user existence for every record
+            bool result;
+            foreach(UserRecord user in records)
+            {
+                result = await CheckUserExistenceAsync((string)user.GetData()["username"]);
+                if (!result)
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+            }
+
+            // Mask personal information about the user before inserting into data store.
             MaskingService maskingService = new MaskingService(new MapDAO());
             foreach (UserRecord user in records)
             {
                     UserRecord resultRecord = (UserRecord)await maskingService.MaskAsync(user).ConfigureAwait(false);
                     await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
             }
+
+            // Log the bulk create operation.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserCreateOperation, adminName, adminIp);
+
             return true;
         }
 

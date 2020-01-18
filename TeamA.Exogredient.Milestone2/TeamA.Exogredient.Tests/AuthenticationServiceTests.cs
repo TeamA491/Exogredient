@@ -21,7 +21,7 @@ namespace TeamA.Exogredient.Tests
                 UserRecord user = new UserRecord(username, "eli", "test@gamil.com", phoneNumber, "asdasd", Constants.EnabledStatus, Constants.CustomerUserType,
                                         "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
-                await UserManagementService.CreateUserAsync(false, user).ConfigureAwait(false);
+                await UserManagementService.CreateUserAsync(false, user, "system", "localhost").ConfigureAwait(false);
             }
             catch
             { }
@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Tests
                 // Arrange: Create user 
                 UserRecord user = new UserRecord(username, "eli", emailAddress, "5625555555", "asdasd", Constants.EnabledStatus, Constants.CustomerUserType,
                                         "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
-                await UserManagementService.CreateUserAsync(false, user).ConfigureAwait(false);
+                await UserManagementService.CreateUserAsync(false, user, "system", "localhost").ConfigureAwait(false);
             }
             catch
             { }

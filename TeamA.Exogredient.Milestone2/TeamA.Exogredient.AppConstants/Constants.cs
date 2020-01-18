@@ -19,6 +19,12 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
+        public static readonly string ProjectStatus = Environment.GetEnvironmentVariable("PROJECT_STATUS", EnvironmentVariableTarget.User);
+
+        // PROJECT STATUSES
+        public static readonly string StatusDev = "DEVELOPMENT";
+        public static readonly string StatusProd = "PRODUCTION";
+        public static readonly string StatusTest = "TESTING";
 
 
         // STRING UTILITY HELPER DATA STRUCTURES
@@ -210,10 +216,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string SendPhoneCodeOperation = "Send Phone Code";
         public const string SendEmailCodeOperation = "Send Email Code";
         public const string UpdatePasswordOperation = "Update Password";
+        public const string SingleUserCreateOperation = "Single User Create";
+        public const string BulkUserCreateOperation = "Buld User Create";
 
         public const string CustomerUserType = "Customer";
+        public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
         public const string AnonymousUserIdentifier = "<Unregistered Customer>";
+        public const string SystemIdentifier = "System";
 
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
@@ -476,6 +486,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string InvalidKeyValue = "Invalid key/value pair.";
         public const string KeyValueNoDoubleQuotes = "Key or value isn't surrounded by double quotes.";
         public const string KeyValueNotAlphaNum = "Key or value is not alpha-numeric (excluding white-space).";
+        public const string MustBeAdmin = "adminName does not exists or is not an admin";
 
         // EXCEPTION MESSAGES -- Data Store Logging
         public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
@@ -518,6 +529,10 @@ namespace TeamA.Exogredient.AppConstants
         public const string CompressionFailed = "Compression archive failed to create.";
         public const string FTPfileNotFound = "FTP archive File not found.";
         public const string FTPinvalidCredentials = "Invalid ftp credentials";
+
+        // EXCEOPTION MESSAGES -- Project Status
+        public const string NotInDevelopment = "Failed on because project status is not in development";
+
 
     }
 }
