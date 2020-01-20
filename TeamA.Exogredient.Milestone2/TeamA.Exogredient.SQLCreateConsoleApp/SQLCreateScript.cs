@@ -80,7 +80,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.IPAddressDAOtableName}` (" +
-                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({Constants.IPAddressLength}) NOT NULL," +
+                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({(Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn] ? Constants.DefaultHashLength : Constants.IPAddressLength)}) NOT NULL," +
                                $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.IPAddressDAOregistrationFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.IPAddressDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
