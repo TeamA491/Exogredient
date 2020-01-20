@@ -20,8 +20,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                // TODO: exception message
-                throw new ArgumentException();
+                throw new ArgumentException(Constants.MapCreateInvalidArgument);
             }
 
             MapRecord mapRecord = (MapRecord)record;
@@ -91,8 +90,7 @@ namespace TeamA.Exogredient.DAL
                     // Check if the hash exists in the table, throw an argument exception if it doesn't exist.
                     if (!await CheckHashExistenceAsync(hash).ConfigureAwait(false))
                     {
-                        // TODO: exception message
-                        throw new ArgumentException();
+                        throw new ArgumentException(Constants.MapDeleteDNE);
                     }
 
                     // Construct the sql string for deleteing where the hash column equals the @HASH parameter.
@@ -116,8 +114,7 @@ namespace TeamA.Exogredient.DAL
             // Check if the id exists in the table, and throw an argument exception if it doesn't.
             if (!await CheckHashExistenceAsync(id).ConfigureAwait(false))
             {
-                // TODO: exception message
-                throw new ArgumentException();
+                throw new ArgumentException(Constants.MapReadDNE);
             }
 
             // Object to return -- MapObject
@@ -160,8 +157,7 @@ namespace TeamA.Exogredient.DAL
             }
             catch
             {
-                // TODO: exception message
-                throw new ArgumentException();
+                throw new ArgumentException(Constants.MapUpdateInvalidArgument);
             }
 
             // Get the record data.
@@ -187,8 +183,7 @@ namespace TeamA.Exogredient.DAL
                     {
                         if (!await CheckHashExistenceAsync((string)pair.Value).ConfigureAwait(false))
                         {
-                            // TODO: exception message
-                            throw new ArgumentException();
+                            throw new ArgumentException(Constants.MapUpdateDNE);
                         }
                     }
 

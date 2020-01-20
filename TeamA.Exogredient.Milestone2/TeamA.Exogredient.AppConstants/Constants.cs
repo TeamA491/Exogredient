@@ -526,6 +526,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserReadDNE = "UserDAO.ReadByIdAsync username did not exist";
         public const string UserUpdateDNE = "UserDAO.UpdateAsync username did not exist";
 
+        // EXCEPTION MESSAGES -- MapDAO
+        public const string MapCreateInvalidArgument = "MapDAO.CreateAsync record argument must be of type MapRecord";
+        public const string MapDeleteDNE = "MapDAO.DeleteByIdsAsync hash did not exist";
+        public const string MapReadDNE = "MapDAO.ReadByIdAsync hash did not exist";
+        public const string MapUpdateDNE = "MapDAO.UpdateAsync hash did not exist";
+        public const string MapUpdateInvalidArgument = "MapDAO.UpdateAsync record argument must be of type MapRecord";
+
         // EXCEPTION MESSAGES -- Archiving
         public const string SourceDirectoryDNE = "Archiving failed on because source directory did not exist";
         public const string FirstArgumentNotInt = "Archiving failed because first argument must be an integer";
@@ -539,9 +546,10 @@ namespace TeamA.Exogredient.AppConstants
         public const string FTPfileNotFound = "FTP archive File not found.";
         public const string FTPinvalidCredentials = "Invalid ftp credentials";
 
-        // EXCEOPTION MESSAGES -- Project Status
+        // EXCEPTION MESSAGES -- Project Status
         public const string NotInDevelopment = "Failed on because project status is not in development";
 
-
+        // EXCEPTION MESSAGES -- Masking
+        public const string HashNotInTable = "The hash attempted to access for decrementation was not in the table";
     }
 }

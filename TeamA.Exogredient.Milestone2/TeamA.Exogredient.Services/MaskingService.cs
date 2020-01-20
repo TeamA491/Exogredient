@@ -181,8 +181,7 @@ namespace TeamA.Exogredient.Services
         {
             if (!await _mapDAO.CheckHashExistenceAsync(hashInput).ConfigureAwait(false))
             {
-                // TODO: exception message
-                throw new ArgumentException();
+                throw new ArgumentException(Constants.HashNotInTable);
             }
 
             // Log the map database read.
