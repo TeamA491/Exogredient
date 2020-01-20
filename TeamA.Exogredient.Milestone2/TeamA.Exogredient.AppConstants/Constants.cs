@@ -220,15 +220,19 @@ namespace TeamA.Exogredient.AppConstants
         public const string BulkUserCreateOperation = "Bulk User Create";
         public const string SingleUserDeleteOperation = "Single Delete Create";
         public const string BulkUserDeleteOperation = "Bulk User Delete";
-
         public const string UpdateSingleUserOperation = "Single User Update";
         public const string BulkUserUpdateOperation = "Bulk User Update";
+        public const string MapTableReadFromOperation = "Map Table Read From";
+        public const string MapTableModifiedOperation = "Map Table Modified";
+        public const string UpdateSingleIPOperation = "Single IP Update";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
         public const string AnonymousUserIdentifier = "<Unregistered Customer>";
         public const string SystemIdentifier = "System";
+
+        public const string LocalHost = "127.0.0.1";
 
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
