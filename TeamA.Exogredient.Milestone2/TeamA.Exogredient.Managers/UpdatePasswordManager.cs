@@ -103,7 +103,7 @@ namespace TeamA.Exogredient.Managers
 
                 string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
-                await UserManagementService.ChangePasswordAsync(username, digest, saltHex);
+                await UserManagementService.ChangePasswordAsync(username, digest, saltHex).ConfigureAwait(false);
 
                 await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.UpdatePasswordOperation, username, ipAddress).ConfigureAwait(false);
