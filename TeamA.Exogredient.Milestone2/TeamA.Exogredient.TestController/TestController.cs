@@ -25,14 +25,9 @@ namespace TeamA.Exogredient.TestController
             UserRecord maskedRecord1 = (UserRecord)await ms.MaskAsync(record1).ConfigureAwait(false);
             await dao.CreateAsync(maskedRecord1).ConfigureAwait(false);
 
-
-            UserRecord record2 = new UserRecord("eli123456", "eli gomez", "elithegolfer2@gmail.com", "949-981-5507", "lskdajf;lsadjf", 1, "test", "sldkd", 1, "123", 1, 1, 1, 1, 57);
-            UserRecord maskedRecord2 = (UserRecord)await ms.MaskAsync(record2).ConfigureAwait(false);
-            await dao.CreateAsync(maskedRecord2).ConfigureAwait(false);
-
             UserObject obj = await UserManagementService.GetUserInfoAsync("eli123").ConfigureAwait(false);
 
-            Console.WriteLine(obj.PhoneCodeFailures);
+            Console.WriteLine(obj.Email);
         }
     }
 }

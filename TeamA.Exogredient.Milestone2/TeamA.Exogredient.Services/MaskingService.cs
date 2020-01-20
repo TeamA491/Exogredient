@@ -43,10 +43,8 @@ namespace TeamA.Exogredient.Services
                             parameters[i] = Int32.Parse(map.Actual);
                         }
 
-                        // Log the map database read.
-                        await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                      Constants.MapTableReadFromOperation, Constants.SystemIdentifier,
-                                                      Constants.LocalHost).ConfigureAwait(false);
+                        await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.MapTableReadFromOperation,
+                                                      Constants.SystemIdentifier, Constants.LocalHost).ConfigureAwait(false);
                     }
                     else
                     {
@@ -135,10 +133,8 @@ namespace TeamA.Exogredient.Services
                                 await UpdateOccurrencesAsync(hashString, mapObj.Occurrences + 1).ConfigureAwait(false);
                             }
 
-                            // Log the map database modification.
-                            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                          Constants.MapTableModifiedOperation, Constants.SystemIdentifier,
-                                                          Constants.LocalHost).ConfigureAwait(false);
+                            //await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.MapTableModifiedOperation,
+                            //                          Constants.SystemIdentifier, Constants.LocalHost).ConfigureAwait(false);
                         }
                         else
                         {
@@ -167,47 +163,29 @@ namespace TeamA.Exogredient.Services
         {
             MapRecord map = new MapRecord(hashInput, occurrences: occurrences);
 
-            await _mapDAO.UpdateAsync(map).ConfigureAwait(false);
-
-            // Log the map database modification.
-            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                          Constants.MapTableModifiedOperation, Constants.SystemIdentifier,
-                                          Constants.LocalHost).ConfigureAwait(false);
-
-            return true;
+            return await _mapDAO.UpdateAsync(map).ConfigureAwait(false);
         }
 
         public async Task<bool> DecrementOccurrencesAsync(string hashInput)
         {
             if (!await _mapDAO.CheckHashExistenceAsync(hashInput).ConfigureAwait(false))
             {
-                throw new ArgumentException(Constants.HashNotInTable);
+                // TODO: exception message
+                throw new ArgumentException();
             }
-
-            // Log the map database read.
-            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                          Constants.MapTableReadFromOperation, Constants.SystemIdentifier,
-                                          Constants.LocalHost).ConfigureAwait(false);
 
             MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hashInput).ConfigureAwait(false);
 
             if (mapObj.Occurrences - 1 == 0)
             {
-                await _mapDAO.DeleteByIdsAsync(new List<string>() { hashInput }).ConfigureAwait(false);
+                return await _mapDAO.DeleteByIdsAsync(new List<string>() { hashInput }).ConfigureAwait(false);
             }
             else
             {
                 MapRecord record = new MapRecord(hashInput, occurrences: mapObj.Occurrences - 1);
 
-                await _mapDAO.UpdateAsync(record).ConfigureAwait(false);
+                return await _mapDAO.UpdateAsync(record).ConfigureAwait(false);
             }
-
-            // Log the map database modification.
-            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                          Constants.MapTableModifiedOperation, Constants.SystemIdentifier,
-                                          Constants.LocalHost).ConfigureAwait(false);
-
-            return true;
         }
 
         public async Task<bool> DecrementMappingForDeleteAsync(IUnMaskableObject maskedObject)
