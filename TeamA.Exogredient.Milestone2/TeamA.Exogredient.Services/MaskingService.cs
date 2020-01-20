@@ -159,6 +159,11 @@ namespace TeamA.Exogredient.Services
             }
         }
 
+        public string MaskStringID(string input)
+        {
+            return SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
+        }
+
         public async Task<bool> UpdateOccurrencesAsync(string hashInput, int occurrences)
         {
             MapRecord map = new MapRecord(hashInput, occurrences: occurrences);
