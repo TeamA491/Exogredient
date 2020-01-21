@@ -197,7 +197,7 @@ namespace TeamA.Exogredient.Services
             foreach (UserRecord user in records)
             {
                 result = await CheckUserExistenceAsync((string)user.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false);
-                if (!result)
+                if (result)
                 {
                     throw new ArgumentException(Constants.UsernameDNE);
                 }

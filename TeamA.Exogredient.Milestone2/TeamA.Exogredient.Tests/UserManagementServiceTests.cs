@@ -236,6 +236,33 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(deleteResult);
         }
 
+
+        [TestMethod]
+        public async Task UserManagementService_CreateUsersAsync_CreateNonExistentUsersSuccess()
+        {
+            // Arrange: Create a list of users.
+            List<UserRecord> users = new List<UserRecord>();
+
+            UserRecord user1 = new UserRecord("username", "mr.DROP TABLE", "blah@gmail.com", "5622224456", "password", Constants.EnabledStatus, Constants.CustomerUserType,
+                                            "12345678", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+            UserRecord user2 = new UserRecord("username1", "mr.DROP TABLE1", "1blah@gmail.com", "5622222456", "password", Constants.EnabledStatus, Constants.CustomerUserType,
+                                                       "12345678", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+            users.Add(user1);
+            users.Add(user2);
+
+            // Act: Create the users.
+            bool createResult = await UserManagementService.CreateUsersAsync(users).ConfigureAwait(false);
+
+            // Assert: that the create was successfull
+            Assert.IsTrue(createResult);
+
+            // Cleanup: Delete the users.
+            List<string> usersToDelete = new List<string> { (string)user1.GetData()["username"], (string)user2.GetData()["username"] };
+            bool deleteResult = await UserManagementService.BulkDeleteUserAsync(usersToDelete).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
+        }
+
         [DataTestMethod]
         [DataRow(true, "username", "mr.DROP TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "87654321")]
         public async Task UserManagementService_DeleteUserAsync_DeleteUserSuccess(bool isTemp, string username, string name, string email,
@@ -551,11 +578,47 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(deleteResult);
         }
 
+        [DataTestMethod]
+        [DataRow("this is an email")]
         public async Task UserManagementService_NotifySystemAdminAsync_SendEmailToSystemAdminSuccess(string body)
         {
             // Act: Check that a successfull message to system admin returns true.
             bool notifyResult = await UserManagementService.NotifySystemAdminAsync(body, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
             Assert.IsTrue(notifyResult);
+        }
+
+        [DataTestMethod]
+        [DataRow(false, "username", "mr.DROP TABLE", "blahblah@gmail.com", "1234567891", "password", 0, "Customer", "12345678")]
+        public async Task UserManagementService_UpdateUserAsync_UpdateUserSuccessfull(bool isTemp, string username, string name, string email,
+                                                                                     string phoneNumber, string password, int disabled, string userType, string salt)
+        {
+            // Arrange: Create a user.
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
+
+            // Act: update the user's name, email, and phone number
+            UserRecord userUpdate = new UserRecord(username, "updateName", "updateEmail@gmail.com", "1234567866", password, Constants.EnabledStatus, Constants.CustomerUserType,
+                                   salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+            bool updateResult = await UserManagementService.UpdateUserAsync(userUpdate).ConfigureAwait(false);
+            Assert.IsTrue(updateResult);
+
+            // Arrange: Make sure that that the user is successfully updated
+            UserObject userObj = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            bool readResult;
+            if (userObj.Name == "updateName" && userObj.Email == "updateEmail@gmail.com" && userObj.PhoneNumber == "1234567866")
+            {
+                readResult = true;
+            }
+            else
+            {
+                readResult = false;
+            }
+
+            Assert.IsTrue(readResult);
         }
     }
 }
