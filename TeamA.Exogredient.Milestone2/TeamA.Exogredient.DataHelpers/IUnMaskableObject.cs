@@ -4,6 +4,9 @@ using System.Text;
 
 namespace TeamA.Exogredient.DataHelpers
 {
+    /// <summary>
+    /// Defines the methods needed for an unmaskable object.
+    /// </summary>
     public interface IUnMaskableObject
     {
         Type[] GetParameterTypes();

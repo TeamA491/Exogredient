@@ -50,16 +50,28 @@ namespace TeamA.Exogredient.DataHelpers
             Fields.Add(errorType);
         }
 
+        /// <summary>
+        /// Sets the status of this object to "Masked".
+        /// </summary>
         public void SetToMasked()
         {
             _masked = true;
         }
 
+        /// <summary>
+        /// Evaluates whether or not the object is masked.
+        /// </summary>
+        /// <returns>(bool) whether the object is masked.</returns>
         public bool IsMasked()
         {
             return _masked;
         }
 
+        /// <summary>
+        /// Evaluates whether an object is equal to this object.
+        /// </summary>
+        /// <param name="obj">The object to compare this one to.</param>
+        /// <returns>(bool) whether the two objects are equal</returns>
         public bool IsEqual(object obj)
         {
             LogRecord logRecord;
@@ -79,6 +91,26 @@ namespace TeamA.Exogredient.DataHelpers
                     ErrorType.Equals(logRecord.ErrorType));
         }
 
+
+        /// <summary>
+        /// Gets the types of the parameters to this object's constructor.
+        /// </summary>
+        /// <returns>(Type[]) the array of types of the constructor's parameters</returns>
+        public Type[] GetParameterTypes()
+        {
+            Type[] result = new Type[5]
+            {
+                typeof(string), typeof(string), typeof(string),
+                typeof(string), typeof(string)
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the masking information of this object (a list of tuples: objects and whether they are/should be masked).
+        /// </summary>
+        /// <returns>(List<Tuple<object, bool>>) the masking information of this object.</object></returns>
         public List<Tuple<object, bool>> GetMaskInformation()
         {
             List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
@@ -88,17 +120,6 @@ namespace TeamA.Exogredient.DataHelpers
                 new Tuple<object, bool>(Identifier, Constants.LogsCollectionIsColumnMasked[Constants.LogsIdentifierField]),
                 new Tuple<object, bool>(IPAddress, Constants.LogsCollectionIsColumnMasked[Constants.LogsIPAddressField]),
                 new Tuple<object, bool>(ErrorType, Constants.LogsCollectionIsColumnMasked[Constants.LogsErrorTypeField])
-            };
-
-            return result;
-        }
-
-        public Type[] GetParameterTypes()
-        {
-            Type[] result = new Type[5]
-            {
-                typeof(string), typeof(string), typeof(string),
-                typeof(string), typeof(string)
             };
 
             return result;

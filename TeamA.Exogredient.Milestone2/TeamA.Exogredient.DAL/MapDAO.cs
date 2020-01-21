@@ -2,15 +2,22 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
+    /// <summary>
+    /// DAO for the data store storing maps of Masking information.
+    /// </summary>
     public class MapDAO : IMasterSQLDAO<string>
     {
+        /// <summary>
+        /// Asynchronously creates the <paramref name="record"/> in the data store.
+        /// </summary>
+        /// <param name="record">The record to insert (ISQLRecord)</param>
+        /// <returns>Task(bool) whether the function executed without exception.</returns>
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
             // Try casting the record to a MapRecord, throw an argument exception if it fails.
@@ -76,12 +83,16 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        /// <summary>
+        /// Delete all the objects referenced by the <paramref name="idsOfRows"/>.
+        /// </summary>
+        /// <param name="idsOfRows">The list of ids of rows to delete (List(string))</param>
+        /// <returns>Task (bool) whether the function executed without exception.</returns>
         public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
-                // Open the connection.
                 connection.Open();
 
                 // Loop through the ids of rows.
@@ -109,6 +120,11 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        /// <summary>
+        /// Asynchronously read the information in the adata store pointed to by the <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The id of the row to read (string)</param>
+        /// <returns>Task (IDataObject) the information represented as an object</returns>
         public async Task<IDataObject> ReadByIdAsync(string id)
         {
             // Check if the id exists in the table, and throw an argument exception if it doesn't.
@@ -123,7 +139,6 @@ namespace TeamA.Exogredient.DAL
             // Get the connection inside of a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
-                // Open the connection.
                 connection.Open();
 
                 // Construct the sql string to get the record where the id column equals the id parameter.
@@ -148,6 +163,11 @@ namespace TeamA.Exogredient.DAL
             return result;
         }
 
+        /// <summary>
+        /// Update the <paramref name="record"/> in the data store based on the values that are not null inside it.
+        /// </summary>
+        /// <param name="record">The record containing the information to update (ISQLRecord)</param>
+        /// <returns>Task (bool) whether the function executed without exception.</returns>
         public async Task<bool> UpdateAsync(ISQLRecord record)
         {
             // Try casting the record to a MapRecord, throw an argument exception if it fails.
@@ -177,7 +197,7 @@ namespace TeamA.Exogredient.DAL
                 int count = 0;
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    // Check if the value at the username column is contained within the table, throw an argument
+                    // Check if the value at the hash column is contained within the table, throw an argument
                     // exception if it doesn't exist.
                     if (pair.Key == Constants.MapDAOHashColumn)
                     {
@@ -217,7 +237,7 @@ namespace TeamA.Exogredient.DAL
                     count++;
                 }
 
-                // Remove the last comma and identify the record by its username column.
+                // Remove the last comma and identify the record by its hash column.
                 sqlString = sqlString.Remove(sqlString.Length - 1);
                 sqlString += $" WHERE {Constants.MapDAOHashColumn} = '{recordData[Constants.MapDAOHashColumn]}';";
 
@@ -264,6 +284,11 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        /// <summary>
+        /// Check if the <paramref name="hash"/> exists.
+        /// </summary>
+        /// <param name="hash"> hash to be checked </param>
+        /// <returns> true if hash exists, otherwise false </returns>
         public async Task<bool> CheckHashExistenceAsync(string hash)
         {
             // Get the connection inside a using statement to properly dispose/close.
@@ -272,7 +297,7 @@ namespace TeamA.Exogredient.DAL
                 // Open the connection.
                 connection.Open();
 
-                // Construct the sql string to select all from the table where the username column matches the hash,
+                // Construct the sql string to select all from the table where the hash column matches the hash,
                 // then check if at least 1 row exists. Use a parameter to protect against sql injections.
                 string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.MapDAOTableName} WHERE {Constants.MapDAOHashColumn} = @HASH);";
 

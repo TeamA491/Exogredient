@@ -41,16 +41,27 @@ namespace TeamA.Exogredient.DataHelpers
             return _data;
         }
 
+        /// <summary>
+        /// Sets the status of this object to "Masked".
+        /// </summary>
         public void SetToMasked()
         {
             _masked = true;
         }
 
+        /// <summary>
+        /// Evaluates whether or not the object is masked.
+        /// </summary>
+        /// <returns>(bool) whether the object is masked.</returns>
         public bool IsMasked()
         {
             return _masked;
         }
 
+        /// <summary>
+        /// Gets the types of the parameters to this object's constructor.
+        /// </summary>
+        /// <returns>(Type[]) the array of types of the constructor's parameters</returns>
         public Type[] GetParameterTypes()
         {
             Type[] result = new Type[4]
@@ -62,6 +73,10 @@ namespace TeamA.Exogredient.DataHelpers
             return result;
         }
 
+        /// <summary>
+        /// Gets the masking information of this object (a list of tuples: objects and whether they are/should be masked).
+        /// </summary>
+        /// <returns>(List<Tuple<object, bool>>) the masking information of this object.</object></returns>
         public List<Tuple<object, bool>> GetMaskInformation()
         {
             List<Tuple<object, bool>> result = new List<Tuple<object, bool>>

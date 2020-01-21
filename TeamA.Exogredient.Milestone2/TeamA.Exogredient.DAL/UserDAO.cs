@@ -121,7 +121,6 @@ namespace TeamA.Exogredient.DAL
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
             {
-                // Open the connection.
                 connection.Open();
 
                 // Loop through the ids of rows.
@@ -150,7 +149,7 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Asynchronously read the information in the adata store pointed to by the <paramref name="id"/>.
+        /// Asynchronously read the information in the data store pointed to by the <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The id of the row to read (string)</param>
         /// <returns>Task (IDataObject) the information represented as an object</returns>
@@ -168,7 +167,6 @@ namespace TeamA.Exogredient.DAL
             // Get the connection inside of a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
             {
-                // Open the connection.
                 connection.Open();
 
                 // Construct the sql string to get the record where the id column equals the id parameter.

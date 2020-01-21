@@ -553,5 +553,7 @@ namespace TeamA.Exogredient.AppConstants
 
         // EXCEPTION MESSAGES -- Masking
         public const string HashNotInTable = "The hash attempted to access for decrementation was not in the table";
+        public const string DecrementDeleteUnmasked = "DecrementMappingForDeleteAsync object was unmasked";
+        public const string DecrementUpdateUnmasked = "DecrementMappingForUpdateAsync object was unmasked";
     }
 }
