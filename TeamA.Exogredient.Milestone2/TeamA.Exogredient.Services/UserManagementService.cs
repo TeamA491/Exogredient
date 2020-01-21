@@ -138,7 +138,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
-            // Check that the User of function is an admin.
+            // Check that the user of function is an admin and throw an exception if they are not.
             if (!adminName.Equals(Constants.SystemIdentifier))
             {
                 UserObject admin = await GetUserInfoAsync(adminName).ConfigureAwait(false);
@@ -149,7 +149,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            // Check for user existence.
+            // Check for user existence and throw an exception if the user already exists.
             bool result = await CheckUserExistenceAsync((string)record.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false);
             if (result)
             {
@@ -159,11 +159,12 @@ namespace TeamA.Exogredient.Services
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
             long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
-
             record.GetData()[Constants.UserDAOtempTimestampColumn] = tempTimestamp;
 
+            // Mask all the sensitive information.
             UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record, true).ConfigureAwait(false);
 
+            // Insert the masked user into the datastore.
             await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
 
             // Log the action.
@@ -175,7 +176,7 @@ namespace TeamA.Exogredient.Services
 
         public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
-            // Check that the User of function is an admin.
+            // Check that the user of function is an admin and throw an exception if they are not.
             if (!adminName.Equals(Constants.SystemIdentifier))
             {
                 UserObject admin = await GetUserInfoAsync(adminName).ConfigureAwait(false);
@@ -192,7 +193,7 @@ namespace TeamA.Exogredient.Services
                 throw new Exception(Constants.NotInDevelopment);
             }
 
-            // Check for user existence for every record
+            // Check for user existence and throw an exception if the user already exists.
             bool result;
             foreach (UserRecord user in records)
             {
@@ -203,7 +204,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            // Mask personal information about the user before inserting into data store.
+            // Mask personal information about the users before inserting into datastore.
             foreach (UserRecord user in records)
             {
                 UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(user, true).ConfigureAwait(false);
@@ -235,6 +236,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
+            // Get information associated with that user.
             string id = (string)userRecord.GetData()[Constants.UserDAOusernameColumn];
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
