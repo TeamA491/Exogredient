@@ -11,59 +11,21 @@ namespace TeamA.Exogredient.Services
     {
         private readonly MapDAO _mapDAO;
 
+        /// <summary>
+        /// Creates the masking service with its dependencies initialized.
+        /// </summary>
+        /// <param name="mdao">The MapDAO to new up and pass into the object.</param>
         public MaskingService(MapDAO mdao)
         {
             _mapDAO = mdao;
         }
 
-        public async Task<IUnMaskableObject> UnMaskAsync(IUnMaskableObject obj)
-        {
-            if (!obj.IsUnMasked())
-            {
-                List<Tuple<object, bool>> info = obj.GetMaskInformation();
-
-                object[] parameters = new object[info.Count];
-
-                for (int i = 0; i < info.Count; i++)
-                {
-                    Tuple<object, bool> data = info[i];
-
-                    if (data.Item2)
-                    {
-                        if (data.Item1 is string)
-                        {
-                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
-
-                            parameters[i] = map.Actual;
-                        }
-                        else
-                        {
-                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
-
-                            parameters[i] = Int32.Parse(map.Actual);
-                        }
-
-                        await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.MapTableReadFromOperation,
-                                                      Constants.SystemIdentifier, Constants.LocalHost).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        parameters[i] = data.Item1;
-                    }
-                }
-
-                IUnMaskableObject resultObject = (IUnMaskableObject)obj.GetType().GetConstructor(obj.GetParameterTypes()).Invoke(parameters);
-
-                resultObject.SetToUnMasked();
-
-                return resultObject;
-            }
-            else
-            {
-                return obj;
-            }
-        }
-
+        /// <summary>
+        /// Takes in a IMaskableRecord and 
+        /// </summary>
+        /// <param name="record"></param>
+        /// <param name="isCreate"></param>
+        /// <returns></returns>
         public async Task<IMaskableRecord> MaskAsync(IMaskableRecord record, bool isCreate)
         {
             if (!record.IsMasked())
@@ -153,6 +115,54 @@ namespace TeamA.Exogredient.Services
             else
             {
                 return record;
+            }
+        }
+
+        public async Task<IUnMaskableObject> UnMaskAsync(IUnMaskableObject obj)
+        {
+            if (!obj.IsUnMasked())
+            {
+                List<Tuple<object, bool>> info = obj.GetMaskInformation();
+
+                object[] parameters = new object[info.Count];
+
+                for (int i = 0; i < info.Count; i++)
+                {
+                    Tuple<object, bool> data = info[i];
+
+                    if (data.Item2)
+                    {
+                        if (data.Item1 is string)
+                        {
+                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
+
+                            parameters[i] = map.Actual;
+                        }
+                        else
+                        {
+                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
+
+                            parameters[i] = Int32.Parse(map.Actual);
+                        }
+
+                        await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.MapTableReadFromOperation,
+                                                      Constants.SystemIdentifier, Constants.LocalHost).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        parameters[i] = data.Item1;
+                    }
+                }
+
+                IUnMaskableObject resultObject = (IUnMaskableObject)obj.GetType().GetConstructor(obj.GetParameterTypes()).Invoke(parameters);
+
+                resultObject.SetToUnMasked();
+
+                return resultObject;
+            }
+            else
+            {
+                return obj;
             }
         }
 
