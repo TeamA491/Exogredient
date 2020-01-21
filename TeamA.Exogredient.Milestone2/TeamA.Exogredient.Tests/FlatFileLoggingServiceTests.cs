@@ -9,7 +9,7 @@ using TeamA.Exogredient.DAL;
 namespace TeamA.Exogredient.Tests
 {
     [TestClass]
-    public class LoggingUnitTests
+    public class FlatFileLoggingServiceTests
     {
         // Flat file log directory
         private readonly string _logDirectory = Constants.LogFolder;

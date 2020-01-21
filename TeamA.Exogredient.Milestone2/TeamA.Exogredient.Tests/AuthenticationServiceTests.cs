@@ -19,9 +19,9 @@ namespace TeamA.Exogredient.Tests
             {
                 // Arrange: Create user 
                 UserRecord user = new UserRecord(username, "eli", "test@gamil.com", phoneNumber, "asdasd", Constants.EnabledStatus, Constants.CustomerUserType,
-                                        "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+                                                 "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
-                await UserManagementService.CreateUserAsync(false, user, "system", "localhost").ConfigureAwait(false);
+                await UserManagementService.CreateUserAsync(false, user).ConfigureAwait(false);
             }
             catch
             { }
@@ -30,7 +30,7 @@ namespace TeamA.Exogredient.Tests
 
             Assert.IsTrue(result);
 
-            await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
         }
 
         [DataTestMethod]

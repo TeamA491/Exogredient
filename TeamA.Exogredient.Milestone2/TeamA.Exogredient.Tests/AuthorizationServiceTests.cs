@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TeamA.Exogredient.Tests
 {
     [TestClass]
-    public class AuthorizationServiceUnitTests
+    public class AuthorizationServiceTests
     {
         private readonly Dictionary<string, string> TestPayload = new Dictionary<string, string>
         {
