@@ -66,7 +66,7 @@ namespace TeamA.Exogredient.Tests
             {
                 result = FileFetchingService.FetchLogs(sourceDirectory, targetDirectory, 30);
             }
-            catch(Exception e)
+            catch
             {
                 result = false;
             }
@@ -128,7 +128,7 @@ namespace TeamA.Exogredient.Tests
             {
                 result = FileFetchingService.FetchLogs(sourceDirectory, targetDirectory, days);
             }
-            catch(ArgumentException e)
+            catch
             {
                 result = false;
             }

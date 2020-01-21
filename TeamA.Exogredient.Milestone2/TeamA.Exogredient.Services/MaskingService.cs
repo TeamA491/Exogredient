@@ -64,7 +64,7 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public async Task<IMaskableRecord> MaskAsync(IMaskableRecord record)
+        public async Task<IMaskableRecord> MaskAsync(IMaskableRecord record, bool isCreate)
         {
             if (!record.IsMasked())
             {
@@ -124,7 +124,7 @@ namespace TeamA.Exogredient.Services
                                 MapRecord mapRecord = new MapRecord(hashString, input, 1);
                                 await _mapDAO.CreateAsync(mapRecord).ConfigureAwait(false);
                             }
-                            else
+                            else if (isCreate)
                             {
                                 MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hashString).ConfigureAwait(false);
                                 await UpdateOccurrencesAsync(hashString, mapObj.Occurrences + 1).ConfigureAwait(false);
@@ -236,12 +236,9 @@ namespace TeamA.Exogredient.Services
                             beingUpdated = false;
                         }
                     }
-                    if (recordData.Item1 is string)
+                    if (recordData.Item1 == null)
                     {
-                        if (recordData.Item1 == null)
-                        {
-                            beingUpdated = false;
-                        }
+                        beingUpdated = false;
                     }
                     if (recordData.Item1 is long)
                     {
@@ -251,7 +248,7 @@ namespace TeamA.Exogredient.Services
                         }
                     }
 
-                    if (beingUpdated)
+                    if (beingUpdated && i != 0)
                     {
                         await DecrementOccurrencesAsync(objectData.Item1.ToString()).ConfigureAwait(false);
                     }

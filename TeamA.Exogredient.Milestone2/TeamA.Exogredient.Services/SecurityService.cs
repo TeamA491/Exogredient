@@ -162,7 +162,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="hashLength"> the length of the output hashcode </param>
         /// <returns> a string of derived key </returns>
         public static string HashWithKDF(string password, byte[] salt, int iterations = Constants.DefaultHashIterations,
-                                         int hashLength = Constants.DefaultHashLength)
+                                         int hashLength = Constants.DefaultHashByteLength)
         {
 
             byte[] passwordBytes = UtilityService.HexStringToBytes(password);

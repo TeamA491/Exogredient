@@ -24,7 +24,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             // Directions: Uncomment the specific create function that you do not want to execute.
 
             //await CreateUserTable().ConfigureAwait(false);
-            //await CreateIPTable().ConfigureAwait(false);
+            await CreateIPTable().ConfigureAwait(false);
             //await CreateMapTable().ConfigureAwait(false);
         }
 
@@ -41,16 +41,16 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.UserDAOtableName}` (" +
-                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn] ? Constants.DefaultHashLength : Constants.MaximumUsernameCharacters)}) NOT NULL," +
-                               $@"`{Constants.UserDAOnameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOnameColumn] ? Constants.DefaultHashLength : (Constants.MaximumFirstNameCharacters + Constants.MaximumLastNameCharacters + 1))}) NOT NULL," +
-                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn] ? Constants.DefaultHashLength : Constants.MaximumEmailCharacters)}) NOT NULL," +
-                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneNumberColumn] ? Constants.DefaultHashLength : Constants.PhoneNumberCharacterLength)}) NOT NULL," +
-                               $@"`{Constants.UserDAOpasswordColumn}` VARCHAR({Constants.DefaultHashLength}) NOT NULL," +
+                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumUsernameCharacters)}) NOT NULL," +
+                               $@"`{Constants.UserDAOnameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOnameColumn] ? Constants.DefaultHashCharacterLength : (Constants.MaximumFirstNameCharacters + Constants.MaximumLastNameCharacters + 1))}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumEmailCharacters)}) NOT NULL," +
+                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneNumberColumn] ? Constants.DefaultHashCharacterLength : Constants.PhoneNumberCharacterLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOpasswordColumn}` VARCHAR({Constants.DefaultHashCharacterLength}) NOT NULL," +
                                $@"`{Constants.UserDAOdisabledColumn}` TINYINT(1) NOT NULL," +
-                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOuserTypeColumn] ? Constants.DefaultHashLength : Constants.MaximumUserTypeLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOuserTypeColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumUserTypeLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOsaltColumn}` VARCHAR({Constants.DefaultSaltLength}) NOT NULL," +
                                $@"`{Constants.UserDAOtempTimestampColumn}` BIGINT NOT NULL," +
-                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeColumn] ? Constants.DefaultHashLength : Constants.EmailCodeLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeColumn] ? Constants.DefaultHashCharacterLength : Constants.EmailCodeLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOemailCodeTimestampColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.UserDAOloginFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.UserDAOlastLoginFailTimestampColumn}` BIGINT NOT NULL," +
@@ -80,7 +80,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.IPAddressDAOtableName}` (" +
-                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({(Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn] ? Constants.DefaultHashLength : Constants.IPAddressLength)}) NOT NULL," +
+                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({(Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn] ? Constants.DefaultHashCharacterLength : Constants.IPAddressLength)}) NOT NULL," +
                                $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.IPAddressDAOregistrationFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.IPAddressDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
@@ -102,7 +102,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
             string sqlString = @$"CREATE TABLE `{_mapSchema}`.`{Constants.MapDAOTableName}` (" +
-                               $@"`{Constants.MapDAOHashColumn}` VARCHAR({Constants.DefaultHashLength}) NOT NULL," +
+                               $@"`{Constants.MapDAOHashColumn}` VARCHAR({Constants.DefaultHashCharacterLength}) NOT NULL," +
                                $@"`{Constants.MapDAOActualColumn}` LONGTEXT NOT NULL," +
                                $@"`{Constants.MapDAOoccurrencesColumn}` INT NOT NULL," +
                                $@"PRIMARY KEY(`{Constants.MapDAOHashColumn}`));" +

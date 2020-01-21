@@ -168,7 +168,8 @@ namespace TeamA.Exogredient.AppConstants
         // SECURITY SERVICE
         public const int DefaultSaltLength = 8;
         public const int DefaultHashIterations = 10000;
-        public const int DefaultHashLength = 64;
+        public const int DefaultHashCharacterLength = 64;
+        public const int DefaultHashByteLength = 32;
 
         public const int ByteLength = 8;
 

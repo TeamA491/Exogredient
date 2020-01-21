@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -94,7 +95,11 @@ namespace TeamA.Exogredient.Tests
         public async Task FlatFileLoggingService_LogToFlatFileAsync_CsvProtection(string timestamp, string operation, string identifier,
                                                                                   string ipAddress, string errorType)
         {
-            LogRecord logRecord = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+            LogRecord rec = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+
+            MaskingService ms = new MaskingService(new MapDAO());
+
+            LogRecord logRecord = (LogRecord)await ms.MaskAsync(rec, false).ConfigureAwait(false);
             try
             {
                 File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
@@ -160,7 +165,12 @@ namespace TeamA.Exogredient.Tests
         public async Task FlatFileLoggingService_DeleteFromFlatFileAsync_DeleteSuccessful(string timestamp, string operation, string identifier,
                                                                                           string ipAddress, string errorType)
         {
-            LogRecord logRecord = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+            LogRecord rec = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+
+            MaskingService ms = new MaskingService(new MapDAO());
+
+            LogRecord logRecord = (LogRecord)await ms.MaskAsync(rec, false).ConfigureAwait(false);
+
             try
             {
                 File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");

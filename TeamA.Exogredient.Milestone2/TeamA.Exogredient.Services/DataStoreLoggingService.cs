@@ -48,7 +48,7 @@ namespace TeamA.Exogredient.Services
 
                 MaskingService maskingService = new MaskingService(new MapDAO());
 
-                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord).ConfigureAwait(false);
+                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord, false).ConfigureAwait(false);
 
                 // The name of the collection/table should be a derivative of the "yyyyMMdd" part of the timestamp.
                 // Asynchronously call the Log DAO's function to create the log record in the collection denoted by the name (second parameter).
@@ -89,7 +89,7 @@ namespace TeamA.Exogredient.Services
 
                 MaskingService maskingService = new MaskingService(new MapDAO());
 
-                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord).ConfigureAwait(false);
+                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord, false).ConfigureAwait(false);
 
                 // Asynchronously find the id field of the log in the data store, passing the collection/table name.
                 string id = await _dsLoggingDAO.FindIdFieldAsync(resultRecord, splitResult[2]).ConfigureAwait(false);

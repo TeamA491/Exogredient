@@ -167,7 +167,7 @@ namespace TeamA.Exogredient.TestsNoDatabase
                 UserManagementServiceUT.CheckIfIPLocked(ipAddress);
                 result = false;
             }
-            catch (ArgumentException ae)
+            catch
             {
                 result = true;
             }
@@ -370,7 +370,7 @@ namespace TeamA.Exogredient.TestsNoDatabase
                 UserManagementServiceUT.DisableUser(username);
                 result = false;
             }
-            catch (ArgumentException ae)
+            catch
             {
                 result = true;
             }

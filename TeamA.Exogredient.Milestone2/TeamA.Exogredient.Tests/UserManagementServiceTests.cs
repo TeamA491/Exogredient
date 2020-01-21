@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
 
@@ -31,7 +31,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: delete the created user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -56,7 +56,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Assert: check that an existing phonenumber returns true.
@@ -64,7 +64,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete Created user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -87,7 +87,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: check that an existing email returns true.
@@ -95,7 +95,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -116,11 +116,11 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange: Create a disabled user.
             // Arrange: Create user 
-            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.DisabledStatus, Constants.CustomerUserType,
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Check that the disabled is disabled.
@@ -128,7 +128,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -143,7 +143,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Check that the non disabled returns false.
@@ -151,12 +151,12 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
         [DataTestMethod]
-        [DataRow("127.0.0.1")]
+        [DataRow("196.0.0.1")]
         public async Task UserManagementService_CheckIfIPLockedAsync_IpIsDisabledSuccess(string ipAddress)
         {
             // Arrange: Insert Ip into ip table.
@@ -179,8 +179,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(result);
 
             // Cleanup: Delete the IP.
-            IPAddressDAO ipDAO = new IPAddressDAO();
-            bool deleteResult = await ipDAO.DeleteByIdsAsync(new List<string>() { ipAddress });
+            bool deleteResult = await UserManagementService.DeleteIPAsync(ipAddress).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
 
         }
@@ -196,7 +195,7 @@ namespace TeamA.Exogredient.Tests
                 await UserManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false);
                 result = false;
             }
-            catch (ArgumentException ae)
+            catch
             {
                 result = true;
             }
@@ -213,7 +212,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
 
             // Assert: that user creation was successful 
             Assert.IsTrue(createResult);
@@ -233,7 +232,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -248,11 +247,11 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Delete the user 
-            bool result = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool result = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(result);
 
             // Assert: that the user is properly deleted from the table with CheckUserExistence
@@ -271,7 +270,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Make the temporary user perm
             bool result = await UserManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
@@ -294,7 +293,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -309,7 +308,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             // Act: Store an email code for a user.
             bool result = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
             Assert.IsTrue(result);
@@ -329,7 +328,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -344,7 +343,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Arrange: Store an email code for that user.
             bool storeResult = await UserManagementService.StoreEmailCodeAsync(username, emailCode, emailCodeTimestamp).ConfigureAwait(false);
@@ -370,7 +369,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -385,7 +384,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: disable that user 
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
@@ -408,7 +407,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Delete the created user 
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -424,7 +423,7 @@ namespace TeamA.Exogredient.Tests
                 await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
                 result = false;
             }
-            catch (ArgumentException ae)
+            catch
             {
                 result = true;
             }
@@ -439,18 +438,18 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange: Create a user that is Disabled
             // Arrange: Create user 
-            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.DisabledStatus, Constants.CustomerUserType,
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Disabling an already disabled user should return false.
             bool result = await UserManagementService.DisableUserAsync(username).ConfigureAwait(false);
             Assert.IsFalse(result);
 
             // Cleanup: Delete the user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -461,11 +460,11 @@ namespace TeamA.Exogredient.Tests
         {
             // Arrange: Create a disabled user.
             // Arrange: Create user 
-            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, Constants.CustomerUserType,
+            UserRecord user = new UserRecord(username, name, email, phoneNumber, password, Constants.DisabledStatus, Constants.CustomerUserType,
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false); Assert.IsTrue(createResult);
 
             // Act: Perform an enable operation on a disabled user.
             bool enableResult = await UserManagementService.EnableUserAsync(username).ConfigureAwait(false);
@@ -488,7 +487,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that created user
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -503,7 +502,7 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
             Assert.IsTrue(createResult);
 
             // Act: Enable and already enabled user should return false.
@@ -511,7 +510,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsFalse(result);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 
@@ -526,7 +525,8 @@ namespace TeamA.Exogredient.Tests
                                     salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
 
-            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user, "system", "localhost").ConfigureAwait(false); Assert.IsTrue(createResult);
+            bool createResult = await UserManagementService.CreateUserAsync(isTemp, user).ConfigureAwait(false);
+            Assert.IsTrue(createResult);
 
             // Act: Change the user password digest.
             bool passwordResult = await UserManagementService.ChangePasswordAsync(username, password, salt).ConfigureAwait(false);
@@ -547,7 +547,7 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(readResult);
 
             // Cleanup: Delete that user.
-            bool deleteResult = await UserManagementService.DeleteUserAsync(username, "system", "localhost").ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 

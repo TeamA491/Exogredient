@@ -83,7 +83,7 @@ namespace TeamA.Exogredient.Tests
             {
                 results = await FTPService.SendAsync(ftpUrl, "", targetDirectory, userName, password);
             }
-            catch(WebException e)
+            catch
             {
                 results = false;
             }
@@ -110,7 +110,7 @@ namespace TeamA.Exogredient.Tests
             {
                 results = await FTPService.SendAsync(ftpUrl, "", "", userName, password);
             }
-            catch(ArgumentException e)
+            catch
             {
                 results = false;
             }

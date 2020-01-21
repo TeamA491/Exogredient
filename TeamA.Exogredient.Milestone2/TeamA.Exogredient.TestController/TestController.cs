@@ -18,16 +18,6 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main()
         {
-            MaskingService ms = new MaskingService(new MapDAO());
-            UserDAO dao = new UserDAO();
-
-            UserRecord record1 = new UserRecord("eli123", "eli gomez", "elithegolfer@gmail.com", "949-981-5506", "lskdajf;lsadjf", 1, "test", "sldkd", 1, "123", 1, 1, 1, 1, 42);
-            UserRecord maskedRecord1 = (UserRecord)await ms.MaskAsync(record1).ConfigureAwait(false);
-            await dao.CreateAsync(maskedRecord1).ConfigureAwait(false);
-
-            UserObject obj = await UserManagementService.GetUserInfoAsync("eli123").ConfigureAwait(false);
-
-            Console.WriteLine(obj.Email);
         }
     }
 }

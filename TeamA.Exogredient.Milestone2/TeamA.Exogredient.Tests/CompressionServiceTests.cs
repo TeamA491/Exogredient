@@ -45,7 +45,7 @@ namespace TeamA.Exogredient.Tests
             {
                 result = CompressionService.Compress(sevenZipPath, sourceDirectory, targetDirectory);
             }
-            catch(Exception e)
+            catch
             {
                 result = false;
             }

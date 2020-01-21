@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Services
             // Initialize the locked time and registration failures to initially have no value.
             IPAddressRecord record = new IPAddressRecord(ipAddress, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong);
 
-            IPAddressRecord resultRecord = (IPAddressRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
+            IPAddressRecord resultRecord = (IPAddressRecord)await _maskingService.MaskAsync(record, true).ConfigureAwait(false);
 
             // Asynchronously call the create method via the IP DAO with the record.
             return await _ipDAO.CreateAsync(resultRecord).ConfigureAwait(false);
@@ -68,14 +68,16 @@ namespace TeamA.Exogredient.Services
                 id = _maskingService.MaskString(id);
             }
 
+            IPAddressRecord maskedRecord = (IPAddressRecord)await _maskingService.MaskAsync(ipRecord, false).ConfigureAwait(false);
+
             IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
-            await _maskingService.DecrementMappingForUpdateAsync(ipRecord, maskedObj).ConfigureAwait(false);
+            await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.UpdateSingleIPOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
-            return await _ipDAO.UpdateAsync(ipRecord).ConfigureAwait(false);
+            return await _ipDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
         }
 
         public static async Task<bool> DeleteIPAsync(string ipAddress, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
@@ -111,7 +113,7 @@ namespace TeamA.Exogredient.Services
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
             // Create a list of the username to pass to the Delete By IDs function.
-            await _userDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
+            await _ipDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
 
             // Log the action.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.DeleteSingleIPOperatoin,
@@ -160,7 +162,7 @@ namespace TeamA.Exogredient.Services
 
             record.GetData()[Constants.UserDAOtempTimestampColumn] = tempTimestamp;
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
+            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record, true).ConfigureAwait(false);
 
             await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
 
@@ -204,7 +206,7 @@ namespace TeamA.Exogredient.Services
             // Mask personal information about the user before inserting into data store.
             foreach (UserRecord user in records)
             {
-                UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(user).ConfigureAwait(false);
+                UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(user, true).ConfigureAwait(false);
                 await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
             }
 
@@ -240,14 +242,16 @@ namespace TeamA.Exogredient.Services
                 id = _maskingService.MaskString(id);
             }
 
+            UserRecord maskedRecord = (UserRecord)await _maskingService.MaskAsync(userRecord, false).ConfigureAwait(false);
+
             UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
-            await _maskingService.DecrementMappingForUpdateAsync(userRecord, maskedObj).ConfigureAwait(false);
+            await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.UpdateSingleUserOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
-            return await _userDAO.UpdateAsync(userRecord).ConfigureAwait(false);
+            return await _userDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -277,11 +281,13 @@ namespace TeamA.Exogredient.Services
                     id = _maskingService.MaskString(id);
                 }
 
+                UserRecord maskedRecord = (UserRecord)await _maskingService.MaskAsync(record, false).ConfigureAwait(false);
+
                 UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
-                await _maskingService.DecrementMappingForUpdateAsync(record, maskedObj).ConfigureAwait(false);
+                await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
-                await _userDAO.UpdateAsync(record).ConfigureAwait(false);
+                await _userDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
             }
 
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserUpdateOperation,
@@ -468,15 +474,8 @@ namespace TeamA.Exogredient.Services
         /// <returns>Task (bool) whether the ip is locked</returns>
         public static async Task<bool> CheckIfIPLockedAsync(string ipAddress)
         {
-            string value = ipAddress;
-
-            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
-            {
-                value = _maskingService.MaskString(ipAddress);
-            }
-
             // Asynchronously gets the info of the ipAddress.
-            IPAddressObject ip = await GetIPAddressInfoAsync(value).ConfigureAwait(false);
+            IPAddressObject ip = await GetIPAddressInfoAsync(ipAddress).ConfigureAwait(false);
 
             // The ip is locked if the timetamp locked has a value.
             return (ip.TimestampLocked != Constants.NoValueLong);
@@ -489,14 +488,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the user is disabled and false if not.</returns>
         public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
-            string value = username;
-
-            if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
-            {
-                value = _maskingService.MaskString(username);
-            }
-
-            UserObject user = await GetUserInfoAsync(value).ConfigureAwait(false);
+            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             return (user.Disabled == Constants.DisabledStatus);
         }
@@ -685,7 +677,6 @@ namespace TeamA.Exogredient.Services
             UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             UserRecord record;
-            UserRecord resultRecord;
 
             // Need to check if the maxtime + lastTime is less than now.
             // if it is then reset the failure
@@ -776,7 +767,6 @@ namespace TeamA.Exogredient.Services
             IPAddressObject ip = await GetIPAddressInfoAsync(ipAddress).ConfigureAwait(false);
 
             IPAddressRecord record;
-            IPAddressRecord resultRecord;
 
             // Need to check if the maxtime + lastTime is less than now.
             // if it is then reset the failure
