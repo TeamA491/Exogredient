@@ -65,7 +65,7 @@ namespace TeamA.Exogredient.Services
 
             if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
             {
-                id = _maskingService.MaskStringID(id);
+                id = _maskingService.MaskString(id);
             }
 
             IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
@@ -76,6 +76,48 @@ namespace TeamA.Exogredient.Services
                                           adminName, adminIp).ConfigureAwait(false);
 
             return await _ipDAO.UpdateAsync(ipRecord).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> DeleteIPAsync(string ipAddress, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
+        {
+
+            // Check that the User of function is an admin.
+            if (!adminName.Equals(Constants.SystemIdentifier))
+            {
+                UserObject admin = await GetUserInfoAsync(adminName).ConfigureAwait(false);
+
+                if (admin.UserType != Constants.AdminUserType)
+                {
+                    throw new ArgumentException(Constants.MustBeAdmin);
+                }
+            }
+
+            // Check for user existence.
+            if (!await CheckIPExistenceAsync(ipAddress).ConfigureAwait(false))
+            {
+                // TODO: exception message
+                throw new ArgumentException();
+            }
+
+            string id = ipAddress;
+
+            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            {
+                id = _maskingService.MaskString(ipAddress);
+            }
+
+            IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
+
+            await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
+
+            // Create a list of the username to pass to the Delete By IDs function.
+            await _userDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
+
+            // Log the action.
+            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.DeleteSingleIPOperatoin,
+                                          adminName, adminIp).ConfigureAwait(false);
+
+            return true;
         }
 
         /// <summary>
@@ -107,9 +149,9 @@ namespace TeamA.Exogredient.Services
 
             // Check for user existence.
             bool result = await CheckUserExistenceAsync((string)record.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false);
-            if (!result)
+            if (result)
             {
-                throw new ArgumentException(Constants.UsernameDNE);
+                throw new ArgumentException(Constants.UsernameExistsLogMessage);
             }
 
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
@@ -195,7 +237,7 @@ namespace TeamA.Exogredient.Services
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
             {
-                id = _maskingService.MaskStringID(id);
+                id = _maskingService.MaskString(id);
             }
 
             UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
@@ -232,7 +274,7 @@ namespace TeamA.Exogredient.Services
 
                 if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
                 {
-                    id = _maskingService.MaskStringID(id);
+                    id = _maskingService.MaskString(id);
                 }
 
                 UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
@@ -277,7 +319,7 @@ namespace TeamA.Exogredient.Services
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
             {
-                id = _maskingService.MaskStringID(username);
+                id = _maskingService.MaskString(username);
             }
 
             UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
@@ -285,7 +327,7 @@ namespace TeamA.Exogredient.Services
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
             // Create a list of the username to pass to the Delete By IDs function.
-            await _userDAO.DeleteByIdsAsync(new List<string>() { username }).ConfigureAwait(false);
+            await _userDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
 
             // Log the action.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserDeleteOperation,
@@ -320,21 +362,25 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
+            List<string> ids = new List<string>();
+
             foreach (string user in usernames)
             {
                 string id = user;
 
                 if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
                 {
-                    id = _maskingService.MaskStringID(user);
+                    id = _maskingService.MaskString(user);
                 }
+
+                ids.Add(id);
 
                 UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
                 await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
             }
 
-            await _userDAO.DeleteByIdsAsync(usernames).ConfigureAwait(false);
+            await _userDAO.DeleteByIdsAsync(ids).ConfigureAwait(false);
 
             // Log the bulk create operation.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserDeleteOperation,
@@ -350,8 +396,15 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the user exists and false if not.</returns>
         public static async Task<bool> CheckUserExistenceAsync(string username)
         {
+            string value = username;
+
+            if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
+            {
+                value = _maskingService.MaskString(username);
+            }
+
             // Asynchronously call the check method via the User DAO with the username.
-            return await _userDAO.CheckUserExistenceAsync(username).ConfigureAwait(false);
+            return await _userDAO.CheckUserExistenceAsync(value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -361,8 +414,15 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the phone number exists and false if not.</returns>
         public static async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
         {
+            string value = phoneNumber;
+
+            if (Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneNumberColumn])
+            {
+                value = _maskingService.MaskString(phoneNumber);
+            }
+
             // Asynchronously call the check method via the User DAO with the phone number.
-            return await _userDAO.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false);
+            return await _userDAO.CheckPhoneNumberExistenceAsync(value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -372,8 +432,15 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the email exists and false if not.</returns>
         public static async Task<bool> CheckEmailExistenceAsync(string email)
         {
+            string value = email;
+
+            if (Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn])
+            {
+                value = _maskingService.MaskString(email);
+            }
+
             // Asynchronously call the check method via the User DAO with the email.
-            return await _userDAO.CheckEmailExistenceAsync(email).ConfigureAwait(false);
+            return await _userDAO.CheckEmailExistenceAsync(value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -383,8 +450,15 @@ namespace TeamA.Exogredient.Services
         /// <returns>Task (bool) whether the function completed without exception</returns>
         public static async Task<bool> CheckIPExistenceAsync(string ipAddress)
         {
+            string value = ipAddress;
+
+            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            {
+                value = _maskingService.MaskString(ipAddress);
+            }
+
             // Asynchronously call the check method via the IP DAO with the ip address.
-            return await _ipDAO.CheckIPExistenceAsync(ipAddress).ConfigureAwait(false);
+            return await _ipDAO.CheckIPExistenceAsync(value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -394,8 +468,15 @@ namespace TeamA.Exogredient.Services
         /// <returns>Task (bool) whether the ip is locked</returns>
         public static async Task<bool> CheckIfIPLockedAsync(string ipAddress)
         {
+            string value = ipAddress;
+
+            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            {
+                value = _maskingService.MaskString(ipAddress);
+            }
+
             // Asynchronously gets the info of the ipAddress.
-            IPAddressObject ip = await GetIPAddressInfoAsync(ipAddress).ConfigureAwait(false);
+            IPAddressObject ip = await GetIPAddressInfoAsync(value).ConfigureAwait(false);
 
             // The ip is locked if the timetamp locked has a value.
             return (ip.TimestampLocked != Constants.NoValueLong);
@@ -408,7 +489,14 @@ namespace TeamA.Exogredient.Services
         /// <returns>Returns true if the user is disabled and false if not.</returns>
         public static async Task<bool> CheckIfUserDisabledAsync(string username)
         {
-            UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
+            string value = username;
+
+            if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
+            {
+                value = _maskingService.MaskString(username);
+            }
+
+            UserObject user = await GetUserInfoAsync(value).ConfigureAwait(false);
 
             return (user.Disabled == Constants.DisabledStatus);
         }
@@ -424,7 +512,7 @@ namespace TeamA.Exogredient.Services
 
             if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
             {
-                id = _maskingService.MaskStringID(ipAddress);
+                id = _maskingService.MaskString(ipAddress);
             }
 
             // Cast the return result of asynchronously reading by the ip address into the IP object.
@@ -444,7 +532,7 @@ namespace TeamA.Exogredient.Services
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
             {
-                id = _maskingService.MaskStringID(username);
+                id = _maskingService.MaskString(username);
             }
 
             UserObject rawUser = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
@@ -462,10 +550,8 @@ namespace TeamA.Exogredient.Services
             // Make the timestamp locked and registration failures have no value.
             IPAddressRecord record = new IPAddressRecord(ipAddress, timestampLocked: Constants.NoValueLong, registrationFailures: Constants.NoValueInt);
 
-            IPAddressRecord resultRecord = (IPAddressRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
             // Asynchronously call the update funciton of the IP DAO with the record.
-            return await UpdateIPAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateIPAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -478,9 +564,7 @@ namespace TeamA.Exogredient.Services
             // Make the temp timestamp have no value.
             UserRecord record = new UserRecord(username, tempTimestamp: Constants.NoValueLong);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            return await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateUserAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -495,9 +579,7 @@ namespace TeamA.Exogredient.Services
             UserRecord record = new UserRecord(username, emailCode: emailCode, emailCodeTimestamp: emailCodeTimestamp,
                                                emailCodeFailures: Constants.NoValueInt);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            return await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateUserAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -512,9 +594,7 @@ namespace TeamA.Exogredient.Services
                                                emailCodeTimestamp: Constants.NoValueLong,
                                                emailCodeFailures: Constants.NoValueInt);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            return await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateUserAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -534,9 +614,7 @@ namespace TeamA.Exogredient.Services
 
             UserRecord record = new UserRecord(username, disabled: Constants.DisabledStatus);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            await UpdateUserAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -559,9 +637,7 @@ namespace TeamA.Exogredient.Services
             // Enable the username.
             UserRecord record = new UserRecord(username, disabled: Constants.EnabledStatus);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            await UpdateUserAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -577,9 +653,7 @@ namespace TeamA.Exogredient.Services
         {
             UserRecord record = new UserRecord(username, password: digest, salt: saltString);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            return await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateUserAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -592,9 +666,7 @@ namespace TeamA.Exogredient.Services
         {
             UserRecord record = new UserRecord(username, phoneCodeFailures: numFailures);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            await UpdateUserAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -630,9 +702,7 @@ namespace TeamA.Exogredient.Services
                 reset = true;
                 record = new UserRecord(username, loginFailures: 0);
 
-                resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-                await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+                await UpdateUserAsync(record).ConfigureAwait(false);
             }
 
             // Increment the user's login failure count.
@@ -649,9 +719,7 @@ namespace TeamA.Exogredient.Services
                 record = new UserRecord(username, loginFailures: updatedLoginFailures, lastLoginFailTimestamp: currentUnix);
             }
 
-            resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            await UpdateUserAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -671,10 +739,8 @@ namespace TeamA.Exogredient.Services
             // Create user record to insert into update.
             UserRecord record = new UserRecord(username, emailCodeFailures: currentFailures + 1);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
             // Increment the failure count for that user.
-            return await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateUserAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -692,10 +758,8 @@ namespace TeamA.Exogredient.Services
             // Create user record to insert into update.
             UserRecord record = new UserRecord(username, phoneCodeFailures: currentFailures + 1);
 
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
             // Increment the failure count for that user.
-            await UpdateUserAsync(resultRecord).ConfigureAwait(false);
+            await UpdateUserAsync(record).ConfigureAwait(false);
 
             return true;
         }
@@ -729,9 +793,7 @@ namespace TeamA.Exogredient.Services
                 reset = true;
                 record = new IPAddressRecord(ipAddress, registrationFailures: 0);
 
-                resultRecord = (IPAddressRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-                await UpdateIPAsync(resultRecord).ConfigureAwait(false);
+                await UpdateIPAsync(record).ConfigureAwait(false);
             }
 
             // Increment the user's login Failure count.
@@ -751,9 +813,7 @@ namespace TeamA.Exogredient.Services
                 record = new IPAddressRecord(ipAddress, registrationFailures: updatedRegistrationFailures, lastRegFailTimestamp: currentUnix);
             }
 
-            resultRecord = (IPAddressRecord)await _maskingService.MaskAsync(record).ConfigureAwait(false);
-
-            return await UpdateIPAsync(resultRecord).ConfigureAwait(false);
+            return await UpdateIPAsync(record).ConfigureAwait(false);
         }
 
         /// <summary>

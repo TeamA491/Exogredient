@@ -87,12 +87,9 @@ namespace TeamA.Exogredient.Services
                                 computeHash = false;
                             }
                         }
-                        if (data.Item1 is string)
+                        if (data.Item1 == null)
                         {
-                            if (data.Item1 == null)
-                            {
-                                computeHash = false;
-                            }
+                            computeHash = false;
                         }
                         if (data.Item1 is long)
                         {
@@ -159,7 +156,7 @@ namespace TeamA.Exogredient.Services
             }
         }
 
-        public string MaskStringID(string input)
+        public string MaskString(string input)
         {
             return SecurityService.HashWithSHA256(SecurityService.HashWithSHA256(input));
         }

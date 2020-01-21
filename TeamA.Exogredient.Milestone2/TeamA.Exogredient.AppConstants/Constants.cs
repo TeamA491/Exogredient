@@ -225,6 +225,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableReadFromOperation = "Map Table Read From";
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
+        public const string DeleteSingleIPOperatoin = "Single IP Delete";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
