@@ -1,5 +1,4 @@
 ﻿using System;
-using TeamA.Exogredient.Services;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using TeamA.Exogredient.AppConstants;
@@ -101,10 +100,10 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
-        /// Decrypts a JWT in order to see the encrypted payload.
+        /// Decrypts a JWT in order to verify it and see the payload.
         /// </summary>
         /// <param name="jwt">The token to decrypt.</param>
-        /// <returns>The contents inside the decrypted token.</returns>
+        /// <returns>The contents inside the token.</returns>
         public Dictionary<string, string> DecryptJWT(string jwt)
         {
             string[] segments = jwt.Split('.');

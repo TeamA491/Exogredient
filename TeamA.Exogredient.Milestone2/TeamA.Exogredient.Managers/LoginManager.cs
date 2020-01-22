@@ -77,7 +77,9 @@ namespace TeamA.Exogredient.Managers
                     authenticationSuccess = true;
 
                     // Create a token for the username.
-                    string token = await AuthorizationService.CreateTokenAsync(username).ConfigureAwait(false);
+                    SessionService sessionService = new SessionService();
+                    string token = await sessionService.CreateTokenAsync(username).ConfigureAwait(false);
+
                     // Get the path to store the token.
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                     path = path + $"{path.Substring(0, 1)}" + Constants.TokenFile;

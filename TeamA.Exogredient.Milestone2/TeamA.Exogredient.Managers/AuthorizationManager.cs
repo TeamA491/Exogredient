@@ -10,15 +10,18 @@ namespace TeamA.Exogredient.Managers
         {
             try
             {
+                SessionService sessionService = new SessionService();
+                AuthorizationService authorizationService = new AuthorizationService();
+
                 // Decrypt it here to make sure the token wasn't tampered with
                 // or it isn't valid
-                Dictionary<string, string> payload = AuthorizationService.DecryptJWS(jwsToken);
+                Dictionary<string, string> payload = authorizationService.DecryptJWT(jwsToken);
 
-                if (AuthorizationService.TokenIsExpired(jwsToken))
+                if (sessionService.TokenIsExpired(jwsToken))
                     return false;
 
                 // Only refresh the token if it isn't expired
-                jwsToken = AuthorizationService.RefreshJWS(jwsToken);
+                jwsToken = sessionService.RefreshJWT(jwsToken);
 
                 // Make sure the user type is an int
                 int userType;
@@ -27,7 +30,7 @@ namespace TeamA.Exogredient.Managers
                     return false;
 
                 // Check if this user has permission to access the resource
-                return AuthorizationService.UserHasPermissionForOperation(userType, operation);
+                return authorizationService.UserHasPermissionForOperation(userType, operation);
             }
             catch
             {
