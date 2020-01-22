@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
-using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {

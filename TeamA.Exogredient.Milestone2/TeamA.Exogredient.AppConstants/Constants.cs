@@ -210,6 +210,8 @@ namespace TeamA.Exogredient.AppConstants
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
 
+        public const string NoError = "null";
+
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
         public const string VerifyEmailOperation = "Verify Email Code";

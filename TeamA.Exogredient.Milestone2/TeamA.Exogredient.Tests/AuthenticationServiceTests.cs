@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
-using System.IO;
-using System;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;

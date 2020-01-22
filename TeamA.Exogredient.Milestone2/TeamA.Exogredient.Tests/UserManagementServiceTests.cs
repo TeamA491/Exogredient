@@ -1,10 +1,8 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
-using TeamA.Exogredient.DAL;
 using System.Collections.Generic;
 
 namespace TeamA.Exogredient.Tests
@@ -619,6 +617,8 @@ namespace TeamA.Exogredient.Tests
             }
 
             Assert.IsTrue(readResult);
+
+            await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
         }
     }
 }

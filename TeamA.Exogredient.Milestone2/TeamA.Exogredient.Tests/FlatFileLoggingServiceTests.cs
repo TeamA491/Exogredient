@@ -20,8 +20,8 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("this is an invalid timestamp", "1", "1", "1", "1")]
-        [DataRow("invalid", "2", "2", "2", "2")]
+        [DataRow("this is an invalid timestamp", "1", "1", "127.0.0.1", "1")]
+        [DataRow("invalid", "2", "2", "127.0.0.1", "2")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_InvalidTimestampRejected(string timestamp, string operation, string identifier,
                                                                                              string ipAddress, string errorType)
         {
@@ -33,8 +33,8 @@ namespace TeamA.Exogredient.Tests
         // IMPORTANT: make sure you are not in the directory in windows explorer etc.
         //            or have any of its children open when running this test.
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "2", "2")]
+        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "127.0.0.1", "2")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_DirectoryCreated(string timestamp, string operation, string identifier,
                                                                                      string ipAddress, string errorType)
         {
@@ -61,8 +61,8 @@ namespace TeamA.Exogredient.Tests
 
         // IMPORTANT: make sure you don't have 20191125.CSV open when running this test.
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "2", "2")]
+        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "127.0.0.1", "2")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_FileCreated(string timestamp, string operation, string identifier,
                                                                                 string ipAddress, string errorType)
         {
@@ -88,10 +88,10 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "127.0.0.1", "1")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_CsvProtection(string timestamp, string operation, string identifier,
                                                                                   string ipAddress, string errorType)
         {
@@ -158,10 +158,10 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "127.0.0.1", "1")]
         public async Task FlatFileLoggingService_DeleteFromFlatFileAsync_DeleteSuccessful(string timestamp, string operation, string identifier,
                                                                                           string ipAddress, string errorType)
         {

@@ -27,6 +27,13 @@ namespace TeamA.Exogredient.Tests
 
             Assert.IsTrue(lrecordMasked.IsMasked());
             Assert.IsTrue(irecordMasked.IsMasked());
+
+            try
+            {
+                await _mapDAO.DeleteByIdsAsync(new List<string>() { _maskingService.MaskString("test") }).ConfigureAwait(false);
+            }
+            catch
+            { }
         }
 
         [TestMethod]
@@ -49,6 +56,7 @@ namespace TeamA.Exogredient.Tests
                 if (Constants.UserDAOIsColumnMasked[pair.Key])
                 {
                     Assert.IsFalse(data[pair.Key].Equals(pair.Value));
+                    await _mapDAO.DeleteByIdsAsync(new List<string>() { pair.Value.ToString() }).ConfigureAwait(false);
                 }
                 else
                 {

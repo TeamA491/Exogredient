@@ -3,8 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.UnitTestServices;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
-using TeamA.Exogredient.DAL;
-using System.Collections.Generic;
 
 namespace TeamA.Exogredient.TestsNoDatabase
 {
