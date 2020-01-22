@@ -252,14 +252,14 @@ namespace TeamA.Exogredient.Tests
             users.Add(user2);
 
             // Act: Create the users.
-            bool createResult = await UserManagementService.CreateUsersAsync(users).ConfigureAwait(false);
+            bool createResult = await UserManagementService.BulkCreateUsersAsync(users).ConfigureAwait(false);
 
             // Assert: that the create was successfull
             Assert.IsTrue(createResult);
 
             // Cleanup: Delete the users.
             List<string> usersToDelete = new List<string> { (string)user1.GetData()["username"], (string)user2.GetData()["username"] };
-            bool deleteResult = await UserManagementService.BulkDeleteUserAsync(usersToDelete).ConfigureAwait(false);
+            bool deleteResult = await UserManagementService.BulkDeleteUsersAsync(usersToDelete).ConfigureAwait(false);
             Assert.IsTrue(deleteResult);
         }
 

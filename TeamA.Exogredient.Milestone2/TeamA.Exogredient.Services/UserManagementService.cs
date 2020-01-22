@@ -48,19 +48,20 @@ namespace TeamA.Exogredient.Services
             return await _ipDAO.CreateAsync(resultRecord).ConfigureAwait(false);
         }
 
-        public static async Task<bool> UpdateIPAsync(IPAddressRecord ipRecord, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
+        /// <summary>
+        /// Updates an entry in the IP Address data store using the <paramref name="ipRecord"/>.
+        /// </summary>
+        /// <param name="ipRecord">The unmasked record conveying the data to update.</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
+        public static async Task<bool> UpdateIPAsync(IPAddressRecord ipRecord)
         {
-            // Check that the User of function is an admin.
-            if (!adminName.Equals(Constants.SystemIdentifier))
+            // Record must be unmasked.
+            if (ipRecord.IsMasked())
             {
-                UserObject admin = await GetUserInfoAsync(adminName).ConfigureAwait(false);
-
-                if (admin.UserType != Constants.AdminUserType)
-                {
-                    throw new ArgumentException(Constants.MustBeAdmin);
-                }
+                throw new ArgumentException(Constants.UpdateIPRecordMasked);
             }
 
+            // If the column is masked, mask the ip.
             string id = (string)ipRecord.GetData()[Constants.IPAddressDAOIPColumn];
 
             if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
@@ -70,37 +71,28 @@ namespace TeamA.Exogredient.Services
 
             IPAddressRecord maskedRecord = (IPAddressRecord)await _maskingService.MaskAsync(ipRecord, false).ConfigureAwait(false);
 
+            // Get the masked object from the ipDAO and decrement its mapping before updating.
             IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
             await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
-            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.UpdateSingleIPOperation,
-                                          adminName, adminIp).ConfigureAwait(false);
-
             return await _ipDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
         }
 
-        public static async Task<bool> DeleteIPAsync(string ipAddress, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
+        /// <summary>
+        /// Deletes the entry in the data store pointed to by the <paramref name="ipAddress"/>.
+        /// </summary>
+        /// <param name="ipAddress">The ip address to delete from the data store.</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
+        public static async Task<bool> DeleteIPAsync(string ipAddress)
         {
-
-            // Check that the User of function is an admin.
-            if (!adminName.Equals(Constants.SystemIdentifier))
-            {
-                UserObject admin = await GetUserInfoAsync(adminName).ConfigureAwait(false);
-
-                if (admin.UserType != Constants.AdminUserType)
-                {
-                    throw new ArgumentException(Constants.MustBeAdmin);
-                }
-            }
-
-            // Check for user existence.
+            // Check for ip existence.
             if (!await CheckIPExistenceAsync(ipAddress).ConfigureAwait(false))
             {
-                // TODO: exception message
-                throw new ArgumentException();
+                throw new ArgumentException(Constants.DeleteIPDNE);
             }
 
+            // If the column is masked, mask the ip.
             string id = ipAddress;
 
             if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
@@ -108,16 +100,12 @@ namespace TeamA.Exogredient.Services
                 id = _maskingService.MaskString(ipAddress);
             }
 
+            // Get the masked object from the ipDAO and decrement its mapping before deleteing.
             IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
-            // Create a list of the username to pass to the Delete By IDs function.
             await _ipDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
-
-            // Log the action.
-            await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.DeleteSingleIPOperatoin,
-                                          adminName, adminIp).ConfigureAwait(false);
 
             return true;
         }
@@ -126,16 +114,10 @@ namespace TeamA.Exogredient.Services
         /// Asynchronously create a user in the data store.
         /// </summary>
         /// <param name="isTemp">Used to specify whether the user is temporary.</param>
-        /// <param name="username">Used to specify the user's username.</param>
-        /// <param name="firstName">Used to specify the user's first name.</param>
-        /// <param name="lastName">Used to specify the user's last name.</param>
-        /// <param name="email">Used to specify the user's email.</param>
-        /// <param name="phoneNumber">Used to specify the user's phone number.</param>
-        /// <param name="password">Used to specify the user's password digest.</param>
-        /// <param name="disabled">Used to specify whether the user is disabled.</param>
-        /// <param name="userType">Used to specify the user's type.</param>
-        /// <param name="salt">Used to specify the salt associated with the user's password digest.</param>
-        /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
+        /// <param name="record">The unmasked record conveying the data to create</param>
+        /// <param name="adminName">The username of the admin performing this operation (default = system)</param>
+        /// <param name="adminIp">The ip address of the admin performing this operation (default = localhost)</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
         public static async Task<bool> CreateUserAsync(bool isTemp, UserRecord record, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
             // Check that the user of function is an admin and throw an exception if they are not.
@@ -149,9 +131,14 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
+            // Record must be unmasked.
+            if (record.IsMasked())
+            {
+                throw new ArgumentException(Constants.CreateUserRecordMasked);
+            }
+
             // Check for user existence and throw an exception if the user already exists.
-            bool result = await CheckUserExistenceAsync((string)record.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false);
-            if (result)
+            if (await CheckUserExistenceAsync((string)record.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false))
             {
                 throw new ArgumentException(Constants.UsernameExistsLogMessage);
             }
@@ -174,7 +161,14 @@ namespace TeamA.Exogredient.Services
             return true;
         }
 
-        public static async Task<bool> CreateUsersAsync(IEnumerable<UserRecord> records, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
+        /// <summary>
+        /// Asynchronously creates all users represented by the <paramref name="records"/>.
+        /// </summary>
+        /// <param name="records">The unmasked records conveying the data to create</param>
+        /// <param name="adminName">The username of the admin performing this operation (default = system)</param>
+        /// <param name="adminIp">The ip address of the admin performing this operation (default = localhost)</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
+        public static async Task<bool> BulkCreateUsersAsync(IEnumerable<UserRecord> records, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
             // Check that the user of function is an admin and throw an exception if they are not.
             if (!adminName.Equals(Constants.SystemIdentifier))
@@ -197,6 +191,12 @@ namespace TeamA.Exogredient.Services
             bool result;
             foreach (UserRecord user in records)
             {
+                // Record must be unmasked.
+                if (user.IsMasked())
+                {
+                    throw new ArgumentException(Constants.CreateUsersRecordMasked);
+                }
+
                 result = await CheckUserExistenceAsync((string)user.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false);
                 if (result)
                 {
@@ -219,10 +219,12 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
-        /// Makes changes to a single user record.
+        /// Makes changes to a single user.
         /// </summary>
-        /// <param name="userRecord">User that needs to be updated.</param>
-        /// <returns> Returns true if operation was successful and false otherwise.</returns>
+        /// <param name="userRecord">The unmasked record conveying the data to update</param>
+        /// <param name="adminName">The username of the admin performing this operation (default = system)</param>
+        /// <param name="adminIp">The ip address of the admin performing this operation (default = localhost)</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
         public static async Task<bool> UpdateUserAsync(UserRecord userRecord, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
             // Check that the User of function is an admin.
@@ -236,7 +238,13 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
-            // Get information associated with that user.
+            // Record must be unmasked.
+            if (userRecord.IsMasked())
+            {
+                throw new ArgumentException(Constants.UpdateUserRecordMasked);
+            }
+
+            // If the column is masked, mask the username.
             string id = (string)userRecord.GetData()[Constants.UserDAOusernameColumn];
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
@@ -246,6 +254,7 @@ namespace TeamA.Exogredient.Services
 
             UserRecord maskedRecord = (UserRecord)await _maskingService.MaskAsync(userRecord, false).ConfigureAwait(false);
 
+            // Get the masked object from the userDAO and decrement its mapping before updating.
             UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
             await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
@@ -257,10 +266,12 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
-        /// Makes changes to multiple user records. 
+        /// Makes changes to multiple users. 
         /// </summary>
         /// <param name="userRecords"> A collection of records that need to be updated.</param>
-        /// <returns> Returns true if successful and false otherwise.</returns>
+        /// <param name="adminName">The username of the admin performing this operation (default = system)</param>
+        /// <param name="adminIp">The ip address of the admin performing this operation (default = localhost)</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
         public static async Task<bool> BulkUpdateUsersAsync(IEnumerable<UserRecord> userRecords, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
             // Check that the User of function is an admin.
@@ -276,6 +287,13 @@ namespace TeamA.Exogredient.Services
 
             foreach (UserRecord record in userRecords)
             {
+                // Record must be unmasked.
+                if (record.IsMasked())
+                {
+                    throw new ArgumentException(Constants.BulkUpdateUsersRecordMasked);
+                }
+
+                // If the column is masked, mask the username.
                 string id = (string)record.GetData()[Constants.UserDAOusernameColumn];
 
                 if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
@@ -285,6 +303,7 @@ namespace TeamA.Exogredient.Services
 
                 UserRecord maskedRecord = (UserRecord)await _maskingService.MaskAsync(record, false).ConfigureAwait(false);
 
+                // Get the masked object from the userDAO and decrement its mapping before updating.
                 UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
                 await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
@@ -302,7 +321,9 @@ namespace TeamA.Exogredient.Services
         /// Asynchronously deletes a user from the data store.
         /// </summary>
         /// <param name="username">Username to be deleted.</param>
-        /// <returns>Returns true if the operation is successful and false if it failed.</returns>
+        /// <param name="adminName">The username of the admin performing this operation (default = system)</param>
+        /// <param name="adminIp">The ip address of the admin performing this operation (default = localhost)</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
         public static async Task<bool> DeleteUserAsync(string username, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
 
@@ -323,6 +344,7 @@ namespace TeamA.Exogredient.Services
                 throw new ArgumentException(Constants.UsernameDNE);
             }
 
+            // If the column is masked, mask the username.
             string id = username;
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
@@ -330,14 +352,13 @@ namespace TeamA.Exogredient.Services
                 id = _maskingService.MaskString(username);
             }
 
+            // Get the masked object from the userDAO and decrement its mapping before deleteing.
             UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
-            // Create a list of the username to pass to the Delete By IDs function.
             await _userDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
 
-            // Log the action.
             await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserDeleteOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
@@ -345,11 +366,13 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
-        /// Asynchronously deletes multiple user from the data store.
+        /// Asynchronously deletes multiple users from the data store.
         /// </summary>
-        /// <param name="usernames">Username to be deleted.</param>
-        /// <returns>Returns true if the operation is successful and false if it failed.</returns>
-        public static async Task<bool> BulkDeleteUserAsync(List<string> usernames, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
+        /// <param name="usernames">List of usernames to be deleted.</param>
+        /// <param name="adminName">The username of the admin performing this operation (default = system)</param>
+        /// <param name="adminIp">The ip address of the admin performing this operation (default = localhost)</param>
+        /// <returns>Task (bool) whether the function completed without exception</returns>
+        public static async Task<bool> BulkDeleteUsersAsync(List<string> usernames, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
         {
             if (!adminName.Equals(Constants.SystemIdentifier))
             {
@@ -374,6 +397,7 @@ namespace TeamA.Exogredient.Services
 
             foreach (string user in usernames)
             {
+                // If the column is masked, mask the username.
                 string id = user;
 
                 if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
@@ -383,6 +407,7 @@ namespace TeamA.Exogredient.Services
 
                 ids.Add(id);
 
+                // Get the masked object from the userDAO and decrement its mapping before deleteing.
                 UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
 
                 await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);

@@ -226,7 +226,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableReadFromOperation = "Map Table Read From";
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
-        public const string DeleteSingleIPOperatoin = "Single IP Delete";
+        public const string DeleteSingleIPOperation = "Single IP Delete";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
@@ -555,5 +555,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string HashNotInTable = "The hash attempted to access for decrementation was not in the table";
         public const string DecrementDeleteUnmasked = "DecrementMappingForDeleteAsync object was unmasked";
         public const string DecrementUpdateUnmasked = "DecrementMappingForUpdateAsync object was unmasked";
+
+        // EXCEPTION MESSAGES -- UserManagement
+        public const string UpdateIPRecordMasked = "UpdateIPAsync record was masked";
+        public const string DeleteIPDNE = "DeleteIPAsync ip address did not exist";
+        public const string CreateUserRecordMasked = "CreateUserAsync record was masked";
+        public const string CreateUsersRecordMasked = "CreateUsersAsync record was masked";
+        public const string UpdateUserRecordMasked = "UpdateUserAsync record was masked";
+        public const string BulkUpdateUsersRecordMasked = "UpdateUserAsync record was masked";
     }
 }
