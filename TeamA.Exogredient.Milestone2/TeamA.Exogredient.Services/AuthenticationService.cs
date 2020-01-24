@@ -6,8 +6,8 @@ using MailKit.Security;
 using MimeKit;
 using Twilio;
 using Twilio.Exceptions;
-using Twilio.Rest.Preview.AccSecurity.Service;
 using TeamA.Exogredient.AppConstants;
+using Twilio.Rest.Verify.V2.Service;
 
 namespace TeamA.Exogredient.Services
 {
