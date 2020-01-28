@@ -42,7 +42,7 @@ namespace TeamA.Exogredient.Services
             // Initialize the locked time and registration failures to initially have no value.
             IPAddressRecord record = new IPAddressRecord(ipAddress, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong);
 
-            IPAddressRecord resultRecord = (IPAddressRecord)await _maskingService.MaskAsync(record, true).ConfigureAwait(false);
+            IPAddressRecord resultRecord = await _maskingService.MaskAsync(record, true).ConfigureAwait(false) as IPAddressRecord;
 
             // Asynchronously call the create method via the IP DAO with the record.
             return await _ipDAO.CreateAsync(resultRecord).ConfigureAwait(false);
@@ -62,17 +62,17 @@ namespace TeamA.Exogredient.Services
             }
 
             // If the column is masked, mask the ip.
-            string id = (string)ipRecord.GetData()[Constants.IPAddressDAOIPColumn];
+            string id = ipRecord.GetData()[Constants.IPAddressDAOIPColumn] as string;
 
             if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
             {
                 id = _maskingService.MaskString(id);
             }
 
-            IPAddressRecord maskedRecord = (IPAddressRecord)await _maskingService.MaskAsync(ipRecord, false).ConfigureAwait(false);
+            IPAddressRecord maskedRecord = await _maskingService.MaskAsync(ipRecord, false).ConfigureAwait(false) as IPAddressRecord;
 
             // Get the masked object from the ipDAO and decrement its mapping before updating.
-            IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
+            IPAddressObject maskedObj = await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
 
             await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
@@ -101,7 +101,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Get the masked object from the ipDAO and decrement its mapping before deleteing.
-            IPAddressObject maskedObj = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
+            IPAddressObject maskedObj = await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
 
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
@@ -138,7 +138,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Check for user existence and throw an exception if the user already exists.
-            if (await CheckUserExistenceAsync((string)record.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false))
+            if (await CheckUserExistenceAsync(record.GetData()[Constants.UserDAOusernameColumn] as string).ConfigureAwait(false))
             {
                 throw new ArgumentException(Constants.UsernameExistsLogMessage);
             }
@@ -149,7 +149,7 @@ namespace TeamA.Exogredient.Services
             record.GetData()[Constants.UserDAOtempTimestampColumn] = tempTimestamp;
 
             // Mask all the sensitive information.
-            UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(record, true).ConfigureAwait(false);
+            UserRecord resultRecord = await _maskingService.MaskAsync(record, true).ConfigureAwait(false) as UserRecord;
 
             // Insert the masked user into the datastore.
             await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
@@ -197,7 +197,7 @@ namespace TeamA.Exogredient.Services
                     throw new ArgumentException(Constants.CreateUsersRecordMasked);
                 }
 
-                result = await CheckUserExistenceAsync((string)user.GetData()[Constants.UserDAOusernameColumn]).ConfigureAwait(false);
+                result = await CheckUserExistenceAsync(user.GetData()[Constants.UserDAOusernameColumn] as string).ConfigureAwait(false);
                 if (result)
                 {
                     throw new ArgumentException(Constants.UsernameDNE);
@@ -207,7 +207,7 @@ namespace TeamA.Exogredient.Services
             // Mask personal information about the users before inserting into datastore.
             foreach (UserRecord user in records)
             {
-                UserRecord resultRecord = (UserRecord)await _maskingService.MaskAsync(user, true).ConfigureAwait(false);
+                UserRecord resultRecord = await _maskingService.MaskAsync(user, true).ConfigureAwait(false) as UserRecord;
                 await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
             }
 
@@ -245,17 +245,17 @@ namespace TeamA.Exogredient.Services
             }
 
             // If the column is masked, mask the username.
-            string id = (string)userRecord.GetData()[Constants.UserDAOusernameColumn];
+            string id = userRecord.GetData()[Constants.UserDAOusernameColumn] as string;
 
             if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
             {
                 id = _maskingService.MaskString(id);
             }
 
-            UserRecord maskedRecord = (UserRecord)await _maskingService.MaskAsync(userRecord, false).ConfigureAwait(false);
+            UserRecord maskedRecord = await _maskingService.MaskAsync(userRecord, false).ConfigureAwait(false) as UserRecord;
 
             // Get the masked object from the userDAO and decrement its mapping before updating.
-            UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
+            UserObject maskedObj = await _userDAO.ReadByIdAsync(id).ConfigureAwait(false) as UserObject;
 
             await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
@@ -294,17 +294,17 @@ namespace TeamA.Exogredient.Services
                 }
 
                 // If the column is masked, mask the username.
-                string id = (string)record.GetData()[Constants.UserDAOusernameColumn];
+                string id = record.GetData()[Constants.UserDAOusernameColumn] as string;
 
                 if (Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn])
                 {
                     id = _maskingService.MaskString(id);
                 }
 
-                UserRecord maskedRecord = (UserRecord)await _maskingService.MaskAsync(record, false).ConfigureAwait(false);
+                UserRecord maskedRecord = await _maskingService.MaskAsync(record, false).ConfigureAwait(false) as UserRecord;
 
                 // Get the masked object from the userDAO and decrement its mapping before updating.
-                UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
+                UserObject maskedObj = await _userDAO.ReadByIdAsync(id).ConfigureAwait(false) as UserObject;
 
                 await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
@@ -353,7 +353,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Get the masked object from the userDAO and decrement its mapping before deleteing.
-            UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
+            UserObject maskedObj = await _userDAO.ReadByIdAsync(id).ConfigureAwait(false) as UserObject;
 
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
@@ -408,7 +408,7 @@ namespace TeamA.Exogredient.Services
                 ids.Add(id);
 
                 // Get the masked object from the userDAO and decrement its mapping before deleteing.
-                UserObject maskedObj = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
+                UserObject maskedObj = await _userDAO.ReadByIdAsync(id).ConfigureAwait(false) as UserObject;
 
                 await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
             }
@@ -535,9 +535,9 @@ namespace TeamA.Exogredient.Services
             }
 
             // Cast the return result of asynchronously reading by the ip address into the IP object.
-            IPAddressObject ip = (IPAddressObject)await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false);
+            IPAddressObject ip = await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
 
-            return (IPAddressObject)await _maskingService.UnMaskAsync(ip).ConfigureAwait(false);
+            return await _maskingService.UnMaskAsync(ip).ConfigureAwait(false) as IPAddressObject;
         }
 
         /// <summary>
@@ -554,9 +554,9 @@ namespace TeamA.Exogredient.Services
                 id = _maskingService.MaskString(username);
             }
 
-            UserObject rawUser = (UserObject)await _userDAO.ReadByIdAsync(id).ConfigureAwait(false);
+            UserObject rawUser = await _userDAO.ReadByIdAsync(id).ConfigureAwait(false) as UserObject;
 
-            return (UserObject)await _maskingService.UnMaskAsync(rawUser).ConfigureAwait(false);
+            return await _maskingService.UnMaskAsync(rawUser).ConfigureAwait(false) as UserObject;
         }
 
         /// <summary>

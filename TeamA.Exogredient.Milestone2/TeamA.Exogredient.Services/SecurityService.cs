@@ -168,7 +168,7 @@ namespace TeamA.Exogredient.Services
             byte[] passwordBytes = UtilityService.HexStringToBytes(password);
             Pkcs5S2ParametersGenerator pbkdf = new Pkcs5S2ParametersGenerator(new Sha3Digest());
             pbkdf.Init(passwordBytes, salt, iterations);
-            KeyParameter derivedKey = (KeyParameter)pbkdf.GenerateDerivedMacParameters(hashLength * Constants.ByteLength);
+            KeyParameter derivedKey = pbkdf.GenerateDerivedMacParameters(hashLength * Constants.ByteLength) as KeyParameter;
 
             return UtilityService.BytesToHexString(derivedKey.GetKey());
         }

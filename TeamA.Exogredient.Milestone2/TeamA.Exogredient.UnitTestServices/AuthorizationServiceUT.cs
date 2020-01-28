@@ -92,7 +92,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
         public static string CreateToken(string username)
         {
-            UserObject user = (UserObject) _userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
 
             // Get the user type of the username.
             string userType = user.UserType;
