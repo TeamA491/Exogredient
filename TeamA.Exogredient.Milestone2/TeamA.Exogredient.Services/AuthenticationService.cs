@@ -8,6 +8,7 @@ using Twilio;
 using Twilio.Exceptions;
 using Twilio.Rest.Preview.AccSecurity.Service;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Services
 {
@@ -16,6 +17,13 @@ namespace TeamA.Exogredient.Services
     /// </summary>
     public static class AuthenticationService
     {
+
+        public static bool Authenticate(AuthenticationDTO existing, AuthenticationDTO credentials)
+        {
+            return existing.Equals(credentials);
+        }
+
+
         /// <summary>
         /// Asynchronously makes a phone call via Twilio to the <paramref name="phoneNumber"/> of the user
         /// indicated by the <paramref name="username"/>. The robot should ask for keyboard
