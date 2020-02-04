@@ -621,8 +621,19 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="username">Username of the user to disable.</param>
         /// <returns>Returns true if the user was originally enabled, false otherwise.</returns>
-        public static async Task<bool> DisableUserAsync(string username)
+        public static async Task<bool> DisableUserAsync(string username, string adminName = Constants.SystemIdentifier)
         {
+            // Check that the user of function is an admin and throw an exception if they are not.
+            if (!adminName.Equals(Constants.SystemIdentifier))
+            {
+                UserObject admin = await GetUserInfoAsync(adminName).ConfigureAwait(false);
+
+                if (admin.UserType != Constants.AdminUserType)
+                {
+                    throw new ArgumentException(Constants.MustBeAdmin);
+                }
+            }
+
             UserObject user = await GetUserInfoAsync(username).ConfigureAwait(false);
 
             // If already disabled, just return false.
