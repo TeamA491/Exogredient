@@ -4,27 +4,24 @@ using System.Threading.Tasks;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Managers
 {
     public static class LogInManager
     {
         // Encrypted password, encrypted AES key, and aesIV are all in hex string format.
-        public static async Task<Result<bool>> LogInAsync(string username, string ipAddress,
-                                                          string encryptedPassword, string encryptedAESKey,
-                                                          string aesIV, int currentNumExceptions)
+        public static async Task<Result<AuthenticationResult>> LogInAsync(string username, string ipAddress,
+                                                          string password, IAuthenticationService AuthenService,
+                                                          UserDAO userDAO, int currentNumExceptions)
         {
+            bool authenticationSuccess = false;
+            bool userExist = false;
             try
             {
-                bool authenticationSuccess = false;
-
                 // If the username doesn't exist.
                 if (!await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
-                    // Increment the number of login failure.
-                    await UserManagementService.IncrementLoginFailuresAsync(username,
-                                                                            Constants.LogInTriesResetTime,
-                                                                            Constants.MaxLogInAttempts).ConfigureAwait(false);
 
                     // Log the action.
                     await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
@@ -32,8 +29,11 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
                     // Return the result of the login failure.
-                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false, currentNumExceptions);
                 }
+
+                userExist = true;
 
                 // Get the information of the usernmae.
                 UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
@@ -47,32 +47,35 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.UserDisableLogMessage).ConfigureAwait(false);
 
                     // Return the result of the disabled username's login try.
-                    return UtilityService.CreateResult(Constants.UserDisableUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return UtilityService.CreateResult(Constants.UserDisableUserMessage, authenResult, false, currentNumExceptions);
                 }
 
                 // Convert the encrypted password hex string to byte array.
-                byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
+                //byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
                 // Convert the encrypted AES key hex string to byte array.
-                byte[] encryptedAESKeyBytes = UtilityService.HexStringToBytes(encryptedAESKey);
+                //byte[] encryptedAESKeyBytes = UtilityService.HexStringToBytes(encryptedAESKey);
                 // Convert the AES IV hex string to byte array.
-                byte[] AESIVBytes = UtilityService.HexStringToBytes(aesIV);
+                //byte[] AESIVBytes = UtilityService.HexStringToBytes(aesIV);
                 // Convert the username's salt hex string to byte array.
-                byte[] userSaltBytes = UtilityService.HexStringToBytes(user.Salt);
+                //byte[] userSaltBytes = UtilityService.HexStringToBytes(user.Salt);
                 // Convert the RSA public key hex string to byte array.
-                byte[] publicKeyBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
+                //byte[] publicKeyBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
                 // Convert the RSA private key hex string to byte array.
-                byte[] privateKeyBytes = UtilityService.HexStringToBytes(Constants.PrivateKey);
+                //byte[] privateKeyBytes = UtilityService.HexStringToBytes(Constants.PrivateKey);
 
 
                 // Decrypt the encrypted AES key byte array with the RSA private key byte array.
-                byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
+                //byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
                 // Decrypt the encrypted Password byte array with the AES Key byte array & AES IV byte array.
-                string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
+                //string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
                 // Hash the password hex string with the username's salt.
-                string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
+                //string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
 
                 // If the username's stored password matches the hashed password.
-                if (user.Password == hashedPassword)
+                AuthenticationDTO existing = new AuthenticationDTO(username, user.Password);
+                AuthenticationDTO credentials = new AuthenticationDTO(username, password);
+                if (AuthenService.Authenticate(existing,credentials))
                 {
                     authenticationSuccess = true;
 
@@ -93,7 +96,8 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
                     // Return the result of the successful login.
-                    return UtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return UtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenResult, false, currentNumExceptions);
                 }
                 // If the password doesn't match.
                 else
@@ -108,7 +112,8 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
                     // Return the result of the unsuccessful login.
-                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false, currentNumExceptions);
                 }
             }
             // Catch exceptions.
@@ -126,7 +131,8 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Return the result of the exception occured.
-                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist); 
+                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, authenResult, true, currentNumExceptions + 1);
             }
         }
     }

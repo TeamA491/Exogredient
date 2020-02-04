@@ -15,12 +15,15 @@ namespace TeamA.Exogredient.Services
     /// <summary>
     /// Contains functions relating to authenticating the user's provided information.
     /// </summary>
-    public static class AuthenticationService
+    public class AuthenticationService: IAuthenticationService
     {
 
-        public static bool Authenticate(AuthenticationDTO existing, AuthenticationDTO credentials)
+        public bool Authenticate(object existing, object credentials)
         {
-            return existing.Equals(credentials);
+            AuthenticationDTO exisitngDTO = existing as AuthenticationDTO;
+            AuthenticationDTO credentialsDTO = credentials as AuthenticationDTO;
+
+            return exisitngDTO.Equals(credentialsDTO);
         }
 
 
