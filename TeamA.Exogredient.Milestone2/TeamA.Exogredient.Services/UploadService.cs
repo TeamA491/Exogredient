@@ -2,37 +2,41 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Services
 {
     public class UploadService
     {
-        public async Task<bool> CreateUpload()
+        private readonly UploadDAO _uploadDao;
+        public UploadService(UploadDAO uploadDAO)
         {
-            throw new NotImplementedException();
+            _uploadDao = uploadDAO;
         }
 
-        public async Task<bool> SaveProgessUpload()
+        public async Task<bool> CreateUpload(UploadRecord uploadRecord)
         {
-            throw new NotImplementedException();
+            return await _uploadDao.CreateAsync(uploadRecord).ConfigureAwait(false);
         }
 
-        public async Task<bool> DeleteProgressUpload()
+        public async Task<bool> SaveProgessUpload(UploadRecord uploadRecord)
         {
-            throw new NotImplementedException();
+            // Set column in_progress in uploadRecord. 
+            return await _uploadDao.CreateAsync(uploadRecord).ConfigureAwait(false);
         }
 
-        public async Task<bool> ContinueProgressUpload()
+        public async Task<IDataObject> ContinueProgressUpload(String id)
         {
-            throw new NotImplementedException();
+            return await _uploadDao.ReadByIdAsync(id).ConfigureAwait(false);
         }
 
-        public async Task<bool> DeleteUpload()
+        public async Task<bool> DeleteUploads(List<String> id)
         {
-            throw new NotImplementedException();
+            return await _uploadDao.DeleteByIdsAsync(id).ConfigureAwait(false);   
         }
 
-        public async Task<bool> ReportUpload()
+        public async Task<bool> ReportUpload(UploadRecord uploadRecord)
         {
             throw new NotImplementedException();
         }

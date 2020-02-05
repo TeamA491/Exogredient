@@ -9,7 +9,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    class UploadDAO : IMasterSQLDAO<string>
+    public class UploadDAO : IMasterSQLDAO<string>
     {
         public Task<bool> CreateAsync(ISQLRecord record)
         {
@@ -30,5 +30,6 @@ namespace TeamA.Exogredient.DAL
         {
             throw new NotImplementedException();
         }
+
     }
 }
