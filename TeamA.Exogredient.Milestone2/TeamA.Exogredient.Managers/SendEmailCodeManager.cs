@@ -8,28 +8,41 @@ namespace TeamA.Exogredient.Managers
 {
     public class SendEmailCodeManager
     {
-        public static async Task<Result<bool>> SendEmailCodeAsync(string username, string emailAddress, string ipAddress, int currentNumExceptions)
+        private readonly LoggingService _loggingService;
+        private readonly AuthenticationService _authenticationService;
+        private readonly VerificationService _verificationService;
+
+        public SendEmailCodeManager(LoggingService loggingService, AuthenticationService authenticationService,
+                                    VerificationService verificationService)
+        {
+            _loggingService = loggingService;
+            _authenticationService = authenticationService;
+            _verificationService = verificationService;
+        }
+
+        public async Task<Result<bool>> SendEmailCodeAsync(string username, string emailAddress, string ipAddress,
+                                                           int currentNumExceptions)
         {
             try
             {
-                await AuthenticationService.SendEmailVerificationAsync(username, emailAddress).ConfigureAwait(false);
+                await _verificationService.SendEmailVerificationAsync(username, emailAddress).ConfigureAwait(false);
 
-                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendEmailCodeOperation, username, ipAddress).ConfigureAwait(false);
 
-                return UtilityService.CreateResult(Constants.SendEmailCodeSuccessUserMessage, true, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.SendEmailCodeSuccessUserMessage, true, false, currentNumExceptions);
             }
             catch (Exception e)
             {
-                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendEmailCodeOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
                 {
-                    await UserManagementService.NotifySystemAdminAsync($"{Constants.SendEmailCodeOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    await SystemUtilityService.NotifySystemAdminAsync($"{Constants.SendEmailCodeOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
             }
         }
     }
