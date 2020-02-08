@@ -8,12 +8,13 @@ namespace TeamA.Exogredient.ArchivingConsoleApp
 {
     public class ArchivingScript
     {
+
         public static async Task Main(string[] args)
         {
             // Make sure only days, source Directory, and targetDirectory are entered into program
             if (args.Length != 4)
             {
-                await UserManagementService.NotifySystemAdminAsync(Constants.InvalidArgs, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                await SystemUtilityService.NotifySystemAdminAsync(Constants.InvalidArgs, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 return;
             }
 
@@ -27,7 +28,7 @@ namespace TeamA.Exogredient.ArchivingConsoleApp
             }
             catch
             {
-                await UserManagementService.NotifySystemAdminAsync(Constants.FirstArgumentNotInt, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                await SystemUtilityService.NotifySystemAdminAsync(Constants.FirstArgumentNotInt, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 return;
             }
 
@@ -39,7 +40,7 @@ namespace TeamA.Exogredient.ArchivingConsoleApp
             }
             else
             {
-                await UserManagementService.NotifySystemAdminAsync(Constants.SourceDirectoryDNE, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                await SystemUtilityService.NotifySystemAdminAsync(Constants.SourceDirectoryDNE, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 return;
             }
 
@@ -63,7 +64,7 @@ namespace TeamA.Exogredient.ArchivingConsoleApp
             // Notify system admin if Archiving fails to run successfully. 
             if(result == false)
             {
-                await UserManagementService.NotifySystemAdminAsync("Archiving failed on" + currentTime, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                await SystemUtilityService.NotifySystemAdminAsync("Archiving failed on" + currentTime, Constants.SystemAdminEmailAddress).ConfigureAwait(false);
             }
         }
     }
