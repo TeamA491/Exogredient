@@ -10,8 +10,14 @@ namespace TeamA.Exogredient.Services
     /// <summary>
     /// This service stores or deletes a log from a flat file.
     /// </summary>
-    public static class FlatFileLoggingService
+    public class FlatFileLoggingService
     {
+        readonly MaskingService _maskingService;
+
+        public FlatFileLoggingService(MaskingService maskingService)
+        {
+            _maskingService = maskingService;
+        }
         /// <summary>
         /// Asynchronously create the log in the flate file.
         /// </summary>
@@ -23,7 +29,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="logFolder">the folder to store the file in (string)</param>
         /// <param name="logFileType">the type of file to create (string)</param>
         /// <returns>Task (bool) whether the log creation was successful</returns>
-        public static async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
+        public async Task<bool> LogToFlatFileAsync(string timestamp, string operation, string identifier,
                                                           string ipAddress, string errorType, string logFolder,
                                                           string logFileType)
         {
@@ -45,9 +51,7 @@ namespace TeamA.Exogredient.Services
                 // Create the log record to be stored, mostly just the parameters to this function apart from the timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                MaskingService maskingService = new MaskingService(new MapDAO());
-
-                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord, false).ConfigureAwait(false);
+                LogRecord resultRecord = (LogRecord)await _maskingService.MaskAsync(logRecord, false).ConfigureAwait(false);
 
                 // Construct the path to the file.
                 string path = Constants.LogFolder + @"\" + fileName;
@@ -103,7 +107,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="logFolder">the folder where the file is located (string)</param>
         /// <param name="logFileType">the type of file that was created (string)</param>
         /// <returns>Task (bool) whether the log deletion was successful</returns>
-        public static async Task<bool> DeleteFromFlatFileAsync(string timestamp, string operation, string identifier,
+        public async Task<bool> DeleteFromFlatFileAsync(string timestamp, string operation, string identifier,
                                                                string ipAddress, string errorType, string logFolder,
                                                                string logFileType)
         {
@@ -126,9 +130,7 @@ namespace TeamA.Exogredient.Services
                 // i.e no unique operation should have the same timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
 
-                MaskingService maskingService = new MaskingService(new MapDAO());
-
-                LogRecord resultRecord = (LogRecord)await maskingService.MaskAsync(logRecord, false).ConfigureAwait(false);
+                LogRecord resultRecord = (LogRecord)await _maskingService.MaskAsync(logRecord, false).ConfigureAwait(false);
 
                 // Temporary file.
                 string tempFile = Path.GetTempFileName();

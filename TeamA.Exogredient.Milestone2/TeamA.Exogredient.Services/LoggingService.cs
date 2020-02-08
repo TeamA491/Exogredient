@@ -6,8 +6,17 @@ namespace TeamA.Exogredient.Services
     /// <summary>
     /// Performs a complete loggging action to both the data store and a flat file.
     /// </summary>
-    public static class LoggingService
+    public class LoggingService
     {
+
+        private readonly FlatFileLoggingService _ffLoggingService;
+        private readonly DataStoreLoggingService _dsLoggingService;
+
+        public LoggingService(FlatFileLoggingService ffLoggingService, DataStoreLoggingService dsLoggingService)
+        {
+            _ffLoggingService = ffLoggingService;
+            _dsLoggingService = dsLoggingService;
+        }
         /// <summary>
         /// Asynchronously logs to the data store and flat file.
         /// </summary>
@@ -17,12 +26,12 @@ namespace TeamA.Exogredient.Services
         /// <param name="ipAddress">The ip address of the operation's performer.</param>
         /// <param name="errorType">The type of error that occurred during the operation (default = no error)</param>
         /// <returns>Task (bool) whether the logging operation was successful.</returns>
-        public static async Task<bool> LogAsync(string timestamp, string operation, string identifier,
+        public async Task<bool> LogAsync(string timestamp, string operation, string identifier,
                                                 string ipAddress, string errorType = Constants.NoError)
         {
             // Attempt logging to both the data store and the flat file and track the results.
-            bool ffLoggingResult = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
-            bool dsLoggingResult = await DataStoreLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+            bool ffLoggingResult = await _ffLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+            bool dsLoggingResult = await _dsLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
 
             int count = 0;
 
@@ -31,11 +40,11 @@ namespace TeamA.Exogredient.Services
             {
                 if (!ffLoggingResult)
                 {
-                    ffLoggingResult = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                    ffLoggingResult = await _ffLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
                 }
                 if (!dsLoggingResult)
                 {
-                    dsLoggingResult = await DataStoreLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                    dsLoggingResult = await _dsLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
                 }
                 count++;
             }
@@ -50,7 +59,7 @@ namespace TeamA.Exogredient.Services
                 // Otherwise, if both failed notify the system admin.
                 if (!ffLoggingResult && !dsLoggingResult)
                 {
-                    await UserManagementService.NotifySystemAdminAsync($"Data Store and Flat File Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    await SystemUtilityService.NotifySystemAdminAsync($"Data Store and Flat File Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
                 else
                 {
@@ -60,14 +69,14 @@ namespace TeamA.Exogredient.Services
 
                     if (ffLoggingResult)
                     {
-                        rollbackSuccess = await FlatFileLoggingService.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                        rollbackSuccess = await _ffLoggingService.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
                     }
                     if (dsLoggingResult)
                     {
-                        rollbackSuccess = await DataStoreLoggingService.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                        rollbackSuccess = await _dsLoggingService.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
                     }
 
-                    await UserManagementService.NotifySystemAdminAsync($"{(ffLoggingResult ? "Flat File" : "Data Store")} Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    await SystemUtilityService.NotifySystemAdminAsync($"{(ffLoggingResult ? "Flat File" : "Data Store")} Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
                 return false;
