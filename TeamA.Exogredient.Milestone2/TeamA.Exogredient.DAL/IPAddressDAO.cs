@@ -13,6 +13,12 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class IPAddressDAO : IMasterSQLDAO<string>
     {
+        private string SQLConnection;
+        public IPAddressDAO(string connection)
+        {
+            SQLConnection = connection;
+        }
+
         /// <summary>
         /// Asynchronously creates the <paramref name="record"/> in the data store.
         /// </summary>
@@ -35,7 +41,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = ipRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection
                 connection.Open();
@@ -119,7 +125,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -166,7 +172,7 @@ namespace TeamA.Exogredient.DAL
             IPAddressObject result;
 
             // Get the connection inside of a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -218,7 +224,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = ipRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -325,7 +331,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckIPExistenceAsync(string ipAddress)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
