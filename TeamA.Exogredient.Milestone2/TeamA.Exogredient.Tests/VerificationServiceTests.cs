@@ -13,8 +13,8 @@ namespace TeamA.Exogredient.Tests
     {
         private static readonly UserDAO _userDAO = new UserDAO(Constants.SQLConnection);
         private static readonly IPAddressDAO _ipDAO = new IPAddressDAO(Constants.SQLConnection);
-        private static readonly LogDAO _logDAO = new LogDAO(Constants.SQLConnection);
-        private static readonly MapDAO _mapDAO = new MapDAO(Constants.SQLConnection);
+        private static readonly LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
+        private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
         private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
         private static readonly DataStoreLoggingService _dsLog = new DataStoreLoggingService(_logDAO, _maskingService);
         private static readonly FlatFileLoggingService _ffLog = new FlatFileLoggingService(_maskingService);
@@ -55,8 +55,10 @@ namespace TeamA.Exogredient.Tests
                                         "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
                 await _userManagementService.CreateUserAsync(false, user).ConfigureAwait(false);
             }
-            catch
-            { }
+            catch (Exception E)
+            {
+                Console.WriteLine(E.Message);
+            }
 
             bool result = await _verificationService.SendEmailVerificationAsync("eli", emailAddress).ConfigureAwait(false);
 

@@ -10,7 +10,7 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class LogDAOTests
     {
-        readonly LogDAO logDAO = new LogDAO(Constants.SQLConnection);
+        readonly LogDAO logDAO = new LogDAO(Constants.NOSQLConnection);
         
         [DataTestMethod]
         [DataRow("Timestamp", "Operation", "Identifier", "IPAddress", "errorType", "20190101")]

@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class FlatFileLoggingServiceTests
     {
-        private static readonly MapDAO _mapDAO = new MapDAO(Constants.SQLConnection);
+        private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
         private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
         private static readonly FlatFileLoggingService _ffLog = new FlatFileLoggingService(_maskingService);
 
