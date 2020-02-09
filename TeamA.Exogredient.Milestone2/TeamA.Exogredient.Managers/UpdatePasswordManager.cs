@@ -9,12 +9,12 @@ namespace TeamA.Exogredient.Managers
     public class UpdatePasswordManager
     {
 
-        private readonly LoggingService _loggingService;
+        private readonly LoggingManager _loggingManager;
         private readonly UserManagementService _userManagementService;
 
-        public UpdatePasswordManager(LoggingService loggingService, UserManagementService userManagementService)
+        public UpdatePasswordManager(LoggingManager loggingManager, UserManagementService userManagementService)
         {
-            _loggingService = loggingService;
+            _loggingManager = loggingManager;
             _userManagementService = userManagementService;
         }
 
@@ -44,7 +44,7 @@ namespace TeamA.Exogredient.Managers
                 if (!StringUtilityService.CheckLength(plaintextPassword, Constants.MaximumPasswordCharacters,
                                                 Constants.MinimumPasswordCharacters))
                 {
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
 
@@ -55,7 +55,7 @@ namespace TeamA.Exogredient.Managers
                 // Check the character requirements of their password.
                 if (!StringUtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
                 {
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
 
@@ -65,7 +65,7 @@ namespace TeamA.Exogredient.Managers
                 // Check if password for context specific words.
                 if (StringUtilityService.ContainsContextSpecificWords(plaintextPassword))
                 {
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
 
@@ -76,7 +76,7 @@ namespace TeamA.Exogredient.Managers
                 // Check if password contains sequences or repetitions.
                 if (StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword))
                 {
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
@@ -87,7 +87,7 @@ namespace TeamA.Exogredient.Managers
                 // Check if password contains dictionary words.
                 if (await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
                 {
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
@@ -98,7 +98,7 @@ namespace TeamA.Exogredient.Managers
                 // Check if password is a previously corrupted password.
                 if (await SystemUtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
                 {
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
 
@@ -116,14 +116,14 @@ namespace TeamA.Exogredient.Managers
 
                 await _userManagementService.ChangePasswordAsync(username, digest, saltHex).ConfigureAwait(false);
 
-                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.UpdatePasswordOperation, username, ipAddress).ConfigureAwait(false);
 
                 return SystemUtilityService.CreateResult(Constants.UpdatePasswordSuccessUserMessage, updateSuccess, false, currentNumExceptions);
             }
             catch (Exception e)
             {
-                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.UpdatePasswordOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)

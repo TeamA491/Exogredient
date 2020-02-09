@@ -11,17 +11,17 @@ namespace TeamA.Exogredient.Managers
     {
 
         private readonly UserManagementService _userManagementService;
-        private readonly LoggingService _loggingService;
+        private readonly LoggingManager _loggingManager;
         private readonly AuthorizationService _authorizationService;
         private readonly IAuthenticationService _authenticationService;
 
         public LogInManager(UserManagementService userManagementService,
-                            LoggingService loggingService,
+                            LoggingManager loggingManager,
                             AuthorizationService authorizationService,
                             IAuthenticationService authenService)
         {
             _userManagementService = userManagementService;
-            _loggingService = loggingService;
+            _loggingManager = loggingManager;
             _authorizationService = authorizationService;
             _authenticationService = authenService;
         }
@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.Managers
                 {
 
                     // Log the action.
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.Managers
                 if (user.Disabled == 1)
                 {
                     // Log the action.
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UserDisableLogMessage).ConfigureAwait(false);
 
@@ -108,7 +108,7 @@ namespace TeamA.Exogredient.Managers
                     }
 
                     // Log the action.
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
                     // Return the result of the successful login.
@@ -123,7 +123,7 @@ namespace TeamA.Exogredient.Managers
                                                                             Constants.LogInTriesResetTime,
                                                                             Constants.MaxLogInAttempts).ConfigureAwait(false);
                     // Log the action.
-                    await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
@@ -136,7 +136,7 @@ namespace TeamA.Exogredient.Managers
             catch (Exception e)
             {
                 // Log the exception.
-                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
                 // If the current number of consecutive exceptions has reached the maximum number of retries.

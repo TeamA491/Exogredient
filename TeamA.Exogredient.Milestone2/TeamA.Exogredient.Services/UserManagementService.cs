@@ -17,17 +17,87 @@ namespace TeamA.Exogredient.Services
         private readonly UserDAO _userDAO;
         private readonly IPAddressDAO _ipDAO;
         private readonly MaskingService _maskingService;
-        private readonly LoggingService _loggingService;
+        private readonly DataStoreLoggingService _dsLoggingService;
+        private readonly FlatFileLoggingService _ffLoggingService;
         /// <summary>
         /// Initiates the object and its dependencies.
         /// </summary>
-        public UserManagementService(UserDAO userDAO, IPAddressDAO ipAddressDAO, MapDAO mapDAO,
-                                     LoggingService loggingService, MaskingService maskingService)
+        public UserManagementService(UserDAO userDAO, IPAddressDAO ipAddressDAO,
+                                     DataStoreLoggingService dsLoggingService, FlatFileLoggingService ffLoggingService,
+                                     MaskingService maskingService)
         {
             _userDAO = userDAO;
             _ipDAO = ipAddressDAO;
+            _dsLoggingService = dsLoggingService;
+            _ffLoggingService = ffLoggingService;
             _maskingService = maskingService;
-            _loggingService = loggingService;
+
+        }
+
+        /// <summary>
+        /// Asynchronously logs to the data store and flat file.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the operation.</param>
+        /// <param name="operation">The type of the operation.</param>
+        /// <param name="identifier">The identifier of the operation's performer.</param>
+        /// <param name="ipAddress">The ip address of the operation's performer.</param>
+        /// <param name="errorType">The type of error that occurred during the operation (default = no error)</param>
+        /// <returns>Task (bool) whether the logging operation was successful.</returns>
+        private async Task<bool> LogAsync(string timestamp, string operation, string identifier,
+                                                string ipAddress, string errorType = Constants.NoError)
+        {
+            // Attempt logging to both the data store and the flat file and track the results.
+            bool ffLoggingResult = await _ffLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+            bool dsLoggingResult = await _dsLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+
+            int count = 0;
+
+            // Retry whichever one failed, a maximum number of times.
+            while (!(ffLoggingResult && dsLoggingResult) && count < Constants.LoggingRetriesAmount)
+            {
+                if (!ffLoggingResult)
+                {
+                    ffLoggingResult = await _ffLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                }
+                if (!dsLoggingResult)
+                {
+                    dsLoggingResult = await _dsLoggingService.LogToDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                }
+                count++;
+            }
+
+            // If both succeeded we are finished.
+            if (ffLoggingResult && dsLoggingResult)
+            {
+                return true;
+            }
+            else
+            {
+                // Otherwise, if both failed notify the system admin.
+                if (!ffLoggingResult && !dsLoggingResult)
+                {
+                    await SystemUtilityService.NotifySystemAdminAsync($"Data Store and Flat File Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                }
+                else
+                {
+                    // Otherwise rollback whichever one succeeded and notify the system admin.
+
+                    bool rollbackSuccess = false;
+
+                    if (ffLoggingResult)
+                    {
+                        rollbackSuccess = await _ffLoggingService.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                    }
+                    if (dsLoggingResult)
+                    {
+                        rollbackSuccess = await _dsLoggingService.DeleteLogFromDataStoreAsync(timestamp, operation, identifier, ipAddress, errorType).ConfigureAwait(false);
+                    }
+
+                    await SystemUtilityService.NotifySystemAdminAsync($"{(ffLoggingResult ? "Flat File" : "Data Store")} Logging failure for the following information:\n\n\t{timestamp}, {operation}, {identifier}, {ipAddress}, {errorType}\n\nRollback status: {(rollbackSuccess ? "successful" : "failed")}", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
@@ -153,7 +223,7 @@ namespace TeamA.Exogredient.Services
             await _userDAO.CreateAsync(resultRecord).ConfigureAwait(false);
 
             // Log the action.
-            await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserCreateOperation,
+            await LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserCreateOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
             return true;
@@ -210,7 +280,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Log the bulk create operation.
-            await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserCreateOperation,
+            await LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserCreateOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
             return true;
@@ -257,7 +327,7 @@ namespace TeamA.Exogredient.Services
 
             await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
-            await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.UpdateSingleUserOperation,
+            await LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.UpdateSingleUserOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
             return await _userDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
@@ -309,7 +379,7 @@ namespace TeamA.Exogredient.Services
                 await _userDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
             }
 
-            await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserUpdateOperation,
+            await LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserUpdateOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
             return true;
@@ -357,7 +427,7 @@ namespace TeamA.Exogredient.Services
 
             await _userDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
 
-            await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserDeleteOperation,
+            await LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.SingleUserDeleteOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
             return true;
@@ -414,7 +484,7 @@ namespace TeamA.Exogredient.Services
             await _userDAO.DeleteByIdsAsync(ids).ConfigureAwait(false);
 
             // Log the bulk create operation.
-            await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserDeleteOperation,
+            await LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.BulkUserDeleteOperation,
                                           adminName, adminIp).ConfigureAwait(false);
 
             return true;

@@ -11,6 +11,10 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class FlatFileLoggingServiceTests
     {
+        private static readonly MapDAO _mapDAO = new MapDAO(Constants.SQLConnection);
+        private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
+        private static readonly FlatFileLoggingService _ffLog = new FlatFileLoggingService(_maskingService);
+
         // Flat file log directory
         private readonly string _logDirectory = Constants.LogFolder;
 
@@ -25,7 +29,7 @@ namespace TeamA.Exogredient.Tests
         public async Task FlatFileLoggingService_LogToFlatFileAsync_InvalidTimestampRejected(string timestamp, string operation, string identifier,
                                                                                              string ipAddress, string errorType)
         {
-            bool result = await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+            bool result = await _ffLog.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
             Assert.IsFalse(result);
         }
@@ -47,7 +51,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                await _ffLog.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = Directory.Exists(_logDirectory);
 
@@ -75,7 +79,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                await _ffLog.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = File.Exists(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
 
@@ -97,9 +101,7 @@ namespace TeamA.Exogredient.Tests
         {
             LogRecord rec = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
 
-            MaskingService ms = new MaskingService(new MapDAO());
-
-            LogRecord logRecord = (LogRecord)await ms.MaskAsync(rec, false).ConfigureAwait(false);
+            LogRecord logRecord = (LogRecord)await _maskingService.MaskAsync(rec, false).ConfigureAwait(false);
             try
             {
                 File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
@@ -109,7 +111,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                await _ffLog.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 bool result = false;
 
@@ -167,9 +169,7 @@ namespace TeamA.Exogredient.Tests
         {
             LogRecord rec = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
 
-            MaskingService ms = new MaskingService(new MapDAO());
-
-            LogRecord logRecord = (LogRecord)await ms.MaskAsync(rec, false).ConfigureAwait(false);
+            LogRecord logRecord = (LogRecord)await _maskingService.MaskAsync(rec, false).ConfigureAwait(false);
 
             try
             {
@@ -180,7 +180,7 @@ namespace TeamA.Exogredient.Tests
 
             try
             {
-                await FlatFileLoggingService.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                await _ffLog.LogToFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 Assert.IsTrue(File.Exists(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}"));
 
@@ -226,7 +226,7 @@ namespace TeamA.Exogredient.Tests
 
                 result = false;
 
-                await FlatFileLoggingService.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
+                await _ffLog.DeleteFromFlatFileAsync(timestamp, operation, identifier, ipAddress, errorType, Constants.LogFolder, Constants.LogFileType).ConfigureAwait(false);
 
                 using (StreamReader reader = new StreamReader(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}"))
                 {

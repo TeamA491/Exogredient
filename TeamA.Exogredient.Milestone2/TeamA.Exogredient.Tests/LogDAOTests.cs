@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Tests
 {
     [TestClass]
     public class LogDAOTests
     {
-        readonly LogDAO logDAO = new LogDAO();
+        readonly LogDAO logDAO = new LogDAO(Constants.SQLConnection);
         
         [DataTestMethod]
         [DataRow("Timestamp", "Operation", "Identifier", "IPAddress", "errorType", "20190101")]

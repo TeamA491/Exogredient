@@ -6,13 +6,13 @@ namespace TeamA.Exogredient.Services
     /// <summary>
     /// Performs a complete loggging action to both the data store and a flat file.
     /// </summary>
-    public class LoggingService
+    public class LoggingManager
     {
 
         private readonly FlatFileLoggingService _ffLoggingService;
         private readonly DataStoreLoggingService _dsLoggingService;
 
-        public LoggingService(FlatFileLoggingService ffLoggingService, DataStoreLoggingService dsLoggingService)
+        public LoggingManager(FlatFileLoggingService ffLoggingService, DataStoreLoggingService dsLoggingService)
         {
             _ffLoggingService = ffLoggingService;
             _dsLoggingService = dsLoggingService;

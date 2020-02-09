@@ -9,14 +9,14 @@ namespace TeamA.Exogredient.Managers
     public class SendPhoneCodeManager
     {
 
-        private readonly LoggingService _loggingService;
+        private readonly LoggingManager _loggingManager;
         private readonly AuthenticationService _authenticationService;
         private readonly VerificationService _verificationService;
 
-        public SendPhoneCodeManager(LoggingService loggingService, AuthenticationService authenticationService,
+        public SendPhoneCodeManager(LoggingManager loggingManager, AuthenticationService authenticationService,
                                     VerificationService verificationService)
         {
-            _loggingService = loggingService;
+            _loggingManager = loggingManager;
             _authenticationService = authenticationService;
             _verificationService = verificationService;
 
@@ -29,14 +29,14 @@ namespace TeamA.Exogredient.Managers
             {
                 await _verificationService.SendCallVerificationAsync(username, phoneNumber).ConfigureAwait(false);
 
-                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendPhoneCodeOperation, username, ipAddress).ConfigureAwait(false);
 
                 return SystemUtilityService.CreateResult(Constants.SendPhoneCodeSuccessUserMessage, true, false, currentNumExceptions);
             }
             catch (Exception e)
             {
-                await _loggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendPhoneCodeOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
