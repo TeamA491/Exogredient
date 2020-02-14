@@ -620,5 +620,45 @@ namespace TeamA.Exogredient.Tests
 
             await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
         }
+
+
+        [DataTestMethod]
+        public async Task UserManagementService_UpdateUsersAsync_UpdateUserSuccessfull()
+        {
+            // Arrange: Create 2 users.
+            UserRecord user1 = new UserRecord("username", "name", "email@gmail.com", "562222754", "password", Constants.EnabledStatus, Constants.CustomerUserType,
+                                    "salt1", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+            UserRecord user2 = new UserRecord("username1", "name", "email1@gmail.com", "562222724", "password", Constants.EnabledStatus, Constants.CustomerUserType,
+                                    "salt1", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+            await UserManagementService.BulkCreateUsersAsync(new List<UserRecord>() { user1, user2}).ConfigureAwait(false);
+
+            // Create an update record to change their email and phone numbers.
+            UserRecord updateUser1 = new UserRecord("username", email:"newEmail@gmail.com", phoneNumber:"1111111111");
+            UserRecord updateUser2 = new UserRecord("username1", email:"newEmail2@gmail.com", phoneNumber:"2222222222");
+
+            // Act: Update the created users.
+            await UserManagementService.BulkUpdateUsersAsync(new List<UserRecord>() { updateUser1, updateUser2 });
+
+            // Assert: check that the updated users values changed.
+            UserObject userObj1 = await UserManagementService.GetUserInfoAsync("username").ConfigureAwait(false);
+            UserObject userObj2 = await UserManagementService.GetUserInfoAsync("username1").ConfigureAwait(false);
+
+            bool updateResult = false;
+
+            if(userObj1.Email == "newEmail@gmail.com" && userObj1.PhoneNumber == "1111111111" &&
+                userObj2.Email == "newEmail2@gmail.com" && userObj2.PhoneNumber == "2222222222")
+            {
+                updateResult = true;
+            }
+
+            Assert.IsTrue(updateResult);
+
+
+            // Cleanup: delete the created users.
+            bool deleteResult = await UserManagementService.BulkDeleteUsersAsync(new List<string>() {"username", "username1"}).ConfigureAwait(false);
+            Assert.IsTrue(deleteResult);
+        }
     }
 }
