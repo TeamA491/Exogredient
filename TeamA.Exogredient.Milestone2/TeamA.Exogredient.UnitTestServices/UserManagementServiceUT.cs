@@ -157,7 +157,7 @@ namespace TeamA.Exogredient.UnitTestServices
         {
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
-            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
+            long tempTimestamp = isTemp ? TimeUtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
             // Email code, email code timestamp, login failures, last login failure timestamp, email code failures,
             // and phone code failures initialized to have no value.
@@ -359,8 +359,8 @@ namespace TeamA.Exogredient.UnitTestServices
             // Need to check if the maxtime + lastTime is less than now.
             // If it is then reset the failure
             long lastLoginFailTimestamp = user.LastLoginFailTimestamp;
-            long maxSeconds = UtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
-            long currentUnix = UtilityService.CurrentUnixTime();
+            long maxSeconds = TimeUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = TimeUtilityService.CurrentUnixTime();
 
             bool reset = false;
 
@@ -449,8 +449,8 @@ namespace TeamA.Exogredient.UnitTestServices
             // Need to check if the maxtime + lastTime is less than now.
             // If it is then reset the failure
             long lastRegFailTimestamp = ip.LastRegFailTimestamp;
-            long maxSeconds = UtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
-            long currentUnix = UtilityService.CurrentUnixTime();
+            long maxSeconds = TimeUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = TimeUtilityService.CurrentUnixTime();
 
             bool reset = false;
 
