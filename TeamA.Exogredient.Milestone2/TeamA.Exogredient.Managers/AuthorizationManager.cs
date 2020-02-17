@@ -4,21 +4,30 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Managers
 {
-    public static class AuthorizationManager
+    public class AuthorizationManager
     {
-        public static bool AuthorizeUser(string operation, string jwsToken)
+
+        readonly AuthorizationService _authorizationService;
+
+        public AuthorizationManager(AuthorizationService authorizationService)
+        {
+            _authorizationService = authorizationService;
+        }
+
+
+        public bool AuthorizeUser(string operation, string jwsToken)
         {
             try
             {
                 // Decrypt it here to make sure the token wasn't tampered with
                 // or it isn't valid
-                Dictionary<string, string> payload = AuthorizationService.DecryptJWS(jwsToken);
+                Dictionary<string, string> payload = _authorizationService.DecryptJWS(jwsToken);
 
-                if (AuthorizationService.TokenIsExpired(jwsToken))
+                if (_authorizationService.TokenIsExpired(jwsToken))
                     return false;
 
                 // Only refresh the token if it isn't expired
-                jwsToken = AuthorizationService.RefreshJWS(jwsToken);
+                jwsToken = _authorizationService.RefreshJWS(jwsToken);
 
                 // Make sure the user type is an int
                 int userType;
@@ -27,7 +36,7 @@ namespace TeamA.Exogredient.Managers
                     return false;
 
                 // Check if this user has permission to access the resource
-                return AuthorizationService.UserHasPermissionForOperation(userType, operation);
+                return _authorizationService.UserHasPermissionForOperation(userType, operation);
             }
             catch
             {

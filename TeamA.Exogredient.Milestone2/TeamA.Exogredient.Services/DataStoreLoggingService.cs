@@ -9,16 +9,17 @@ namespace TeamA.Exogredient.Services
     /// <summary>
     /// This service stores or deletes a log in the data store by using the DAL.
     /// </summary>
-    public static class DataStoreLoggingService
+    public class DataStoreLoggingService
     {
-        private static readonly LogDAO _dsLoggingDAO;
-
+        private readonly LogDAO _dsLoggingDAO;
+        private readonly MaskingService _maskingService;
         /// <summary>
         /// Initiates the object and its dependencies.
         /// </summary>
-        static DataStoreLoggingService()
+        public DataStoreLoggingService(LogDAO logDAO, MaskingService maskingService)
         {
-            _dsLoggingDAO = new LogDAO();
+            _dsLoggingDAO = logDAO;
+            _maskingService = maskingService;
         }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="ipAddress">ip address of the performer of the operation (string)</param>
         /// <param name="errorType">the error type that occurred during the operation (string)</param>
         /// <returns>Task (bool) whether the log creation was successful</returns>
-        public static async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
+        public async Task<bool> LogToDataStoreAsync(string timestamp, string operation, string identifier,
                                                            string ipAddress, string errorType)
         {
             try
@@ -45,10 +46,7 @@ namespace TeamA.Exogredient.Services
 
                 // Create the log record to be stored, mostly just the parameters to this function apart from the timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
-
-                MaskingService maskingService = new MaskingService(new MapDAO());
-
-                LogRecord resultRecord = await maskingService.MaskAsync(logRecord, false).ConfigureAwait(false) as LogRecord;
+                LogRecord resultRecord = await _maskingService.MaskAsync(logRecord, false).ConfigureAwait(false) as LogRecord;;
 
                 // The name of the collection/table should be a derivative of the "yyyyMMdd" part of the timestamp.
                 // Asynchronously call the Log DAO's function to create the log record in the collection denoted by the name (second parameter).
@@ -70,7 +68,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="ipAddress">the ip address that was logged (string)</param>
         /// <param name="errorType">the error type that was logged (string)</param>
         /// <returns>Task (bool) whether the log deletion was successful</returns>
-        public static async Task<bool> DeleteLogFromDataStoreAsync(string timestamp, string operation, string identifier,
+        public async Task<bool> DeleteLogFromDataStoreAsync(string timestamp, string operation, string identifier,
                                                                    string ipAddress, string errorType)
         {
             try
@@ -86,10 +84,7 @@ namespace TeamA.Exogredient.Services
                 // Create the log record to be found, the parameters to this function should make it unique among the data store,
                 // i.e no unique operation should have the same timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
-
-                MaskingService maskingService = new MaskingService(new MapDAO());
-
-                LogRecord resultRecord = await maskingService.MaskAsync(logRecord, false).ConfigureAwait(false) as LogRecord;
+                LogRecord resultRecord = await _maskingService.MaskAsync(logRecord, false).ConfigureAwait(false) as LogRecord;
 
                 // Asynchronously find the id field of the log in the data store, passing the collection/table name.
                 string id = await _dsLoggingDAO.FindIdFieldAsync(resultRecord, splitResult[2]).ConfigureAwait(false);

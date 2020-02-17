@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class UserDAOTests
     {
-        UserDAO userDAO = new UserDAO();
+        UserDAO userDAO = new UserDAO(Constants.SQLConnection);
 
         private bool DataEquals(UserRecord userRecord, UserObject userObject)
         {

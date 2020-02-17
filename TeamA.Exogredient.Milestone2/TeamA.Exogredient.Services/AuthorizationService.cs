@@ -17,25 +17,24 @@ namespace TeamA.Exogredient.Services
     /// only certain operations. The JWS is encrypted and decrypted using the RSA
     /// algorithm.
     /// </summary>
-    public static class AuthorizationService
+    public class AuthorizationService
     {
         private const string SIGNING_ALGORITHM = "RS512";
         private const string HASHING_ALGORITHM = "SHA512";
         private const string EXPIRATION_FIELD = "exp";
         private const string PUBLIC_KEY_FIELD = "pk";
 
-        private static readonly byte[] keyPair;
-        private static readonly UserDAO _userDAO;
+        private readonly byte[] keyPair;
+        private readonly UserManagementService _userManagementService;
 
-        static AuthorizationService()
+        public AuthorizationService(UserManagementService userManagementService)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048))
             {
                 // Holds both the private key and public key
                 keyPair = rsa.ExportCspBlob(true);
             }
-
-            _userDAO = new UserDAO();
+            _userManagementService = userManagementService;
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace TeamA.Exogredient.Services
         /// </remarks>
         /// <param name="payload">The data to be encrypted.</param>
         /// <returns>The JWS.</returns>
-        public static string GenerateJWS(Dictionary<string, string> payload)
+        public string GenerateJWS(Dictionary<string, string> payload)
         {
             // TODO CHECK PUBLIC KEY AND PRIVATE KEY, CHECK THEIR LENGTHS AND IF THEY INCLUDE ----BEGIN... ---END... ETC
 
@@ -65,18 +64,18 @@ namespace TeamA.Exogredient.Services
             if (!payload.ContainsKey(EXPIRATION_FIELD))
             {
                 // Add a 20 min expiration
-                payload.Add(EXPIRATION_FIELD, UtilityService.GetEpochFromNow().ToString());
+                payload.Add(EXPIRATION_FIELD, TimeUtilityService.GetEpochFromNow().ToString());
             }
 
             // Base64 encode the header and payload
-            string encodedHeader = DictionaryToString(joseHeader).ToBase64URL();
-            string encodedPayload = DictionaryToString(payload).ToBase64URL();
+            string encodedHeader = ToBase64URL(DictionaryToString(joseHeader));
+            string encodedPayload = ToBase64URL(DictionaryToString(payload));
 
             // The signature will be the hash of the header and payload
             string stringToSign = encodedHeader + '.' + encodedPayload;
 
             // Create the signature
-            string signature = GetPKCSSignature(stringToSign).ToBase64URL();
+            string signature = ToBase64URL(GetPKCSSignature(stringToSign));
 
             return string.Format("{0}.{1}.{2}", encodedHeader, encodedPayload, signature);
         }
@@ -87,7 +86,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="data">The data to sign.</param>
         /// <param name="privateKey">The private key to sign it with.</param>
         /// <returns></returns>
-        public static string GetPKCSSignature(string data)
+        public string GetPKCSSignature(string data)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
@@ -95,7 +94,7 @@ namespace TeamA.Exogredient.Services
                 byte[] hash;
                 using (SHA512 sha256 = SHA512.Create())
                 {
-                    hash = sha256.ComputeHash(data.ToBytes());
+                    hash = sha256.ComputeHash(ToBytes(data));
                 }
 
                 // Set the private key
@@ -108,7 +107,7 @@ namespace TeamA.Exogredient.Services
                 // Create the signature from the hash
                 byte[] signedHash = RSAFormatter.CreateSignature(hash);
 
-                return signedHash.FromBytes();
+                return FromBytes(signedHash);
             }
         }
 
@@ -117,9 +116,9 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="username"> logged-in username </param>
         /// <returns> string of token that represents the user type and unique ID of the username </returns>
-        public static async Task<string> CreateTokenAsync(string username)
+        public async Task<string> CreateTokenAsync(string username)
         {
-            UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+            UserObject user = await _userManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
 
             // Get the user type of the username.
             string userType = user.UserType;
@@ -139,7 +138,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="jws">The token to decrypt.</param>
         /// <returns>The contents inside the decrypted token.</returns>
-        public static Dictionary<string, string> DecryptJWS(string jws)
+        public Dictionary<string, string> DecryptJWS(string jws)
         {
             string[] segments = jws.Split('.');
 
@@ -151,11 +150,11 @@ namespace TeamA.Exogredient.Services
             string encodedPayload = segments[1];
 
             // Convert header back to dictionary format
-            string decodedHeader = segments[0].FromBase64URL();
+            string decodedHeader = FromBase64URL(segments[0]);
             Dictionary<string, string> headerJSON = StringToDictionary(decodedHeader);
 
             // Convert payload back to dictionary format
-            string decodedPayload = segments[1].FromBase64URL();
+            string decodedPayload = FromBase64URL(segments[1]);
             Dictionary<string, string> payloadJSON = StringToDictionary(decodedPayload);
 
             // Make sure that we are using the correct encryption algorithm in the header
@@ -177,7 +176,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="data">The signature to check.</param>
         /// <param name="publicKey">The public key to use.</param>
         /// <returns></returns>
-        public static bool VerifyPKCSSignature(string data)
+        public bool VerifyPKCSSignature(string data)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
@@ -185,7 +184,7 @@ namespace TeamA.Exogredient.Services
                 byte[] hash;
                 using (SHA512 sha256 = SHA512.Create())
                 {
-                    hash = sha256.ComputeHash(data.ToBytes());
+                    hash = sha256.ComputeHash(ToBytes(data));
                 }
 
                 // Set the public key
@@ -215,12 +214,12 @@ namespace TeamA.Exogredient.Services
         /// <param name="privateKey">An optional private key to be used instead of the one
         /// loaded from the environment.</param>
         /// <returns>A new token that has been refreshed and active for 20 more minutes.</returns>
-        public static string RefreshJWS(string jws, int minutes = Constants.TOKEN_EXPIRATION_MIN)
+        public string RefreshJWS(string jws, int minutes = Constants.TOKEN_EXPIRATION_MIN)
         {
             Dictionary<string, string> payload = DecryptJWS(jws);
 
             // Refresh the token for an additional 20 minutes
-            payload[EXPIRATION_FIELD] = UtilityService.GetEpochFromNow(minutes).ToString();
+            payload[EXPIRATION_FIELD] = TimeUtilityService.GetEpochFromNow(minutes).ToString();
 
             return GenerateJWS(payload);
         }
@@ -230,7 +229,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="jws">The token to check.</param>
         /// <returns>Whether the current token is past it's 20 minute lifetime.</returns>
-        public static bool TokenIsExpired(string jws)
+        public bool TokenIsExpired(string jws)
         {
             Dictionary<string, string> payload = DecryptJWS(jws);
 
@@ -245,7 +244,7 @@ namespace TeamA.Exogredient.Services
             if (!isNumeric)
                 throw new ArgumentException("Expiration time is not a number!");
 
-            return UtilityService.CurrentUnixTime() > expTime;
+            return TimeUtilityService.CurrentUnixTime() > expTime;
         }
 
         /// <summary>
@@ -254,7 +253,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="userRole">The role of the current user.</param>
         /// <param name="operation">The operation the user is trying to access.</param>
         /// <returns>Whether the user can perform the operation.</returns>
-        public static bool UserHasPermissionForOperation(int userRole, string operation)
+        public bool UserHasPermissionForOperation(int userRole, string operation)
         {
             // Make sure the operation exists
             if (!Constants.UserOperations.ContainsKey(operation))
@@ -280,7 +279,7 @@ namespace TeamA.Exogredient.Services
         /// </remarks>
         /// <param name="dict">The dictionary to represent as a string.</param>
         /// <returns>A JSON string representation of the dictionary.</returns>
-        private static string DictionaryToString(Dictionary<string, string> dict)
+        private string DictionaryToString(Dictionary<string, string> dict)
         {
             List<string> body = new List<string>();  // Holds all the key value pairs in string representation
      
@@ -289,8 +288,8 @@ namespace TeamA.Exogredient.Services
             {
                 // Create a string representation of the key/value pair
                 string serializedKeyVal = string.Format("\"{0}\":\"{1}\"",
-                                                        entry.Key.ToAlphaNumeric(),
-                                                        entry.Value.ToAlphaNumeric());
+                                                        ToAlphaNumeric(entry.Key),
+                                                        ToAlphaNumeric(entry.Value));
 
                 body.Add(serializedKeyVal);
             }
@@ -304,7 +303,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="dictStr">The string to parse into a dictionary.</param>
         /// <returns>Dictionary representation of the string.</returns>
-        private static Dictionary<string, string> StringToDictionary(string dictStr)
+        private Dictionary<string, string> StringToDictionary(string dictStr)
         {
             // The passed in string is assumed to be in proper JSON format, with each
             // key/value pair being alpha-numeric
@@ -381,7 +380,7 @@ namespace TeamA.Exogredient.Services
                 val = val.Remove(val.Length - 1);
 
                 // Check for condition (4)
-                if (!(key.IsAlphaNumeric() && val.IsAlphaNumeric()))
+                if (!(IsAlphaNumeric(key) && IsAlphaNumeric(val)))
                 {
                     throw new ArgumentException("Key or value is not alpha-numeric (excluding white-space).");
                 }
@@ -400,7 +399,7 @@ namespace TeamA.Exogredient.Services
         /// </remarks>
         /// <param name="str">The string to be converted.</param>
         /// <returns>An alpha numeric representation</returns>
-        private static string ToAlphaNumeric(this string str)
+        private string ToAlphaNumeric(string str)
         {
             if (str == null)
                 return "";
@@ -430,7 +429,7 @@ namespace TeamA.Exogredient.Services
         /// </remarks>
         /// <param name="str">The string to check.</param>
         /// <returns>Whether the string is alpha-numeric or not.</returns>
-        private static bool IsAlphaNumeric(this string str)
+        private bool IsAlphaNumeric(string str)
         {
             if (str == null)
                 return false;
@@ -453,7 +452,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="str">The string to be converted.</param>
         /// <returns>A Base64 representation of the string.</returns>
-        public static string ToBase64URL(this string str)
+        public string ToBase64URL(string str)
         {
             string b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
             // Make sure it's URL safe
@@ -466,9 +465,9 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="bytes">The bytes array to be converted.</param>
         /// <returns>A Base64 representation of the bytes array.</returns>
-        public static string ToBase64URL(this byte[] bytes)
+        public string ToBase64URL(byte[] bytes)
         {
-            return Convert.ToBase64String(bytes).ToBase64URL();
+            return Convert.ToBase64String(bytes);
         }
 
         /// <summary>
@@ -476,7 +475,7 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="str">The string to decode.</param>
         /// <returns>The original representation of the string.</returns>
-        private static string FromBase64URL(this string str)
+        private string FromBase64URL(string str)
         {
             string oldStr = str.Replace('_', '/').Replace('-', '+');
 
@@ -490,15 +489,15 @@ namespace TeamA.Exogredient.Services
             else if (missingPadding == 3)
                 oldStr += "=";          // Missing 1 character
 
-            return Convert.FromBase64String(oldStr).FromBytes();
+            return FromBytes(Convert.FromBase64String(oldStr));
         }
 
-        public static byte[] ToBytes(this string s)
+        public byte[] ToBytes(string s)
         {
             return Encoding.UTF8.GetBytes(s);
         }
 
-        public static string FromBytes(this byte[] b)
+        public string FromBytes(byte[] b)
         {
             return Encoding.UTF8.GetString(b);
         }

@@ -13,7 +13,6 @@ namespace TeamA.Exogredient.Services
     public class MaskingService
     {
         private readonly MapDAO _mapDAO;
-
         /// <summary>
         /// Creates the masking service with its dependencies initialized.
         /// </summary>
@@ -179,10 +178,6 @@ namespace TeamA.Exogredient.Services
 
                             parameters[i] = Int32.Parse(map.Actual);
                         }
-
-                        // Log the map table read access evet.
-                        await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.MapTableReadFromOperation,
-                                                      Constants.SystemIdentifier, Constants.LocalHost).ConfigureAwait(false);
                     }
                     else
                     {

@@ -409,7 +409,7 @@ namespace TeamA.Exogredient.Tests
             //Arrange
 
             // Convert the password to hex string.
-            string hexPassword = UtilityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
 
@@ -432,7 +432,7 @@ namespace TeamA.Exogredient.Tests
             // Generate a salt.
             byte[] salt = SecurityService.GenerateSalt();
             // Convert the password to hex string.
-            string hexPassword = UtilityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
 
@@ -456,9 +456,9 @@ namespace TeamA.Exogredient.Tests
             // Generate a salt.
             byte[] salt = SecurityService.GenerateSalt();
             // Convert the password1 to hex string.
-            string hexPassword1 = UtilityService.ToHexString(password1);
+            string hexPassword1 = StringUtilityService.ToHexString(password1);
             // Convert the password2 to hex string.
-            string hexPassword2 = UtilityService.ToHexString(password2);
+            string hexPassword2 =StringUtilityService.ToHexString(password2);
 
             //Act
 
@@ -484,7 +484,7 @@ namespace TeamA.Exogredient.Tests
             // Generate a salt2.
             byte[] salt2 = SecurityService.GenerateSalt();
             // Convert the password to hex string.
-            string hexPassword = UtilityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
 
@@ -510,7 +510,7 @@ namespace TeamA.Exogredient.Tests
             // Byte length of the hashcode.
             int hashBytesLength = 32;
             // Convert the password to hex string.
-            string hexPassword = UtilityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
 
@@ -536,7 +536,7 @@ namespace TeamA.Exogredient.Tests
             // Number of iterations.
             int iterations = 10000;
             // Convert the password to hex string.
-            string hexPassword = UtilityService.ToHexString(password);
+            string hexPassword = StringUtilityService.ToHexString(password);
 
             //Act
 
@@ -560,9 +560,9 @@ namespace TeamA.Exogredient.Tests
             // Generate a salt.
             byte[] salt = SecurityService.GenerateSalt();
             // Convert the password1 to hex string.
-            string hexPassword1 = UtilityService.ToHexString(password1);
+            string hexPassword1 = StringUtilityService.ToHexString(password1);
             // Convert the password2 to hex string.
-            string hexPassword2 = UtilityService.ToHexString(password2);
+            string hexPassword2 = StringUtilityService.ToHexString(password2);
 
             //Act
 
