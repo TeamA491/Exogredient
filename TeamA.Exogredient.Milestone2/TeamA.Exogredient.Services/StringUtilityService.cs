@@ -4,11 +4,40 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
+using Snowball;
+using WeCantSpell.Hunspell;
+using System.Linq;
+using System.Reflection;
 
 namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
     {
+
+        public static string AutoCorrectWord(string word, string dicFilePath, string affFilePath)
+        {
+            var dictionary = WordList.CreateFromFiles(dicFilePath,affFilePath);
+            var suggestions = dictionary.Suggest(word).ToArray<string>();
+            foreach (var suggestion in suggestions)
+            {
+                if (suggestion.Length > word.Length)
+                {
+                    return suggestion;
+                }
+            }
+
+            return word;
+        }
+
+
+        public static string Stem(string word)
+        {
+            var stemmer = new EnglishStemmer();
+            stemmer.Current = word;
+            stemmer.Stem();
+            return stemmer.Current;
+        }
+
         /// <summary>
         /// Convert a hex string to a byte array
         /// </summary>
