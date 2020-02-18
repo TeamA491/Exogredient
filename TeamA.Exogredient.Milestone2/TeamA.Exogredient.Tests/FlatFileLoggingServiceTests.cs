@@ -4,11 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Tests
 {
     [TestClass]
-    public class LoggingUnitTests
+    public class FlatFileLoggingServiceTests
     {
         // Flat file log directory
         private readonly string _logDirectory = Constants.LogFolder;
@@ -19,8 +20,8 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("this is an invalid timestamp", "1", "1", "1", "1")]
-        [DataRow("invalid", "2", "2", "2", "2")]
+        [DataRow("this is an invalid timestamp", "1", "1", "127.0.0.1", "1")]
+        [DataRow("invalid", "2", "2", "127.0.0.1", "2")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_InvalidTimestampRejected(string timestamp, string operation, string identifier,
                                                                                              string ipAddress, string errorType)
         {
@@ -32,8 +33,8 @@ namespace TeamA.Exogredient.Tests
         // IMPORTANT: make sure you are not in the directory in windows explorer etc.
         //            or have any of its children open when running this test.
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "2", "2")]
+        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "127.0.0.1", "2")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_DirectoryCreated(string timestamp, string operation, string identifier,
                                                                                      string ipAddress, string errorType)
         {
@@ -60,8 +61,8 @@ namespace TeamA.Exogredient.Tests
 
         // IMPORTANT: make sure you don't have 20191125.CSV open when running this test.
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "2", "2")]
+        [DataRow("20:33:08:59 UTC 20191125", "1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "2", "2", "127.0.0.1", "2")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_FileCreated(string timestamp, string operation, string identifier,
                                                                                 string ipAddress, string errorType)
         {
@@ -87,14 +88,18 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "127.0.0.1", "1")]
         public async Task FlatFileLoggingService_LogToFlatFileAsync_CsvProtection(string timestamp, string operation, string identifier,
                                                                                   string ipAddress, string errorType)
         {
-            LogRecord logRecord = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+            LogRecord rec = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+
+            MaskingService ms = new MaskingService(new MapDAO());
+
+            LogRecord logRecord = (LogRecord)await ms.MaskAsync(rec, false).ConfigureAwait(false);
             try
             {
                 File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");
@@ -153,14 +158,19 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "1", "1")]
-        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "=1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "@1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "+1", "1", "127.0.0.1", "1")]
+        [DataRow("20:33:08:59 UTC 20191125", "-1", "1", "127.0.0.1", "1")]
         public async Task FlatFileLoggingService_DeleteFromFlatFileAsync_DeleteSuccessful(string timestamp, string operation, string identifier,
                                                                                           string ipAddress, string errorType)
         {
-            LogRecord logRecord = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+            LogRecord rec = new LogRecord(timestamp.Split(' ')[0] + " " + timestamp.Split(' ')[1], operation, identifier, ipAddress, errorType);
+
+            MaskingService ms = new MaskingService(new MapDAO());
+
+            LogRecord logRecord = (LogRecord)await ms.MaskAsync(rec, false).ConfigureAwait(false);
+
             try
             {
                 File.Delete(_logDirectory + $@"\{timestamp.Split(' ')[2]}{Constants.LogFileType}");

@@ -1,17 +1,17 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
     /// <summary>
-    /// DAO for the data store containing User information.
+    /// DAO for the data store storing maps of Masking information.
     /// </summary>
-    public class UserDAO : IMasterSQLDAO<string>
+    public class MapDAO : IMasterSQLDAO<string>
     {
         /// <summary>
         /// Asynchronously creates the <paramref name="record"/> in the data store.
@@ -20,57 +20,29 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task(bool) whether the function executed without exception.</returns>
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
-            // Try casting the record to a UserRecord, throw an argument exception if it fails.
+            // Try casting the record to a MapRecord, throw an argument exception if it fails.
             try
             {
-                UserRecord temp = (UserRecord)record;
+                MapRecord temp = (MapRecord)record;
             }
             catch
             {
-                throw new ArgumentException(Constants.UserCreateInvalidArgument);
+                throw new ArgumentException(Constants.MapCreateInvalidArgument);
             }
 
-            // Get the data stored in the record.
-            UserRecord userRecord = (UserRecord)record;
-            IDictionary<string, object> recordData = userRecord.GetData();
+            MapRecord mapRecord = (MapRecord)record;
+            IDictionary<string, object> recordData = mapRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
-                // Open the connection
                 connection.Open();
 
                 // Construct the sql string .. start by inserting into the table name
-                string sqlString = $"INSERT INTO {Constants.UserDAOtableName} (";
+                string sqlString = $"INSERT INTO {Constants.MapDAOTableName} (";
 
-                // Loop through the data.
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    // Check for null values in the data (string == null, numeric == -1), and throw a NoNullAllowedException
-                    // if one is found.
-                    if (pair.Value is int)
-                    {
-                        if ((int)pair.Value == -1)
-                        {
-                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
-                        }
-                    }
-                    if (pair.Value is string)
-                    {
-                        if (pair.Value == null)
-                        {
-                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
-                        }
-                    }
-                    if (pair.Value is long)
-                    {
-                        if ((long)pair.Value == -1)
-                        {
-                            throw new NoNullAllowedException(Constants.UserRecordNoNull);
-                        }
-                    }
-
-                    // Otherwise add the key to the string (column name).
                     sqlString += $"{pair.Key},";
                 }
 
@@ -119,27 +91,27 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
                 connection.Open();
 
                 // Loop through the ids of rows.
-                foreach (string username in idsOfRows)
+                foreach (string hash in idsOfRows)
                 {
-                    // Check if the username exists in the table, throw an argument exception if it doesn't exist.
-                    if (!await CheckUserExistenceAsync(username).ConfigureAwait(false))
+                    // Check if the hash exists in the table, throw an argument exception if it doesn't exist.
+                    if (!await CheckHashExistenceAsync(hash).ConfigureAwait(false))
                     {
-                        throw new ArgumentException(Constants.UserDeleteDNE);
+                        throw new ArgumentException(Constants.MapDeleteDNE);
                     }
 
-                    // Construct the sql string for deleteing where the username column equals the @USERNAME parameter.
-                    string sqlString = $"DELETE FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME;";
+                    // Construct the sql string for deleteing where the hash column equals the @HASH parameter.
+                    string sqlString = $"DELETE FROM {Constants.MapDAOTableName} WHERE {Constants.MapDAOHashColumn} = @HASH;";
 
                     // Get the command object inside a using statement to properly dispose/close.
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                     {
-                        // Add the value of the username to the parameter and execute the non query asynchronously.
-                        command.Parameters.AddWithValue("@USERNAME", username);
+                        // Add the value of the hash to the parameter and execute the non query asynchronously.
+                        command.Parameters.AddWithValue("@HASH", hash);
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
@@ -149,28 +121,28 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Asynchronously read the information in the data store pointed to by the <paramref name="id"/>.
+        /// Asynchronously read the information in the adata store pointed to by the <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The id of the row to read (string)</param>
         /// <returns>Task (IDataObject) the information represented as an object</returns>
         public async Task<IDataObject> ReadByIdAsync(string id)
         {
             // Check if the id exists in the table, and throw an argument exception if it doesn't.
-            if (!await CheckUserExistenceAsync(id).ConfigureAwait(false))
+            if (!await CheckHashExistenceAsync(id).ConfigureAwait(false))
             {
-                throw new ArgumentException(Constants.UserReadDNE);
+                throw new ArgumentException(Constants.MapReadDNE);
             }
 
-            // Object to return -- UserObject
-            UserObject result;
+            // Object to return -- MapObject
+            MapObject result;
 
             // Get the connection inside of a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
                 connection.Open();
 
                 // Construct the sql string to get the record where the id column equals the id parameter.
-                string sqlString = $"SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @ID;";
+                string sqlString = $"SELECT * FROM {Constants.MapDAOTableName} WHERE {Constants.MapDAOHashColumn} = @ID;";
 
                 // Get the command and data table objects inside using statements to properly dispose/close.
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -183,14 +155,8 @@ namespace TeamA.Exogredient.DAL
                     dataTable.Load(reader);
                     DataRow row = dataTable.Rows[0];
 
-                    // Construct the UserObject by casting the values of the columns to their proper data types.
-                    result = new UserObject((string)row[Constants.UserDAOusernameColumn], (string)row[Constants.UserDAOnameColumn], (string)row[Constants.UserDAOemailColumn],
-                                            (string)row[Constants.UserDAOphoneNumberColumn], (string)row[Constants.UserDAOpasswordColumn],
-                                            (bool)row[Constants.UserDAOdisabledColumn] ? Constants.DisabledStatus : Constants.EnabledStatus, (string)row[Constants.UserDAOuserTypeColumn],
-                                            (string)row[Constants.UserDAOsaltColumn], (long)row[Constants.UserDAOtempTimestampColumn],
-                                            (string)row[Constants.UserDAOemailCodeColumn], (long)row[Constants.UserDAOemailCodeTimestampColumn],
-                                            (int)row[Constants.UserDAOloginFailuresColumn], (long)row[Constants.UserDAOlastLoginFailTimestampColumn],
-                                            (int)row[Constants.UserDAOemailCodeFailuresColumn], (int)row[Constants.UserDAOphoneCodeFailuresColumn]);
+                    // Construct the MapObject by casting the values of the columns to their proper data types.
+                    result = new MapObject((string)row[Constants.MapDAOHashColumn], (string)row[Constants.MapDAOActualColumn], (int)row[Constants.MapDAOoccurrencesColumn]);
                 }
             }
 
@@ -204,46 +170,46 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task (bool) whether the function executed without exception.</returns>
         public async Task<bool> UpdateAsync(ISQLRecord record)
         {
-            // Try casting the record to a UserRecord, throw an argument exception if it fails.
+            // Try casting the record to a MapRecord, throw an argument exception if it fails.
             try
             {
-                UserRecord temp = (UserRecord)record;
+                MapRecord temp = (MapRecord)record;
             }
             catch
             {
-                throw new ArgumentException(Constants.UserUpdateInvalidArgument);
+                throw new ArgumentException(Constants.MapUpdateInvalidArgument);
             }
 
             // Get the record data.
-            UserRecord userRecord = (UserRecord)record;
+            MapRecord userRecord = (MapRecord)record;
             IDictionary<string, object> recordData = userRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
                 // Open the connection.
                 connection.Open();
 
                 // Construct the sql string to update the table name where..
-                string sqlString = $"UPDATE {Constants.UserDAOtableName} SET ";
+                string sqlString = $"UPDATE {Constants.MapDAOTableName} SET ";
 
                 // Loop through the record data.
                 int count = 0;
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    // Check if the value at the username column is contained within the table, throw an argument
+                    // Check if the value at the hash column is contained within the table, throw an argument
                     // exception if it doesn't exist.
-                    if (pair.Key == Constants.UserDAOusernameColumn)
+                    if (pair.Key == Constants.MapDAOHashColumn)
                     {
-                        if (!await CheckUserExistenceAsync((string)pair.Value).ConfigureAwait(false))
+                        if (!await CheckHashExistenceAsync((string)pair.Value).ConfigureAwait(false))
                         {
-                            throw new ArgumentException(Constants.UserUpdateDNE);
+                            throw new ArgumentException(Constants.MapUpdateDNE);
                         }
                     }
 
                     // Update only the values where the record value is not null (string == null, numeric == -1).
                     // Again, use parameters to prevent against sql injections.
-                    if (pair.Key != Constants.UserDAOusernameColumn)
+                    if (pair.Key != Constants.MapDAOHashColumn)
                     {
                         if (pair.Value is int)
                         {
@@ -271,9 +237,9 @@ namespace TeamA.Exogredient.DAL
                     count++;
                 }
 
-                // Remove the last comma and identify the record by its username column.
+                // Remove the last comma and identify the record by its hash column.
                 sqlString = sqlString.Remove(sqlString.Length - 1);
-                sqlString += $" WHERE {Constants.UserDAOusernameColumn} = '{recordData[Constants.UserDAOusernameColumn]}';";
+                sqlString += $" WHERE {Constants.MapDAOHashColumn} = '{recordData[Constants.MapDAOHashColumn]}';";
 
                 // Get the command inside a using statement to properly dispose/close.
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -282,7 +248,7 @@ namespace TeamA.Exogredient.DAL
                     count = 0;
                     foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Key != Constants.UserDAOusernameColumn)
+                        if (pair.Key != Constants.MapDAOHashColumn)
                         {
                             if (pair.Value is int)
                             {
@@ -319,21 +285,21 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Check if the <paramref name="username"/> exists.
+        /// Check if the <paramref name="hash"/> exists.
         /// </summary>
-        /// <param name="username"> username to be checked </param>
-        /// <returns> true if username exists, otherwise false </returns>
-        public async Task<bool> CheckUserExistenceAsync(string username)
+        /// <param name="hash"> hash to be checked </param>
+        /// <returns> true if hash exists, otherwise false </returns>
+        public async Task<bool> CheckHashExistenceAsync(string hash)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
             {
                 // Open the connection.
                 connection.Open();
 
-                // Construct the sql string to select all from the table where the username column matches the username,
+                // Construct the sql string to select all from the table where the hash column matches the hash,
                 // then check if at least 1 row exists. Use a parameter to protect against sql injections.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME);";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.MapDAOTableName} WHERE {Constants.MapDAOHashColumn} = @HASH);";
 
                 bool result;
 
@@ -341,73 +307,7 @@ namespace TeamA.Exogredient.DAL
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
                     // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
-                    command.Parameters.AddWithValue("@USERNAME", username);
-                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    await reader.ReadAsync().ConfigureAwait(false);
-                    result = reader.GetBoolean(0);
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Check if the <paramref name="phoneNumber"/> exists.
-        /// </summary>
-        /// <param name="phoneNumber"> phone number to be checked </param>
-        /// <returns> true if phone number exists, otherwise false </returns>
-        public async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
-        {
-            // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
-            {
-                // Open the connection.
-                connection.Open();
-
-                // Construct the sql string to select all from the table where the phone number column matches the phoneNumber,
-                // then check if at least 1 row exists. Use a parameter to protect against sql injections.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOphoneNumberColumn} = @PHONENUMBER);";
-
-                bool result;
-
-                // Open the command inside a using statement to properly dispose/close.
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
-                    command.Parameters.AddWithValue("@PHONENUMBER", phoneNumber);
-                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    await reader.ReadAsync().ConfigureAwait(false);
-                    result = reader.GetBoolean(0);
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Check if the <paramref name="email"/> exists.
-        /// </summary>
-        /// <param name="email"> email to be checked </param>
-        /// <returns> true if email exists, otherwise false </returns>
-        public async Task<bool> CheckEmailExistenceAsync(string email)
-        {
-            // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
-            {
-                // Open the connection.
-                connection.Open();
-
-                // Construct the sql string to select all from the table where the email column matches the email,
-                // then check if at least 1 row exists. Use a parameter to protect against sql injections.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOemailColumn} = @EMAIL);";
-
-                bool result;
-
-                // Open the command inside a using statement to properly dispose/close.
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
-                    command.Parameters.AddWithValue("@EMAIL", email);
+                    command.Parameters.AddWithValue("@HASH", hash);
                     var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                     await reader.ReadAsync().ConfigureAwait(false);
                     result = reader.GetBoolean(0);

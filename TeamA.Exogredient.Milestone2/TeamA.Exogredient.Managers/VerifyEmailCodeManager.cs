@@ -18,7 +18,7 @@ namespace TeamA.Exogredient.Managers
 
                 if (user.EmailCodeFailures >= Constants.MaxEmailCodeAttempts)
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyEmailOperation, username, ipAddress,
                                                   Constants.MaxEmailTriesReachedLogMessage).ConfigureAwait(false);
 
@@ -30,7 +30,7 @@ namespace TeamA.Exogredient.Managers
 
                 if (user.EmailCodeTimestamp + maxValidTimeSeconds < currentUnix)
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyEmailOperation, username, ipAddress,
                                                   Constants.EmailCodeExpiredLogMessage).ConfigureAwait(false);
 
@@ -40,14 +40,14 @@ namespace TeamA.Exogredient.Managers
                 if (user.EmailCode.Equals(inputCode))
                 {
                     emailVerificationSuccess = true;
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyEmailOperation, username, ipAddress).ConfigureAwait(false);
 
                     return UtilityService.CreateResult(Constants.VerifyEmailSuccessUserMessage, emailVerificationSuccess, false, currentNumExceptions);
                 }
                 else
                 {
-                    await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.VerifyEmailOperation, username, ipAddress,
                                                   Constants.WrongEmailCodeMessage).ConfigureAwait(false);
 
@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.Managers
             }
             catch (Exception e)
             {
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.VerifyEmailOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)

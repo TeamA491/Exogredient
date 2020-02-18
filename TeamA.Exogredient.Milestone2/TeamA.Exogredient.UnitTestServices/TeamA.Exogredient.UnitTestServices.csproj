@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="MailKit" Version="2.4.1" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.5.2" />
-    <PackageReference Include="Twilio" Version="5.36.0" />
+    <PackageReference Include="Twilio" Version="5.37.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj" />

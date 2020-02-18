@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.Services;
-using System.IO;
-using System;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.Tests
 {
@@ -15,7 +15,11 @@ namespace TeamA.Exogredient.Tests
         {
             try
             {
-                await UserManagementService.CreateUserAsync(false, "eli", "test", "test", "test", phoneNumber, "test", 0, "test", "test").ConfigureAwait(false);
+                // Arrange: Create user 
+                UserRecord user = new UserRecord(username, "eli", "test@gamil.com", phoneNumber, "asdasd", Constants.EnabledStatus, Constants.CustomerUserType,
+                                                 "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+
+                await UserManagementService.CreateUserAsync(false, user).ConfigureAwait(false);
             }
             catch
             { }
@@ -33,7 +37,10 @@ namespace TeamA.Exogredient.Tests
         {
             try
             {
-                await UserManagementService.CreateUserAsync(false, "eli", "test", "test", emailAddress, "test", "test", 0, "test", "test").ConfigureAwait(false);
+                // Arrange: Create user 
+                UserRecord user = new UserRecord(username, "eli", emailAddress, "5625555555", "asdasd", Constants.EnabledStatus, Constants.CustomerUserType,
+                                        "123123", Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+                await UserManagementService.CreateUserAsync(false, user).ConfigureAwait(false);
             }
             catch
             { }

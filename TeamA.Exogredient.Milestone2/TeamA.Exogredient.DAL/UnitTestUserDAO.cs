@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
@@ -111,8 +110,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> data = User[id].GetData();
 
             // Return the data in UserObject.
-            return new UserObject((string)data[Constants.UserDAOusernameColumn], (string)data[Constants.UserDAOfirstNameColumn],
-                                  (string)data[Constants.UserDAOlastNameColumn], (string)data[Constants.UserDAOemailColumn],
+            return new UserObject((string)data[Constants.UserDAOusernameColumn], (string)data[Constants.UserDAOnameColumn], (string)data[Constants.UserDAOemailColumn],
                                   (string)data[Constants.UserDAOphoneNumberColumn], (string)data[Constants.UserDAOpasswordColumn],
                                   (int)data[Constants.UserDAOdisabledColumn], (string)data[Constants.UserDAOuserTypeColumn],
                                   (string)data[Constants.UserDAOsaltColumn], (long)data[Constants.UserDAOtempTimestampColumn],

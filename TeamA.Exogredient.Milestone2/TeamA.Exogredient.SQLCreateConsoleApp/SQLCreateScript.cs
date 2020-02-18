@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
 
@@ -11,7 +12,8 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
     {
         private static readonly string _connection = Constants.SQLConnection;
 
-        private const string _schema = Constants.SQLSchemaName;
+        private const string _exogredientSchema = Constants.ExogredientSQLSchemaName;
+        private const string _mapSchema = Constants.MapSQLSchemaName;
 
         /// <summary>
         /// Function to execute the necessary create table sql statements.
@@ -19,10 +21,11 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         /// <returns>Task</returns>
         public static async Task Main()
         {
-            // Directions: Comment out the specific create function that you do not want to execute.
+            // Directions: Uncomment the specific create function that you do not want to execute.
 
-            await CreateUserTable().ConfigureAwait(false);
+            //await CreateUserTable().ConfigureAwait(false);
             await CreateIPTable().ConfigureAwait(false);
+            //await CreateMapTable().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -37,18 +40,17 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
-            string sqlString = @$"CREATE TABLE `{_schema}`.`{Constants.UserDAOtableName}` (" +
-                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({Constants.MaximumUsernameCharacters}) NOT NULL," +
-                               $@"`{Constants.UserDAOfirstNameColumn}` VARCHAR({Constants.MaximumFirstNameCharacters}) NOT NULL," +
-                               $@"`{Constants.UserDAOlastNameColumn}` VARCHAR({Constants.MaximumLastNameCharacters}) NOT NULL," +
-                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({Constants.MaximumEmailCharacters}) NOT NULL," +
-                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({Constants.PhoneNumberCharacterLength}) NOT NULL," +
-                               $@"`{Constants.UserDAOpasswordColumn}` VARCHAR({Constants.DefaultHashLength}) NOT NULL," +
+            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.UserDAOtableName}` (" +
+                               $@"`{Constants.UserDAOusernameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumUsernameCharacters)}) NOT NULL," +
+                               $@"`{Constants.UserDAOnameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOnameColumn] ? Constants.DefaultHashCharacterLength : (Constants.MaximumFirstNameCharacters + Constants.MaximumLastNameCharacters + 1))}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumEmailCharacters)}) NOT NULL," +
+                               $@"`{Constants.UserDAOphoneNumberColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOphoneNumberColumn] ? Constants.DefaultHashCharacterLength : Constants.PhoneNumberCharacterLength)}) NOT NULL," +
+                               $@"`{Constants.UserDAOpasswordColumn}` VARCHAR({Constants.DefaultHashCharacterLength}) NOT NULL," +
                                $@"`{Constants.UserDAOdisabledColumn}` TINYINT(1) NOT NULL," +
-                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({Constants.MaximumUserTypeLength}) NOT NULL," +
+                               $@"`{Constants.UserDAOuserTypeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOuserTypeColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumUserTypeLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOsaltColumn}` VARCHAR({Constants.DefaultSaltLength}) NOT NULL," +
                                $@"`{Constants.UserDAOtempTimestampColumn}` BIGINT NOT NULL," +
-                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({Constants.EmailCodeLength}) NOT NULL," +
+                               $@"`{Constants.UserDAOemailCodeColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailCodeColumn] ? Constants.DefaultHashCharacterLength : Constants.EmailCodeLength)}) NOT NULL," +
                                $@"`{Constants.UserDAOemailCodeTimestampColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.UserDAOloginFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.UserDAOlastLoginFailTimestampColumn}` BIGINT NOT NULL," +
@@ -77,8 +79,8 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
-            string sqlString = @$"CREATE TABLE `{_schema}`.`{Constants.IPAddressDAOtableName}` (" +
-                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({Constants.IPAddressLength}) NOT NULL," +
+            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.IPAddressDAOtableName}` (" +
+                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({(Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn] ? Constants.DefaultHashCharacterLength : Constants.IPAddressLength)}) NOT NULL," +
                                $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.IPAddressDAOregistrationFailuresColumn}` INT NOT NULL," +
                                $@"`{Constants.IPAddressDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
@@ -88,6 +90,31 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             MySqlCommand command = new MySqlCommand(sqlString, connection);
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
+
+            return true;
+        }
+
+        private static async Task<bool> CreateMapTable()
+        {
+            MySqlConnection connection = new MySqlConnection(_connection);
+
+            connection.Open();
+
+            // Construct the sql string based on the constants for table name, column names, and variable length values.
+            string sqlString = @$"CREATE TABLE `{_mapSchema}`.`{Constants.MapDAOTableName}` (" +
+                               $@"`{Constants.MapDAOHashColumn}` VARCHAR({Constants.DefaultHashCharacterLength}) NOT NULL," +
+                               $@"`{Constants.MapDAOActualColumn}` LONGTEXT NOT NULL," +
+                               $@"`{Constants.MapDAOoccurrencesColumn}` INT NOT NULL," +
+                               $@"PRIMARY KEY(`{Constants.MapDAOHashColumn}`));" +
+                               $@"INSERT INTO `{_mapSchema}`.`{Constants.MapDAOTableName}` (`{Constants.MapDAOHashColumn}`, `{Constants.MapDAOActualColumn}`, `{Constants.MapDAOoccurrencesColumn}`) VALUES('0', '1', '1');" +
+                               $@"INSERT INTO `{_mapSchema}`.`{Constants.MapDAOTableName}` (`{Constants.MapDAOHashColumn}`, `{Constants.MapDAOActualColumn}`, `{Constants.MapDAOoccurrencesColumn}`) VALUES('1', '0', '1');";
+
+            // Create the commmand object and execute/dispose it asynchronously.
+            MySqlCommand command = new MySqlCommand(sqlString, connection);
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await command.DisposeAsync().ConfigureAwait(false);
+
+            Environment.SetEnvironmentVariable("COUNT", (2).ToString(), EnvironmentVariableTarget.User);
 
             return true;
         }

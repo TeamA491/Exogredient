@@ -14,14 +14,14 @@ namespace TeamA.Exogredient.Managers
             {
                 await AuthenticationService.SendEmailVerificationAsync(username, emailAddress).ConfigureAwait(false);
 
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendEmailCodeOperation, username, ipAddress).ConfigureAwait(false);
 
                 return UtilityService.CreateResult(Constants.SendEmailCodeSuccessUserMessage, true, false, currentNumExceptions);
             }
             catch (Exception e)
             {
-                await LoggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendEmailCodeOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)

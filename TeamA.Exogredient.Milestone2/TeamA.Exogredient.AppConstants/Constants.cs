@@ -15,9 +15,17 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string SystemEmailPassword = Environment.GetEnvironmentVariable("SYSTEM_EMAIL_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string NOSQLConnection = Environment.GetEnvironmentVariable("NOSQL_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string SQLConnection = Environment.GetEnvironmentVariable("SQL_CONNECTION", EnvironmentVariableTarget.User);
+        public static readonly string MapSQLConnection = Environment.GetEnvironmentVariable("MAPTABLE_CONNECTION", EnvironmentVariableTarget.User);
         public static readonly string FTPpassword = Environment.GetEnvironmentVariable("FTP_PASSWORD", EnvironmentVariableTarget.User);
         public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
+        public static readonly string ProjectStatus = Environment.GetEnvironmentVariable("PROJECT_STATUS", EnvironmentVariableTarget.User);
+
+        // PROJECT STATUSES
+        public static readonly string StatusDev = "DEVELOPMENT";
+        public static readonly string StatusProd = "PRODUCTION";
+        public static readonly string StatusTest = "TESTING";
+
 
         // STRING UTILITY HELPER DATA STRUCTURES
         public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
@@ -167,7 +175,8 @@ namespace TeamA.Exogredient.AppConstants
         // SECURITY SERVICE
         public const int DefaultSaltLength = 8;
         public const int DefaultHashIterations = 10000;
-        public const int DefaultHashLength = 32;
+        public const int DefaultHashCharacterLength = 64;
+        public const int DefaultHashByteLength = 32;
 
         public const int ByteLength = 8;
 
@@ -208,6 +217,8 @@ namespace TeamA.Exogredient.AppConstants
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
 
+        public const string NoError = "null";
+
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
         public const string VerifyEmailOperation = "Verify Email Code";
@@ -215,10 +226,24 @@ namespace TeamA.Exogredient.AppConstants
         public const string SendPhoneCodeOperation = "Send Phone Code";
         public const string SendEmailCodeOperation = "Send Email Code";
         public const string UpdatePasswordOperation = "Update Password";
+        public const string SingleUserCreateOperation = "Single User Create";
+        public const string BulkUserCreateOperation = "Bulk User Create";
+        public const string SingleUserDeleteOperation = "Single Delete Create";
+        public const string BulkUserDeleteOperation = "Bulk User Delete";
+        public const string UpdateSingleUserOperation = "Single User Update";
+        public const string BulkUserUpdateOperation = "Bulk User Update";
+        public const string MapTableReadFromOperation = "Map Table Read From";
+        public const string MapTableModifiedOperation = "Map Table Modified";
+        public const string UpdateSingleIPOperation = "Single IP Update";
+        public const string DeleteSingleIPOperation = "Single IP Delete";
 
         public const string CustomerUserType = "Customer";
+        public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
         public const string AnonymousUserIdentifier = "<Unregistered Customer>";
+        public const string SystemIdentifier = "System";
+
+        public const string LocalHost = "127.0.0.1";
 
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
@@ -380,13 +405,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string TokenFile = "token.txt";
 
         // SQL SCHEMA
-        public const string SQLSchemaName = "exogredient";
+        public const string ExogredientSQLSchemaName = "exogredient";
+        public const string MapSQLSchemaName = "mapping_table";
 
         // USER TABLE
         public const string UserDAOtableName = "user";
         public const string UserDAOusernameColumn = "username";                                  // VARCHAR(200)
-        public const string UserDAOfirstNameColumn = "first_name";                               // VARCHAR(200)
-        public const string UserDAOlastNameColumn = "last_name";                                 // VARCHAR(200)
+        public const string UserDAOnameColumn = "name";                                          // VARCHAR(401)
         public const string UserDAOemailColumn = "email";                                        // VARCHAR(200)
         public const string UserDAOphoneNumberColumn = "phone_number";                           // VARCHAR(10)
         public const string UserDAOpasswordColumn = "password";                                  // VARCHAR(2000)
@@ -401,12 +426,47 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDAOemailCodeFailuresColumn = "email_code_failures";              // INT
         public const string UserDAOphoneCodeFailuresColumn = "phone_code_failures";              // INT
 
+        // RECORD HELPER DATA STRUCTURES
+        public static readonly IDictionary<string, bool> UserDAOIsColumnMasked = new Dictionary<string, bool>()
+        {
+            {UserDAOusernameColumn, false},
+            {UserDAOnameColumn, true},
+            {UserDAOemailColumn, true},
+            {UserDAOphoneNumberColumn, true},
+            {UserDAOpasswordColumn, false},
+            {UserDAOdisabledColumn, false},
+            {UserDAOuserTypeColumn, false},
+            {UserDAOsaltColumn, false},
+            {UserDAOtempTimestampColumn, false},
+            {UserDAOemailCodeColumn, false},
+            {UserDAOemailCodeTimestampColumn, false},
+            {UserDAOloginFailuresColumn, false},
+            {UserDAOlastLoginFailTimestampColumn, false},
+            {UserDAOemailCodeFailuresColumn, false},
+            {UserDAOphoneCodeFailuresColumn, false}
+        };
+
         // IP ADDRESS TABLE
         public const string IPAddressDAOtableName = "ip_address";
         public const string IPAddressDAOIPColumn = "ip";                                         // VARCHAR(15)
         public const string IPAddressDAOtimestampLockedColumn = "timestamp_locked";              // BIGINT -- unix
         public const string IPAddressDAOregistrationFailuresColumn = "registration_failures";    // INT
         public const string IPAddressDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT -- unix
+
+        // RECORD HELPER DATA STRUCTURES
+        public static readonly IDictionary<string, bool> IPAddressDAOIsColumnMasked = new Dictionary<string, bool>()
+        {
+            {IPAddressDAOIPColumn, true},
+            {IPAddressDAOtimestampLockedColumn, false},
+            {IPAddressDAOregistrationFailuresColumn, false},
+            {IPAddressDAOlastRegFailTimestampColumn, false}
+        };
+
+        // MAP TABLE
+        public const string MapDAOTableName = "map";
+        public const string MapDAOHashColumn = "hash";
+        public const string MapDAOActualColumn = "actual";
+        public const string MapDAOoccurrencesColumn = "occurrences";
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
@@ -423,6 +483,16 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
 
+        // RECORD HELPER DATA STRUCTURES
+        public static readonly IDictionary<string, bool> LogsCollectionIsColumnMasked = new Dictionary<string, bool>()
+        {
+            {LogsTimestampField, false},
+            {LogsOperationField, false},
+            {LogsIdentifierField, false},
+            {LogsIPAddressField, true},
+            {LogsErrorTypeField, false}
+        };
+
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";
         public const string JWSthreeSegments = "JWS must have 3 segments separated by periods.";
@@ -436,6 +506,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string InvalidKeyValue = "Invalid key/value pair.";
         public const string KeyValueNoDoubleQuotes = "Key or value isn't surrounded by double quotes.";
         public const string KeyValueNotAlphaNum = "Key or value is not alpha-numeric (excluding white-space).";
+        public const string MustBeAdmin = "adminName does not exists or is not an admin";
 
         // EXCEPTION MESSAGES -- Data Store Logging
         public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
@@ -466,6 +537,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserReadDNE = "UserDAO.ReadByIdAsync username did not exist";
         public const string UserUpdateDNE = "UserDAO.UpdateAsync username did not exist";
 
+        // EXCEPTION MESSAGES -- MapDAO
+        public const string MapCreateInvalidArgument = "MapDAO.CreateAsync record argument must be of type MapRecord";
+        public const string MapDeleteDNE = "MapDAO.DeleteByIdsAsync hash did not exist";
+        public const string MapReadDNE = "MapDAO.ReadByIdAsync hash did not exist";
+        public const string MapUpdateDNE = "MapDAO.UpdateAsync hash did not exist";
+        public const string MapUpdateInvalidArgument = "MapDAO.UpdateAsync record argument must be of type MapRecord";
+
         // EXCEPTION MESSAGES -- Archiving
         public const string SourceDirectoryDNE = "Archiving failed on because source directory did not exist";
         public const string FirstArgumentNotInt = "Archiving failed because first argument must be an integer";
@@ -479,5 +557,20 @@ namespace TeamA.Exogredient.AppConstants
         public const string FTPfileNotFound = "FTP archive File not found.";
         public const string FTPinvalidCredentials = "Invalid ftp credentials";
 
+        // EXCEPTION MESSAGES -- Project Status
+        public const string NotInDevelopment = "Failed on because project status is not in development";
+
+        // EXCEPTION MESSAGES -- Masking
+        public const string HashNotInTable = "The hash attempted to access for decrementation was not in the table";
+        public const string DecrementDeleteUnmasked = "DecrementMappingForDeleteAsync object was unmasked";
+        public const string DecrementUpdateUnmasked = "DecrementMappingForUpdateAsync object was unmasked";
+
+        // EXCEPTION MESSAGES -- UserManagement
+        public const string UpdateIPRecordMasked = "UpdateIPAsync record was masked";
+        public const string DeleteIPDNE = "DeleteIPAsync ip address did not exist";
+        public const string CreateUserRecordMasked = "CreateUserAsync record was masked";
+        public const string CreateUsersRecordMasked = "CreateUsersAsync record was masked";
+        public const string UpdateUserRecordMasked = "UpdateUserAsync record was masked";
+        public const string BulkUpdateUsersRecordMasked = "UpdateUserAsync record was masked";
     }
 }

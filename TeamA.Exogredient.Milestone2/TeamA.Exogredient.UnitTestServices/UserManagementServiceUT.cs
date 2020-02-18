@@ -152,8 +152,8 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <param name="userType">Used to specify the user's type.</param>
         /// <param name="salt">Used to specify the salt associated with the user's password digest.</param>
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
-        public static bool CreateUser(bool isTemp, string username, string firstName, string lastName, string email,
-                                                       string phoneNumber, string password, int disabled, string userType, string salt)
+        public static bool CreateUser(bool isTemp, string username, string name, string email,
+                                      string phoneNumber, string password, int disabled, string userType, string salt)
         {
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
@@ -161,7 +161,7 @@ namespace TeamA.Exogredient.UnitTestServices
 
             // Email code, email code timestamp, login failures, last login failure timestamp, email code failures,
             // and phone code failures initialized to have no value.
-            UserRecord record = new UserRecord(username, firstName, lastName, email, phoneNumber, password,
+            UserRecord record = new UserRecord(username, name, email, phoneNumber, password,
                                                disabled, userType, salt, tempTimestamp, Constants.NoValueString, Constants.NoValueLong,
                                                Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 

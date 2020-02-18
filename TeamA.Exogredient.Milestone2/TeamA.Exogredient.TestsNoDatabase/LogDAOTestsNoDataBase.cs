@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
+
 namespace TeamA.Exogredient.TestsNoDatabase
 {
     [TestClass]
