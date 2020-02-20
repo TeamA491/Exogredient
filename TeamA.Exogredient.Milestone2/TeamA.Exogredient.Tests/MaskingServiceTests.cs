@@ -11,10 +11,14 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class MaskingServiceTests
     {
-        private readonly MaskingService _maskingService = new MaskingService(new MapDAO());
-        private readonly IPAddressDAO _ipDAO = new IPAddressDAO();
-        private readonly UserDAO _userDAO = new UserDAO();
-        private readonly MapDAO _mapDAO = new MapDAO();
+        private static readonly IPAddressDAO _ipDAO = new IPAddressDAO(Constants.SQLConnection);
+        private static readonly UserDAO _userDAO = new UserDAO(Constants.SQLConnection);
+        private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
+        private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
+        private static readonly LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
+        private static readonly DataStoreLoggingService _dsLog = new DataStoreLoggingService(_logDAO, _maskingService);
+        private static readonly FlatFileLoggingService _ffLog = new FlatFileLoggingService(_maskingService);
+        private static readonly UserManagementService _userManagementService = new UserManagementService(_userDAO, _ipDAO, _dsLog, _ffLog, _maskingService);
 
         [TestMethod]
         public async Task MaskingService_MaskAsync_WorksWithDifferentRecords()
@@ -40,8 +44,8 @@ namespace TeamA.Exogredient.Tests
         public async Task MaskingService_MaskAsync_AllNecessaryColumnsAreDifferent()
         {
             UserRecord record = new UserRecord("username", "name", "email", "9499815506", "password", Constants.EnabledStatus,
-                                                Constants.CustomerUserType, "salt", UtilityService.CurrentUnixTime(), "89456",
-                                                UtilityService.CurrentUnixTime(), 5, UtilityService.CurrentUnixTime(), 4, 7);
+                                                Constants.CustomerUserType, "salt", TimeUtilityService.CurrentUnixTime(), "89456",
+                                                TimeUtilityService.CurrentUnixTime(), 5, TimeUtilityService.CurrentUnixTime(), 4, 7);
 
             IDictionary<string, object> data = record.GetData();
 
@@ -70,12 +74,12 @@ namespace TeamA.Exogredient.Tests
         public async Task MaskingService_UnMaskAsync_WorksWithDifferentObjects(bool isTemp, string username, string name, string email,
                                                                                string phoneNumber, string password, string userType, string salt, string ipAddress)
         {
-            await UserManagementService.CreateIPAsync(ipAddress).ConfigureAwait(false);
+            await _userManagementService.CreateIPAsync(ipAddress).ConfigureAwait(false);
 
             UserRecord userRecord = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, userType,
                                              salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
-            await UserManagementService.CreateUserAsync(isTemp, userRecord).ConfigureAwait(false);
+            await _userManagementService.CreateUserAsync(isTemp, userRecord).ConfigureAwait(false);
 
             string id = username;
 
@@ -102,8 +106,8 @@ namespace TeamA.Exogredient.Tests
             Assert.IsTrue(ip.IsUnMasked());
             Assert.IsTrue(user.IsUnMasked());
 
-            await UserManagementService.DeleteIPAsync(ipAddress).ConfigureAwait(false);
-            await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            await _userManagementService.DeleteIPAsync(ipAddress).ConfigureAwait(false);
+            await _userManagementService.DeleteUserAsync(username).ConfigureAwait(false);
         }
 
         [DataTestMethod]
@@ -114,7 +118,7 @@ namespace TeamA.Exogredient.Tests
             UserRecord userRecord = new UserRecord(username, name, email, phoneNumber, password, Constants.EnabledStatus, userType,
                                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
 
-            await UserManagementService.CreateUserAsync(isTemp, userRecord).ConfigureAwait(false);
+            await _userManagementService.CreateUserAsync(isTemp, userRecord).ConfigureAwait(false);
 
             string id = username;
 
@@ -138,7 +142,7 @@ namespace TeamA.Exogredient.Tests
                 Assert.Fail();
             }
 
-            await UserManagementService.DeleteUserAsync(username).ConfigureAwait(false);
+            await _userManagementService.DeleteUserAsync(username).ConfigureAwait(false);
         }
 
         [DataTestMethod]

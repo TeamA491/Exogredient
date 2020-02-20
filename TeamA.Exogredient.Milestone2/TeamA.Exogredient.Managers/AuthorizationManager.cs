@@ -4,24 +4,32 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Managers
 {
-    public static class AuthorizationManager
+    public class AuthorizationManager
     {
-        public static bool AuthorizeUser(string operation, string jwsToken)
+
+        readonly AuthorizationService _authorizationService;
+        readonly SessionService _sessionService;
+
+        public AuthorizationManager(AuthorizationService authorizationService, SessionService sessionService)
+        {
+            _authorizationService = authorizationService;
+            _sessionService = sessionService;
+        }
+
+
+        public bool AuthorizeUser(string operation, string jwsToken)
         {
             try
             {
-                SessionService sessionService = new SessionService();
-                AuthorizationService authorizationService = new AuthorizationService();
-
                 // Decrypt it here to make sure the token wasn't tampered with
                 // or it isn't valid
-                Dictionary<string, string> payload = authorizationService.DecryptJWT(jwsToken);
+                Dictionary<string, string> payload = _authorizationService.DecryptJWT(jwsToken);
 
-                if (sessionService.TokenIsExpired(jwsToken))
+                if (_sessionService.TokenIsExpired(jwsToken))
                     return false;
 
                 // Only refresh the token if it isn't expired
-                jwsToken = sessionService.RefreshJWT(jwsToken);
+                jwsToken = _sessionService.RefreshJWT(jwsToken);
 
                 // Make sure the user type is an int
                 int userType;
@@ -30,7 +38,7 @@ namespace TeamA.Exogredient.Managers
                     return false;
 
                 // Check if this user has permission to access the resource
-                return authorizationService.UserHasPermissionForOperation(userType, operation);
+                return _authorizationService.UserHasPermissionForOperation(userType, operation);
             }
             catch
             {

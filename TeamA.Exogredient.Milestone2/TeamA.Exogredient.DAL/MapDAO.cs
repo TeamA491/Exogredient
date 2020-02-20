@@ -13,6 +13,11 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class MapDAO : IMasterSQLDAO<string>
     {
+        private string MapSQLConnection;
+        public MapDAO(string connection)
+        {
+            MapSQLConnection = connection;
+        }
         /// <summary>
         /// Asynchronously creates the <paramref name="record"/> in the data store.
         /// </summary>
@@ -34,7 +39,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = mapRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(MapSQLConnection))
             {
                 connection.Open();
 
@@ -91,7 +96,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(MapSQLConnection))
             {
                 connection.Open();
 
@@ -137,7 +142,7 @@ namespace TeamA.Exogredient.DAL
             MapObject result;
 
             // Get the connection inside of a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(MapSQLConnection))
             {
                 connection.Open();
 
@@ -185,7 +190,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = userRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(MapSQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -292,7 +297,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckHashExistenceAsync(string hash)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.MapSQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(MapSQLConnection))
             {
                 // Open the connection.
                 connection.Open();

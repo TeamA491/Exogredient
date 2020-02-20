@@ -12,6 +12,12 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class LogDAO : IMasterNOSQLDAO<string>
     {
+        private string NOSQLConnection;
+        public LogDAO(string connection)
+        {
+            NOSQLConnection = connection;
+        }
+
         /// <summary>
         /// Asynchronously inserts the <paramref name="record"/>'s data into the data store defined
         /// by the <paramref name="groupName"/>.
@@ -34,7 +40,7 @@ namespace TeamA.Exogredient.DAL
             LogRecord logRecord = (LogRecord)record;
 
             // Get the session inside a using statement to properly dispose/close.
-            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            using (Session session = MySQLX.GetSession(NOSQLConnection))
             {
                 // Create the schema if it doesn't exist.
                 Schema schema;
@@ -74,7 +80,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> DeleteAsync(string uniqueId, string groupName)
         {
             // Get the session inside a using statement to properly dispose/close.
-            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            using (Session session = MySQLX.GetSession(NOSQLConnection))
             {
                 // Get the schema and collection.
                 Schema schema = session.GetSchema(Constants.LogsSchemaName);
@@ -124,7 +130,7 @@ namespace TeamA.Exogredient.DAL
             LogRecord logRecord = (LogRecord)record;
 
             // Get the session inside a using statement to properly dispose/close.
-            using (Session session = MySQLX.GetSession(Constants.NOSQLConnection))
+            using (Session session = MySQLX.GetSession(NOSQLConnection))
             {
                 // Get the schema and collection.
                 Schema schema = session.GetSchema(Constants.LogsSchemaName);

@@ -13,7 +13,6 @@ namespace TeamA.Exogredient.Services
     public class MaskingService
     {
         private readonly MapDAO _mapDAO;
-
         /// <summary>
         /// Creates the masking service with its dependencies initialized.
         /// </summary>
@@ -105,7 +104,7 @@ namespace TeamA.Exogredient.Services
                             else if (isCreate)
                             {
                                 // Otherwise, if this function is being used in a creation, increment the occurrences. Do nothing otherwise.
-                                MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hashString).ConfigureAwait(false);
+                                MapObject mapObj = await _mapDAO.ReadByIdAsync(hashString).ConfigureAwait(false) as MapObject;
                                 await UpdateOccurrencesAsync(hashString, mapObj.Occurrences + 1).ConfigureAwait(false);
                             }
 
@@ -168,21 +167,17 @@ namespace TeamA.Exogredient.Services
                         // If the data is a string simply add the actual value to the parameters.
                         if (data.Item1 is string)
                         {
-                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
+                            MapObject map = await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false) as MapObject;
 
                             parameters[i] = map.Actual;
                         }
                         else
                         {
                             // Otherwise we must parse the string actual value into an integer and add that to the parameters.
-                            MapObject map = (MapObject)await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false);
+                            MapObject map = await _mapDAO.ReadByIdAsync(data.Item1.ToString()).ConfigureAwait(false) as MapObject;
 
                             parameters[i] = Int32.Parse(map.Actual);
                         }
-
-                        // Log the map table read access evet.
-                        await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.MapTableReadFromOperation,
-                                                      Constants.SystemIdentifier, Constants.LocalHost).ConfigureAwait(false);
                     }
                     else
                     {
@@ -244,7 +239,7 @@ namespace TeamA.Exogredient.Services
                 throw new ArgumentException(Constants.HashNotInTable);
             }
 
-            MapObject mapObj = (MapObject)await _mapDAO.ReadByIdAsync(hashInput).ConfigureAwait(false);
+            MapObject mapObj = await _mapDAO.ReadByIdAsync(hashInput).ConfigureAwait(false) as MapObject;
 
             // If the new occurrences will be 0, we have to delete it from the Map table.
             if (mapObj.Occurrences - 1 == 0)

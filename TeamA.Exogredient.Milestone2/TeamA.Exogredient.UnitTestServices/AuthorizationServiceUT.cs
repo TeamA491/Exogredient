@@ -53,12 +53,12 @@ namespace TeamA.Exogredient.Services
             if (!payload.ContainsKey(Constants.EXPIRATION_FIELD))
             {
                 // Add a 20 min expiration
-                payload.Add(Constants.EXPIRATION_FIELD, UtilityService.GetEpochFromNow().ToString());
+                payload.Add(Constants.EXPIRATION_FIELD, TimeUtilityService.GetEpochFromNow().ToString());
             }
 
             // Base64 encode the header and payload
-            string encodedHeader = UtilityService.DictionaryToString(joseHeader).ToBase64URL();
-            string encodedPayload = UtilityService.DictionaryToString(payload).ToBase64URL();
+            string encodedHeader = StringUtilityService.DictionaryToString(joseHeader).ToBase64URL();
+            string encodedPayload = StringUtilityService.DictionaryToString(payload).ToBase64URL();
 
             // The signature will be the hash of the header and payload
             string stringToSign = encodedHeader + '.' + encodedPayload;
@@ -117,11 +117,11 @@ namespace TeamA.Exogredient.Services
 
             // Convert header back to dictionary format
             string decodedHeader = segments[0].FromBase64URL();
-            Dictionary<string, string> headerJSON = UtilityService.StringToDictionary(decodedHeader);
+            Dictionary<string, string> headerJSON = StringUtilityService.StringToDictionary(decodedHeader);
 
             // Convert payload back to dictionary format
             string decodedPayload = segments[1].FromBase64URL();
-            Dictionary<string, string> payloadJSON = UtilityService.StringToDictionary(decodedPayload);
+            Dictionary<string, string> payloadJSON = StringUtilityService.StringToDictionary(decodedPayload);
 
             // Make sure that we are using the correct encryption algorithm in the header
             if (headerJSON[Constants.SigningAlgKey] != Constants.SIGNING_ALGORITHM)

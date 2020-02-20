@@ -2,12 +2,24 @@
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TeamA.Exogredient.DAL;
 
 namespace TeamA.Exogredient.Tests
 {
     [TestClass]
-    public class AuthorizationServiceTests
+    public class _authorizationServiceTests
     {
+        private static readonly UserDAO _userDAO = new UserDAO(Constants.SQLConnection);
+        private static readonly IPAddressDAO _ipDAO = new IPAddressDAO(Constants.SQLConnection);
+        private static readonly LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
+        private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
+        private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
+        private static readonly DataStoreLoggingService _dsLog = new DataStoreLoggingService(_logDAO, _maskingService);
+        private static readonly FlatFileLoggingService _ffLog = new FlatFileLoggingService(_maskingService);
+        private static readonly UserManagementService _userManagementService = new UserManagementService(_userDAO, _ipDAO, _dsLog, _ffLog, _maskingService);
+        private static readonly AuthorizationService _authorizationService = new AuthorizationService();
+        private static readonly SessionService _sessionService = new SessionService(_userDAO, _authorizationService);
+
         private readonly Dictionary<string, string> TestPayload = new Dictionary<string, string>
         {
             { Constants.UserTypeKey, "1" },
@@ -34,63 +46,57 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public void AuthorizationService_RefreshJWS_SuccessTokenRefreshed()
+        public void _authorizationService_RefreshJWS_SuccessTokenRefreshed()
         {
             // Arrange
             string jwtToken;
             string refreshedToken;
             long expectedExpirationTime;
             Dictionary<string, string> payload;
-            SessionService sessionService = new SessionService();
-            AuthorizationService authorizationService = new AuthorizationService();
 
             // Act
-            jwtToken = authorizationService.GenerateJWT(TestPayload);
-            refreshedToken = sessionService.RefreshJWT(jwtToken,           // Token to refresh
+            jwtToken = _authorizationService.GenerateJWT(TestPayload);
+            refreshedToken = _sessionService.RefreshJWT(jwtToken,           // Token to refresh
                                                              1);                 // Set expiration 1 minute from now
 
-            payload = authorizationService.DecryptJWT(refreshedToken);
-            expectedExpirationTime = UtilityService.GetEpochFromNow(1);
+            payload = _authorizationService.DecryptJWT(refreshedToken);
+            expectedExpirationTime = TimeUtilityService.GetEpochFromNow(1);
 
             // Assert
             Assert.AreEqual(int.Parse(payload[Constants.AuthzExpirationField]), expectedExpirationTime);
         }
 
         [TestMethod]
-        public void AuthorizationService_TokenIsExpired_SuccessExpired()
+        public void _authorizationService_TokenIsExpired_SuccessExpired()
         {
             // Arrange
             string jwtToken;
             string expiredToken;
-            SessionService sessionService = new SessionService();
-            AuthorizationService authorizationService = new AuthorizationService();
 
             // Act
-            jwtToken = authorizationService.GenerateJWT(TestPayload);
-            expiredToken = sessionService.RefreshJWT(jwtToken,            // Token to refresh
-                                                           -20);                // Set back 20 minutes
+            jwtToken = _authorizationService.GenerateJWT(TestPayload);
+            expiredToken = _sessionService.RefreshJWT(jwtToken,            // Token to refresh
+                                                      -20);                // Set back 20 minutes
 
             // Assert
-            Assert.IsTrue(sessionService.TokenIsExpired(expiredToken));
+            Assert.IsTrue(_sessionService.TokenIsExpired(expiredToken));
         }
 
         [TestMethod]
-        public void AuthorizationService_TokenIsExpired_FalseExpired()
+        public void _authorizationService_TokenIsExpired_FalseExpired()
         {
             // Arrange
             string jwtToken;
             string expiredToken;
-            SessionService sessionService = new SessionService();
-            AuthorizationService authorizationService = new AuthorizationService();
 
             // Act
-            jwtToken = authorizationService.GenerateJWT(TestPayload);
-            expiredToken = sessionService.RefreshJWT(jwtToken,            // Token to refresh
-                                                           20);                 // Set back 20 minutes
+            jwtToken = _authorizationService.GenerateJWT(TestPayload);
+            expiredToken = _sessionService.RefreshJWT(jwtToken,            // Token to refresh
+                                                      20);                 // Set back 20 minutes
                                                                                 
 
             // Assert
-            Assert.IsFalse(sessionService.TokenIsExpired(expiredToken));
+            Assert.IsFalse(_sessionService.TokenIsExpired(expiredToken));
         }
 
         [TestMethod]
@@ -104,14 +110,13 @@ namespace TeamA.Exogredient.Tests
         [DataRow(3, "deleteUser")]
         [DataRow(4, "createSysAdmin")]
         [DataRow(4, "search")]
-        public void AuthorizationService_UserHasPermissionForOperation_SuccessHasPermission(int userRole, string operation)
+        public void _authorizationService_UserHasPermissionForOperation_SuccessHasPermission(int userRole, string operation)
         {
             // Arrange
             bool hasPermission;
-            AuthorizationService authorizationService = new AuthorizationService();
 
             // Act
-            hasPermission = authorizationService.UserHasPermissionForOperation(userRole, operation);
+            hasPermission = _authorizationService.UserHasPermissionForOperation(userRole, operation);
 
             // Assert
             Assert.IsTrue(hasPermission);
@@ -122,14 +127,13 @@ namespace TeamA.Exogredient.Tests
         [DataRow(1, "claimBusiness")]
         [DataRow(5, "search")]
         [DataRow(-1, "register")]
-        public void AuthorizationService_UserHasPermissionForOperation_FailHasPermission(int userRole, string operation)
+        public void _authorizationService_UserHasPermissionForOperation_FailHasPermission(int userRole, string operation)
         {
             // Arrange
             bool hasPermission;
-            AuthorizationService authorizationService = new AuthorizationService();
 
             // Act
-            hasPermission = authorizationService.UserHasPermissionForOperation(userRole, operation);
+            hasPermission = _authorizationService.UserHasPermissionForOperation(userRole, operation);
 
             // Assert
             Assert.IsFalse(hasPermission);

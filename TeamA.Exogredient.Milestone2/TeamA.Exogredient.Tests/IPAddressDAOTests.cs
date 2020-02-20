@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class IPAddressDAOTests
     {
-        IPAddressDAO ipDAO = new IPAddressDAO();
+        IPAddressDAO ipDAO = new IPAddressDAO(Constants.SQLConnection);
         string NonExistingIP = "192.1.1";
 
         private bool DataEquals(IPAddressRecord ipRecord, IPAddressObject ipObject)

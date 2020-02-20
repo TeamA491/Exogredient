@@ -35,11 +35,11 @@ namespace TeamA.Exogredient.Services
             byte[] fileBytes = File.ReadAllBytes(archiveFilePath);
 
             // Create the FTP request. Set the folder and file name.
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpURL + ftpFolder + Path.GetFileName(archiveFilePath));
+            FtpWebRequest request = WebRequest.Create(ftpURL + ftpFolder + Path.GetFileName(archiveFilePath)) as FtpWebRequest;
             request.Method = WebRequestMethods.Ftp.UploadFile;
 
             // Create a variable for FTP responses.
-            FtpWebResponse response = null;
+            FtpWebResponse response;
 
             // Entering in FTP user credentials.
             request.Credentials = new NetworkCredential(userName, password);
@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.Services
             }
             catch(WebException e)
             {
-                response = (FtpWebResponse)e.Response;
+                response = e.Response as FtpWebResponse;
                 if(response != null)
                 {
                     throw new WebException(Constants.FTPinvalidCredentials);

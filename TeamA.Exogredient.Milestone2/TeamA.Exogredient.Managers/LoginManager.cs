@@ -7,78 +7,99 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Managers
 {
-    public static class LogInManager
+    public class LogInManager
     {
-        // Encrypted password, encrypted AES key, and aesIV are all in hex string format.
-        public static async Task<Result<bool>> LogInAsync(string username, string ipAddress,
-                                                          string encryptedPassword, string encryptedAESKey,
-                                                          string aesIV, int currentNumExceptions)
+
+        private readonly UserManagementService _userManagementService;
+        private readonly LoggingManager _loggingManager;
+        private readonly AuthorizationService _authorizationService;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly SessionService _sessionService;
+
+        public LogInManager(UserManagementService userManagementService,
+                            LoggingManager loggingManager,
+                            AuthorizationService authorizationService,
+                            IAuthenticationService authenService,
+                            SessionService sessionService)
         {
+            _userManagementService = userManagementService;
+            _loggingManager = loggingManager;
+            _authorizationService = authorizationService;
+            _authenticationService = authenService;
+            _sessionService = sessionService;
+        }
+
+
+        // Encrypted password, encrypted AES key, and aesIV are all in hex string format.
+        public async Task<Result<AuthenticationResult>> LogInAsync(string username, string ipAddress,
+                                                          string password, int currentNumExceptions)
+        {
+            bool authenticationSuccess = false;
+            bool userExist = false;
             try
             {
-                bool authenticationSuccess = false;
-
                 // If the username doesn't exist.
-                if (!await UserManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
+                if (!await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
                 {
-                    // Increment the number of login failure.
-                    await UserManagementService.IncrementLoginFailuresAsync(username,
-                                                                            Constants.LogInTriesResetTime,
-                                                                            Constants.MaxLogInAttempts).ConfigureAwait(false);
 
                     // Log the action.
-                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
                     // Return the result of the login failure.
-                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false, currentNumExceptions);
                 }
 
+                userExist = true;
+
                 // Get the information of the usernmae.
-                UserObject user = await UserManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
+                UserObject user = await _userManagementService.GetUserInfoAsync(username).ConfigureAwait(false);
 
                 // If the username is disabled.
                 if (user.Disabled == 1)
                 {
                     // Log the action.
-                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UserDisableLogMessage).ConfigureAwait(false);
 
                     // Return the result of the disabled username's login try.
-                    return UtilityService.CreateResult(Constants.UserDisableUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return SystemUtilityService.CreateResult(Constants.UserDisableUserMessage, authenResult, false, currentNumExceptions);
                 }
 
                 // Convert the encrypted password hex string to byte array.
-                byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
+                //byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
                 // Convert the encrypted AES key hex string to byte array.
-                byte[] encryptedAESKeyBytes = UtilityService.HexStringToBytes(encryptedAESKey);
+                //byte[] encryptedAESKeyBytes = UtilityService.HexStringToBytes(encryptedAESKey);
                 // Convert the AES IV hex string to byte array.
-                byte[] AESIVBytes = UtilityService.HexStringToBytes(aesIV);
+                //byte[] AESIVBytes = UtilityService.HexStringToBytes(aesIV);
                 // Convert the username's salt hex string to byte array.
-                byte[] userSaltBytes = UtilityService.HexStringToBytes(user.Salt);
+                //byte[] userSaltBytes = UtilityService.HexStringToBytes(user.Salt);
                 // Convert the RSA public key hex string to byte array.
-                byte[] publicKeyBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
+                //byte[] publicKeyBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
                 // Convert the RSA private key hex string to byte array.
-                byte[] privateKeyBytes = UtilityService.HexStringToBytes(Constants.PrivateKey);
+                //byte[] privateKeyBytes = UtilityService.HexStringToBytes(Constants.PrivateKey);
 
 
                 // Decrypt the encrypted AES key byte array with the RSA private key byte array.
-                byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
+                //byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
                 // Decrypt the encrypted Password byte array with the AES Key byte array & AES IV byte array.
-                string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
+                //string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
                 // Hash the password hex string with the username's salt.
-                string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
+                //string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
 
                 // If the username's stored password matches the hashed password.
-                if (user.Password == hashedPassword)
+                AuthenticationDTO existing = new AuthenticationDTO(username, user.Password);
+                AuthenticationDTO credentials = new AuthenticationDTO(username, password);
+                if (_authenticationService.Authenticate(existing,credentials))
                 {
                     authenticationSuccess = true;
 
                     // Create a token for the username.
-                    SessionService sessionService = new SessionService();
-                    string token = await sessionService.CreateTokenAsync(username).ConfigureAwait(false);
+                    string token = await _sessionService.CreateTokenAsync(username).ConfigureAwait(false);
 
                     // Get the path to store the token.
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -91,44 +112,47 @@ namespace TeamA.Exogredient.Managers
                     }
 
                     // Log the action.
-                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
                     // Return the result of the successful login.
-                    return UtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return SystemUtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenResult, false, currentNumExceptions);
                 }
                 // If the password doesn't match.
                 else
                 {
                     // Increment the number of login failure.
-                    await UserManagementService.IncrementLoginFailuresAsync(username,
+                    await _userManagementService.IncrementLoginFailuresAsync(username,
                                                                             Constants.LogInTriesResetTime,
                                                                             Constants.MaxLogInAttempts).ConfigureAwait(false);
                     // Log the action.
-                    await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
                     // Return the result of the unsuccessful login.
-                    return UtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenticationSuccess, false, currentNumExceptions);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false, currentNumExceptions);
                 }
             }
             // Catch exceptions.
             catch (Exception e)
             {
                 // Log the exception.
-                await LoggingService.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
                 // If the current number of consecutive exceptions has reached the maximum number of retries.
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
                 {
                     // Notify the system admin.
-                    await UserManagementService.NotifySystemAdminAsync($"{Constants.LogInOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    await SystemUtilityService.NotifySystemAdminAsync($"{Constants.LogInOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
                 // Return the result of the exception occured.
-                return UtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, authenResult, true, currentNumExceptions + 1);
             }
         }
     }

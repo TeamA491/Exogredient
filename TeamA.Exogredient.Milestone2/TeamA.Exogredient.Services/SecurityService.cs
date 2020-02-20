@@ -149,7 +149,7 @@ namespace TeamA.Exogredient.Services
         {
             using (SHA256CryptoServiceProvider sha256 = new SHA256CryptoServiceProvider())
             {
-                return UtilityService.BytesToHexString(sha256.ComputeHash(Encoding.ASCII.GetBytes(data)));
+                return StringUtilityService.BytesToHexString(sha256.ComputeHash(Encoding.ASCII.GetBytes(data)));
             }
         }
 
@@ -165,12 +165,12 @@ namespace TeamA.Exogredient.Services
                                          int hashLength = Constants.DefaultHashByteLength)
         {
 
-            byte[] passwordBytes = UtilityService.HexStringToBytes(password);
+            byte[] passwordBytes = StringUtilityService.HexStringToBytes(password);
             Pkcs5S2ParametersGenerator pbkdf = new Pkcs5S2ParametersGenerator(new Sha3Digest());
             pbkdf.Init(passwordBytes, salt, iterations);
-            KeyParameter derivedKey = (KeyParameter)pbkdf.GenerateDerivedMacParameters(hashLength * Constants.ByteLength);
+            KeyParameter derivedKey = pbkdf.GenerateDerivedMacParameters(hashLength * Constants.ByteLength) as KeyParameter;
 
-            return UtilityService.BytesToHexString(derivedKey.GetKey());
+            return StringUtilityService.BytesToHexString(derivedKey.GetKey());
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace TeamA.Exogredient.Services
                 // Convert the str to ASCII byte array ->
                 // Compute the hashcode in byte array with the ASCII byte array ->
                 // Convert the hashcode byte array to a hex string
-                return UtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(str)));
+                return StringUtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(str)));
             }
         }
         

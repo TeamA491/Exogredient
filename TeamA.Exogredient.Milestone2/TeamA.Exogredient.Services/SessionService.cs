@@ -10,12 +10,12 @@ namespace TeamA.Exogredient.Services
     public class SessionService
     {
         private readonly UserDAO _userDAO;
-        private readonly AuthorizationService authorizationService;
+        private readonly AuthorizationService _authorizationService;
 
-        public SessionService()
+        public SessionService(UserDAO userDAO, AuthorizationService authorizationService)
         {
-            _userDAO = new UserDAO();
-            authorizationService = new AuthorizationService();
+            _userDAO = userDAO;
+            _authorizationService = authorizationService;
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace TeamA.Exogredient.Services
                 {Constants.IdKey, username }
             };
 
-            return authorizationService.GenerateJWT(userInfo);
+            return _authorizationService.GenerateJWT(userInfo);
         }
 
         /// <summary>
@@ -47,12 +47,12 @@ namespace TeamA.Exogredient.Services
         /// <returns>A new token that has been refreshed and active for 20 more minutes.</returns>
         public string RefreshJWT(string jwt, int minutes = Constants.TOKEN_EXPIRATION_MIN)
         {
-            Dictionary<string, string> payload = authorizationService.DecryptJWT(jwt);
+            Dictionary<string, string> payload = _authorizationService.DecryptJWT(jwt);
 
             // Refresh the token for an additional 20 minutes
-            payload[Constants.EXPIRATION_FIELD] = UtilityService.GetEpochFromNow(minutes).ToString();
+            payload[Constants.EXPIRATION_FIELD] = TimeUtilityService.GetEpochFromNow(minutes).ToString();
 
-            return authorizationService.GenerateJWT(payload);
+            return _authorizationService.GenerateJWT(payload);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Whether the current token is past it's 20 minute lifetime.</returns>
         public bool TokenIsExpired(string jwt)
         {
-            Dictionary<string, string> payload = authorizationService.DecryptJWT(jwt);
+            Dictionary<string, string> payload = _authorizationService.DecryptJWT(jwt);
 
             // Check if the expiration key exists first
             if (!payload.ContainsKey(Constants.EXPIRATION_FIELD))
@@ -75,7 +75,7 @@ namespace TeamA.Exogredient.Services
             if (!isNumeric)
                 throw new ArgumentException("Expiration time is not a number!");
 
-            return UtilityService.CurrentUnixTime() > expTime;
+            return TimeUtilityService.CurrentUnixTime() > expTime;
         }
     }
 }

@@ -13,6 +13,11 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class UserDAO : IMasterSQLDAO<string>
     {
+        private string SQLConnection;
+        public UserDAO(string connection)
+        {
+            SQLConnection = connection;
+        }
         /// <summary>
         /// Asynchronously creates the <paramref name="record"/> in the data store.
         /// </summary>
@@ -35,7 +40,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = userRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection
                 connection.Open();
@@ -119,7 +124,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 connection.Open();
 
@@ -165,7 +170,7 @@ namespace TeamA.Exogredient.DAL
             UserObject result;
 
             // Get the connection inside of a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 connection.Open();
 
@@ -219,7 +224,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = userRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -326,7 +331,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckUserExistenceAsync(string username)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -359,7 +364,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -392,7 +397,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckEmailExistenceAsync(string email)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(Constants.SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
             {
                 // Open the connection.
                 connection.Open();

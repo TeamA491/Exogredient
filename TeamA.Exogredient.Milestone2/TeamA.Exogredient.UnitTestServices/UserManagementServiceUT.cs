@@ -95,7 +95,7 @@ namespace TeamA.Exogredient.UnitTestServices
         public static IPAddressObject GetIPAddressInfo(string ipAddress)
         {
             // Cast the return result of reading by the ip address into the IP object.
-            return (IPAddressObject)_ipDAO.ReadById(ipAddress);
+            return _ipDAO.ReadById(ipAddress) as IPAddressObject;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Returns true if the user is disabled and false if not.</returns>
         public static bool CheckIfUserDisabled(string username)
         {
-            UserObject user = (UserObject)_userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
 
             return (user.Disabled == Constants.DisabledStatus);
         }
@@ -157,7 +157,7 @@ namespace TeamA.Exogredient.UnitTestServices
         {
             // If the user being created is temporary, update the timestamp to be the current unix time, otherwise
             // the timestamp has no value.
-            long tempTimestamp = isTemp ? UtilityService.CurrentUnixTime() : Constants.NoValueLong;
+            long tempTimestamp = isTemp ? TimeUtilityService.CurrentUnixTime() : Constants.NoValueLong;
 
             // Email code, email code timestamp, login failures, last login failure timestamp, email code failures,
             // and phone code failures initialized to have no value.
@@ -239,7 +239,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Returns true if the user was originally enabled, false otherwise.</returns>
         public static bool DisableUser(string username)
         {
-            UserObject user = (UserObject)_userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
 
             // If already disabled, just return false.
             if (user.Disabled == Constants.DisabledStatus)
@@ -260,7 +260,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Returns true if the user was originally disabled, false otherwise.</returns>
         public static bool EnableUser(string username)
         {
-            UserObject user = (UserObject)_userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
 
             // If already enabled, return false.
             if (user.Disabled == Constants.EnabledStatus)
@@ -353,14 +353,14 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static bool IncrementLoginFailures(string username, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
         {
-            UserObject user = (UserObject)_userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
             UserRecord record;
 
             // Need to check if the maxtime + lastTime is less than now.
             // If it is then reset the failure
             long lastLoginFailTimestamp = user.LastLoginFailTimestamp;
-            long maxSeconds = UtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
-            long currentUnix = UtilityService.CurrentUnixTime();
+            long maxSeconds = TimeUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = TimeUtilityService.CurrentUnixTime();
 
             bool reset = false;
 
@@ -399,7 +399,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Returns true if the operation is successfull and false if it failed.</returns>
         public static bool IncrementEmailCodeFailures(string username)
         {
-            UserObject user = (UserObject)_userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
 
             // Get the current failure count.
             int currentFailures = user.EmailCodeFailures;
@@ -420,7 +420,7 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Task (bool) whether the function executed without exception</returns>
         public static bool IncrementPhoneCodeFailures(string username)
         {
-            UserObject user = (UserObject)_userDAO.ReadById(username);
+            UserObject user = _userDAO.ReadById(username) as UserObject;
 
             // Get the current failure count.
             int currentFailures = user.PhoneCodeFailures;
@@ -443,14 +443,14 @@ namespace TeamA.Exogredient.UnitTestServices
         /// <returns>Task (bool) whether the funciton executed without exception</returns>
         public static bool IncrementRegistrationFailures(string ipAddress, TimeSpan maxTimeBeforeFailureReset, int maxNumberOfTries)
         {
-            IPAddressObject ip = (IPAddressObject)_ipDAO.ReadById(ipAddress);
+            IPAddressObject ip = _ipDAO.ReadById(ipAddress) as IPAddressObject;
             IPAddressRecord record;
 
             // Need to check if the maxtime + lastTime is less than now.
             // If it is then reset the failure
             long lastRegFailTimestamp = ip.LastRegFailTimestamp;
-            long maxSeconds = UtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
-            long currentUnix = UtilityService.CurrentUnixTime();
+            long maxSeconds = TimeUtilityService.TimespanToSeconds(maxTimeBeforeFailureReset);
+            long currentUnix = TimeUtilityService.CurrentUnixTime();
 
             bool reset = false;
 
