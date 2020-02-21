@@ -28,7 +28,7 @@ namespace TeamA.Exogredient.Tests
         };
 
         [TestMethod]
-        public void AuthorizationService_GenerateJWT_SuccessGenerateAndDecryptJWS()
+        public void AuthorizationService_GenerateJWT_SuccessGenerateAndDecryptJWT()
         {
             // Arrange
             string jwtToken;
@@ -46,7 +46,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [TestMethod]
-        public void _authorizationService_RefreshJWS_SuccessTokenRefreshed()
+        public void _authorizationService_RefreshJWT_SuccessTokenRefreshed()
         {
             // Arrange
             string jwtToken;

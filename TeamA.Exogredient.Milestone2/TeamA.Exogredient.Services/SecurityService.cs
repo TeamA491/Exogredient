@@ -188,6 +188,16 @@ namespace TeamA.Exogredient.Services
                 return StringUtilityService.BytesToHexString(sha1.ComputeHash(Encoding.ASCII.GetBytes(str)));
             }
         }
+
+        public static byte[] HashWithSHA512AsBytes(string data)
+        {
+            byte[] hash;
+            using (SHA512 sha512 = SHA512.Create())
+            {
+                hash = sha512.ComputeHash(data.ToBytes());
+            }
+            return hash;
+        }
         
         /// <summary>
         /// Generate a salt.

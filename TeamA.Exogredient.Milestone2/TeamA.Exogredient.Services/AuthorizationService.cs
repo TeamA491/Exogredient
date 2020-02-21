@@ -37,8 +37,6 @@ namespace TeamA.Exogredient.Services
         /// <returns>The JWT.</returns>
         public string GenerateJWT(Dictionary<string, string> payload)
         {
-            // TODO CHECK PUBLIC KEY AND PRIVATE KEY, CHECK THEIR LENGTHS AND IF THEY INCLUDE ----BEGIN... ---END... ETC
-
             // Make sure we have the proper parameters inside the dictionary
             if (!payload.ContainsKey(Constants.UserTypeKey) || !payload.ContainsKey(Constants.IdKey))
                 throw new ArgumentException("UserType or ID was not provided.");
@@ -52,7 +50,6 @@ namespace TeamA.Exogredient.Services
             // If the expiration date wasn't already specified, then create one
             if (!payload.ContainsKey(Constants.EXPIRATION_FIELD))
             {
-                // Add a 20 min expiration
                 payload.Add(Constants.EXPIRATION_FIELD, TimeUtilityService.GetEpochFromNow().ToString());
             }
 
@@ -79,11 +76,7 @@ namespace TeamA.Exogredient.Services
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
                 // Hash the data
-                byte[] hash;
-                using (SHA512 sha256 = SHA512.Create())
-                {
-                    hash = sha256.ComputeHash(data.ToBytes());
-                }
+                byte[] hash = SecurityService.HashWithSHA512AsBytes(data);
 
                 // Set the private key
                 rsa.ImportCspBlob(keyPair);
@@ -116,11 +109,11 @@ namespace TeamA.Exogredient.Services
             string encodedPayload = segments[1];
 
             // Convert header back to dictionary format
-            string decodedHeader = segments[0].FromBase64URL();
+            string decodedHeader = encodedHeader.FromBase64URL();
             Dictionary<string, string> headerJSON = StringUtilityService.StringToDictionary(decodedHeader);
 
             // Convert payload back to dictionary format
-            string decodedPayload = segments[1].FromBase64URL();
+            string decodedPayload = encodedPayload.FromBase64URL();
             Dictionary<string, string> payloadJSON = StringUtilityService.StringToDictionary(decodedPayload);
 
             // Make sure that we are using the correct encryption algorithm in the header
@@ -146,11 +139,7 @@ namespace TeamA.Exogredient.Services
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
                 // Hash the data
-                byte[] hash;
-                using (SHA512 sha256 = SHA512.Create())
-                {
-                    hash = sha256.ComputeHash(data.ToBytes());
-                }
+                byte[] hash = SecurityService.HashWithSHA512AsBytes(data);
 
                 // Set the public key
                 rsa.ImportCspBlob(keyPair);

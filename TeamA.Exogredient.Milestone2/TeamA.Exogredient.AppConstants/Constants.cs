@@ -495,10 +495,10 @@ namespace TeamA.Exogredient.AppConstants
 
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";
-        public const string JWSthreeSegments = "JWS must have 3 segments separated by periods.";
+        public const string JWTthreeSegments = "JWT must have 3 segments separated by periods.";
         public const string IncorrectEncryption = "Incorrect encryption algorithm.";
-        public const string PubKeyNotFound = "Public key not found in the JWS payload!";
-        public const string JWSNotVerified = "JWS could not be verified!";
+        public const string PubKeyNotFound = "Public key not found in the JWT payload!";
+        public const string JWTNotVerified = "JWT could not be verified!";
         public const string ExpirationNotSpecified = "Expiration time is not specified!";
         public const string ExpirationNotNumeric = "Expiration time is not a number!";
         public const string DictionaryMissingBrackets = "Dictionary doesn't have proper surrounding brackets.";
