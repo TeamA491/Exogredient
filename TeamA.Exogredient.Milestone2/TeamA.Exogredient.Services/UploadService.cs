@@ -40,5 +40,10 @@ namespace TeamA.Exogredient.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IDataObject> ReadByIngredientName(string ingredientName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

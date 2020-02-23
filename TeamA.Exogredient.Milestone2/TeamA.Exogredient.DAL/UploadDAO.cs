@@ -11,22 +11,29 @@ namespace TeamA.Exogredient.DAL
 {
     public class UploadDAO : IMasterSQLDAO<string>
     {
-        public Task<bool> CreateAsync(ISQLRecord record)
+        private string _SQLConnection;
+
+        public UploadDAO(string connection)
+        {
+            _SQLConnection = connection;
+        }
+
+        public async Task<bool> CreateAsync(ISQLRecord record)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
+        public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDataObject> ReadByIdAsync(string id)
+        public async Task<IDataObject> ReadByIdAsync(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateAsync(ISQLRecord record)
+        public async Task<bool> UpdateAsync(ISQLRecord record)
         {
             throw new NotImplementedException();
         }
