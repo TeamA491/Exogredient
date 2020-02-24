@@ -14,28 +14,49 @@ namespace TeamA.Exogredient.Services
     public static class StringUtilityService
     {
 
-        public static string AutoCorrectWord(string word, string dicFilePath, string affFilePath)
+        public static string AutoCorrect(string word, string dicFilePath, string affFilePath)
         {
-            var dictionary = WordList.CreateFromFiles(dicFilePath,affFilePath);
-            var suggestions = dictionary.Suggest(word).ToArray<string>();
-            foreach (var suggestion in suggestions)
+            var dictionary = WordList.CreateFromFiles(dicFilePath, affFilePath);
+            var tokens = word.Split(new char[] { ' ', ',', ':'});
+            var correctedWord = new List<string>();
+            
+            foreach (var token in tokens)
             {
-                if (suggestion.Length > word.Length)
+                if (dictionary.Check(token))
                 {
-                    return suggestion;
+                    correctedWord.Add(token);
+                    continue;
+                }
+
+                var suggestions = dictionary.Suggest(token).ToArray<string>();
+                foreach (var suggestion in suggestions)
+                {
+                    if (suggestion.Length > token.Length)
+                    {
+                        correctedWord.Add(suggestion);
+                        break;
+                    }
                 }
             }
 
-            return word;
+            return string.Join(" ", correctedWord.ToArray());
         }
 
 
         public static string Stem(string word)
         {
             var stemmer = new EnglishStemmer();
-            stemmer.Current = word;
-            stemmer.Stem();
-            return stemmer.Current;
+            var tokens = word.Split(new char[] { ' ', ',', ':' });
+            var stemmedWord = new List<string>();
+
+            foreach(var token in tokens)
+            {
+                stemmer.Current = token;
+                stemmer.Stem();
+                stemmedWord.Add(stemmer.Current);
+            }
+
+            return string.Join(" ", stemmedWord.ToArray());
         }
 
         /// <summary>
