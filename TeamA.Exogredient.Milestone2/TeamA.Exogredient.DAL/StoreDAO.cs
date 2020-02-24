@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
@@ -43,9 +44,16 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 var sqlString =
-                    $"SELECT store.store_id, store.store_name, store.latitude, store.longitude, COUNT(*) as upload_num " +
-                    $"FROM upload INNER JOIN store ON upload.store_id = store.store_id " +
-                    $"WHERE upload.ingredient_name = @INGREDIENT_NAME GROUP BY store.store_id;";
+                    $"SELECT {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn}, " +
+                    $"{Constants.StoreDAOTableName}.{Constants.StoreDAOStoreNameColumn}, " +
+                    $"{Constants.StoreDAOTableName}.{Constants.StoreDAOLatitudeColumn}, " +
+                    $"{Constants.StoreDAOTableName}.{Constants.StoreDAOLongitudeColumn}, " +
+                    $"COUNT(*) as {Constants.StoreDAOUploadNumColumn} " +
+                    $"FROM {Constants.UploadDAOTableName} INNER JOIN {Constants.StoreDAOTableName} " +
+                    $"ON {Constants.UploadDAOTableName}.{Constants.UploadDAOStoreIdColumn} " +
+                    $"= {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn} " +
+                    $"WHERE {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} " +
+                    $"= @INGREDIENT_NAME GROUP BY {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn};";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
@@ -56,8 +64,8 @@ namespace TeamA.Exogredient.DAL
 
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        stores.Add(new SearchResultStoreObject((int)row["store_id"], (string)row["store_name"],3),
-                                   new Geocode((double)row["latitude"],(double)row["longitude"]));
+                        stores.Add(new SearchResultStoreObject((int)row[Constants.StoreDAOStoreIdColumn], (string)row[Constants.StoreDAOStoreNameColumn], Convert.ToInt32(row[Constants.StoreDAOUploadNumColumn])),
+                                   new Geocode((double)row[Constants.StoreDAOLatitudeColumn],(double)row[Constants.StoreDAOLongitudeColumn]));
                     }
 
                 }

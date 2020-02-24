@@ -384,6 +384,9 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string WrongPhoneCodeMessage = "Wrong phone code input";
 
+        public const string IngredientSearchSuccessMessage = "Search Ingredient Successful";
+        public const string IngredientSearchUnsuccessMessage = "Search Ingredient Unsuccessful";
+
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";
         public const string SystemAdminEmailAddress = "TEAMA.CS491@gmail.com";
@@ -460,6 +463,31 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapDAOHashColumn = "hash";
         public const string MapDAOActualColumn = "actual";
         public const string MapDAOoccurrencesColumn = "occurrences";
+
+        // STORE TABLE
+        public const string StoreDAOTableName = "store";
+        public const string StoreDAOStoreIdColumn = "store_id";
+        public const string StoreDAOOwnerColumn = "owner";
+        public const string StoreDAOStoreNameColumn = "store_name";
+        public const string StoreDAOLatitudeColumn = "latitude";
+        public const string StoreDAOLongitudeColumn = "longitude";
+        public const string StoreDAOStoreDescriptionColumn = "store_description";
+        public const string StoreDAOUploadNumColumn = "upload_num";
+
+        // UPLOAD TABLE
+        public const string UploadDAOTableName = "upload";
+        public const string UploadDAOUploadIdColumn = "upload_id";
+        public const string UploadDAOStoreIdColumn = "store_id";
+        public const string UploadDAOIngredientNameColumn = "ingredient_name";
+        public const string UploadDAOUploaderColumn = "uploader";
+        public const string UploadDAOPostTimeDateColumn = "post_time_date";
+        public const string UploadDAODescriptionColumn = "description";
+        public const string UploadDAORatingColumn = "rating";
+        public const string UploadDAOPhotoColumn = "photo";
+        public const string UploadDAOPriceColumn = "price";
+        public const string UploadDAOUpvoteColumn = "upvote";
+        public const string UploadDAODownvoteColumn = "downvote";
+        public const string UploadDAOInProgressColumn = "in_progress";
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
