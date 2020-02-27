@@ -14,18 +14,21 @@ namespace TeamA.Exogredient.Managers
         private readonly LoggingManager _loggingManager;
         private readonly AuthorizationService _authorizationService;
         private readonly IAuthenticationService _authenticationService;
+        private readonly SessionService _sessionService;
 
         public LogInManager(UserManagementService userManagementService,
                             LoggingManager loggingManager,
                             AuthorizationService authorizationService,
-                            IAuthenticationService authenService)
+                            IAuthenticationService authenService,
+                            SessionService sessionService)
         {
             _userManagementService = userManagementService;
             _loggingManager = loggingManager;
             _authorizationService = authorizationService;
             _authenticationService = authenService;
+            _sessionService = sessionService;
         }
-        
+
 
         // Encrypted password, encrypted AES key, and aesIV are all in hex string format.
         public async Task<Result<AuthenticationResult>> LogInAsync(string username, string ipAddress,
@@ -96,7 +99,8 @@ namespace TeamA.Exogredient.Managers
                     authenticationSuccess = true;
 
                     // Create a token for the username.
-                    string token = await _authorizationService.CreateTokenAsync(username).ConfigureAwait(false);
+                    string token = await _sessionService.CreateTokenAsync(username).ConfigureAwait(false);
+
                     // Get the path to store the token.
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                     path = path + $"{path.Substring(0, 1)}" + Constants.TokenFile;
@@ -147,7 +151,7 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Return the result of the exception occured.
-                AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist); 
+                AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
                 return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, authenResult, true, currentNumExceptions + 1);
             }
         }

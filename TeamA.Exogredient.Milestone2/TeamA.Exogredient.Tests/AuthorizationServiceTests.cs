@@ -16,9 +16,9 @@ namespace TeamA.Exogredient.Tests
         private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
         private static readonly DataStoreLoggingService _dsLog = new DataStoreLoggingService(_logDAO, _maskingService);
         private static readonly FlatFileLoggingService _ffLog = new FlatFileLoggingService(_maskingService);
-
         private static readonly UserManagementService _userManagementService = new UserManagementService(_userDAO, _ipDAO, _dsLog, _ffLog, _maskingService);
-        private readonly AuthorizationService _authorizationService = new AuthorizationService(_userManagementService);
+        private static readonly AuthorizationService _authorizationService = new AuthorizationService();
+        private static readonly SessionService _sessionService = new SessionService(_userDAO, _authorizationService);
 
         private readonly Dictionary<string, string> TestPayload = new Dictionary<string, string>
         {
@@ -28,15 +28,16 @@ namespace TeamA.Exogredient.Tests
         };
 
         [TestMethod]
-        public void _authorizationService_GenerateJWS_SuccessGenerateAndDecryptJWS()
+        public void AuthorizationService_GenerateJWT_SuccessGenerateAndDecryptJWS()
         {
             // Arrange
-            string jwsToken;
+            string jwtToken;
             Dictionary<string, string> payload;
+            AuthorizationService authorizationService = new AuthorizationService();
 
             // Act
-            jwsToken = _authorizationService.GenerateJWS(TestPayload);
-            payload = _authorizationService.DecryptJWS(jwsToken);
+            jwtToken = authorizationService.GenerateJWT(TestPayload);
+            payload = authorizationService.DecryptJWT(jwtToken);
 
             // Assert
             Assert.AreEqual(TestPayload[Constants.UserTypeKey], payload[Constants.UserTypeKey]);
@@ -48,17 +49,17 @@ namespace TeamA.Exogredient.Tests
         public void _authorizationService_RefreshJWS_SuccessTokenRefreshed()
         {
             // Arrange
-            string jwsToken;
+            string jwtToken;
             string refreshedToken;
             long expectedExpirationTime;
             Dictionary<string, string> payload;
 
             // Act
-            jwsToken = _authorizationService.GenerateJWS(TestPayload);
-            refreshedToken = _authorizationService.RefreshJWS(jwsToken,           // Token to refresh
+            jwtToken = _authorizationService.GenerateJWT(TestPayload);
+            refreshedToken = _sessionService.RefreshJWT(jwtToken,           // Token to refresh
                                                              1);                 // Set expiration 1 minute from now
 
-            payload = _authorizationService.DecryptJWS(refreshedToken);
+            payload = _authorizationService.DecryptJWT(refreshedToken);
             expectedExpirationTime = TimeUtilityService.GetEpochFromNow(1);
 
             // Assert
@@ -69,33 +70,33 @@ namespace TeamA.Exogredient.Tests
         public void _authorizationService_TokenIsExpired_SuccessExpired()
         {
             // Arrange
+            string jwtToken;
             string expiredToken;
-            string jwsToken;
 
             // Act
-            jwsToken = _authorizationService.GenerateJWS(TestPayload);
-            expiredToken = _authorizationService.RefreshJWS(jwsToken,            // Token to refresh
-                                                           -20);                // Set back 20 minutes
+            jwtToken = _authorizationService.GenerateJWT(TestPayload);
+            expiredToken = _sessionService.RefreshJWT(jwtToken,            // Token to refresh
+                                                      -20);                // Set back 20 minutes
 
             // Assert
-            Assert.IsTrue(_authorizationService.TokenIsExpired(expiredToken));
+            Assert.IsTrue(_sessionService.TokenIsExpired(expiredToken));
         }
 
         [TestMethod]
         public void _authorizationService_TokenIsExpired_FalseExpired()
         {
             // Arrange
+            string jwtToken;
             string expiredToken;
-            string jwsToken;
 
             // Act
-            jwsToken = _authorizationService.GenerateJWS(TestPayload);
-            expiredToken = _authorizationService.RefreshJWS(jwsToken,            // Token to refresh
-                                                           20);                 // Set back 20 minutes
+            jwtToken = _authorizationService.GenerateJWT(TestPayload);
+            expiredToken = _sessionService.RefreshJWT(jwtToken,            // Token to refresh
+                                                      20);                 // Set back 20 minutes
                                                                                 
 
             // Assert
-            Assert.IsFalse(_authorizationService.TokenIsExpired(expiredToken));
+            Assert.IsFalse(_sessionService.TokenIsExpired(expiredToken));
         }
 
         [TestMethod]
