@@ -473,6 +473,10 @@ namespace TeamA.Exogredient.AppConstants
         public const string StoreDAOLongitudeColumn = "longitude";
         public const string StoreDAOStoreDescriptionColumn = "store_description";
         public const string StoreDAOUploadNumColumn = "upload_num";
+        public const string StoreDAODistance = "distance";
+
+        //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
+        public const int FractionalDigits = 2;
 
         // UPLOAD TABLE
         public const string UploadDAOTableName = "upload";

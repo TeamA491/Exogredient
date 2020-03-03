@@ -21,28 +21,20 @@ namespace TeamA.Exogredient.Managers
         }
 
         //TODO Replace message to constants
-        public async Task<Result<List<SearchResultStoreObject>>> Search(string ingredient, double latitude, double longitude, double radius, int currentNumExceptions)
+        public async Task<Result<List<StoreResult>>> Search(string ingredient, double latitude, double longitude, double radius, int currentNumExceptions)
         {
             try
             {
-                var normalizedIngredient = StringUtilityService.AutoCorrect(StringUtilityService.Stem(ingredient), this._enUSDicPath, this._enUSAffPath);
-                var storeDict = await _searchService.SearchByIngredientAsync(normalizedIngredient).ConfigureAwait(false);
-                var centerLocation = new Geocode(latitude, longitude);
-                var storeList = new List<SearchResultStoreObject>();
-                foreach(KeyValuePair<SearchResultStoreObject,Geocode>pair in storeDict)
-                {
-                    if(pair.Value.ComputeDistance(centerLocation) <= radius)
-                    {
-                        storeList.Add(pair.Key);
-                    }
-                }
+                //if()
+                var normalizedIngredient = StringUtilityService.NormalizeTerm(ingredient, this._enUSDicPath, this._enUSAffPath);
+                var stores = await _searchService.SearchByIngredientAsync(normalizedIngredient, latitude, longitude, radius).ConfigureAwait(false);
 
-                return SystemUtilityService.CreateResult(Constants.IngredientSearchSuccessMessage, storeList, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.IngredientSearchSuccessMessage, stores, false, currentNumExceptions);
 
             }
             catch
             {
-                return SystemUtilityService.CreateResult<List<SearchResultStoreObject>>(Constants.IngredientSearchUnsuccessMessage, null, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult<List<StoreResult>>(Constants.IngredientSearchUnsuccessMessage, null, true, currentNumExceptions + 1);
             }
         }
     }

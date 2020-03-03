@@ -1,21 +1,24 @@
 ﻿using System;
+using TeamA.Exogredient.AppConstants;
+
 namespace TeamA.Exogredient.DataHelpers
 {
-    public class SearchResultStoreObject: IDataObject, IEquatable<SearchResultStoreObject>
+    public class StoreResult: IDataObject, IEquatable<StoreResult>
     {
         public int StoreId { get; }
         public string StoreName { get; }
         public int UploadNum { get; }
-        public double distance { get; }
+        public double Distance { get; set; }
 
-        public SearchResultStoreObject(int storeId, string storeName, int uploadNum)
+        public StoreResult(int storeId, string storeName, int uploadNum, double distance)
         {
             StoreId = storeId;
             StoreName = storeName;
             UploadNum = uploadNum;
+            Distance = Math.Round(distance, Constants.FractionalDigits, MidpointRounding.AwayFromZero);
         }
 
-        public bool Equals(SearchResultStoreObject other)
+        public bool Equals(StoreResult other)
         {
             if(other == null)
                 return false;
@@ -32,14 +35,14 @@ namespace TeamA.Exogredient.DataHelpers
             if (obj == null)
                 return false;
 
-            SearchResultStoreObject storeObj = obj as SearchResultStoreObject;
+            StoreResult storeObj = obj as StoreResult;
             if (storeObj == null)
                 return false;
             else
                 return Equals(storeObj);
         }
 
-        public static bool operator ==(SearchResultStoreObject store1, SearchResultStoreObject store2)
+        public static bool operator ==(StoreResult store1, StoreResult store2)
         {
             if (((object)store1) == null || ((object)store2) == null)
                 return Object.Equals(store1, store2);
@@ -47,7 +50,7 @@ namespace TeamA.Exogredient.DataHelpers
             return store1.Equals(store2);
         }
 
-        public static bool operator !=(SearchResultStoreObject store1, SearchResultStoreObject store2)
+        public static bool operator !=(StoreResult store1, StoreResult store2)
         {
             if (((object)store1) == null || ((object)store2) == null)
                 return !Object.Equals(store1, store2);

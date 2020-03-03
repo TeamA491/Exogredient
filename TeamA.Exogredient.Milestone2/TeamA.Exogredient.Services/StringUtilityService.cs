@@ -13,50 +13,64 @@ namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
     {
+        
+        public static string NormalizeTerm(string term, string dicFilePath, string affFilePath)
+        {
+            var tokens = term.Split(new char[] { ' ', ',', ':' });
+            var normalizedTerm = new List<string>();
+
+            foreach(var token in tokens)
+            {
+                if(!CheckIfTermInDictionary(token,dicFilePath,affFilePath))
+                {
+                    Console.WriteLine(token + " not in dictionary");
+                    normalizedTerm.Add(token);
+                }
+                else
+                {
+                    var stemmedTerm = Stem(token);
+                    if(stemmedTerm.Length == term.Length)
+                    {
+                        normalizedTerm.Add(stemmedTerm);
+                    }
+                    else
+                    {
+                        normalizedTerm.Add(AutoCorrect(stemmedTerm, dicFilePath, affFilePath));
+                    }
+                }
+            }
+            return string.Join(" ", normalizedTerm.ToArray());
+        }
+
+        public static bool CheckIfTermInDictionary(string term, string dicFilePath, string affFilePath)
+        {
+            var dictionary = WordList.CreateFromFiles(dicFilePath, affFilePath);
+            return dictionary.Check(term);
+        }
 
         public static string AutoCorrect(string word, string dicFilePath, string affFilePath)
         {
             var dictionary = WordList.CreateFromFiles(dicFilePath, affFilePath);
-            var tokens = word.Split(new char[] { ' ', ',', ':'});
-            var correctedWord = new List<string>();
-            
-            foreach (var token in tokens)
-            {
-                if (dictionary.Check(token))
-                {
-                    correctedWord.Add(token);
-                    continue;
-                }
+            var suggestions = dictionary.Suggest(word).ToArray<string>();
 
-                var suggestions = dictionary.Suggest(token).ToArray<string>();
-                foreach (var suggestion in suggestions)
+            foreach (var suggestion in suggestions)
+            {
+                if (suggestion.Length > word.Length)
                 {
-                    if (suggestion.Length > token.Length)
-                    {
-                        correctedWord.Add(suggestion);
-                        break;
-                    }
+                    return suggestion;
                 }
             }
-
-            return string.Join(" ", correctedWord.ToArray());
+            return word;
         }
-
+        
 
         public static string Stem(string word)
         {
             var stemmer = new EnglishStemmer();
-            var tokens = word.Split(new char[] { ' ', ',', ':' });
-            var stemmedWord = new List<string>();
 
-            foreach(var token in tokens)
-            {
-                stemmer.Current = token;
-                stemmer.Stem();
-                stemmedWord.Add(stemmer.Current);
-            }
-
-            return string.Join(" ", stemmedWord.ToArray());
+            stemmer.Current = word;
+            stemmer.Stem();
+            return stemmer.Current;
         }
 
         /// <summary>
