@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestsNoDa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.UnitTestServices", "TeamA.Exogredient.UnitTestServices\TeamA.Exogredient.UnitTestServices.csproj", "{970152BA-99AB-4F61-B1F8-0755BA0DCAE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "controller", "controller\controller.csproj", "{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{970152BA-99AB-4F61-B1F8-0755BA0DCAE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{970152BA-99AB-4F61-B1F8-0755BA0DCAE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{970152BA-99AB-4F61-B1F8-0755BA0DCAE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{2702BFE4-5868-46BB-A845-2C219D27DCC3} = {F8AF24C4-D01C-4CA7-BE27-0B37C99C46A9}
 		{D911AD68-5267-4D54-BAA5-37B671B463C2} = {ABA97013-760C-4F3A-9BF3-3AE4744A5095}
 		{970152BA-99AB-4F61-B1F8-0755BA0DCAE2} = {448E6539-B3AC-46CA-8E06-952D4D6C25F4}
+		{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A67D26EE-42F3-4231-8991-BDE591B4C5CD}
