@@ -8,10 +8,12 @@ namespace TeamA.Exogredient.Managers
     {
 
         readonly AuthorizationService _authorizationService;
+        readonly SessionService _sessionService;
 
-        public AuthorizationManager(AuthorizationService authorizationService)
+        public AuthorizationManager(AuthorizationService authorizationService, SessionService sessionService)
         {
             _authorizationService = authorizationService;
+            _sessionService = sessionService;
         }
 
 
@@ -21,13 +23,13 @@ namespace TeamA.Exogredient.Managers
             {
                 // Decrypt it here to make sure the token wasn't tampered with
                 // or it isn't valid
-                Dictionary<string, string> payload = _authorizationService.DecryptJWS(jwsToken);
+                Dictionary<string, string> payload = _authorizationService.DecryptJWT(jwsToken);
 
-                if (_authorizationService.TokenIsExpired(jwsToken))
+                if (_sessionService.TokenIsExpired(jwsToken))
                     return false;
 
                 // Only refresh the token if it isn't expired
-                jwsToken = _authorizationService.RefreshJWS(jwsToken);
+                jwsToken = _sessionService.RefreshJWT(jwsToken);
 
                 // Make sure the user type is an int
                 int userType;
