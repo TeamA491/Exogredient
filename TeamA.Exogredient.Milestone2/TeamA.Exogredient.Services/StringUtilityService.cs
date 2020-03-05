@@ -16,6 +16,12 @@ namespace TeamA.Exogredient.Services
         
         public static string NormalizeTerm(string term, string dicFilePath, string affFilePath)
         {
+            if(term == null)
+            {
+                return null;
+            }
+
+            term = term.ToLower();
             var tokens = term.Split(new char[] { ' ', ',', ':' });
             var normalizedTerm = new List<string>();
 
@@ -23,7 +29,6 @@ namespace TeamA.Exogredient.Services
             {
                 if(!CheckIfTermInDictionary(token,dicFilePath,affFilePath))
                 {
-                    Console.WriteLine(token + " not in dictionary");
                     normalizedTerm.Add(token);
                 }
                 else

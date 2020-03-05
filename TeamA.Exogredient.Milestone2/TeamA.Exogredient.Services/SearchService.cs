@@ -9,15 +9,28 @@ namespace TeamA.Exogredient.Services
     public class SearchService
     {
         private readonly StoreDAO _storeDAO;
-        public SearchService(StoreDAO storeDAO)
+        private readonly UploadDAO _uploadDAO;
+        public SearchService(StoreDAO storeDAO, UploadDAO uploadDAO)
         {
             _storeDAO = storeDAO;
+            _uploadDAO = uploadDAO;
         }
 
-        public async Task<List<StoreResult>> SearchByIngredientAsync(string ingredient, double latitude, double longitude, double radius)
+        public async Task<List<StoreResult>> GetStoresByIngredientNameAsync(string ingredientName, double latitude, double longitude, double radius)
         {
-            return await _storeDAO.ReadByIngredientAsync(ingredient,latitude,longitude,radius).ConfigureAwait(false);
+            return await _storeDAO.ReadByIngredientNameAsync(ingredientName,latitude,longitude,radius).ConfigureAwait(false);
 
         }
+
+        public async Task<List<StoreResult>> GetStoresByStoreNameAsync(string storeName, double latitude, double longitude, double radius)
+        {
+            return await _storeDAO.ReadByStoreNameAsync(storeName, latitude, longitude, radius);
+        }
+
+        public async Task<List<IngredientResult>> GetIngredientsAsync(int storeId, string ingredientName)
+        {
+            return await _uploadDAO.ReadIngredientsByStoreIdAsync(storeId, ingredientName).ConfigureAwait(false);
+        }
+
     }
 }

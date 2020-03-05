@@ -384,8 +384,10 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string WrongPhoneCodeMessage = "Wrong phone code input";
 
-        public const string IngredientSearchSuccessMessage = "Search Ingredient Successful";
-        public const string IngredientSearchUnsuccessMessage = "Search Ingredient Unsuccessful";
+        public const string StoresFetchSuccessMessage = "The list of stores for search successfully fetched.";
+        public const string StoresFetchUnsuccessMessage = "System Error. Failed to fetch the list of stores for search. Please try again.";
+        public const string IngredientsFetchSuccessMessage = "The list of ingredients for the selected store successfully fetched";
+        public const string IngredientsFetchUnsuccessMessage = "System Error. Failed to fetch the list of ingredients for the selected store. Please try again.";
 
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";
@@ -472,8 +474,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string StoreDAOLatitudeColumn = "latitude";
         public const string StoreDAOLongitudeColumn = "longitude";
         public const string StoreDAOStoreDescriptionColumn = "store_description";
-        public const string StoreDAOUploadNumColumn = "upload_num";
-        public const string StoreDAODistance = "distance";
+        public const string StoreDAODistanceColumn = "distance";
+        public const string StoreDAOIngredientNumColumn = "ingredient_num";
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;
@@ -492,6 +494,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadDAOUpvoteColumn = "upvote";
         public const string UploadDAODownvoteColumn = "downvote";
         public const string UploadDAOInProgressColumn = "in_progress";
+        public const string UploadDAOUploadNumColumn = "upload_num";
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";

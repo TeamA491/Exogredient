@@ -3,18 +3,18 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.DataHelpers
 {
-    public class StoreResult: IDataObject, IEquatable<StoreResult>
+    public class StoreResult:IEquatable<StoreResult>
     {
         public int StoreId { get; }
         public string StoreName { get; }
-        public int UploadNum { get; }
+        public int IngredientNum { get; }
         public double Distance { get; set; }
 
-        public StoreResult(int storeId, string storeName, int uploadNum, double distance)
+        public StoreResult(int storeId, string storeName, int ingredientNum, double distance)
         {
             StoreId = storeId;
             StoreName = storeName;
-            UploadNum = uploadNum;
+            IngredientNum = ingredientNum;
             Distance = Math.Round(distance, Constants.FractionalDigits, MidpointRounding.AwayFromZero);
         }
 
