@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestsNoDa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.UnitTestServices", "TeamA.Exogredient.UnitTestServices\TeamA.Exogredient.UnitTestServices.csproj", "{970152BA-99AB-4F61-B1F8-0755BA0DCAE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "controller", "controller\controller.csproj", "{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "controller", "controller\controller.csproj", "{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
