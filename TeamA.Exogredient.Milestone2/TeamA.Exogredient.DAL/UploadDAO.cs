@@ -33,7 +33,7 @@ namespace TeamA.Exogredient.DAL
             throw new NotImplementedException();
         }
 
-        public async Task<List<IngredientResult>> ReadIngredientsByStoreIdAsync(int storeId, string ingredientName)
+        public async Task<List<IngredientResult>> ReadIngredientsByStoreIdAsync(int storeId, string ingredientName, int pagination)
         {
             var ingredients = new List<IngredientResult>();
 
@@ -52,7 +52,8 @@ namespace TeamA.Exogredient.DAL
                     $"= {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn} " +
                     $"WHERE {Constants.UploadDAOTableName}.{Constants.UploadDAOStoreIdColumn} = @STORE_ID " +
                     (ingredientName == null ? "" : $"AND {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} LIKE @INGREDIENT_NAME ") +
-                    $"GROUP BY {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn};";
+                    $"GROUP BY {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} " +
+                    $"LIMIT @START,@END;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
@@ -62,6 +63,8 @@ namespace TeamA.Exogredient.DAL
                         command.Parameters.AddWithValue("@INGREDIENT_NAME", "%" + ingredientName + "%");
                     }
                     command.Parameters.AddWithValue("@STORE_ID", storeId);
+                    command.Parameters.AddWithValue("@START", (pagination - 1) * Constants.NumOfResultsPerPage);
+                    command.Parameters.AddWithValue("@END", pagination * Constants.NumOfResultsPerPage);
                     var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                     dataTable.Load(reader);
 

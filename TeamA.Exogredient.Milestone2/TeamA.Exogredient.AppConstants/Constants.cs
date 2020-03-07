@@ -229,6 +229,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
+        public const string GetStoresByIngredientOperation = "Get Stores By Ingredient";
+        public const string GetStoresByStoreOperation = "Get Stores By Store";
+        public const string GetIngredientsOperation = "Get Ingredients";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
@@ -238,6 +241,7 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string LocalHost = "127.0.0.1";
 
+        public const int NumOfResultsPerPage = 100;  
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 

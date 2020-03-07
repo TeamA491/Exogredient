@@ -32,7 +32,7 @@ namespace TeamA.Exogredient.DAL
             throw new NotImplementedException();
         }
 
-        public async Task<List<StoreResult>> ReadByIngredientNameAsync(string ingredientName,double latitude, double longitude, double radius)
+        public async Task<List<StoreResult>> ReadByIngredientNameAsync(string ingredientName,double latitude, double longitude, double radius, int pagination)
         {
             var stores = new List<StoreResult>();
 
@@ -45,27 +45,33 @@ namespace TeamA.Exogredient.DAL
                     $"SELECT {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn}, " +
                     $"{Constants.StoreDAOTableName}.{Constants.StoreDAOStoreNameColumn}, " +
                     $"{Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn}, " +
-                    $"(SELECT(3959 * acos(cos(radians({latitude}))* cos(radians({Constants.StoreDAOLatitudeColumn}))* " +
-                    $"cos(radians({Constants.StoreDAOLongitudeColumn}) - radians({longitude}))+ " +
-                    $"sin(radians({latitude}))* sin(radians({Constants.StoreDAOLatitudeColumn}))))) AS {Constants.StoreDAODistanceColumn} " +
+                    $"(SELECT(3959 * acos(cos(radians(@LATITUDE))* cos(radians({Constants.StoreDAOLatitudeColumn}))* " +
+                    $"cos(radians({Constants.StoreDAOLongitudeColumn}) - radians(@LONGITUDE))+ " +
+                    $"sin(radians(@LATITUDE))* sin(radians({Constants.StoreDAOLatitudeColumn}))))) AS {Constants.StoreDAODistanceColumn} " +
                     $"FROM {Constants.UploadDAOTableName} INNER JOIN {Constants.StoreDAOTableName} " +
                     $"ON {Constants.UploadDAOTableName}.{Constants.UploadDAOStoreIdColumn} " +
                     $"= {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn} " +
                     $"WHERE {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} " +
                     $"LIKE @INGREDIENT_NAME GROUP BY {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn}, " +
                     $"{Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} " +
-                    $"HAVING {Constants.StoreDAODistanceColumn} <= {radius}";
+                    $"HAVING {Constants.StoreDAODistanceColumn} <= @RADIUS";
 
 
                 var sqlString =
                     $"SELECT x.{Constants.StoreDAOStoreIdColumn}, x.{Constants.StoreDAOStoreNameColumn}, " +
                     $"x.{Constants.StoreDAODistanceColumn}, COUNT(*) AS {Constants.StoreDAOIngredientNumColumn} " +
-                    $"FROM ({subQuery}) AS x GROUP BY x.{Constants.StoreDAOStoreIdColumn};";
+                    $"FROM ({subQuery}) AS x GROUP BY x.{Constants.StoreDAOStoreIdColumn} " +
+                    $"LIMIT @START,@END;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
                 {
                     command.Parameters.AddWithValue("@INGREDIENT_NAME", "%"+ingredientName+"%");
+                    command.Parameters.AddWithValue("@LATITUDE", latitude);
+                    command.Parameters.AddWithValue("@LONGITUDE", longitude);
+                    command.Parameters.AddWithValue("@RADIUS", radius);
+                    command.Parameters.AddWithValue("@START", (pagination-1)*Constants.NumOfResultsPerPage);
+                    command.Parameters.AddWithValue("@END", pagination * Constants.NumOfResultsPerPage);
                     var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                     dataTable.Load(reader);
 
@@ -82,7 +88,7 @@ namespace TeamA.Exogredient.DAL
 
         }
 
-        public async Task<List<StoreResult>> ReadByStoreNameAsync(string storeName,double latitude, double longitude, double radius)
+        public async Task<List<StoreResult>> ReadByStoreNameAsync(string storeName,double latitude, double longitude, double radius, int pagination)
         {
             var stores = new List<StoreResult>();
 
@@ -95,28 +101,34 @@ namespace TeamA.Exogredient.DAL
                     $"SELECT {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn}, " +
                     $"{Constants.StoreDAOTableName}.{Constants.StoreDAOStoreNameColumn}, " +
                     $"{Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn}, " +
-                    $"(SELECT(3959 * acos(cos(radians({latitude}))* cos(radians({Constants.StoreDAOLatitudeColumn}))* " +
-                    $"cos(radians({Constants.StoreDAOLongitudeColumn}) - radians({longitude}))+ " +
-                    $"sin(radians({latitude}))* sin(radians({Constants.StoreDAOLatitudeColumn}))))) AS {Constants.StoreDAODistanceColumn} " +
+                    $"(SELECT(3959 * acos(cos(radians(@LATITUDE))* cos(radians({Constants.StoreDAOLatitudeColumn}))* " +
+                    $"cos(radians({Constants.StoreDAOLongitudeColumn}) - radians(@LONGITUDE))+ " +
+                    $"sin(radians(@LATITUDE))* sin(radians({Constants.StoreDAOLatitudeColumn}))))) AS {Constants.StoreDAODistanceColumn} " +
                     $"FROM {Constants.UploadDAOTableName} INNER JOIN {Constants.StoreDAOTableName} " +
                     $"ON {Constants.UploadDAOTableName}.{Constants.UploadDAOStoreIdColumn} " +
                     $"= {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn} " +
                     $"WHERE {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreNameColumn} " +
                     $"LIKE @STORE_NAME GROUP BY {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn}, " +
                     $"{Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} " +
-                    $"HAVING {Constants.StoreDAODistanceColumn} <= {radius}";
+                    $"HAVING {Constants.StoreDAODistanceColumn} <= @RADIUS";
 
 
                 var sqlString =
                     $"SELECT x.{Constants.StoreDAOStoreIdColumn}, x.{Constants.StoreDAOStoreNameColumn}, " +
                     $"x.{Constants.StoreDAODistanceColumn}, COUNT(*) AS {Constants.StoreDAOIngredientNumColumn} " +
-                    $"FROM ({subQuery}) AS x GROUP BY x.{Constants.StoreDAOStoreIdColumn};";
+                    $"FROM ({subQuery}) AS x GROUP BY x.{Constants.StoreDAOStoreIdColumn} " +
+                    $"LIMIT @START,@END;";
 
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
                 {
                     command.Parameters.AddWithValue("@STORE_NAME", "%" + storeName + "%");
+                    command.Parameters.AddWithValue("@LATITUDE", latitude);
+                    command.Parameters.AddWithValue("@LONGITUDE", longitude);
+                    command.Parameters.AddWithValue("@RADIUS", radius);
+                    command.Parameters.AddWithValue("@START", (pagination - 1) * Constants.NumOfResultsPerPage);
+                    command.Parameters.AddWithValue("@END", pagination * Constants.NumOfResultsPerPage);
                     var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                     dataTable.Load(reader);
 

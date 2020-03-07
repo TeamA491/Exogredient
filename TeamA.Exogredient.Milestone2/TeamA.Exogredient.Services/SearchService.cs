@@ -16,20 +16,20 @@ namespace TeamA.Exogredient.Services
             _uploadDAO = uploadDAO;
         }
 
-        public async Task<List<StoreResult>> GetStoresByIngredientNameAsync(string ingredientName, double latitude, double longitude, double radius)
+        public async Task<List<StoreResult>> GetStoresByIngredientNameAsync(string ingredientName, double latitude, double longitude, double radius, int pagination)
         {
-            return await _storeDAO.ReadByIngredientNameAsync(ingredientName,latitude,longitude,radius).ConfigureAwait(false);
+            return await _storeDAO.ReadByIngredientNameAsync(ingredientName,latitude,longitude,radius,pagination).ConfigureAwait(false);
 
         }
 
-        public async Task<List<StoreResult>> GetStoresByStoreNameAsync(string storeName, double latitude, double longitude, double radius)
+        public async Task<List<StoreResult>> GetStoresByStoreNameAsync(string storeName, double latitude, double longitude, double radius, int pagination)
         {
-            return await _storeDAO.ReadByStoreNameAsync(storeName, latitude, longitude, radius);
+            return await _storeDAO.ReadByStoreNameAsync(storeName, latitude, longitude, radius, pagination);
         }
 
-        public async Task<List<IngredientResult>> GetIngredientsAsync(int storeId, string ingredientName)
+        public async Task<List<IngredientResult>> GetIngredientsAsync(int storeId, string ingredientName, int pagination)
         {
-            return await _uploadDAO.ReadIngredientsByStoreIdAsync(storeId, ingredientName).ConfigureAwait(false);
+            return await _uploadDAO.ReadIngredientsByStoreIdAsync(storeId, ingredientName, pagination).ConfigureAwait(false);
         }
 
     }
