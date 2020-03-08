@@ -7,11 +7,14 @@ using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
 
+
+
+
 namespace TeamA.Exogredient.DAL
 {
     public class UploadDAO : IMasterSQLDAO<string>
     {
-        private string _SQLConnection;
+        private readonly string _SQLConnection;
 
         public UploadDAO(string connection)
         {
@@ -80,6 +83,41 @@ namespace TeamA.Exogredient.DAL
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<ProfileScoreResult>> ReadUploadVotes(string username)
+        {
+            var votes = new List<ProfileScoreResult>();
+
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection)) 
+            { 
+
+                connection.Open();
+
+                var sqlString =
+                    $"SELECT {Constants.UploadDAOUpvoteColumn}, {Constants.UploadDAODownvoteColumn} " +
+                    $"FROM {Constants.UploadDAOTableName} " + 
+                    $"WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME;";
+
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                using (DataTable dataTable = new DataTable())
+                {
+                    command.Parameters.AddWithValue("@USERNAME", username);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    dataTable.Load(reader);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        votes.Add(new ProfileScoreResult(Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn])));
+                    }
+
+                }
+
+            }
+            return votes;
+        }
+
+
 
     }
 }

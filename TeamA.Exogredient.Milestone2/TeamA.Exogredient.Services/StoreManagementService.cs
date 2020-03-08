@@ -4,7 +4,9 @@ using System.Text;
 
 namespace TeamA.Exogredient.Services
 {
-    class StoreManagementService
+    public class StoreManagementService
     {
+
+
     }
 }

@@ -45,5 +45,10 @@ namespace TeamA.Exogredient.Services
         {
             throw new NotImplementedException();
         }
+        public async Task<List<ProfileScoreResult>> getUploadVotes(string username)
+        {
+            return await _uploadDao.ReadUploadVotes(username).ConfigureAwait(false);
+        }
+
     }
 }

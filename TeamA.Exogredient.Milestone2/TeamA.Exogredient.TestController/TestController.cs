@@ -20,11 +20,15 @@ namespace TeamA.Exogredient.TestController
 
         public async static Task Main()
         {
-            var stemmed = StringUtilityService.Stem("airplanes");
-            Console.WriteLine(stemmed);
-            Console.WriteLine(StringUtilityService.AutoCorrectWord(stemmed,
-                "/Users/charleskwak/MyPersonal/Git/Exogredient/TeamA.Exogredient.Milestone2/en_US.dic",
-                "/Users/charleskwak/MyPersonal/Git/Exogredient/TeamA.Exogredient.Milestone2/en_US.aff"));
+            UploadDAO ud = new UploadDAO(Constants.SQLConnection);
+            List<ProfileScoreResult> listprofile = await ud.ReadUploadVotes("username").ConfigureAwait(false);
+            foreach(ProfileScoreResult ps in listprofile)
+            {
+                Console.WriteLine(ps.UploadUpvote + " " + ps.UploadDownvote);
+            }
+
+
+            //Console.WriteLine(ud.ReadUploadVotes("username"));
         }
     }
 }
