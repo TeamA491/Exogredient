@@ -245,12 +245,19 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string LocalHost = "127.0.0.1";
 
+        public const int RecentUploadPagination = 10;
+        public const int SavedUploadPagination = 10;
+        public const int SaveListPagination = 20;
+
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
         public const long NoValueLong = 0;
         public const int NoValueInt = 0;
         public const string NoValueString = "";
+        public const int UploadInprogress = 1;
+        public const int UploadNotInprogress = 0;
+
 
         public const int MaximumOperationRetries = 3;
 
@@ -502,6 +509,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadDAODownvoteColumn = "downvote";
         public const string UploadDAOInProgressColumn = "in_progress";
         public const string UploadDAOUploadNumColumn = "upload_num";
+
+        // SAVELIST TABLE
+        public const string SaveListDAOTableName = "save_list";
+        public const string SaveListDAOStoreColumn = "store";
+        public const string SaveListDAOUsername = "username";
+        public const string SaveListDAOIngredient = "ingredient";
+
+
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
