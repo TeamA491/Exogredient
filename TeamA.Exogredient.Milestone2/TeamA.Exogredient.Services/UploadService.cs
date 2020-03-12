@@ -50,5 +50,10 @@ namespace TeamA.Exogredient.Services
             return await _uploadDao.ReadUploadVotes(username).ConfigureAwait(false);
         }
 
+        public async Task<List<UploadResult>> ReadRecentByUploader(string username, int pagination)
+        {
+            return await _uploadDao.ReadRecentByUploader(username, pagination).ConfigureAwait(false);
+        }
+
     }
 }
