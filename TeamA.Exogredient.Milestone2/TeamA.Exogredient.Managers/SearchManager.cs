@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
@@ -28,15 +29,30 @@ namespace TeamA.Exogredient.Managers
         {
             try
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 var normalizedIngredient = StringUtilityService.NormalizeTerm(ingredientName, this._enUSDicPath, this._enUSAffPath);
-                var stores = await _searchService.GetStoresByIngredientNameAsync(normalizedIngredient, latitude, longitude, radius, pagination).ConfigureAwait(false);
+                sw.Stop();
+                Console.WriteLine($"Normalize: {sw.Elapsed}");
+                sw.Reset();
 
+                sw.Start();
+                var stores = await _searchService.GetStoresByIngredientNameAsync(normalizedIngredient, latitude, longitude, radius, pagination).ConfigureAwait(false);
+                sw.Stop();
+                Console.WriteLine($"Get: {sw.Elapsed}");
+                sw.Reset();
+
+                sw.Start();
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetStoresByIngredientOperation, username, ipAddress).ConfigureAwait(false);
+                sw.Stop();
+                Console.WriteLine($"Log: {sw.Elapsed}");
+                sw.Reset();
                 return SystemUtilityService.CreateResult(Constants.StoresFetchSuccessMessage, stores, false, failureCounter);
 
             }
             catch(Exception e)
             {
+                Console.WriteLine(e.Message);
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetStoresByIngredientOperation, username, ipAddress, e.Message).ConfigureAwait(false);
                 return SystemUtilityService.CreateResult<List<StoreResult>>(Constants.StoresFetchUnsuccessMessage, null, true, failureCounter + 1);
             }
