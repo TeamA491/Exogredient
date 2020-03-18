@@ -41,18 +41,20 @@ namespace TeamA.Exogredient.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IDataObject> ReadByIngredientName(string ingredientName)
-        {
-            throw new NotImplementedException();
-        }
+
         public async Task<List<ProfileScoreResult>> getUploadVotes(string username)
         {
             return await _uploadDao.ReadUploadVotes(username).ConfigureAwait(false);
         }
 
-        public async Task<List<UploadResult>> ReadRecentByUploader(string username, int pagination)
+        public async Task<List<UploadResult>> GetRecentByUploader(string username, int pagination)
         {
             return await _uploadDao.ReadRecentByUploader(username, pagination).ConfigureAwait(false);
+        }
+
+        public async Task<List<UploadResult>> GetInProgressUploadsByUploader(string username, int pagination)
+        {
+            return await _uploadDao.ReadInProgressUploadsByUploader(username, pagination).ConfigureAwait(false);
         }
 
     }

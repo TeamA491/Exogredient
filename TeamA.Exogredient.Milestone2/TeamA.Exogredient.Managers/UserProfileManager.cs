@@ -25,14 +25,19 @@ namespace TeamA.Exogredient.Managers
             return await _uploadService.getUploadVotes(username).ConfigureAwait(false);
         }
 
-        public string GetSavedUploadDraft()
+        public async Task<List<UploadResult>> GetRecentUploads(string username, int pagination)
         {
-            throw new NotImplementedException();
+            return await _uploadService.GetRecentByUploader(username, pagination).ConfigureAwait(false);
+        }
+        
+        public async Task<List<UploadResult>> GetInProgressUploads(string username, int pagination)
+        {
+            return await _uploadService.GetInProgressUploadsByUploader(username, pagination).ConfigureAwait(false);
         }
 
-        public string GetSaveList()
+        public async Task<List<SaveListResult>> GetSaveList(string username, int pagination)
         {
-            throw new NotImplementedException();
+            return await _saveListService.GetSaveList(username, pagination).ConfigureAwait(false);
         }
 
     }

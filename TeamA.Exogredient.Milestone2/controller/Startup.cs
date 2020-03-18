@@ -41,18 +41,25 @@ namespace controller
             // Adding Managers.
             services.AddTransient<RegistrationManager>();
             services.AddTransient<LoggingManager>();
+            services.AddTransient<UserProfileManager>();
 
             // Adding service layer.
             services.AddTransient<FlatFileLoggingService>();
             services.AddTransient<DataStoreLoggingService>();
             services.AddTransient<UserManagementService>();
             services.AddTransient<MaskingService>();
+            services.AddTransient<UploadService>();
+            services.AddTransient<StoreManagementService>();
+            services.AddTransient<SaveListService>();
+
 
             // Adding DAL.
             services.AddSingleton(new IPAddressDAO(Constants.SQLConnection));
             services.AddSingleton(new LogDAO(Constants.NOSQLConnection));
             services.AddSingleton(new MapDAO(Constants.MapSQLConnection));
             services.AddSingleton(new UserDAO(Constants.SQLConnection));
+            services.AddSingleton(new UploadDAO(Constants.SQLConnection));
+            services.AddSingleton(new SaveListDAO(Constants.SQLConnection));
 
         }
 

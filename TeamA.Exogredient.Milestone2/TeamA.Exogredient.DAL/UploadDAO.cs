@@ -161,7 +161,7 @@ namespace TeamA.Exogredient.DAL
             return uploads;
         }
 
-        public async Task<List<UploadResult>> ReadSavedUploadsByUploader(string username, int pagination)
+        public async Task<List<UploadResult>> ReadInProgressUploadsByUploader(string username, int pagination)
         {
             var uploads = new List<UploadResult>();
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
