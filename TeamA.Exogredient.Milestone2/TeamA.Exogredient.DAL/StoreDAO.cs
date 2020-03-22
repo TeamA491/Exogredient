@@ -80,12 +80,12 @@ namespace TeamA.Exogredient.DAL
                         stores.Add(new StoreResult(Convert.ToInt32(row[Constants.StoreDAOStoreIdColumn]), (string)row[Constants.StoreDAOStoreNameColumn],
                                                    Convert.ToInt32(row[Constants.StoreDAOIngredientNumColumn]), (double)row[Constants.StoreDAODistanceColumn]));
                     }
+                    stores.Sort((StoreResult x, StoreResult y) => x.Distance.CompareTo(y.Distance));
 
                 }
             }
 
             return stores;
-
         }
 
         public async Task<List<StoreResult>> ReadByStoreNameAsync(string storeName,double latitude, double longitude, double radius, int pagination)
@@ -137,10 +137,36 @@ namespace TeamA.Exogredient.DAL
                         stores.Add(new StoreResult(Convert.ToInt32(row[Constants.StoreDAOStoreIdColumn]), (string)row[Constants.StoreDAOStoreNameColumn],
                                                    Convert.ToInt32(row[Constants.StoreDAOIngredientNumColumn]), (double)row[Constants.StoreDAODistanceColumn]));
                     }
+                    stores.Sort((StoreResult x, StoreResult y) => x.Distance.CompareTo(y.Distance));
                 }
             }
-
             return stores;
+        }
+
+        public async Task<StoreViewData> ReadStoreViewDataByIdAsync(int id)
+        {
+            StoreViewData storeViewData = null;
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                var sqlString = $"SELECT {Constants.StoreDAOStoreNameColumn}, {Constants.StoreDAOLatitudeColumn}, {Constants.StoreDAOLongitudeColumn}, {Constants.StoreDAOStoreDescriptionColumn}, {Constants.StoreDAOPlaceIdColumn} FROM {Constants.StoreDAOTableName} WHERE {Constants.StoreDAOStoreIdColumn} = @ID;";
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                using (DataTable dataTable = new DataTable())
+                {
+                    command.Parameters.AddWithValue("@ID", id);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    dataTable.Load(reader);
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        storeViewData = new StoreViewData((string)row[Constants.StoreDAOStoreNameColumn], (double)row[Constants.StoreDAOLatitudeColumn], (double)row[Constants.StoreDAOLongitudeColumn], (string)row[Constants.StoreDAOStoreDescriptionColumn], (string)row[Constants.StoreDAOPlaceIdColumn]);
+                    }
+                }
+            }
+            return storeViewData;
         }
 
         public Task<bool> UpdateAsync(ISQLRecord record)

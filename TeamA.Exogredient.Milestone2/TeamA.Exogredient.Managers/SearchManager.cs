@@ -24,8 +24,8 @@ namespace TeamA.Exogredient.Managers
         }
 
         //TODO Replace message to constants
-        public async Task<Result<List<StoreResult>>> GetStoresByIngredientAsync(string ingredientName, double latitude, double longitude,
-                                                                                double radius, int pagination, int failureCounter, string username, string ipAddress)
+        public async Task<Result<List<StoreResult>>> GetStoresByIngredientNameAsync(string ingredientName, double latitude, double longitude,
+                                                                                double radius, int pagination, int failureCount, string username, string ipAddress)
         {
             try
             {
@@ -47,20 +47,20 @@ namespace TeamA.Exogredient.Managers
                 sw.Stop();
                 Console.WriteLine($"Log: {sw.Elapsed}");
                 sw.Reset();
-                return SystemUtilityService.CreateResult(Constants.StoresFetchSuccessMessage, stores, false, failureCounter);
+                return SystemUtilityService.CreateResult(Constants.StoresFetchSuccessMessage, stores, false, failureCount);
 
             }
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetStoresByIngredientOperation, username, ipAddress, e.Message).ConfigureAwait(false);
-                return SystemUtilityService.CreateResult<List<StoreResult>>(Constants.StoresFetchUnsuccessMessage, null, true, failureCounter + 1);
+                return SystemUtilityService.CreateResult<List<StoreResult>>(Constants.StoresFetchUnsuccessMessage, null, true, failureCount + 1);
             }
         }
 
 
-        public async Task<Result<List<StoreResult>>> GetStoresByStoreAsync(string storeName, double latitude, double longitude,
-                                                                           double radius, int pagination, int failureCounter, string username, string ipAddress)
+        public async Task<Result<List<StoreResult>>> GetStoresByStoreNameAsync(string storeName, double latitude, double longitude,
+                                                                           double radius, int pagination, int failureCount, string username, string ipAddress)
 
         {
             try
@@ -69,16 +69,16 @@ namespace TeamA.Exogredient.Managers
                 var stores = await _searchService.GetStoresByStoreNameAsync(lowercaseStore, latitude, longitude, radius, pagination);
 
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetStoresByStoreOperation, username, ipAddress).ConfigureAwait(false);
-                return SystemUtilityService.CreateResult(Constants.StoresFetchSuccessMessage, stores, false, failureCounter);
+                return SystemUtilityService.CreateResult(Constants.StoresFetchSuccessMessage, stores, false, failureCount);
             }
             catch(Exception e)
             {
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetStoresByStoreOperation, username, ipAddress, e.Message).ConfigureAwait(false);
-                return SystemUtilityService.CreateResult<List<StoreResult>>(Constants.StoresFetchUnsuccessMessage, null, true, failureCounter + 1);
+                return SystemUtilityService.CreateResult<List<StoreResult>>(Constants.StoresFetchUnsuccessMessage, null, true, failureCount + 1);
             }
         }
 
-        public async Task<Result<List<IngredientResult>>> GetIngredientsAsync(string username, string ipAddress, int failureCounter, int storeId, int pagination, string ingredientName = null)
+        public async Task<Result<List<IngredientResult>>> GetIngredientsAsync(string username, string ipAddress, int failureCount, int storeId, int pagination, string ingredientName)
         {
             try
             {
@@ -86,14 +86,29 @@ namespace TeamA.Exogredient.Managers
                 var ingredients = await _searchService.GetIngredientsAsync(storeId, normalizedIngredient, pagination).ConfigureAwait(false);
 
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetIngredientsOperation, username, ipAddress).ConfigureAwait(false);
-                return SystemUtilityService.CreateResult(Constants.IngredientsFetchSuccessMessage, ingredients, false, failureCounter);
+                return SystemUtilityService.CreateResult(Constants.IngredientsFetchSuccessMessage, ingredients, false, failureCount);
             }
             catch(Exception e)
             {
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString), Constants.GetIngredientsOperation, username, ipAddress, e.Message).ConfigureAwait(false);
-                return SystemUtilityService.CreateResult<List<IngredientResult>>(Constants.IngredientsFetchUnsuccessMessage, null, true, failureCounter+1);
+                return SystemUtilityService.CreateResult<List<IngredientResult>>(Constants.IngredientsFetchUnsuccessMessage, null, true, failureCount+1);
             }
-            
         }
+
+        public async Task<Result<StoreViewData>> GetStoreViewDataAsync(int storeId, int failureCount)
+        {
+            try
+            {
+                var data = await _searchService.GetStoreViewDataAsync(storeId).ConfigureAwait(false);
+                return SystemUtilityService.CreateResult("Successfully fetched Store View data", data, false, failureCount);
+
+            }
+            catch(Exception e)
+            {
+                return SystemUtilityService.CreateResult<StoreViewData>("Error fetching Store View data", null, false, failureCount+1);
+            }
+        }
+
+
     }
 }
