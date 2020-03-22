@@ -480,6 +480,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string StoreDAOStoreDescriptionColumn = "store_description";
         public const string StoreDAODistanceColumn = "distance";
         public const string StoreDAOIngredientNumColumn = "ingredient_num";
+        public const string StoreDAOPlaceIdColumn = "place_id";
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;
