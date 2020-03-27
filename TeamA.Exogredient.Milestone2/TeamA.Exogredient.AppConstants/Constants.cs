@@ -241,7 +241,8 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string LocalHost = "127.0.0.1";
 
-        public const int NumOfResultsPerPage = 100;  
+        public const int NumOfResultsPerSearchPage = 100;
+        public const int NumOfIngredientsPerStorePage = 50;
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
@@ -303,6 +304,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string TwilioAuthenticationFailString = "fail";
         public const string TwilioAuthenticationApprovedString = "approved";
         public const string TwilioAuthenticationPendingString = "pending";
+
+        public const string sortByIngredientNum = "ingredientNum";
+        public const string sortByDistance = "distance";
+        public const string searchByIngredient = "ingredient";
+        public const string searchByStore = "store";
 
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
@@ -481,6 +487,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string StoreDAODistanceColumn = "distance";
         public const string StoreDAOIngredientNumColumn = "ingredient_num";
         public const string StoreDAOPlaceIdColumn = "place_id";
+        public const string StoreDAOTotalResultsNum = "total_results_num";
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;

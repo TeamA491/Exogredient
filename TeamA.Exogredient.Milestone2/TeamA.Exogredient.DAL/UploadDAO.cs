@@ -33,7 +33,7 @@ namespace TeamA.Exogredient.DAL
             throw new NotImplementedException();
         }
 
-        public async Task<List<IngredientResult>> ReadIngredientsByStoreIdAsync(int storeId, string ingredientName, int pagination)
+        public async Task<List<IngredientResult>> ReadIngredientsByStoreIdAsync(int storeId, string ingredientName, string lastIngredientName)
         {
             var ingredients = new List<IngredientResult>();
 
@@ -52,8 +52,10 @@ namespace TeamA.Exogredient.DAL
                     $"= {Constants.StoreDAOTableName}.{Constants.StoreDAOStoreIdColumn} " +
                     $"WHERE {Constants.UploadDAOTableName}.{Constants.UploadDAOStoreIdColumn} = @STORE_ID " +
                     (ingredientName == null ? "" : $"AND {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} LIKE @INGREDIENT_NAME ") +
+                    (lastIngredientName == null ? "" : $"AND {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} > @LAST_INGREDIENT_NAME ") +
                     $"GROUP BY {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} " +
-                    $"LIMIT @START,@END;";
+                    $"ORDER BY {Constants.UploadDAOTableName}.{Constants.UploadDAOIngredientNameColumn} ASC " +
+                    $"LIMIT @COUNT;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 using (DataTable dataTable = new DataTable())
@@ -62,12 +64,17 @@ namespace TeamA.Exogredient.DAL
                     {
                         command.Parameters.AddWithValue("@INGREDIENT_NAME", "%" + ingredientName + "%");
                     }
+                    if(lastIngredientName != null)
+                    {
+                        command.Parameters.AddWithValue("@LAST_INGREDIENT_NAME", lastIngredientName);
+                    }
+                    command.Parameters.AddWithValue("@LAST_INGREDIENT_NAME", lastIngredientName);
                     command.Parameters.AddWithValue("@STORE_ID", storeId);
-                    command.Parameters.AddWithValue("@START", (pagination - 1) * Constants.NumOfResultsPerPage);
-                    command.Parameters.AddWithValue("@END", pagination * Constants.NumOfResultsPerPage);
+                    command.Parameters.AddWithValue("@COUNT", Constants.NumOfIngredientsPerStorePage);
                     var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                     dataTable.Load(reader);
 
+                    Console.WriteLine(sqlString);
                     foreach (DataRow row in dataTable.Rows)
                     {
                         ingredients.Add(new IngredientResult((string)row[Constants.UploadDAOIngredientNameColumn], (double)row[Constants.UploadDAOPriceColumn],
