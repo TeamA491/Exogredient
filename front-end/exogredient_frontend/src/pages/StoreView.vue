@@ -20,7 +20,7 @@
 
 <script>
 export default {
-    name: "IngredientsView",
+    name: "StoreView",
     computed:{
         ingredients: function(){
             return this.$store.getters.ingredientResults;
@@ -37,8 +37,10 @@ export default {
             //TODO: Implement what to do when user clicks the ingredient.
         },
         openMap: function(){
-            window.open(`https://www.google.com/maps/search/?api=1&query=${this.storeViewData.latitude},${this.storeViewData.longitude}&query_place_id=${this.storeViewData.placeId}`, "_blank");
-        }
+            var encodedOriginAddress = encodeURIComponent(this.$store.state.searchData.address);
+            window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodedOriginAddress}&destination=${this.storeViewData.storeName}&destination_place_id=${this.storeViewData.placeId}&travelmode=driving`, "_blank");
+        },
+
     }
 }
 </script>
