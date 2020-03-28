@@ -496,6 +496,26 @@ namespace TeamA.Exogredient.AppConstants
         public const string StoreDAOPlaceIdColumn = "place_id";
         public const string StoreDAOTotalResultsNum = "total_results_num";
 
+        // TICKET TABLE
+        public const int DefaultVarCharLength = 32;
+
+        public const string TicketDAOTableName = "ticket";
+        public const string TicketCategoryDAOTableName = "ticket_category";
+        public const string TicketStatusDAOTableName = "ticket_status";
+        public const string TicketFlagColorDAOTableName = "ticket_flag_color";
+
+        public const string TicketDAOTicketIDColumn = "ticket_id";
+        public const string TicketDAOSubmitTimestampColumn = "submit_timestamp";
+        public const string TicketDAOCategoryColumn = "category";
+        public const string TicketDAOStatusColumn = "status";
+        public const string TicketDAOFlagColorColumn = "flag_color";
+        public const string TicketDAODescriptionColumn = "description";
+        public const string TicketDAOIsReadColumn = "is_read";
+
+        public static readonly string[] TicketFlagColors = { "" };
+        public static readonly string[] TicketStatuses = { "" };
+        public static readonly string[] TicketCategories = { "" };
+
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;
 
@@ -590,6 +610,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapReadDNE = "MapDAO.ReadByIdAsync hash did not exist";
         public const string MapUpdateDNE = "MapDAO.UpdateAsync hash did not exist";
         public const string MapUpdateInvalidArgument = "MapDAO.UpdateAsync record argument must be of type MapRecord";
+
+        // EXCEPTION MESSAGES -- TicketDAO
+        public const string TicketCreateInvalidArgument = "TicketDAO.CreateAsync record argument must be of type TicketRecord";
+        public const string TicketRecordNoNull = "All columns in Ticket must not be null";
+        public const string TicketDeleteDNE = "TicketDAO.DeleteByIdsAsync ticket id did not exist";
+        public const string TicketReadDNE = "TicketDAO.ReadByIdAsync ticket id did not exist";
+        public const string TicketUpdateDNE = "TicketDAO.UpdateAsync ticket id did not exist";
+        public const string TicketUpdateInvalidArgument = "TicketDAO.UpdateAsync record argument must be of type TicketRecord";
 
         // EXCEPTION MESSAGES -- Archiving
         public const string SourceDirectoryDNE = "Archiving failed on because source directory did not exist";

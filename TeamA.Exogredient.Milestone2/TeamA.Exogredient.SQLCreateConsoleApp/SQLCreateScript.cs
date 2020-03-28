@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
@@ -26,6 +27,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             //await CreateUserTable().ConfigureAwait(false);
             await CreateIPTable().ConfigureAwait(false);
             //await CreateMapTable().ConfigureAwait(false);
+            //await CreateTicketTables().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -34,9 +36,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         /// <returns>Task (bool)</returns>
         private static async Task<bool> CreateUserTable()
         {
-
             MySqlConnection connection = new MySqlConnection(_connection);
-
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
@@ -65,6 +65,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
 
+            connection.Close();
             return true;
         }
 
@@ -75,7 +76,6 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         private static async Task<bool> CreateIPTable()
         {
             MySqlConnection connection = new MySqlConnection(_connection);
-
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
@@ -91,13 +91,13 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             await command.DisposeAsync().ConfigureAwait(false);
 
+            connection.Close();
             return true;
         }
 
         private static async Task<bool> CreateMapTable()
         {
             MySqlConnection connection = new MySqlConnection(_connection);
-
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
@@ -116,7 +116,79 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
             Environment.SetEnvironmentVariable("COUNT", (2).ToString(), EnvironmentVariableTarget.User);
 
+            connection.Close();
             return true;
+        }
+
+        private static async Task<bool> CreateTicketTables()
+        {
+            MySqlConnection connection = new MySqlConnection(_connection);
+            connection.Open();
+
+            string insertCategoriesQuery = BuildMultiSingleValueInsertStatement(Constants.TicketCategoryDAOTableName, Constants.TicketCategories);
+            string insertStatusesQuery = BuildMultiSingleValueInsertStatement(Constants.TicketStatusDAOTableName, Constants.TicketStatuses);
+            string insertFlagColorsQuery = BuildMultiSingleValueInsertStatement(Constants.TicketFlagColorDAOTableName, Constants.TicketFlagColors);
+
+            StringBuilder sqlString = new StringBuilder($@"
+                -- Enumeration tables
+                CREATE TABLE IF NOT EXISTS `{Constants.TicketCategoryDAOTableName}` (
+                    `{Constants.TicketDAOCategoryColumn}` VARCHAR({Constants.DefaultVarCharLength}) NOT NULL,
+                    PRIMARY KEY (`{Constants.TicketDAOCategoryColumn}`)
+                );
+                CREATE TABLE IF NOT EXISTS `{Constants.TicketStatusDAOTableName}` (
+                    `{Constants.TicketDAOStatusColumn}` VARCHAR({Constants.DefaultVarCharLength}) NOT NULL,
+                    PRIMARY KEY (`{Constants.TicketDAOStatusColumn}`)
+                );
+                CREATE TABLE IF NOT EXISTS `{Constants.TicketFlagColorDAOTableName}` (
+                    `{Constants.TicketDAOFlagColorColumn}` VARCHAR({Constants.DefaultVarCharLength}) NOT NULL,
+                    PRIMARY KEY (`{Constants.TicketDAOFlagColorColumn}`)
+                );
+
+                CREATE TABLE IF NOT EXISTS `{Constants.TicketDAOTableName}` (
+                    `{Constants.TicketDAOTicketIDColumn}` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	                `{Constants.TicketDAOSubmitTimestampColumn}` INT UNSIGNED NOT NULL,
+                    `{Constants.TicketDAOCategoryColumn}` VARCHAR({Constants.DefaultVarCharLength}) NOT NULL,
+                    `{Constants.TicketDAOStatusColumn}` VARCHAR({Constants.DefaultVarCharLength}) NOT NULL,
+                    `{Constants.TicketDAOFlagColorColumn}` VARCHAR({Constants.DefaultVarCharLength}) NOT NULL,
+                    `{Constants.TicketDAODescriptionColumn}` LONGTEXT NOT NULL,
+                    `{Constants.TicketDAOIsReadColumn}` BOOLEAN NOT NULL DEFAULT 0,
+
+                    PRIMARY KEY (`{Constants.TicketDAOTicketIDColumn}`),
+                    FOREIGN KEY (`{Constants.TicketDAOCategoryColumn}`)
+                        REFERENCES `{Constants.TicketCategoryDAOTableName}`(`{Constants.TicketDAOCategoryColumn}`) ON DELETE CASCADE,
+                    FOREIGN KEY (`{Constants.TicketDAOStatusColumn}`)
+                      REFERENCES `{Constants.TicketStatusDAOTableName}`(`{Constants.TicketDAOStatusColumn}`) ON DELETE CASCADE,
+                    FOREIGN KEY (`{Constants.TicketDAOFlagColorColumn}`)
+                      REFERENCES `{Constants.TicketFlagColorDAOTableName}`(`{Constants.TicketDAOFlagColorColumn}`) ON DELETE CASCADE
+                );
+                
+                {insertCategoriesQuery}
+                {insertStatusesQuery}
+                {insertFlagColorsQuery}
+            ");
+
+            // Create the commmand object and execute/dispose it asynchronously.
+            MySqlCommand command = new MySqlCommand(sqlString.ToString(), connection);
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await command.DisposeAsync().ConfigureAwait(false);
+
+            connection.Close();
+            return true;
+        }
+
+        // TODO: MOVE TO STRINGUTILITY
+        private static string BuildMultiSingleValueInsertStatement(string tableName, string[] values)
+        {
+            StringBuilder insertSQLString = new StringBuilder($"INSERT INTO {tableName} VALUES ");
+            foreach (string s in values)
+            {
+                insertSQLString.Append($"(`{s}`),");
+            }
+
+            // Remove the last character ","
+            insertSQLString.Length--;
+            insertSQLString.Append(";");
+            return insertSQLString.ToString();
         }
     }
 }
