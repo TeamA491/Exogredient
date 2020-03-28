@@ -512,9 +512,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketDAODescriptionColumn = "description";
         public const string TicketDAOIsReadColumn = "is_read";
 
-        public static readonly string[] TicketFlagColors = { "" };
-        public static readonly string[] TicketStatuses = { "" };
-        public static readonly string[] TicketCategories = { "" };
+        public static readonly string[] TicketFlagColors = { "red", "blue", "green", "yellow", "orange" };
+        public static readonly string[] TicketStatuses = { "unresolved", "resolved" };
+        public static readonly string[] TicketCategories = { "error", "bug", "other" };
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;
