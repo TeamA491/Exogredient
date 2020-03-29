@@ -89,34 +89,33 @@ namespace TeamA.Exogredient.DAL
             // List to store upload's votes.
             var votes = new List<ProfileScoreResult>();
 
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection)) 
-            { 
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
                 connection.Open();
 
                 // SQL command to retrive all upvotes and downvotes from a user.
                 var sqlString =
                     $"SELECT {Constants.UploadDAOUpvoteColumn}, {Constants.UploadDAODownvoteColumn} " +
-                    $"FROM {Constants.UploadDAOTableName} " + 
+                    $"FROM {Constants.UploadDAOTableName} " +
                     $"WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME;";
 
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
                 {
-                    command.Prepare();
-                    // Add paramters of username into the command.
-                    command.Parameters.AddWithValue("@USERNAME", username);
-
-                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    dataTable.Load(reader);
-
-                    foreach (DataRow row in dataTable.Rows)
+                    using (DataTable dataTable = new DataTable())
                     {
-                        votes.Add(new ProfileScoreResult(Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn])));
+                        // Add paramters of username into the command.
+                        command.Parameters.AddWithValue("@USERNAME", username);
+
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        dataTable.Load(reader);
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            votes.Add(new ProfileScoreResult(Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn])));
+                        }
                     }
-
                 }
-
             }
             return votes;
         }
@@ -134,29 +133,29 @@ namespace TeamA.Exogredient.DAL
                     $"FROM {Constants.UploadDAOTableName} " +
                     $"WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME AND {Constants.UploadDAOInProgressColumn} = {Constants.UploadNotInprogress} " +
                     $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
-                    $"LIMIT @START, @END;";
+                    $"LIMIT @OFFSET, @AMOUNT;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
                 {
-                    command.Prepare();
-                    // Add paramters of username into the command.
-                    command.Parameters.AddWithValue("@USERNAME", username);
-                    command.Parameters.AddWithValue("@START", (pagination - 1) * Constants.RecentUploadPagination);
-                    command.Parameters.AddWithValue("@END", pagination * Constants.RecentUploadPagination);
-
-                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    dataTable.Load(reader);
-
-                    foreach (DataRow row in dataTable.Rows)
+                    using (DataTable dataTable = new DataTable())
                     {
-                        uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
-                                    (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
-                                    (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        // Add paramters of username into the command.
+                        command.Parameters.AddWithValue("@USERNAME", username);
+                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.RecentUploadPagination);
+                        command.Parameters.AddWithValue("@AMOUNT", Constants.RecentUploadPagination);
+
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        dataTable.Load(reader);
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
+                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
+                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        }
+
                     }
-
                 }
-
             }
             return uploads;
         }
@@ -174,35 +173,31 @@ namespace TeamA.Exogredient.DAL
                     $"FROM {Constants.UploadDAOTableName} " +
                     $"WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME AND {Constants.UploadDAOInProgressColumn} = {Constants.UploadInprogress} " +
                     $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
-                    $"LIMIT @START, @END;";
+                    $"LIMIT @OFFSET, @AMOUNT;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
                 {
-                    command.Prepare();
-                    // Add paramters of into the sql string.
-                    command.Parameters.AddWithValue("@USERNAME", username);
-                    command.Parameters.AddWithValue("@START", (pagination - 1) * Constants.SavedUploadPagination);
-                    command.Parameters.AddWithValue("@END", pagination * Constants.SavedUploadPagination);
-
-                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    dataTable.Load(reader);
-
-                    foreach (DataRow row in dataTable.Rows)
+                    using (DataTable dataTable = new DataTable())
                     {
-                        uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
-                                    (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
-                                    (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        // Add paramters of into the sql string.
+                        command.Parameters.AddWithValue("@USERNAME", username);
+                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.SavedUploadPagination);
+                        command.Parameters.AddWithValue("@AMOUNT", Constants.SavedUploadPagination);
+
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        dataTable.Load(reader);
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
+                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
+                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        }
+
                     }
-
                 }
-
             }
             return uploads;
         }
-            
-
-
-
     }
 }

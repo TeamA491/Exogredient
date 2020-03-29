@@ -217,7 +217,17 @@ namespace TeamA.Exogredient.AppConstants
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
 
+        public const int OperationRetry = 3;
+
         public const string NoError = "null";
+
+        // BUSINESS RULES: USER PROFILE
+        public const string GetProfileScoreOperation = "Get Profile Score";
+        public const string GetRecentUploadsOperation = "Get Recent Uploads";
+        public const string GetInProgressUploadsOperation = "Get InProgress Uploads";
+        public const string GetSaveListOperation = "Get Save Lists";
+        public const string DeleteSaveListOperation = "Delete Save List";
+
 
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
@@ -236,7 +246,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
-
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
@@ -593,6 +602,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapReadDNE = "MapDAO.ReadByIdAsync hash did not exist";
         public const string MapUpdateDNE = "MapDAO.UpdateAsync hash did not exist";
         public const string MapUpdateInvalidArgument = "MapDAO.UpdateAsync record argument must be of type MapRecord";
+
+        // EXCPETION MESSAGES -- SaveListDAO
+        public const string SaveListDNE = "SaveList does not exists";
+
+
 
         // EXCEPTION MESSAGES -- Archiving
         public const string SourceDirectoryDNE = "Archiving failed on because source directory did not exist";

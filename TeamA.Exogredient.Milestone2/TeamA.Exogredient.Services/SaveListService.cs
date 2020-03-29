@@ -20,5 +20,10 @@ namespace TeamA.Exogredient.Services
         {
             return await _saveListDao.ReadyByUsername(user, pagination).ConfigureAwait(false);
         }
+
+        public async Task<bool> DeleteSaveList(string username, int storeId, string ingredient)
+        {
+            return await _saveListDao.DeleteByPK(username, storeId, ingredient);
+        }
     }
 }
