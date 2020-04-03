@@ -16,20 +16,19 @@ namespace TeamA.Exogredient.Managers
             _sessionService = sessionService;
         }
 
-
-        public bool AuthorizeUser(string operation, string jwsToken)
+        public bool AuthorizeUser(string operation, string jwtToken)
         {
             try
             {
                 // Decrypt it here to make sure the token wasn't tampered with
                 // or it isn't valid
-                Dictionary<string, string> payload = _authorizationService.DecryptJWT(jwsToken);
+                Dictionary<string, string> payload = _authorizationService.DecryptJWT(jwtToken);
 
-                if (_sessionService.TokenIsExpired(jwsToken))
+                if (_sessionService.TokenIsExpired(jwtToken))
                     return false;
 
                 // Only refresh the token if it isn't expired
-                jwsToken = _sessionService.RefreshJWT(jwsToken);
+                jwtToken = _sessionService.RefreshJWT(jwtToken);
 
                 // Make sure the user type is an int
                 int userType;

@@ -26,7 +26,6 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string StatusProd = "PRODUCTION";
         public static readonly string StatusTest = "TESTING";
 
-
         // STRING UTILITY HELPER DATA STRUCTURES
         public static readonly IDictionary<int, int> MonthDays = new Dictionary<int, int>()
         {
@@ -213,6 +212,52 @@ namespace TeamA.Exogredient.AppConstants
 
         public const int MaxAlphaValue = 26;
         public const int MinAlphaValue = 1;
+
+        // TICKET SERVICE
+        public enum TicketSearchFilter
+        {
+            DateTo,
+            DateFrom,
+            FlagColor,
+            Status,
+            Category,
+            ReadStatus
+        }
+
+        public enum TicketFlagColors
+        {
+            Red,
+            Blue,
+            Green,
+            Yellow,
+            Orange
+        }
+
+        public enum TicketStatuses
+        {
+            Unresolved,
+            Resolved
+        }
+
+        public enum TicketReadStatuses
+        {
+            All,
+            Unread,
+            Read
+        }
+
+        public enum TicketCategories
+        {
+            Report,
+            Error,
+            Bug,
+            Other,
+        }
+
+        //public static readonly string[] TicketFlagColors = { "red", "blue", "green", "yellow", "orange" };
+        //public static readonly string[] TicketStatuses = { "unresolved", "resolved" };
+        //public static readonly string[] TicketReadStatuses = { "all", "unread", "read" };
+        //public static readonly string[] TicketCategories = { "error", "bug", "other" };
 
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
@@ -511,10 +556,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketDAOFlagColorColumn = "flag_color";
         public const string TicketDAODescriptionColumn = "description";
         public const string TicketDAOIsReadColumn = "is_read";
-
-        public static readonly string[] TicketFlagColors = { "red", "blue", "green", "yellow", "orange" };
-        public static readonly string[] TicketStatuses = { "unresolved", "resolved" };
-        public static readonly string[] TicketCategories = { "error", "bug", "other" };
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;

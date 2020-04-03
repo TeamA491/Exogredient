@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
 
-namespace TeamA.Exogredient.Services
+namespace ticket
 {
     public class SearchService
     {

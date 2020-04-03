@@ -125,9 +125,9 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             MySqlConnection connection = new MySqlConnection(_connection);
             connection.Open();
 
-            string insertCategoriesQuery = BuildMultiSingleValueInsertStatement(Constants.TicketCategoryDAOTableName, Constants.TicketCategories);
-            string insertStatusesQuery = BuildMultiSingleValueInsertStatement(Constants.TicketStatusDAOTableName, Constants.TicketStatuses);
-            string insertFlagColorsQuery = BuildMultiSingleValueInsertStatement(Constants.TicketFlagColorDAOTableName, Constants.TicketFlagColors);
+            string insertCategoriesQuery = BuildMultiSingleValueInsertStatement(Constants.TicketCategoryDAOTableName, new Constants.TicketCategories());
+            string insertStatusesQuery = BuildMultiSingleValueInsertStatement(Constants.TicketStatusDAOTableName, new Constants.TicketStatuses());
+            string insertFlagColorsQuery = BuildMultiSingleValueInsertStatement(Constants.TicketFlagColorDAOTableName, new Constants.TicketFlagColors());
 
             StringBuilder sqlString = new StringBuilder($@"
                 -- Enumeration tables
@@ -177,12 +177,13 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         }
 
         // TODO: MOVE TO STRINGUTILITY
-        private static string BuildMultiSingleValueInsertStatement(string tableName, string[] values)
+        private static string BuildMultiSingleValueInsertStatement(string tableName, Enum enumStruct)
         {
             StringBuilder insertSQLString = new StringBuilder($"INSERT INTO {tableName} VALUES ");
-            foreach (string s in values)
+            foreach (Enum s in Enum.GetValues(enumStruct.GetType()))
             {
-                insertSQLString.Append($"(`{s}`),");
+                string enumStr = s.ToString();
+                insertSQLString.Append($"(`{enumStr}`),");
             }
 
             // Remove the last character ","

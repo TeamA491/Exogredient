@@ -19,7 +19,6 @@ namespace TeamA.Exogredient.Managers
             _loggingManager = loggingManager;
             _authenticationService = authenticationService;
             _verificationService = verificationService;
-
         }
 
         public async Task<Result<bool>> SendPhoneCodeAsync(string username, string phoneNumber, string ipAddress,
