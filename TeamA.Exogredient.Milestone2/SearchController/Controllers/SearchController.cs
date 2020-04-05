@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -19,65 +14,13 @@ namespace SearchController.Controllers
     [Route("api/[controller]")]
     public class SearchController : Controller
     {
-
-        //[EnableCors]
-        //[HttpGet("byIngredient")]
-        //public async Task<IEnumerable<StoreResult>> GetStoresByIngredientNameAsync(string searchTerm, double latitude, double longitude,
-        //    double radius, int pagination, int failureCount, string username, string ipAddress)
-        //{
-        //    Console.WriteLine(radius);
-        //    var connection = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
-        //    var map = "server=localhost;user=root;database=mapping_table;port=3306;password=1234567890";
-        //    var log = "server=localhost;user=root;database=exogredient_log;port=3306;password=1234567890";
-        //    StoreDAO storeDao = new StoreDAO(connection);
-        //    UploadDAO uploadDAO = new UploadDAO(connection);
-        //    var logdao = new LogDAO(log);
-        //    var searchService = new SearchService(storeDao, uploadDAO);
-        //    var mapdao = new MapDAO(map);
-        //    var mask = new MaskingService(mapdao);
-        //    var ffLogging = new FlatFileLoggingService(mask);
-        //    var dsLogging = new DataStoreLoggingService(logdao, mask);
-        //    var loggingManager = new LoggingManager(ffLogging, dsLogging);
-        //    string enUSAff = "en_US/en_US.aff";
-        //    string enUSDic = "en_US/en_US.dic";
-        //    SearchManager searchManager = new SearchManager(searchService, loggingManager, enUSDic, enUSAff);
-
-        //    var result = await searchManager.GetStoresByIngredientNameAsync(searchTerm, latitude, longitude, radius, pagination, failureCount, username, ipAddress).ConfigureAwait(false);
-        //    var stores = result.Data;
-        //    return stores;
-        //}
-
-        //[EnableCors]
-        //[HttpGet("byStore")]
-        //public async Task<IEnumerable<StoreResult>> GetStoresByStoreNameAsync(string searchTerm, double latitude, double longitude,
-        //    double radius, int pagination, int failureCount, string username, string ipAddress)
-        //{
-        //    Console.WriteLine(radius);
-        //    var connection = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
-        //    var map = "server=localhost;user=root;database=mapping_table;port=3306;password=1234567890";
-        //    var log = "server=localhost;user=root;database=exogredient_log;port=3306;password=1234567890";
-        //    StoreDAO storeDao = new StoreDAO(connection);
-        //    UploadDAO uploadDAO = new UploadDAO(connection);
-        //    var logdao = new LogDAO(log);
-        //    var searchService = new SearchService(storeDao, uploadDAO);
-        //    var mapdao = new MapDAO(map);
-        //    var mask = new MaskingService(mapdao);
-        //    var ffLogging = new FlatFileLoggingService(mask);
-        //    var dsLogging = new DataStoreLoggingService(logdao, mask);
-        //    var loggingManager = new LoggingManager(ffLogging, dsLogging);
-        //    string enUSAff = "en_US/en_US.aff";
-        //    string enUSDic = "en_US/en_US.dic";
-        //    SearchManager searchManager = new SearchManager(searchService, loggingManager, enUSDic, enUSAff);
-
-        //    var result = await searchManager.GetStoresByStoreNameAsync(searchTerm, latitude, longitude, radius, pagination, failureCount, username, ipAddress).ConfigureAwait(false);
-        //    var stores = result.Data;
-        //    return stores;
-        //}
+        int failureCount = 0;
 
         [EnableCors]
         [HttpGet("getTotalNum")]
-        public async Task<int> GetTotalResultsNumberAsync(string searchTerm, double latitude, double longitude, double radius, string searchBy,
-                                                          int failureCount, string username, string ipAddress)
+        [Produces("application/json")]
+        public async Task<IActionResult> GetTotalStoreResultsNumberAsync(string searchTerm, double latitude, double longitude, double radius, string searchBy,
+                                                                         string username, string ipAddress)
         {
             var connection = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
             var map = "server=localhost;user=root;database=mapping_table;port=3306;password=1234567890";
@@ -95,16 +38,22 @@ namespace SearchController.Controllers
             string enUSDic = "en_US/en_US.dic";
             SearchManager searchManager = new SearchManager(searchService, loggingManager, enUSDic, enUSAff);
 
-            var result = await searchManager.GetTotalResultsNumberAsync(searchTerm, latitude, longitude, radius, searchBy, failureCount, username, ipAddress);
-            var num = result.Data;
-            Console.WriteLine($"total num: {num}");
-            return num;
+            try
+            {
+                return Ok(await searchManager.GetTotalStoreResultsNumberAsync(searchTerm, latitude, longitude, radius, searchBy,
+                    failureCount, username, ipAddress).ConfigureAwait(false));
+            }
+            catch(Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
         [EnableCors]
-        [HttpGet("getResults")]
-        public async Task<IEnumerable<StoreResult>> GetStoresByStoreNameAsync(string searchTerm, double latitude, double longitude, double radius, string searchBy,
-            double lastStoreData, int lastStoreId, string sortOption, bool fromSmallest, int failureCount, string username, string ipAddress)
+        [HttpGet("getStoreResults")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetStoresByStoreNameAsync(string searchTerm, double latitude, double longitude, double radius, string searchBy,
+            double lastStoreData, int lastStoreId, int lastPageResultsNum, int skipPages, string sortOption, bool fromSmallest, string username, string ipAddress)
         {
             Console.WriteLine(searchBy);
             Console.WriteLine(fromSmallest);
@@ -125,19 +74,61 @@ namespace SearchController.Controllers
             string enUSDic = "en_US/en_US.dic";
             SearchManager searchManager = new SearchManager(searchService, loggingManager, enUSDic, enUSAff);
 
-            var result = await searchManager.GetStoresAsync(searchTerm, latitude, longitude, radius,searchBy,lastStoreData,lastStoreId,sortOption,fromSmallest, failureCount, username, ipAddress).ConfigureAwait(false);
-            var stores = result.Data;
-            return stores;
+            try
+            {
+                return Ok(await searchManager.GetStoresAsync(searchTerm, latitude, longitude, radius, searchBy, lastStoreData, lastStoreId,
+                    lastPageResultsNum, skipPages, sortOption, fromSmallest, failureCount, username, ipAddress).ConfigureAwait(false));
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
         [EnableCors]
-        [HttpGet("storeView")]
-        public async Task<Tuple<StoreViewData,IEnumerable<IngredientResult>>> GetIngredientsAsync(string username, string ipAddress, int failureCount, int storeId, string lastIngredientName = null, string ingredientName = null)
+        [HttpGet("storeViewData")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetStoreViewDataAsync(int storeId, string ingredientName = null)
+        {
+            var connection = "server=localhost;user=root;database=exogredient;port=3306;password=1234567890";
+            var map = "server=localhost;user=root;database=mapping_table;port=3306;password=1234567890";
+            var log = "server=localhost;user=root;database=exogredient_log;port=3306;password=1234567890";
+            StoreDAO storeDao = new StoreDAO(connection);
+            UploadDAO uploadDAO = new UploadDAO(connection);
+            var logdao = new LogDAO(log);
+            var searchService = new SearchService(storeDao, uploadDAO);
+            var mapdao = new MapDAO(map);
+            var mask = new MaskingService(mapdao);
+            var ffLogging = new FlatFileLoggingService(mask);
+            var dsLogging = new DataStoreLoggingService(logdao, mask);
+            var loggingManager = new LoggingManager(ffLogging, dsLogging);
+            string enUSAff = "en_US/en_US.aff";
+            string enUSDic = "en_US/en_US.dic";
+            SearchManager searchManager = new SearchManager(searchService, loggingManager, enUSDic, enUSAff);
+       
+            try
+            {
+                var storeViewData = await searchManager.GetStoreViewDataAsync(storeId, failureCount).ConfigureAwait(false);
+                var totalResultsNum = await searchManager.GetTotalIngredientResultsNumberAsync(storeId, ingredientName, failureCount).ConfigureAwait(false);
+                return Ok(new Tuple<int, StoreViewData>(totalResultsNum, storeViewData));
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [EnableCors]
+        [HttpGet("getIngredientResults")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetIngredientsAsync(string username, string ipAddress,
+            int storeId, int skipPages, int lastPageResultsNum, string lastIngredientName = null, string ingredientName = null)
         {
             Console.WriteLine(username);
             Console.WriteLine(ipAddress);
             Console.WriteLine(failureCount);
             Console.WriteLine(storeId);
+            Console.WriteLine(skipPages);
             Console.WriteLine(lastIngredientName);
             Console.WriteLine(ingredientName);
 
@@ -157,14 +148,15 @@ namespace SearchController.Controllers
             string enUSDic = "en_US/en_US.dic";
             SearchManager searchManager = new SearchManager(searchService, loggingManager, enUSDic, enUSAff);
 
-
-            var ingredientsResult = await searchManager.GetIngredientsAsync(username, ipAddress, failureCount, storeId, lastIngredientName, ingredientName).ConfigureAwait(false);
-            var ingredients = ingredientsResult.Data;
-            var storeViewDataResult = await searchManager.GetStoreViewDataAsync(storeId, failureCount);
-            var storeViewData = storeViewDataResult.Data;
-
-            var tuple = new Tuple<StoreViewData, IEnumerable<IngredientResult>>(storeViewData, ingredients);
-            return tuple;
+            try
+            {             
+                return Ok(await searchManager.GetIngredientsAsync(username, ipAddress, failureCount, storeId,
+                    skipPages, lastPageResultsNum, lastIngredientName, ingredientName).ConfigureAwait(false));
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
         [EnableCors]
@@ -172,9 +164,15 @@ namespace SearchController.Controllers
         public IActionResult GetImage(int id)
         {
             Console.WriteLine("Image retrieved");
-            var image = System.IO.File.OpenRead($"images/store{id}.jpg");
-            return File(image, "image/jpeg");
-
+            try
+            {
+                var image = System.IO.File.OpenRead($"images/store{id}.jpg");
+                return File(image, "image/jpeg");
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
     }

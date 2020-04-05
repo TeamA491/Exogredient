@@ -241,8 +241,8 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string LocalHost = "127.0.0.1";
 
-        public const int NumOfResultsPerSearchPage = 100;
-        public const int NumOfIngredientsPerStorePage = 50;
+        public const int NumOfResultsPerSearchPage = 20;
+        public const int NumOfIngredientsPerStorePage = 20;
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
