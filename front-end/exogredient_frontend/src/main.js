@@ -6,6 +6,9 @@ import App from './App.vue';
 import './registerServiceWorker';
 import SearchResultsView from './pages/SearchResultsView';
 import StoreView from './pages/StoreView';
+import NoResults from './pages/NoResults';
+export const bus = new Vue();
+export const resultsPerPage = 20;
 require("./assets/main.scss");
 
 Vue.config.productionTip = false;
@@ -20,9 +23,16 @@ const store = new Vuex.Store({
     searchData:{},
     storeResults: [],
     ingredientResults: [],
-    storeViewData: null,
-    totalResultsNum:null,
+    storeViewData: {},
+    totalResultsNum:{
+      storeResultsTotalNum: null,
+      ingredientResultsTotalNum: null
+    },
     sortOption:{by:'distance', fromSmallest: true},
+    currentPages:{
+      searchResultsView: 1,
+      storeView: 1
+    },
     username: "anonymous",
     ipAddress: "127.1.1.0",
   },
@@ -39,11 +49,20 @@ const store = new Vuex.Store({
     updateStoreViewData (state, newStoreViewData){
       state.storeViewData = newStoreViewData;
     },
-    updateTotalResultsNum(state, newTotalResultsNum){
-      state.totalResultsNum = newTotalResultsNum;
+    updateStoreResultsTotalNum(state, newTotalResultsNum){
+      state.totalResultsNum.storeResultsTotalNum = newTotalResultsNum;
+    },
+    updateIngredientResultsTotalNum(state, newTotalResultsNum){
+      state.totalResultsNum.ingredientResultsTotalNum = newTotalResultsNum;
     },
     updateSortOption(state, newSortOption){
       state.sortOption = newSortOption;
+    },
+    updateSearchResultsViewCurrentPage(state, newCurrentPage){
+      state.currentPages.searchResultsView = newCurrentPage;
+    },
+    updateStoreViewCurrentPage(state, newCurrentPage){
+      state.currentPages.storeView = newCurrentPage;
     }
   },
   actions:{
@@ -59,11 +78,20 @@ const store = new Vuex.Store({
     updateStoreViewData ({commit}, newStoreViewData){
       commit('updateStoreViewData', newStoreViewData);
     },
-    updateTotalResultsNum({commit}, newTotalResultsNum){
-      commit('updateTotalResultsNum', newTotalResultsNum);
+    updateStoreResultsTotalNum({commit}, newTotalResultsNum){
+      commit('updateStoreResultsTotalNum', newTotalResultsNum);
+    },
+    updateIngredientResultsTotalNum({commit}, newTotalResultsNum){
+      commit('updateIngredientResultsTotalNum', newTotalResultsNum);
     },
     updateSortOption({commit}, newSortOption){
       commit('updateSortOption', newSortOption);
+    },
+    updateSearchResultsViewCurrentPage({commit}, newCurrentPage){
+      commit('updateSearchResultsViewCurrentPage', newCurrentPage);
+    },
+    updateStoreViewCurrentPage({commit}, newCurrentPage){
+      commit('updateStoreViewCurrentPage', newCurrentPage);
     },
     sortStoreResults ({state}, sortOption){
       if(sortOption.by === 'distance'){
@@ -98,7 +126,8 @@ const store = new Vuex.Store({
 
 const routes = [
   { path: '/SearchResultsView', component: SearchResultsView},
-  { path: '/StoreView', component: StoreView}
+  { path: '/StoreView', component: StoreView},
+  { path: '/NoResults', component: NoResults}
 ]
 const router = new VueRouter({
   routes

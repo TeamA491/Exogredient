@@ -29,6 +29,7 @@
 </template>
 
 <script>
+  import {bus} from "./main.js";
   export default {
     name: "App",
     mounted(){
@@ -43,6 +44,8 @@
             console.log(place.geometry.location.lat());
             console.log(place.geometry.location.lng());
         });
+
+        console.log(this.$router.currentRoute.path);
     },
     data(){
         return{
@@ -54,11 +57,15 @@
             searchBy: "ingredient",
             address: '',
           },
-          failureCount: 0,
           searchPlaceholder: "Ingredient Search...",
             
         }
     },
+    // computed:{
+    //   totalResultsNum: function(){
+    //     return this.$store.state.totalResultsNum.storeResultsTotalNum;
+    //   }
+    // },
     methods:{
         search: async function(){
           if( (isNaN(parseFloat(this.$data.searchData.radius)) || !isFinite(this.$data.searchData.radius)) || 
@@ -68,28 +75,38 @@
           }
           this.$store.dispatch('updateSearchData', this.$data.searchData);
           let paginationResponse = 
-          await fetch(`https://localhost:5001/api/search/getTotalNum?`
-          + `searchTerm=${this.searchData.searchTerm}&latitude=${this.searchData.lat}&longitude=${this.searchData.lng}&radius=${this.searchData.radius}`
-          + `&searchBy=${this.searchData.searchBy}&failureCount=${this.failureCount}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`);
+              await fetch(`https://localhost:5001/api/search/getTotalNum?`
+              + `searchTerm=${this.searchData.searchTerm}&latitude=${this.searchData.lat}&longitude=${this.searchData.lng}&radius=${this.searchData.radius}`
+              + `&searchBy=${this.searchData.searchBy}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`);
           let totalResultsNum = await paginationResponse.json();
-          this.$store.dispatch('updateTotalResultsNum',totalResultsNum);
+          this.$store.dispatch('updateStoreResultsTotalNum',totalResultsNum);
           console.log(totalResultsNum);
+
+          if(totalResultsNum === 0){
+            if(this.$router.currentRoute.path !== "/SearchResultsView"){
+              this.$router.push("/SearchResultsView");
+            }
+            return;
+          }
           
           let resultsResponse = 
-          await fetch(`https://localhost:5001/api/search/getResults?`
-          + `searchTerm=${this.searchData.searchTerm}&latitude=${this.searchData.lat}&longitude=${this.searchData.lng}&radius=${this.searchData.radius}`
-          + `&searchBy=${this.searchData.searchBy}&lastStoreData=${-1}&lastStoreId=${0}&sortOption=${"distance"}&fromSmallest=${true}`
-          + `&failureCount=${this.failureCount}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`);
+              await fetch(`https://localhost:5001/api/search/getStoreResults?`
+              + `searchTerm=${this.searchData.searchTerm}&latitude=${this.searchData.lat}&longitude=${this.searchData.lng}&radius=${this.searchData.radius}`
+              + `&searchBy=${this.searchData.searchBy}&lastStoreData=-1&lastStoreId=0&skipPages=1&sortOption=distance&fromSmallest=true`
+              + `&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`);
           let stores = await resultsResponse.json();
           console.log(stores);
 
           this.$store.dispatch('updateStoreResults',stores);
           //this.$store.dispatch('updateAddress', this.$data.address);
-          if(this.$router.currentRoute.path !== "/SearchResultsView"){
-            this.$router.push("/SearchResultsView");
-          }else{
+          if(this.$router.currentRoute.path === "/SearchResultsView"){
             console.log("in search results view")
             this.$store.dispatch('updateSortOption', {by:'distance', fromSmallest: true});
+            bus.$emit("updatePagination",1);
+          }else{
+            this.$store.dispatch('updateSortOption', {by:'distance', fromSmallest: true});
+            this.$store.dispatch('updateSearchResultsViewCurrentPage', 1);
+            this.$router.push("/SearchResultsView");
           }
         },
         setToIngredientSearch: function(){
