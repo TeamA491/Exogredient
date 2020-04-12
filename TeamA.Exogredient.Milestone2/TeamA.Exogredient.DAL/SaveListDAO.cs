@@ -33,6 +33,36 @@ namespace TeamA.Exogredient.DAL
             throw new NotImplementedException();
         }
 
+        public async Task<bool> DeleteByPK(string username, int storeId, string ingredient)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct sql string for deleting a save list 
+                string sqlString = $"DELETE FROM {Constants.SaveListDAOTableName} " +
+                                   $"WHERE {Constants.SaveListDAOIngredient} = @INGREDIENT " +
+                                   $"AND {Constants.SaveListDAOStoreColumn} = @STOREID " +
+                                   $"AND {Constants.SaveListDAOUsername} = @USERNAME;";
+
+                // Add values from the parameters and execute the command.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    command.Parameters.AddWithValue("@INGREDIENT", ingredient);
+                    command.Parameters.AddWithValue("@STOREID", storeId);
+                    command.Parameters.AddWithValue("@USERNAME", username);
+                    int result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+                    // Throw exception if the command doesn't delete a row.
+                    if(result == 0)
+                    {
+                        throw new ArgumentException(Constants.SaveListDNE);
+                    }
+                } 
+            }
+            return true;
+        }
+
 
         public async Task<List<SaveListResult>> ReadyByUsername(string username, int pagination)
         {
@@ -46,23 +76,24 @@ namespace TeamA.Exogredient.DAL
                     $"SELECT * " +
                     $"FROM {Constants.SaveListDAOTableName} " +
                     $"WHERE {Constants.SaveListDAOUsername} = @USERNAME " +
-                    $"LIMIT @START, @END;";
+                    $"LIMIT @OFFSET, @AMOUNT;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
-                {
-                    command.Prepare();
-                    // Add parameters into the sql string.
-                    command.Parameters.AddWithValue("@USERNAME", username);
-                    command.Parameters.AddWithValue("@START", (pagination - 1) * Constants.SaveListPagination);
-                    command.Parameters.AddWithValue("@END", pagination * Constants.SaveListPagination);
-
-                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    dataTable.Load(reader);
-
-                    foreach (DataRow row in dataTable.Rows)
+                { 
+                    using (DataTable dataTable = new DataTable())
                     {
-                        saveLists.Add(new SaveListResult((string)row[Constants.SaveListDAOUsername], (string)row[Constants.SaveListDAOIngredient], Convert.ToInt32(row[Constants.SaveListDAOStoreColumn])));
+                        // Add parameters into the sql string.
+                        command.Parameters.AddWithValue("@USERNAME", username);
+                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.SaveListPagination);
+                        command.Parameters.AddWithValue("@AMOUNT", Constants.SaveListPagination);
+
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        dataTable.Load(reader);
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            saveLists.Add(new SaveListResult((string)row[Constants.SaveListDAOUsername], (string)row[Constants.SaveListDAOIngredient], Convert.ToInt32(row[Constants.SaveListDAOStoreColumn])));
+                        }
                     }
                 }
             }
