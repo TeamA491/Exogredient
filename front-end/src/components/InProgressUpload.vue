@@ -1,0 +1,35 @@
+<template>
+  <div>
+    <button @click="DeleteInProgressUpload(upload.uploadId)">X</button>
+    <a>{{upload.photo}} for {{upload.ingredientName}}</a>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    upload: {
+      type: Object,
+      default: {},
+    },
+    index: {
+      type: Number,
+      default: -1,
+    },
+  },
+  methods: {
+    DeleteInProgressUpload(id) {
+      // http DELETE on the in progress upload
+      fetch(
+        `https://localhost:44354/api/UserProfile/Upload/${this.$store.getters.username}/${id}`,
+        { method: "DELETE" }
+      );
+
+      // remove this upload from the in progress array.
+      this.$parent.inProgressList.splice(this.Index, 1);
+    }
+  },
+};
+</script>
+
+<style scoped></style>

@@ -2,8 +2,8 @@
   <div id='app'>
     <div id='static'>
       <nav>
-        <button onclick="SendRegistration()">Upload</button> 
-        <button onclick="al()">Profile</button>
+        <router-link :to="{name: 'upload'}" tag="button">Upload</router-link>
+        <router-link :to="{name: 'profile'}" tag="button">Profile</router-link>
       </nav>
       <h1>exogredient</h1>
       <div>
@@ -52,7 +52,7 @@
             radius: null,
             pagination: 1,
             failureCount: 0,
-            username: 'testuser',
+            username: 'anonymous',
             ipAddress: '127.1.1.0',
             address: '',
             searchPlaceholder: "Ingredient Search...",
