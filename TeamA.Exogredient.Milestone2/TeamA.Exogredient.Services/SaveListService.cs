@@ -25,5 +25,10 @@ namespace TeamA.Exogredient.Services
         {
             return await _saveListDao.DeleteByPK(username, storeId, ingredient);
         }
+
+        public async Task<int> GetPaginationSize(string username)
+        {
+            return await _saveListDao.GetPaginationSize(username).ConfigureAwait(false);
+        }
     }
 }

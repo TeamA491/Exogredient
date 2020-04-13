@@ -67,5 +67,14 @@ namespace TeamA.Exogredient.Services
             return await _uploadDao.CheckUploadsExistence(ids).ConfigureAwait(false);
         }
 
+        public async Task<int> GetInProgressPaginationSize(string username)
+        {
+            return await _uploadDao.GetInProgressPaginationSize(username).ConfigureAwait(false);
+        }
+
+        public async Task<int> GetRecentPaginationSize(string username)
+        {
+            return await _uploadDao.GetRecentPaginationSize(username).ConfigureAwait(false);
+        }
     }
 }

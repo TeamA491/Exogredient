@@ -315,5 +315,75 @@ namespace TeamA.Exogredient.DAL
                 }
             }
         }
+
+        public async Task<int> GetInProgressPaginationSize(string username)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // SQL command to retrieve count of all saveLists for a user.
+                var sqlString =
+                    $"SELECT COUNT(*) " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME AND {Constants.UploadDAOInProgressColumn} = {Constants.UploadInprogress};";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    command.Parameters.AddWithValue("@USERNAME", username);
+                    var inProgresscount = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
+
+                    var paginationSize = inProgresscount / Constants.SavedUploadPagination;
+                    if (paginationSize == 0)
+                    {
+                        return 1;
+                    }
+                    else if ((paginationSize % Constants.SavedUploadPagination) == 0)
+                    {
+                        return paginationSize;
+                    }
+                    else
+                    {
+                        return paginationSize + 1;
+                    }
+                }
+            }
+        }
+
+        public async Task<int> GetRecentPaginationSize(string username)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // SQL command to retrieve count of all saveLists for a user.
+                var sqlString =
+                    $"SELECT COUNT(*) " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME AND {Constants.UploadDAOInProgressColumn} = {Constants.UploadNotInprogress};";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    command.Parameters.AddWithValue("@USERNAME", username);
+                    var inProgresscount = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
+
+                    var paginationSize = inProgresscount / Constants.RecentUploadPagination;
+                    if (paginationSize == 0)
+                    {
+                        return 1;
+                    }
+                    else if ((paginationSize % Constants.RecentUploadPagination) == 0)
+                    {
+                        return paginationSize;
+                    }
+                    else
+                    {
+                        return paginationSize + 1;
+                    }
+                }
+            }
+        }
+
+
     }
 }

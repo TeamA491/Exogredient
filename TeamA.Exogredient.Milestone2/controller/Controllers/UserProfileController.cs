@@ -148,5 +148,71 @@ namespace controller.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        [HttpGet("SaveListPagination/{username}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetSaveListPaginationSize(string username)
+        {
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await _userProfileManager.GetSaveListPaginationSize(username, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("InProgressUploadPagination/{username}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetInProgressUploadPaginationSize(string username)
+        {
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await _userProfileManager.GetInProgressUploadPaginationSize(username, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("RecentUploadPagination/{username}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetRecentUploadPaginationSize(string username)
+        {
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await _userProfileManager.GetRecentUploadPaginationSize(username, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
     }
+
 }

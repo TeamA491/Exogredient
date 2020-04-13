@@ -100,6 +100,38 @@ namespace TeamA.Exogredient.DAL
             return saveLists;
         }
 
+        public async Task<int> GetPaginationSize(string username)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
 
+                // SQL command to retrieve count of all saveLists for a user.
+                var sqlString =
+                    $"SELECT COUNT(*) " +
+                    $"FROM {Constants.SaveListDAOTableName} " +
+                    $"WHERE {Constants.SaveListDAOUsername} = @USERNAME;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    command.Parameters.AddWithValue("@USERNAME", username);
+                    var saveListcount = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
+
+                    var paginationSize = saveListcount / Constants.SaveListPagination;
+                    if(paginationSize == 0)
+                    {
+                        return 1;
+                    }
+                    else if((paginationSize % Constants.SaveListPagination) == 0)
+                    {
+                        return paginationSize;
+                    }
+                    else
+                    {
+                        return paginationSize + 1;
+                    }                    
+                }
+            }
+        }
     }
 }

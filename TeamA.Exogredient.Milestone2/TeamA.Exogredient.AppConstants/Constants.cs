@@ -228,6 +228,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetSaveListOperation = "Get Save Lists";
         public const string DeleteSaveListOperation = "Delete Save List";
         public const string DeleteUploadOperation = "Delete Upload";
+        public const string GetSaveListPagination = "Get SaveList pagination";
+        public const string GetInProgressUploadPagination = "Get In Progress Upload pagination";
+        public const string GetRecentUploadPagination = "Get recent upload pagination";
 
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";

@@ -250,6 +250,102 @@ namespace TeamA.Exogredient.Managers
             return deleteResult;
         }
 
+        public async Task<int> GetSaveListPaginationSize(string username, string ipAddress, int failureCount, Exception ex)
+        {
+            if (failureCount >= Constants.OperationRetry)
+            {
+                throw ex;
+            }
+
+            int paginationSize = 0;
+            try
+            {
+                // Check that the user exists.
+                var userExists = await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
+                if (!userExists)
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+                paginationSize = await _saveListService.GetPaginationSize(username).ConfigureAwait(false);
+            }
+            catch(Exception e)
+            {
+                // Log everytime we catch an exception.
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                               Constants.GetSaveListPagination, username, ipAddress, e.ToString()).ConfigureAwait(false);
+               
+                await GetSaveListPaginationSize(username, ipAddress, failureCount, e).ConfigureAwait(false);
+            }
+            await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                   Constants.GetSaveListPagination, username, ipAddress).ConfigureAwait(false);
+
+            return paginationSize;
+        }
+
+        public async Task<int> GetInProgressUploadPaginationSize(string username, string ipAddress, int failureCount, Exception ex)
+        {
+            if (failureCount >= Constants.OperationRetry)
+            {
+                throw ex;
+            }
+
+            int paginationSize = 0;
+            try
+            {
+                // Check that the user exists.
+                var userExists = await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
+                if (!userExists)
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+                paginationSize = await _uploadService.GetInProgressPaginationSize(username).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                // Log everytime we catch an exception.
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                               Constants.GetInProgressUploadPagination, username, ipAddress, e.ToString()).ConfigureAwait(false);
+
+                await GetInProgressUploadPaginationSize(username, ipAddress, failureCount, e).ConfigureAwait(false);
+            }
+            await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                   Constants.GetInProgressUploadPagination, username, ipAddress).ConfigureAwait(false);
+
+            return paginationSize;
+        }
+
+        public async Task<int> GetRecentUploadPaginationSize(string username, string ipAddress, int failureCount, Exception ex)
+        {
+            if (failureCount >= Constants.OperationRetry)
+            {
+                throw ex;
+            }
+
+            int paginationSize = 0;
+            try
+            {
+                // Check that the user exists.
+                var userExists = await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
+                if (!userExists)
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+                paginationSize = await _uploadService.GetRecentPaginationSize(username).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                // Log everytime we catch an exception.
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                               Constants.GetRecentUploadPagination, username, ipAddress, e.ToString()).ConfigureAwait(false);
+
+                await GetRecentUploadPaginationSize(username, ipAddress, failureCount, e).ConfigureAwait(false);
+            }
+            await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                   Constants.GetRecentUploadPagination, username, ipAddress).ConfigureAwait(false);
+
+            return paginationSize;
+        }
+
 
     }
 }
