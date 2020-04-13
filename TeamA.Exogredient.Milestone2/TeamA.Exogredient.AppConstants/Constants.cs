@@ -236,6 +236,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
+        public const string GetStoresByIngredientOperation = "Get Stores By Ingredient";
+        public const string GetStoresByStoreOperation = "Get Stores By Store";
+        public const string GetIngredientsOperation = "Get Ingredients";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
@@ -245,6 +248,8 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string LocalHost = "127.0.0.1";
 
+        public const int NumOfResultsPerSearchPage = 20;
+        public const int NumOfIngredientsPerStorePage = 20;
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
@@ -306,6 +311,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string TwilioAuthenticationFailString = "fail";
         public const string TwilioAuthenticationApprovedString = "approved";
         public const string TwilioAuthenticationPendingString = "pending";
+
+        public const string sortByIngredientNum = "ingredientNum";
+        public const string sortByDistance = "distance";
+        public const string searchByIngredient = "ingredient";
+        public const string searchByStore = "store";
 
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
@@ -391,6 +401,11 @@ namespace TeamA.Exogredient.AppConstants
 
         public const string WrongPhoneCodeMessage = "Wrong phone code input";
 
+        public const string StoresFetchSuccessMessage = "The list of stores for search successfully fetched.";
+        public const string StoresFetchUnsuccessMessage = "System Error. Failed to fetch the list of stores for search. Please try again.";
+        public const string IngredientsFetchSuccessMessage = "The list of ingredients for the selected store successfully fetched";
+        public const string IngredientsFetchUnsuccessMessage = "System Error. Failed to fetch the list of ingredients for the selected store. Please try again.";
+
         // EMAIL
         public const string SystemEmailAddress = "exogredient.system@gmail.com";
         public const string SystemAdminEmailAddress = "TEAMA.CS491@gmail.com";
@@ -467,6 +482,38 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapDAOHashColumn = "hash";
         public const string MapDAOActualColumn = "actual";
         public const string MapDAOoccurrencesColumn = "occurrences";
+
+        // STORE TABLE
+        public const string StoreDAOTableName = "store";
+        public const string StoreDAOStoreIdColumn = "store_id";
+        public const string StoreDAOOwnerColumn = "owner";
+        public const string StoreDAOStoreNameColumn = "store_name";
+        public const string StoreDAOLatitudeColumn = "latitude";
+        public const string StoreDAOLongitudeColumn = "longitude";
+        public const string StoreDAOStoreDescriptionColumn = "store_description";
+        public const string StoreDAODistanceColumn = "distance";
+        public const string StoreDAOIngredientNumColumn = "ingredient_num";
+        public const string StoreDAOPlaceIdColumn = "place_id";
+        public const string StoreDAOTotalResultsNum = "total_results_num";
+
+        //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
+        public const int FractionalDigits = 2;
+
+        // UPLOAD TABLE
+        public const string UploadDAOTableName = "upload";
+        public const string UploadDAOUploadIdColumn = "upload_id";
+        public const string UploadDAOStoreIdColumn = "store_id";
+        public const string UploadDAOIngredientNameColumn = "ingredient_name";
+        public const string UploadDAOUploaderColumn = "uploader";
+        public const string UploadDAOPostTimeDateColumn = "post_time_date";
+        public const string UploadDAODescriptionColumn = "description";
+        public const string UploadDAORatingColumn = "rating";
+        public const string UploadDAOPhotoColumn = "photo";
+        public const string UploadDAOPriceColumn = "price";
+        public const string UploadDAOUpvoteColumn = "upvote";
+        public const string UploadDAODownvoteColumn = "downvote";
+        public const string UploadDAOInProgressColumn = "in_progress";
+        public const string UploadDAOUploadNumColumn = "upload_num";
 
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
