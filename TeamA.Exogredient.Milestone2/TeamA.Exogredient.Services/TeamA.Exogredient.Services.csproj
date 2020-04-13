@@ -7,12 +7,14 @@
   <ItemGroup>
     <PackageReference Include="MailKit" Version="2.5.0" />
     <PackageReference Include="Twilio" Version="5.37.3" />
+    <PackageReference Include="WeCantSpell.Hunspell" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj" />
+    <ProjectReference Include="..\SnowballStemmer\SnowballStemmer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
