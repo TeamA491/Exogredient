@@ -74,7 +74,6 @@ namespace controller
             app.UseCors("AllowOrigin");
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();

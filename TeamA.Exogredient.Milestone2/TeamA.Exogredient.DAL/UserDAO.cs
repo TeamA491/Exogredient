@@ -421,5 +421,30 @@ namespace TeamA.Exogredient.DAL
                 return result;
             }
         }
+
+        public async Task<String> ReadUserType(String user)
+        {
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                // Construct the sql string to select all from the table where the email column matches the email,
+                string sqlString = $"SELECT {Constants.UserDAOuserTypeColumn} FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME";
+
+                // Open the command inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
+                    command.Parameters.AddWithValue("@USERNAME", user);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+
+                    reader.Read();
+                    return reader.GetString(0);
+                }
+            }
+
+        }
     }
 }

@@ -26,9 +26,44 @@ namespace TeamA.Exogredient.DAL
             throw new NotImplementedException();
         }
 
-        public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
+        public async Task<bool> DeleteByIdsAsync(List<string> ids)
         {
-            throw new NotImplementedException();
+            // Get the connnection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+                //TODO: CHANGE TO DELETE
+                var sqlString = $"DELETE FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} IN (";
+                var idsToDelete = ids.Count;
+
+                // Loop through the ids
+                for (var i = 0; i < idsToDelete; i++)
+                {
+                    // Construcet the sql string for deleting an all the uploads.
+                    sqlString += $"@UPLOAD_ID{i},";
+                }
+
+                // delete the trailing comma and add a semicolon to complete sql string.
+                sqlString = sqlString.TrimEnd(new char[] {','});
+                sqlString += ");";
+
+                // Get the command object inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    // Loop through the idsOfRows and replace them with the parameters.
+                    
+                    for(var i = 0; i < idsToDelete; i++)
+                    {
+                        command.Parameters.AddWithValue($"@UPLOAD_ID{i}", ids[i]);
+                    }
+
+                    // Result reeturn the number of rows affected.
+                    var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+                    // Return false when no rows are affected.
+                    return result != 0;
+                }
+            }
         }
 
         public async Task<IDataObject> ReadByIdAsync(string id)
@@ -198,6 +233,87 @@ namespace TeamA.Exogredient.DAL
                 }
             }
             return uploads;
+        }
+
+        public async Task<bool> CheckUploadsOwner(List<string> ids, string owner)
+        {
+            // Get the connnection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+                //TODO: CHANGE TO DELETE
+                var sqlString = $"SELECT COUNT(*) FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploaderColumn} = @USERNAME AND {Constants.UploadDAOUploadIdColumn} IN (";
+                var idsToCount = ids.Count;
+
+                // Loop through the ids
+                for (var i = 0; i < idsToCount; i++)
+                {
+                    // Construcet the sql string for deleting an all the uploads.
+                    sqlString += $"@UPLOAD_ID{i},";
+                }
+
+                // delete the trailing comma and add a semicolon to complete sql string.
+                sqlString = sqlString.TrimEnd(new char[] { ',' });
+                sqlString += ");";
+
+                // Get the command object inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    command.Parameters.AddWithValue("@USERNAME", owner);
+
+                    // Loop through the idsOfRows and replace them with the parameters for upload ID.
+                    for (var i = 0; i < idsToCount; i++)
+                    {
+                        command.Parameters.AddWithValue($"@UPLOAD_ID{i}", ids[i]);
+                    }
+
+                    // Result contains the number of rows counted.
+                    var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                    // Return false when the rows returned are not equal to size of list ids.
+                    return Convert.ToInt32(result) == idsToCount;
+                }
+            }
+        }
+
+        public async Task<bool> CheckUploadsExistence(List<string> ids)
+        {
+            // Get the connnection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+                //TODO: CHANGE TO DELETE
+                var sqlString = $"SELECT COUNT(*) FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} IN (";
+                var idsToCount = ids.Count;
+
+                // Loop through the ids
+                for (var i = 0; i < idsToCount; i++)
+                {
+                    // Construcet the sql string for deleting an all the uploads.
+                    sqlString += $"@UPLOAD_ID{i},";
+                }
+
+                // delete the trailing comma and add a semicolon to complete sql string.
+                sqlString = sqlString.TrimEnd(new char[] { ',' });
+                sqlString += ");";
+
+                // Get the command object inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    // Loop through the idsOfRows and replace them with the parameters.
+
+                    for (var i = 0; i < idsToCount; i++)
+                    {
+                        command.Parameters.AddWithValue($"@UPLOAD_ID{i}", ids[i]);
+                    }
+
+                    // Result reeturn the number of rows affected.
+                    var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                    // Return false when the rows returned are not equal to size of list ids.
+                    return Convert.ToInt32(result) == idsToCount;
+                }
+            }
         }
     }
 }

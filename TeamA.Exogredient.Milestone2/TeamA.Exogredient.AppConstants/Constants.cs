@@ -227,7 +227,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetInProgressUploadsOperation = "Get InProgress Uploads";
         public const string GetSaveListOperation = "Get Save Lists";
         public const string DeleteSaveListOperation = "Delete Save List";
-
+        public const string DeleteUploadOperation = "Delete Upload";
 
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
@@ -247,6 +247,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
         public const string CustomerUserType = "Customer";
+        public const string StoreOwnerUserType = "Store Owner";
         public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
         public const string AnonymousUserIdentifier = "<Unregistered Customer>";
@@ -566,6 +567,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string KeyValueNoDoubleQuotes = "Key or value isn't surrounded by double quotes.";
         public const string KeyValueNotAlphaNum = "Key or value is not alpha-numeric (excluding white-space).";
         public const string MustBeAdmin = "adminName does not exists or is not an admin";
+        public const string UserNotAllowed = "Usertype not authorized";
+
 
         // EXCEPTION MESSAGES -- Data Store Logging
         public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
@@ -636,5 +639,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string CreateUsersRecordMasked = "CreateUsersAsync record was masked";
         public const string UpdateUserRecordMasked = "UpdateUserAsync record was masked";
         public const string BulkUpdateUsersRecordMasked = "UpdateUserAsync record was masked";
+
+        // EXCEPTION MESSAGE -- Uploads
+        public const string UploadIdsDNE = "One or more of the uploads Ids does not exist";
+
+
+
     }
 }

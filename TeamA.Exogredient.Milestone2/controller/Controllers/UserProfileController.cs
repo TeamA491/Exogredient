@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TeamA.Exogredient.Managers;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.Exceptions;
 
 namespace controller.Controllers
 {
@@ -75,6 +76,29 @@ namespace controller.Controllers
             {
                 // Return an 404 error when the resource does not exists.
                 return NotFound(ae.Message);  
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpDelete("Upload/{performingUser}/{uploadId}")]
+        public async Task<IActionResult> DeleteUpload(string performingUser, string uploadId)
+        {
+            try
+            {
+                return Ok(await _userProfileManager.DeleteUploads(new List<string>() { uploadId}, performingUser, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                return NotFound(ae.Message);
+            }
+            catch (NotAuthorizedException na)
+            {
+                // Return forbidden status code when user is not allowed to delete.
+                return StatusCode(StatusCodes.Status403Forbidden, na.Message);
             }
             catch
             {

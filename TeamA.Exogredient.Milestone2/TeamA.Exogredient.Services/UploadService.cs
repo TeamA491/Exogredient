@@ -31,9 +31,9 @@ namespace TeamA.Exogredient.Services
             return await _uploadDao.ReadByIdAsync(id).ConfigureAwait(false);
         }
 
-        public async Task<bool> DeleteUploads(List<String> id)
+        public async Task<bool> DeleteUploads(List<string> ids)
         {
-            return await _uploadDao.DeleteByIdsAsync(id).ConfigureAwait(false);   
+            return await _uploadDao.DeleteByIdsAsync(ids).ConfigureAwait(false);   
         }
 
         public async Task<bool> ReportUpload(UploadRecord uploadRecord)
@@ -55,6 +55,16 @@ namespace TeamA.Exogredient.Services
         public async Task<List<UploadResult>> GetInProgressUploadsByUploader(string username, int pagination)
         {
             return await _uploadDao.ReadInProgressUploadsByUploader(username, pagination).ConfigureAwait(false);
+        }
+
+        public async Task<bool> CheckUploadOwner(List<string> ids, string owner)
+        {
+            return await _uploadDao.CheckUploadsOwner(ids, owner).ConfigureAwait(false);
+        }
+
+        public async Task<bool> CheckUploadsExistence(List<String> ids)
+        {
+            return await _uploadDao.CheckUploadsExistence(ids).ConfigureAwait(false);
         }
 
     }

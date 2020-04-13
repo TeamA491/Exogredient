@@ -5,6 +5,7 @@ using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.Exceptions;
 
 namespace TeamA.Exogredient.Managers
 {
@@ -194,6 +195,61 @@ namespace TeamA.Exogredient.Managers
                                            Constants.DeleteSaveListOperation, username, ipAddress).ConfigureAwait(false);
             return deleteResult;
         }
+
+        public async Task<bool> DeleteUploads(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        {
+            if (failureCount >= Constants.OperationRetry)
+            {
+                throw ex;
+            }
+
+            bool deleteResult = false;
+            try
+            {
+                // Check that all the Ids exists.
+                if (!await _uploadService.CheckUploadsExistence(ids).ConfigureAwait(false))
+                {
+                    throw new ArgumentException(Constants.UploadIdsDNE);
+                }
+
+                // Get user type.
+                var userType = await _userManagementService.GetUserType(performingUser).ConfigureAwait(false);
+
+                // Check is user is admin. if true then let him perform
+                if (userType.Equals(Constants.AdminUserType))
+                {
+                    // Let execution continue.
+                }
+                else if (userType.Equals(Constants.CustomerUserType) || userType.Equals(Constants.StoreOwnerUserType))
+                {
+                    // Check if use is allowed to perform operation
+                    if (!await _uploadService.CheckUploadOwner(ids, performingUser).ConfigureAwait(false))
+                    {
+                        throw new NotAuthorizedException(Constants.UserNotAllowed);
+                    }
+                }
+                else
+                {
+                    throw new NotAuthorizedException(Constants.UserNotAllowed);
+                }
+
+
+                deleteResult =  await _uploadService.DeleteUploads(ids).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                // Log everytime we catch an exception.
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                               Constants.DeleteUploadOperation, performingUser, ipAddress, e.ToString()).ConfigureAwait(false);
+                await DeleteUploads(ids, performingUser, ipAddress, ++failureCount, e).ConfigureAwait(false);
+            }
+
+            // Log the successful operations.
+            await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+               Constants.DeleteUploadOperation, performingUser, ipAddress).ConfigureAwait(false);
+            return deleteResult;
+        }
+
 
     }
 }
