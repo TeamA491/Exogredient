@@ -207,6 +207,9 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxAlphaValue = 26;
         public const int MinAlphaValue = 1;
 
+        public static readonly char[] termSpliters = new char[] { ' ', ',', ':' };
+        public const string termJoiner = " ";
+
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
 
@@ -229,9 +232,12 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
-        public const string GetStoresByIngredientOperation = "Get Stores By Ingredient";
-        public const string GetStoresByStoreOperation = "Get Stores By Store";
+
+        public const string GetTotalStoreResultsNumberOperation = "Get Total StoreResults Number";
+        public const string GetTotalIngredientResultsNumberOperation = "Get Total IngredientResults Number";
         public const string GetIngredientsOperation = "Get Ingredients";
+        public const string GetStoreViewDataOperation = "Get StoreViewData";
+        public const string GetStoreImageOperation = "Get store image";
 
         public const string CustomerUserType = "Customer";
         public const string AdminUserType = "Admin";
@@ -259,6 +265,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxRegistrationAttempts = 3;
         public const int MaxEmailCodeAttempts = 3;
         public const int MaxPhoneCodeAttempts = 3;
+        public const int MaxSearchRelatedAttempts = 3;
+        public const int InitialFailureCount = 0;
         
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
         public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);

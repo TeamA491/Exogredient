@@ -7,7 +7,6 @@ using TeamA.Exogredient.AppConstants;
 using Snowball;
 using WeCantSpell.Hunspell;
 using System.Linq;
-using System.Reflection;
 
 namespace TeamA.Exogredient.Services
 {
@@ -22,7 +21,7 @@ namespace TeamA.Exogredient.Services
             }
 
             term = term.ToLower();
-            var tokens = term.Split(new char[] { ' ', ',', ':' });
+            var tokens = term.Split(Constants.termSpliters);
             var normalizedTerm = new List<string>();
 
             foreach(var token in tokens)
@@ -44,7 +43,7 @@ namespace TeamA.Exogredient.Services
                     }
                 }
             }
-            return string.Join(" ", normalizedTerm.ToArray());
+            return string.Join(Constants.termJoiner, normalizedTerm.ToArray());
         }
 
         public static bool CheckIfTermInDictionary(string term, string dicFilePath, string affFilePath)
