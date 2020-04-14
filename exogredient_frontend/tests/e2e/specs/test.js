@@ -4,7 +4,7 @@ describe('General Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("beef");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Ingredient').click();
@@ -22,7 +22,7 @@ describe('General Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("error");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Ingredient').click();
@@ -44,7 +44,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("beef");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Ingredient').click();
@@ -58,7 +58,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("asdasd");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Ingredient').click();
@@ -72,7 +72,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Store').click();
@@ -86,7 +86,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("asdasd");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Store').click();
@@ -113,7 +113,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="mile"]').type(20);
     const stub = cy.stub();
     cy.on('window:alert', stub)
@@ -127,7 +127,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(0);
     cy.contains('Store').click();
@@ -145,7 +145,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -183,7 +183,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -221,7 +221,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -237,7 +237,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -252,7 +252,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -285,7 +285,7 @@ describe('SearchResultsView Test', () => {
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -328,7 +328,7 @@ describe('StoreView Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("beef");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Ingredient').click();
@@ -347,7 +347,7 @@ describe('StoreView Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(100);
     cy.contains('Store').click();
@@ -387,7 +387,7 @@ describe('StoreView Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -427,7 +427,7 @@ describe('StoreView Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
@@ -445,7 +445,7 @@ describe('StoreView Test', ()=>{
     cy.visit("http://localhost:8080/")
     cy.get('input[name="street"]').type("1250");
     cy.wait(700);
-    cy.get('html').click(400,135);
+    cy.get('html').click(400,155);
     cy.get('input[name="search"]').type("store");
     cy.get('input[name="mile"]').type(50);
     cy.contains('Store').click();
