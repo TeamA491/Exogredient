@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import * as global from '../globalExports.js';
+
 import SaveList from "@/components/SaveList.vue";
 import InProgressUpload from "@/components/InProgressUpload.vue";
 import RecentUpload from "@/components/RecentUpload.vue";
@@ -107,7 +109,7 @@ export default {
 
         // Fetch the RecentUploads
         fetch(
-          `https://localhost:44354/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}`
         )
           .then(response => response.json())
           .then(data => {
@@ -118,7 +120,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `https://localhost:44354/api/Userprofile/RecentUploadPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.username}`
         )
           .then(response => response.json())
           .then(data => {
@@ -137,7 +139,7 @@ export default {
 
         // Fetch the InProgress uploads
         fetch(
-          `https://localhost:44354/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}`
         )
           .then(response => response.json())
           .then(data => {
@@ -148,7 +150,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `https://localhost:44354/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}`
         )
           .then(response => response.json())
           .then(data => {
@@ -167,7 +169,7 @@ export default {
 
         // Fetch the save lists for a user
         fetch(
-          `https://localhost:44354/api/UserProfile/SaveList/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.username}/${page}`
         )
           .then(response => response.json())
           .then(data => {
@@ -178,7 +180,7 @@ export default {
           });
         // Fetch the pagination size.
         fetch(
-          `https://localhost:44354/api/Userprofile/SaveListPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.username}`
         )
           .then(response => response.json())
           .then(data => {
@@ -194,7 +196,7 @@ export default {
     saveListPage(newValue, oldValue) {
       // Recall fetch save list with new pagination.
       fetch(
-        `https://localhost:44354/api/UserProfile/SaveList/${
+        `${global.ApiDomainName}/api/UserProfile/SaveList/${
           this.$store.state.username
         }/${newValue - 1}`
       )
@@ -210,7 +212,7 @@ export default {
     inProgressPage(newValue, oldValue) {
       // Recall fetch in progress with new pagination.
       fetch(
-        `https://localhost:44354/api/UserProfile/InProgressUploads/${
+        `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${
           this.$store.state.username
         }/${newValue - 1}`
       )
@@ -226,7 +228,7 @@ export default {
     recentUploadPage(newValue, oldValue) {
       // Recall fetch in progress for new pagination.
       fetch(
-        `https://localhost:44354/api/Userprofile/Recentuploads/${
+        `${global.ApiDomainName}/api/Userprofile/Recentuploads/${
           this.$store.state.username
         }/${newValue - 1}`
       )
@@ -246,7 +248,7 @@ export default {
 
     // Make an API call to calculate the score for this user \.
     fetch(
-      `https://localhost:44354/api/UserProfile/ProfileScore/${this.$store.state.username}`
+      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.username}`
     )
       .then(response => response.json())
       .then(data => {

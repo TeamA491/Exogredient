@@ -22,7 +22,7 @@ const store = new Vuex.Store({
       searchResultsView: 1,
       storeView: 1
     },
-    username: "anonymous",
+    username: "username",
     ipAddress: "127.1.1.0"
   },
   mutations:{

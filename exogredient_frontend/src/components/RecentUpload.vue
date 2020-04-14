@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import * as global from '../globalExports.js';
+
 export default {
   props: {
     upload: {
@@ -24,7 +26,7 @@ export default {
     DeleteRecentUpload(id) {
       // http DELETE on the in progress upload
       fetch(
-        `https://localhost:44354/api/UserProfile/Upload/${this.$store.getters.username}/${id}`,
+        `${global.ApiDomainName}/api/UserProfile/Upload/${this.$store.getters.username}/${id}`,
         { method: "DELETE" }
       );
 

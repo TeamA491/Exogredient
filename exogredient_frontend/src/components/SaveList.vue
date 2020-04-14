@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import * as global from '../globalExports.js';
+
 export default {
   props: {
     saveItem: {
@@ -21,7 +23,7 @@ export default {
     DeleteSaveItem(saveItem) {
       // http DELETE on the save item
       fetch(
-        `https://localhost:44354/api/UserProfile/SaveList/${saveItem.username}/${saveItem.storeId}/${saveItem.ingredientName}`,
+        `${global.ApiDomainName}/api/UserProfile/SaveList/${saveItem.username}/${saveItem.storeId}/${saveItem.ingredientName}`,
         { method: "DELETE" }
       );
 
