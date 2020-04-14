@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestsNoDa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.UnitTestServices", "TeamA.Exogredient.UnitTestServices\TeamA.Exogredient.UnitTestServices.csproj", "{970152BA-99AB-4F61-B1F8-0755BA0DCAE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "controller", "controller\controller.csproj", "{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserProfileController", "controller\UserProfileController.csproj", "{B8E38A64-D07F-4D0D-B4FF-319A7D582CE9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SnowballStemmer", "SnowballStemmer", "{A1DDCCEF-31C9-484B-8454-96E16E9B4554}"
 EndProject
@@ -54,10 +54,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JsonObjects", "JsonObjects"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomExceptions", "CustomExceptions", "{DD596409-603B-4CB6-9497-467E2BB44775}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamA.Exogredient.Exceptions", "TeamA.Exogredient.Exceptions\TeamA.Exogredient.Exceptions.csproj", "{017BD27D-B70F-49BC-B650-8E67E353453C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Exceptions", "TeamA.Exogredient.Exceptions\TeamA.Exogredient.Exceptions.csproj", "{017BD27D-B70F-49BC-B650-8E67E353453C}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestController", "TestController", "{187375EE-57A6-4853-B037-8B3107A97C89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchController", "SearchController\SearchController.csproj", "{E31DA6C2-E82F-4B04-933E-9AB49D5F7487}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SearchController", "SearchController\SearchController.csproj", "{E31DA6C2-E82F-4B04-933E-9AB49D5F7487}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

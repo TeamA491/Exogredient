@@ -52,6 +52,9 @@ const store = new Vuex.Store({
     },
     updateStoreViewCurrentPage(state, newCurrentPage){
       state.currentPages.storeView = newCurrentPage;
+    },
+    updateUsername(state, newUsername) {
+      state.username = newUsername;
     }
   },
   actions:{
@@ -100,6 +103,9 @@ const store = new Vuex.Store({
         }
       }
 
+    },
+    updateUsername({commit}, newUsername) {
+      commit("updateUsername", newUsername)
     }
   },
   getters:{
@@ -109,7 +115,10 @@ const store = new Vuex.Store({
 
     ingredientResults: state=>{
       return state.ingredientResults;
-    }
+    },
+    username: state => {
+      return state.username;
+    },
   }
 });
 

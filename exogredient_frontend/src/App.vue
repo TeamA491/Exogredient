@@ -6,7 +6,13 @@
         <v-btn to="profile">Profile</v-btn>
       </nav>
       <h1><a @click="goToHomePage">exogredient</a></h1>
-
+      <div>
+        <input style="border-style:solid" size="65" maxlength="100" ref="autocomplete" type="text" placeholder="Street Address..." name="street" v-model="searchData.address">
+        <br/>
+        <input style="border-style:solid" type="text" maxlength="100" :placeholder="searchPlaceholder" name="search" v-model="searchData.searchTerm">
+        <input style="border-style:solid" type="text" placeholder="Mile Range..." name="mile" v-model="searchData.radius">
+        <button @click="search">Search</button>
+      </div>
       <div>
         <button @click="setToIngredientSearch">Ingredient</button>
         <button @click="setToStoreSearch">Store</button>

@@ -1,4 +1,4 @@
-import store from "../../../src/store";
+import store from "../../../src/store/index";
 
 describe("Get profile score positive", () => {
   it("Visit the profile view and verify score is positive", () => {
