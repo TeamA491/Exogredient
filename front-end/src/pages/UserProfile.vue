@@ -9,10 +9,17 @@
 
     <!-- display the recent uploads  -->
     <div>
-      <button @click="GetRecentUploads">
+      <button @click="GetRecentUploads(0)">
         {{ recentUploadStatus ? "Hide Recent Uploads" : "Show Recent Uploads" }}
       </button>
       <div v-if="recentUploadStatus" class="content">
+        <v-pagination
+          v-model="recentUploadPage"
+          :value="1"
+          :dark="true"
+          :length="recentUploadPageLength"
+        ></v-pagination>
+
         <div v-for="(item, index) in recentUploadList" :key="index">
           <RecentUpload :upload="item" :index="index"> </RecentUpload>
         </div>
@@ -21,27 +28,37 @@
 
     <!-- display the inprogress uploads  -->
     <div class="inProgress">
-      <Button @click="GetInProgressUploads">{{
+      <Button @click="GetInProgressUploads(0)">{{
         inProgressStatus
           ? "Hide In Progress Uploads"
           : "Show In Progress Uploads"
       }}</Button>
       <div v-if="inProgressStatus" class="content">
+        <v-pagination
+          v-model="inProgressPage"
+          :value="1"
+          :dark="true"
+          :length="inProgressPageLength"
+        ></v-pagination>
+
         <div v-for="(item, index) in inProgressList" :key="index">
-          <InProgressUpload
-            :upload="item"
-            :index:="index"
-          ></InProgressUpload>
+          <InProgressUpload :upload="item" :index:="index"></InProgressUpload>
         </div>
       </div>
     </div>
 
     <!-- display the save list  -->
     <div class="saveList">
-      <button @click="GetSaveList">
+      <button @click="GetSaveList(0)">
         {{ saveListStatus ? "Hide SaveList" : "Show SaveList" }}
       </button>
       <div v-if="saveListStatus" Class="content">
+        <v-pagination
+          v-model="saveListPage"
+          :dark="true"
+          :length="saveListPageLength"
+        ></v-pagination>
+
         <div v-for="(item, index) in saveList" :key="index">
           <SaveList :saveItem="item" :index="index"></SaveList>
         </div>
@@ -59,30 +76,38 @@ export default {
   components: {
     SaveList,
     InProgressUpload,
-    RecentUpload,
+    RecentUpload
   },
   data() {
     return {
       username: String,
       score: 0,
+
       saveList: [],
       saveListStatus: false,
       saveListPage: 1,
+      saveListPageLength: 1,
+
       inProgressList: [],
       inProgressStatus: false,
+      inProgressPage: 1,
+      inProgressPageLength: 1,
+
       recentUploadList: [],
       recentUploadStatus: false,
+      recentUploadPage: 1,
+      recentUploadPageLength: 1
     };
   },
   methods: {
-    GetRecentUploads() {
+    GetRecentUploads(page) {
       if (!this.recentUploadStatus) {
         // Change the show recent uploads button to hide
         this.recentUploadStatus = true;
 
         // Fetch the RecentUploads
         fetch(
-          `https://localhost:44354/api/Userprofile/Recentuploads/${this.$store.state.username}/0`
+          `https://localhost:44354/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}`
         )
           .then(response => response.json())
           .then(data => {
@@ -90,20 +115,29 @@ export default {
               this.recentUploadList.push(i);
             });
           });
+
+        // Fetch the pagination size.
+        fetch(
+          `https://localhost:44354/api/Userprofile/RecentUploadPagination/${this.$store.state.username}`
+        )
+          .then(response => response.json())
+          .then(data => {
+            this.recentUploadPageLength = data;
+          });
       } else {
         this.recentUploadStatus = false;
         this.recentUploadList = [];
       }
     },
 
-    GetInProgressUploads() {
+    GetInProgressUploads(page) {
       if (!this.inProgressStatus) {
         // Change the show InProgress uploads button to hide
         this.inProgressStatus = true;
 
         // Fetch the InProgress uploads
         fetch(
-          `https://localhost:44354/api/UserProfile/InProgressUploads/${this.$store.state.username}/0`
+          `https://localhost:44354/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}`
         )
           .then(response => response.json())
           .then(data => {
@@ -111,20 +145,29 @@ export default {
               this.inProgressList.push(i);
             });
           });
+
+        // Fetch the pagination size.
+        fetch(
+          `https://localhost:44354/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}`
+        )
+          .then(response => response.json())
+          .then(data => {
+            this.recentUploadPageLength = data;
+          });
       } else {
         this.inProgressStatus = false;
         this.inProgressList = [];
       }
     },
 
-    GetSaveList() {
+    GetSaveList(page) {
       if (!this.saveListStatus) {
         // Change the show saveList button to hide
         this.saveListStatus = true;
 
         // Fetch the save lists for a user
         fetch(
-          `https://localhost:44354/api/UserProfile/SaveList/${this.$store.state.username}/0`
+          `https://localhost:44354/api/UserProfile/SaveList/${this.$store.state.username}/${page}`
         )
           .then(response => response.json())
           .then(data => {
@@ -133,11 +176,69 @@ export default {
               this.saveList.push(i);
             });
           });
+        // Fetch the pagination size.
+        fetch(
+          `https://localhost:44354/api/Userprofile/SaveListPagination/${this.$store.state.username}`
+        )
+          .then(response => response.json())
+          .then(data => {
+            this.recentUploadPageLength = data;
+          });
       } else {
         this.saveListStatus = false;
         this.saveList = [];
       }
+    }
+  },
+  watch: {
+    saveListPage(newValue, oldValue) {
+      // Recall fetch save list with new pagination.
+      fetch(
+        `https://localhost:44354/api/UserProfile/SaveList/${
+          this.$store.state.username
+        }/${newValue - 1}`
+      )
+        .then(response => response.json())
+        .then(data => {
+          // Add the first page of the savelist to the saveList data object
+          this.saveList = [];
+          data.forEach(i => {
+            this.saveList.push(i);
+          });
+        });
     },
+    inProgressPage(newValue, oldValue) {
+      // Recall fetch in progress with new pagination.
+      fetch(
+        `https://localhost:44354/api/UserProfile/InProgressUploads/${
+          this.$store.state.username
+        }/${newValue - 1}`
+      )
+        .then(response => response.json())
+        .then(data => {
+          // Reset the in progress list for new pagination.
+          this.inProgressList = [];
+          data.forEach(i => {
+            this.inProgressList.push(i);
+          });
+        });
+    },
+    recentUploadPage(newValue, oldValue) {
+      // Recall fetch in progress for new pagination.
+      fetch(
+        `https://localhost:44354/api/Userprofile/Recentuploads/${
+          this.$store.state.username
+        }/${newValue - 1}`
+      )
+        .then(response => response.json())
+        .then(data => {
+          // Reset the recent upload list when page changes.
+          this.recentUploadList = [];
+          data.forEach(i => {
+            this.recentUploadList.push(i);
+          });
+        });
+    }
   },
   created() {
     // Retrieve user name from the vuex store.
@@ -158,7 +259,7 @@ export default {
         });
         this.score = upvotes - downvotes;
       });
-  },
+  }
 };
 </script>
 
