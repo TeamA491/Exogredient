@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TeamA.Exogredient.Managers;
 using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.Exceptions;
 
 namespace controller.Controllers
 {
@@ -21,12 +22,12 @@ namespace controller.Controllers
 
         [HttpGet("ProfileScore/{username}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetProfileScores(string username)
+        public async Task<IActionResult> GetProfileScoresAsync(string username)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetProfileScore(username,"localhost", 0 , null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetProfileScoreAsync(username,"localhost", 0 , null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -42,12 +43,12 @@ namespace controller.Controllers
 
         [HttpGet("RecentUploads/{username}/{pagination}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetRecentUploads(string username, int pagination)
+        public async Task<IActionResult> GetRecentUploadsAsync(string username, int pagination)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetRecentUploads(username, pagination, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetRecentUploadsAsync(username, pagination, "localhost", 0, null).ConfigureAwait(false));
 
             }
             catch (ArgumentException ae)
@@ -64,12 +65,12 @@ namespace controller.Controllers
 
         [HttpGet("InProgressUploads/{username}/{pagination}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetInProgressUploads(string username, int pagination)
+        public async Task<IActionResult> GetInProgressUploadsAsync(string username, int pagination)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetInProgressUploads(username, pagination, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetInProgressUploadsAsync(username, pagination, "localhost", 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -83,14 +84,37 @@ namespace controller.Controllers
             }
         }
 
+        [HttpDelete("Upload/{performingUser}/{uploadId}")]
+        public async Task<IActionResult> DeleteUploadAsync(string performingUser, string uploadId)
+        {
+            try
+            {
+                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<string>() { uploadId}, performingUser, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                return NotFound(ae.Message);
+            }
+            catch (NotAuthorizedException na)
+            {
+                // Return forbidden status code when user is not allowed to delete.
+                return StatusCode(StatusCodes.Status403Forbidden, na.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpGet("SaveList/{username}/{pagination}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetSaveList(string username, int pagination)
+        public async Task<IActionResult> GetSaveListAsync(string username, int pagination)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetSaveList(username, pagination, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetSaveListAsync(username, pagination, "localhost", 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -106,12 +130,12 @@ namespace controller.Controllers
 
         [HttpDelete("SaveList/{username}/{storeId}/{ingredient}")]
         [Produces("application/json")]
-        public async Task<IActionResult> DeleteSaveList(string username, int storeId, string ingredient) 
+        public async Task<IActionResult> DeleteSaveListAsync(string username, int storeId, string ingredient) 
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.DeleteSaveList(username, storeId, ingredient, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.DeleteSaveListAsync(username, storeId, ingredient, "localhost", 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -124,5 +148,71 @@ namespace controller.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        [HttpGet("SaveListPagination/{username}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetSaveListPaginationSizeAsync(string username)
+        {
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await _userProfileManager.GetSaveListPaginationSizeAsync(username, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("InProgressUploadPagination/{username}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetInProgressUploadPaginationSizeAsync(string username)
+        {
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await _userProfileManager.GetInProgressUploadPaginationSizeAsync(username, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("RecentUploadPagination/{username}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetRecentUploadPaginationSizeAsync(string username)
+        {
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await _userProfileManager.GetRecentUploadPaginationSizeAsync(username, "localhost", 0, null).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
     }
+
 }
