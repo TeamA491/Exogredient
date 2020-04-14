@@ -33,8 +33,16 @@ namespace TeamA.Exogredient.DAL
             throw new NotImplementedException();
         }
 
-        public async Task<bool> DeleteByPK(string username, int storeId, string ingredient)
+        /// <summary>
+        /// Delete a save list from the data store.
+        /// </summary>
+        /// <param name="username">Username of save list to delete.</param>
+        /// <param name="storeId">StoreId of the save list to delete.</param>
+        /// <param name="ingredient">Ingredient of the save list.</param>
+        /// <returns>bool reprsenting whether the operation passed.</returns>
+        public async Task<bool> DeleteByPKAsync(string username, int storeId, string ingredient)
         {
+            // Get connection inside using to properly dispose.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 connection.Open();
@@ -45,12 +53,14 @@ namespace TeamA.Exogredient.DAL
                                    $"AND {Constants.SaveListDAOStoreColumn} = @STOREID " +
                                    $"AND {Constants.SaveListDAOUsername} = @USERNAME;";
 
-                // Add values from the parameters and execute the command.
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    // Add values from the parameters.
                     command.Parameters.AddWithValue("@INGREDIENT", ingredient);
                     command.Parameters.AddWithValue("@STOREID", storeId);
                     command.Parameters.AddWithValue("@USERNAME", username);
+
+                    // Execute command.
                     int result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
                     // Throw exception if the command doesn't delete a row.
@@ -63,10 +73,17 @@ namespace TeamA.Exogredient.DAL
             return true;
         }
 
-
-        public async Task<List<SaveListResult>> ReadyByUsername(string username, int pagination)
+        /// <summary>
+        /// Get the save list for a user.
+        /// </summary>
+        /// <param name="username">User to get save list from.</param>
+        /// <param name="pagination">Specific pagination of the save list.</param>
+        /// <returns>List of SaveListResult.</returns>
+        public async Task<List<SaveListResult>> ReadyByUsernameAsync(string username, int pagination)
         {
             var saveLists = new List<SaveListResult>();
+
+            // Get connection inside using to properly dispose.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 connection.Open();
@@ -87,9 +104,10 @@ namespace TeamA.Exogredient.DAL
                         command.Parameters.AddWithValue("@OFFSET", pagination * Constants.SaveListPagination);
                         command.Parameters.AddWithValue("@AMOUNT", Constants.SaveListPagination);
 
+                        // Execute command.
                         var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                        dataTable.Load(reader);
 
+                        dataTable.Load(reader);
                         foreach (DataRow row in dataTable.Rows)
                         {
                             saveLists.Add(new SaveListResult((string)row[Constants.SaveListDAOUsername], (string)row[Constants.SaveListDAOIngredient], Convert.ToInt32(row[Constants.SaveListDAOStoreColumn])));
@@ -100,8 +118,15 @@ namespace TeamA.Exogredient.DAL
             return saveLists;
         }
 
-        public async Task<int> GetPaginationSize(string username)
+        /// <summary>
+        /// Get the pagination size for a user.
+        /// </summary>
+        /// <param name="username">User to get the pagination size from.</param>
+        /// <returns>int representing the pagination size.</returns>
+        public async Task<int> GetPaginationSizeAsync(string username)
         {
+
+            // Get connection inside using to properly dispose.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 connection.Open();
@@ -114,9 +139,13 @@ namespace TeamA.Exogredient.DAL
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
                 {
+                    // Add paramters to command.
                     command.Parameters.AddWithValue("@USERNAME", username);
+
+                    // Execute command and convert object to int.
                     var saveListcount = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
 
+                    // Perform logic to account for needed extra pagination.
                     var paginationSize = saveListcount / Constants.SaveListPagination;
                     if(paginationSize == 0)
                     {

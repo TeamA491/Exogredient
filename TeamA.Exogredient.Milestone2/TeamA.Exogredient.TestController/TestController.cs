@@ -44,7 +44,7 @@ namespace TeamA.Exogredient.TestController
             //var asasd = "one";
             //Console.WriteLine(asasd.Equals("one"));
 
-            await ud.DeleteByIdsAsync(new List<string>() { "20" });
+            Console.WriteLine(await ud.GetRecentPaginationSize("username").ConfigureAwait(false));
         }
     }
 }

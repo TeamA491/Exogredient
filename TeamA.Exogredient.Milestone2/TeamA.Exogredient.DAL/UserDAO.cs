@@ -422,6 +422,11 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        /// <summary>
+        /// Get the user type for a user.
+        /// </summary>
+        /// <param name="user">User to perform operation on.</param>
+        /// <returns>String containing that user's type.</returns>
         public async Task<String> ReadUserType(String user)
         {
             // Get the connection inside a using statement to properly dispose/close.
