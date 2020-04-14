@@ -48,7 +48,7 @@ describe("Get zero profile Score", () => {
 describe("Attempt to get the profile score of an non existent user", () => {
   it("Make API call for nonexistent user", () => {
     cy.request({
-      url: "https://localhost:44354/api/Userprofile/ProfileScore/nonexi",
+      url: "https://localhost:44354/api/userprofile/profilescore/nonexi",
       failOnStatusCode: false,
     }).should((response) => {
       expect(response.status).to.eq(404);
@@ -147,7 +147,13 @@ describe("attempt to get recent upload of an non existent user", () => {
 describe("delete a recent upload", () => {
   it("delete a recent upload and verify that it was deleted", () => {
 
-
+    cy.request({
+      url: "https://localhost:44354/api/Userprofile/Upload/username/20",
+      failOnStatusCode: false,
+      method: "DELETE"
+    }).should((response) => {
+      expect(response.status).to.eq(200);
+    });
 
   });
 });
@@ -158,23 +164,15 @@ describe("delete a recent upload", () => {
 describe("attempt to delete a nonexistent recent upload", () => {
   it("attempt to delete a recent upload for a nonexistent user and verify the 404 response", () => {
     
-
+    cy.request({
+      url: "https://localhost:44354/api/Userprofile/Upload/nonexistent/1",
+      failOnStatusCode: false,
+      method: "DELETE"
+    }).should((response) => {
+      expect(response.status).to.eq(404);
+    });
 
   });
 });
 
 
-
-//   describe("Get in progress upload", () => {
-//     it("Visits the app root url", () => {
-//       cy.visit("/");
-//       cy.contains("h1", "Welcome to Your Vue.js App");
-//     });
-//   });
-
-//   describe("delete in progress upload", () => {
-//     it("Visits the app root url", () => {
-//       cy.visit("/");
-//       cy.contains("h1", "Welcome to Your Vue.js App");
-//     });
-//   });

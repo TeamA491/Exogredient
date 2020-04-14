@@ -9,10 +9,10 @@
 
     <!-- display the recent uploads  -->
     <div>
-      <button @click="GetRecentUploads(0)">
+      <v-btn @click="GetRecentUploads(0)">
         {{ recentUploadStatus ? "Hide Recent Uploads" : "Show Recent Uploads" }}
-      </button>
-      <div v-if="recentUploadStatus" class="content">
+      </v-btn>
+      <div v-if="recentUploadStatus" class="column">
         <v-pagination
           v-model="recentUploadPage"
           :value="1"
@@ -28,12 +28,12 @@
 
     <!-- display the inprogress uploads  -->
     <div class="inProgress">
-      <Button @click="GetInProgressUploads(0)">{{
+      <v-btn @click="GetInProgressUploads(0)">{{
         inProgressStatus
           ? "Hide In Progress Uploads"
           : "Show In Progress Uploads"
-      }}</Button>
-      <div v-if="inProgressStatus" class="content">
+      }}</v-btn>
+      <div v-if="inProgressStatus" class="column">
         <v-pagination
           v-model="inProgressPage"
           :value="1"
@@ -49,10 +49,10 @@
 
     <!-- display the save list  -->
     <div class="saveList">
-      <button @click="GetSaveList(0)">
+      <v-btn @click="GetSaveList(0)">
         {{ saveListStatus ? "Hide SaveList" : "Show SaveList" }}
-      </button>
-      <div v-if="saveListStatus" Class="content">
+      </v-btn>
+      <div v-if="saveListStatus" Class="column">
         <v-pagination
           v-model="saveListPage"
           :dark="true"

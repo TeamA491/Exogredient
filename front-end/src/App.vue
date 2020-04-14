@@ -2,14 +2,17 @@
   <v-app id="app">
     <div id="static">
       <nav>
-        <router-link :to="{ name: 'upload' }" tag="button">Upload</router-link>
+        <v-btn to="upload">Upload</v-btn>
+        <v-btn to="profile">Profile</v-btn>
+        <!-- <router-link :to="{ name: 'upload' }" tag="button">Upload</router-link>
         <router-link :to="{ name: 'profile' }" tag="button"
-          >Profile</router-link
-        >
+          >Profile</router-link -->
+        
       </nav>
       <h1><router-link :to="{ name: 'home' }"> exogredient </router-link></h1>
       <div>
         <input
+          style="border-style:solid"
           size="65"
           ref="autocomplete"
           type="text"
@@ -19,26 +22,28 @@
         />
         <br />
         <input
+          style="border-style:solid"
           type="text"
           :placeholder="searchPlaceholder"
           name="search"
           v-model="searchTerm"
         />
-        <input
+        <input 
+          style="border-style:solid"
           type="text"
           placeholder="Mile Range..."
           name="Mile"
           v-model="radius"
         />
-        <button @click="search">Search</button>
+        <v-btn @click="search">Search</v-btn>
         <!-- <router-link to = '/StoresView'> 
             
           </router-link> -->
       </div>
 
       <div>
-        <button @click="setToIngredientSearch">Ingredient</button>
-        <button @click="setToStoreSearch">Store</button>
+        <button class="button is-light are-small" @click="setToIngredientSearch">Ingredient</button>
+        <button class="button is-light are-small" @click="setToStoreSearch">Store</button>
       </div>
       <span
         >Search by: <strong>{{ searchBy.slice(2) }}</strong></span
