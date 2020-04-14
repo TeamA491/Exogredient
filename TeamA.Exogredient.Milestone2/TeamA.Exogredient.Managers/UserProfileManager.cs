@@ -292,6 +292,13 @@ namespace TeamA.Exogredient.Managers
             bool deleteResult = false;
             try
             {
+                // Check that the user exists.
+                var userExists = await _userManagementService.CheckUserExistenceAsync(performingUser).ConfigureAwait(false);
+                if (!userExists)
+                {
+                    throw new ArgumentException(Constants.UsernameDNE);
+                }
+
                 // Check that all the Ids exists.
                 if (!await _uploadService.CheckUploadsExistenceAsync(ids).ConfigureAwait(false))
                 {
