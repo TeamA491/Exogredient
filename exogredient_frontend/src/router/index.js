@@ -9,7 +9,23 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/SearchResultsView', component: SearchResultsView},
   { path: '/StoreView', component: StoreView},
-  { path: '/ErrorView', component: ErrorView}
+  { path: '/ErrorView', component: ErrorView}, 
+
+  {
+    path: "/profile",
+    name: "profile",
+    component: () => import("@/pages/UserProfile.vue"),
+  },
+  {
+    path: "/upload",
+    name: "upload",
+    component: () => import("@/pages/Upload.vue"),
+  },
+  {
+    path: "/",
+    name: "home",
+  },
+  
 ]
 
 const router = new VueRouter({
