@@ -214,6 +214,9 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxAlphaValue = 26;
         public const int MinAlphaValue = 1;
 
+        public static readonly char[] termSpliters = new char[] { ' ', ',', ':' };
+        public const string termJoiner = " ";
+
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
 
@@ -249,6 +252,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
+
+        public const string GetTotalStoreResultsNumberOperation = "Get Total StoreResults Number";
+        public const string GetTotalIngredientResultsNumberOperation = "Get Total IngredientResults Number";
+        public const string GetIngredientsOperation = "Get Ingredients";
+        public const string GetStoreViewDataOperation = "Get StoreViewData";
+        public const string GetStoreImageOperation = "Get store image";
+
         public const string CustomerUserType = "Customer";
         public const string StoreOwnerUserType = "Store Owner";
         public const string AdminUserType = "Admin";
@@ -262,6 +272,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int SavedUploadPagination = 10;
         public const int SaveListPagination = 20;
 
+        public const int NumOfResultsPerSearchPage = 20;
+        public const int NumOfIngredientsPerStorePage = 20;
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
@@ -281,6 +293,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxRegistrationAttempts = 3;
         public const int MaxEmailCodeAttempts = 3;
         public const int MaxPhoneCodeAttempts = 3;
+        public const int MaxSearchRelatedAttempts = 3;
+        public const int InitialFailureCount = 0;
         
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
         public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);
@@ -326,6 +340,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string TwilioAuthenticationFailString = "fail";
         public const string TwilioAuthenticationApprovedString = "approved";
         public const string TwilioAuthenticationPendingString = "pending";
+
+        public const string sortByIngredientNum = "ingredientNum";
+        public const string sortByDistance = "distance";
+        public const string searchByIngredient = "ingredient";
+        public const string searchByStore = "store";
 
         // BUSINESS RULES -- MESSAGES
         public const string RegistrationSuccessUserMessage = "Registration Successful!";
@@ -503,6 +522,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string StoreDAOStoreDescriptionColumn = "store_description";
         public const string StoreDAODistanceColumn = "distance";
         public const string StoreDAOIngredientNumColumn = "ingredient_num";
+        public const string StoreDAOPlaceIdColumn = "place_id";
+        public const string StoreDAOTotalResultsNum = "total_results_num";
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;

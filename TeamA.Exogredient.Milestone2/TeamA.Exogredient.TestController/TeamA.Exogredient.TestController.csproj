@@ -12,4 +12,43 @@
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="test2\Properties\launchSettings.json" />
+    <None Remove="Test\appsettings.json" />
+    <None Remove="Test\appsettings.Development.json" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Test.pdb" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Test.runtimeconfig.json" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Test" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Test.dll" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\appsettings.json" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Test.deps.json" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Test.runtimeconfig.dev.json" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\appsettings.Development.json" />
+    <None Remove="Test\bin\Debug\netcoreapp3.1\Properties\launchSettings.json" />
+    <None Remove="Test\obj\Test.csproj.nuget.g.targets" />
+    <None Remove="Test\obj\Test.csproj.nuget.dgspec.json" />
+    <None Remove="Test\obj\Test.csproj.nuget.cache" />
+    <None Remove="Test\obj\Test.csproj.nuget.g.props" />
+    <None Remove="Test\obj\project.assets.json" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.RazorTargetAssemblyInfo.cache" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.pdb" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.AssemblyInfoInputs.cache" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.dll" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.MvcApplicationPartsAssemblyInfo.cache" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.csprojAssemblyReference.cache" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.assets.cache" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.csproj.FileListAbsolute.txt" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\staticwebassets\Test.StaticWebAssets.Manifest.cache" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\staticwebassets\Test.StaticWebAssets.xml" />
+    <None Remove="Test\Properties\launchSettings.json" />
+    <None Remove="Test\obj\Debug\netcoreapp3.1\Test.csproj.CopyComplete" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Test\Controllers\WeatherForecastController.cs" />
+    <Compile Remove="Test\WeatherForecast.cs" />
+    <Compile Remove="Test\Startup.cs" />
+    <Compile Remove="Test\Program.cs" />
+    <Compile Remove="Test\obj\Debug\netcoreapp3.1\Test.AssemblyInfo.cs" />
+  </ItemGroup>
 </Project>
