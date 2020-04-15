@@ -11,11 +11,11 @@
         <br/>
         <input style="border-style:solid" type="text" maxlength="100" :placeholder="searchPlaceholder" name="search" v-model="searchData.searchTerm">
         <input style="border-style:solid" type="text" placeholder="Mile Range..." name="mile" v-model="searchData.radius">
-        <button @click="search">Search</button>
+        <button class="button is-light" @click="search">Search</button>
       </div>
       <div>
-        <button @click="setToIngredientSearch">Ingredient</button>
-        <button @click="setToStoreSearch">Store</button>
+        <button class="button is-light" @click="setToIngredientSearch">Ingredient</button>
+        <button class="button is-light" @click="setToStoreSearch">Store</button>
       </div>
       <span>Search by: <strong>{{searchData.searchBy}}</strong></span>
       <div id="demo">___________________________</div>
