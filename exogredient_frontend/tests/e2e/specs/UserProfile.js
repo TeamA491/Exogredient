@@ -1,4 +1,5 @@
 import store from "../../../src/store/index";
+import * as global from '../../../src/globalExports.js';
 
 describe("Get profile score positive", () => {
   it("Visit the profile view and verify score is positive", () => {
@@ -48,7 +49,7 @@ describe("Get zero profile Score", () => {
 describe("Attempt to get the profile score of an non existent user", () => {
   it("Make API call for nonexistent user", () => {
     cy.request({
-      url: "https://localhost:44354/api/userprofile/profilescore/nonexi",
+      url: `${global.ApiDomainName}/api/userprofile/profilescore/nonexi`,
       failOnStatusCode: false,
     }).should((response) => {
       expect(response.status).to.eq(404);
@@ -91,7 +92,7 @@ describe("Get a empty savelist for a user", () => {
 describe("attempt to get the savelist of an non existent user", () => {
   it("make request for a nonexistent user", () => {
     cy.request({
-      url: "https://localhost:44354/api/Userprofile/SaveList/nonexistent/0",
+      url: `${global.ApiDomainName}/api/Userprofile/SaveList/nonexistent/0`,
       failOnStatusCode: false,
     }).should((response) => {
       expect(response.status).to.eq(404);
@@ -100,7 +101,6 @@ describe("attempt to get the savelist of an non existent user", () => {
 });
 
 
-////////////// START ////////////////
 describe("Get the nonempty recent uploads for existing user", () => {
   it("retrieve a non empty recent recent upload list and verify that it is not empty", () => {
     // Arrange
@@ -134,7 +134,7 @@ describe("Get the empty recent uploads for existing user", () => {
 describe("attempt to get recent upload of an non existent user", () => {
   it("retrieve recent upload on nonexistent and verify that we get a 404 error", () => {
     cy.request({
-      url: "https://localhost:44354/api/Userprofile/SaveList/nonexistent/0",
+      url: `${global.ApiDomainName}/api/Userprofile/SaveList/nonexistent/0`,
       failOnStatusCode: false,
     }).should((response) => {
       expect(response.status).to.eq(404);
@@ -148,7 +148,7 @@ describe("delete a recent upload", () => {
   it("delete a recent upload and verify that it was deleted", () => {
 
     cy.request({
-      url: "https://localhost:44354/api/Userprofile/Upload/username/20",
+      url: `${global.ApiDomainName}/api/Userprofile/Upload/username/20`,
       failOnStatusCode: false,
       method: "DELETE"
     }).should((response) => {
@@ -165,7 +165,7 @@ describe("attempt to delete a nonexistent recent upload", () => {
   it("attempt to delete a recent upload for a nonexistent user and verify the 404 response", () => {
     
     cy.request({
-      url: "https://localhost:44354/api/Userprofile/Upload/nonexistent/1",
+      url: `${global.ApiDomainName}/api/Userprofile/Upload/nonexistent/1`,
       failOnStatusCode: false,
       method: "DELETE"
     }).should((response) => {
