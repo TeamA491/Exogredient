@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using TeamA.Exogredient.Managers;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.Exceptions;
+using System.Reflection.Metadata;
+using TeamA.Exogredient.AppConstants;
 
 namespace controller.Controllers
 {
@@ -22,12 +24,12 @@ namespace controller.Controllers
 
         [HttpGet("ProfileScore/{username}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetProfileScoresAsync(string username)
+        public async Task<IActionResult> GetProfileScoresAsync(string username, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetProfileScoreAsync(username,"localhost", 0 , null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetProfileScoreAsync(username,ipAddress, 0 , null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -43,12 +45,12 @@ namespace controller.Controllers
 
         [HttpGet("RecentUploads/{username}/{pagination}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetRecentUploadsAsync(string username, int pagination)
+        public async Task<IActionResult> GetRecentUploadsAsync(string username, int pagination, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetRecentUploadsAsync(username, pagination, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetRecentUploadsAsync(username, pagination, ipAddress, 0, null).ConfigureAwait(false));
 
             }
             catch (ArgumentException ae)
@@ -65,12 +67,12 @@ namespace controller.Controllers
 
         [HttpGet("InProgressUploads/{username}/{pagination}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetInProgressUploadsAsync(string username, int pagination)
+        public async Task<IActionResult> GetInProgressUploadsAsync(string username, int pagination, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetInProgressUploadsAsync(username, pagination, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetInProgressUploadsAsync(username, pagination, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -85,11 +87,11 @@ namespace controller.Controllers
         }
 
         [HttpDelete("Upload/{performingUser}/{uploadId}")]
-        public async Task<IActionResult> DeleteUploadAsync(string performingUser, string uploadId)
+        public async Task<IActionResult> DeleteUploadAsync(string performingUser, string uploadId, string ipAddress = Constants.LocalHost)
         {
             try
             {
-                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<string>() { uploadId}, performingUser, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<string>() { uploadId}, performingUser, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -109,12 +111,12 @@ namespace controller.Controllers
 
         [HttpGet("SaveList/{username}/{pagination}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetSaveListAsync(string username, int pagination)
+        public async Task<IActionResult> GetSaveListAsync(string username, int pagination, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetSaveListAsync(username, pagination, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetSaveListAsync(username, pagination, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -130,12 +132,12 @@ namespace controller.Controllers
 
         [HttpDelete("SaveList/{username}/{storeId}/{ingredient}")]
         [Produces("application/json")]
-        public async Task<IActionResult> DeleteSaveListAsync(string username, int storeId, string ingredient) 
+        public async Task<IActionResult> DeleteSaveListAsync(string username, int storeId, string ingredient, string ipAddress = Constants.LocalHost) 
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.DeleteSaveListAsync(username, storeId, ingredient, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.DeleteSaveListAsync(username, storeId, ingredient, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -151,12 +153,12 @@ namespace controller.Controllers
 
         [HttpGet("SaveListPagination/{username}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetSaveListPaginationSizeAsync(string username)
+        public async Task<IActionResult> GetSaveListPaginationSizeAsync(string username, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetSaveListPaginationSizeAsync(username, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetSaveListPaginationSizeAsync(username, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -172,12 +174,12 @@ namespace controller.Controllers
 
         [HttpGet("InProgressUploadPagination/{username}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetInProgressUploadPaginationSizeAsync(string username)
+        public async Task<IActionResult> GetInProgressUploadPaginationSizeAsync(string username, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetInProgressUploadPaginationSizeAsync(username, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetInProgressUploadPaginationSizeAsync(username, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
@@ -193,12 +195,12 @@ namespace controller.Controllers
 
         [HttpGet("RecentUploadPagination/{username}")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetRecentUploadPaginationSizeAsync(string username)
+        public async Task<IActionResult> GetRecentUploadPaginationSizeAsync(string username, string ipAddress = Constants.LocalHost)
         {
             try
             {
                 // Return status code of 200 as well as the content.
-                return Ok(await _userProfileManager.GetRecentUploadPaginationSizeAsync(username, "localhost", 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.GetRecentUploadPaginationSizeAsync(username, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {
