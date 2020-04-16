@@ -109,7 +109,7 @@ export default {
 
         // Fetch the RecentUploads
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -125,7 +125,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -150,7 +150,7 @@ export default {
 
         // Fetch the InProgress uploads
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -166,7 +166,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -191,7 +191,7 @@ export default {
 
         // Fetch the save lists for a user
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -207,7 +207,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -231,7 +231,7 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/SaveList/${
           this.$store.state.username
-        }/${newValue - 1}`
+        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
       )
         .then((response) => {
           // Display error view based on response status code
@@ -251,7 +251,7 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${
           this.$store.state.username
-        }/${newValue - 1}`
+        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
       )
         .then((response) => {
           // Display error view based on response status code
@@ -271,7 +271,7 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/Userprofile/Recentuploads/${
           this.$store.state.username
-        }/${newValue - 1}`
+        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
       )
         .then((response) => {
           // Display error view based on response status code
@@ -293,7 +293,7 @@ export default {
 
     // Make an API call to calculate the score for this user \.
     fetch(
-      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.username}`
+      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
     )
       .then((response) => {
         // Display error view based on response status code
