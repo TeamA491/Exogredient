@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import * as global from '../globalExports.js';
+import * as global from "../globalExports.js";
 
 export default {
   props: {
@@ -25,7 +25,10 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/SaveList/${saveItem.username}/${saveItem.storeId}/${saveItem.ingredientName}`,
         { method: "DELETE" }
-      );
+      ).then((response) => {
+        // Display error view based on response status code
+        global.ErrorHandler(this.$router, response);
+      });
 
       // remove this save list item from the parent saveList array
       this.$parent.saveList.splice(this.Index, 1);

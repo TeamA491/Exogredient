@@ -9,17 +9,17 @@
 </template>
 
 <script>
-import * as global from '../globalExports.js';
+import * as global from "../globalExports.js";
 
 export default {
   props: {
     upload: {
       type: Object,
-      default: {}
+      default: {},
     },
     index: {
       type: Number,
-      default: -1
+      default: -1,
     },
   },
   methods: {
@@ -28,12 +28,15 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/Upload/${this.$store.getters.username}/${id}`,
         { method: "DELETE" }
-      );
+      ).then((response) => {
+        // Display error view based on response status code
+        global.ErrorHandler(this.$router, response);
+      });
 
       // remove this upload from recent upload array.
       this.$parent.recentUploadList.splice(this.Index, 1);
-    }
-  }
+    },
+  },
 };
 </script>
 

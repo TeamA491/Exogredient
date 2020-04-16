@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-export const ApiDomainName = "https://localhost:5001";
+export const ApiDomainName = "https://localhost:44392";
 
 export const SortByDistance = 'distance';
 export const SortByIngredientNum = 'ingredientNum';
@@ -21,6 +21,7 @@ export const DefaultPage = 1;
 export const ResultsPerPage = 20;
 
 export const Bus = new Vue();
+export const AdminContact = "TEAMA.CS491@gmail.com"
 export const ErrorHandler = function(router,response){
   if(400 <= response.status){
     if(router.currentRoute.path !== '/ErrorView'){
