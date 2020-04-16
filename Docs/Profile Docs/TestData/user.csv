@@ -1,0 +1,4 @@
+username,name,email,phone_number,password,disabled,user_type,salt,temp_timestamp,email_code,email_code_timestamp,login_failures,last_login_fail_timestamp,email_code_failures,phone_code_failures
+testuser,"test user ",test@email.com,5622349876,asdfsadf,0,Customer,12345678,0,1234,0,0,0,0,0
+username,name,email@email.com,phonenumber,password,0,Customer,12345678,0,ecode,0,0,0,0,0
+zero,game,emadsail@email.com,phonenumbser,password,0,Customer,12345678,0,ecode,0,0,0,0,0
