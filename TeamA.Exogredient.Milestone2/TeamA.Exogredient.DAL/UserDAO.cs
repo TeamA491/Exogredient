@@ -13,10 +13,10 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class UserDAO : IMasterSQLDAO<string>
     {
-        private string SQLConnection;
+        private string _SQLConnection;
         public UserDAO(string connection)
         {
-            SQLConnection = connection;
+            _SQLConnection = connection;
         }
         /// <summary>
         /// Asynchronously creates the <paramref name="record"/> in the data store.
@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = userRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection
                 connection.Open();
@@ -124,7 +124,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 connection.Open();
 
@@ -170,7 +170,7 @@ namespace TeamA.Exogredient.DAL
             UserObject result;
 
             // Get the connection inside of a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 connection.Open();
 
@@ -224,7 +224,7 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> recordData = userRecord.GetData();
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -331,7 +331,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckUserExistenceAsync(string username)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -364,7 +364,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckPhoneNumberExistenceAsync(string phoneNumber)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -397,7 +397,7 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> CheckEmailExistenceAsync(string email)
         {
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -422,6 +422,38 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        /// <summary>
+        /// Get the user type for a user.
+        /// </summary>
+        /// <param name="user">User to perform operation on.</param>
+        /// <returns>String containing that user's type.</returns>
+        public async Task<String> ReadUserType(String user)
+        {
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                // Construct the sql string to select all from the table where the email column matches the email,
+                string sqlString = $"SELECT {Constants.UserDAOuserTypeColumn} FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOusernameColumn} = @USERNAME";
+
+                // Open the command inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
+                    command.Parameters.AddWithValue("@USERNAME", user);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+
+                    reader.Read();
+                    return reader.GetString(0);
+                }
+            }
+
+        }
+
+
+        
         public async Task<int> CountUsersTypeAsync(String userType)
         {
             int result;
@@ -448,6 +480,5 @@ namespace TeamA.Exogredient.DAL
             }
             return result;
         }
-
     }
 }

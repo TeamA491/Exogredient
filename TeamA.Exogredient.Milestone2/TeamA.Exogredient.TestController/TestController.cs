@@ -14,43 +14,40 @@ using System.Text;
 using System.Reflection;
 using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.CRUD;
+using System.Reflection.Metadata;
+using System.Linq;
+using WeCantSpell.Hunspell;
 
 namespace TeamA.Exogredient.TestController
 {
     class TestController
     {
-
         public async static Task Main()
         {
-            var map = new MapDAO(Constants.MapSQLConnection);
-            var mask = new MaskingService(map);
-            var flat = new FlatFileLoggingService(mask);
+            //UploadDAO ud = new UploadDAO(Constants.SQLConnection);
+            //List<ProfileScoreResult> listprofile = await ud.ReadUploadVotes("username").ConfigureAwait(false);
+            //foreach(ProfileScoreResult ps in listprofile)
+            //{
+            //    Console.WriteLine(ps.UploadUpvote + " " + ps.UploadDownvote);
+            //}
 
-            var log = new LogDAO(Constants.NOSQLConnection);
-            var data = new DataStoreLoggingService(log, mask);
-            var logman = new LoggingManager(flat, data);
 
-            var user = new UserDAO(Constants.SQLConnection);
-            var upload = new UploadDAO(Constants.SQLConnection);
-            var snapdao = new SnapshotDAO(Constants.NOSQLConnection);
-            var snap = new SnapshotService(log, user, upload, snapdao);
-            var c = new CreateSnapshotManager(logman, snap);
+            //string killcomma = "asdfsdf,";
+            //Console.WriteLine(killcomma.TrimEnd(new char[] { ',' }));
 
-            var d = new ReadSnapshotManager(logman, snap);
 
-            int tries = 0;
-            //await c.CreateSnapshotAsync(tries).ConfigureAwait(false);
+            var ud = new UploadDAO(Constants.SQLConnection);
+            //Console.WriteLine(await ud.DeleteByIdsAsync(new List<string>() { "20", "21", "22" }));
+            //Console.WriteLine(await ud.CheckUploadsExistence(new List<string>() { "1", "2", "3","23" }));
 
-            var snapshot = await d.ReadOneSnapshotAsync(tries, 2020, 4).ConfigureAwait(false);
-            Console.WriteLine(snapshot._month);
+            //var userD = new UserDAO(Constants.SQLConnection);
+            //Console.WriteLine(await userD.ReadUserType("testuser"));
 
-            var snapshotList = await d.ReadMultiSnapshotAsync(tries, 2020).ConfigureAwait(false);
-            
-            foreach(var snaps in snapshotList)
-            {
-                Console.WriteLine(snapshot._month);
-            }
 
+            //var asasd = "one";
+            //Console.WriteLine(asasd.Equals("one"));
+
+            Console.WriteLine(await ud.GetRecentPaginationSize("username").ConfigureAwait(false));
         }
     }
 }

@@ -4,11 +4,79 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
+using Snowball;
+using WeCantSpell.Hunspell;
+using System.Linq;
 
 namespace TeamA.Exogredient.Services
 {
     public static class StringUtilityService
     {
+        
+        public static string NormalizeTerm(string term, string dicFilePath, string affFilePath)
+        {
+            if(term == null)
+            {
+                return null;
+            }
+
+            term = term.ToLower();
+            var tokens = term.Split(Constants.termSpliters);
+            var normalizedTerm = new List<string>();
+
+            foreach(var token in tokens)
+            {
+                if(!CheckIfTermInDictionary(token,dicFilePath,affFilePath))
+                {
+                    normalizedTerm.Add(token);
+                }
+                else
+                {
+                    var stemmedTerm = Stem(token);
+                    if(stemmedTerm.Length == term.Length)
+                    {
+                        normalizedTerm.Add(stemmedTerm);
+                    }
+                    else
+                    {
+                        normalizedTerm.Add(AutoCorrect(stemmedTerm, dicFilePath, affFilePath));
+                    }
+                }
+            }
+            return string.Join(Constants.termJoiner, normalizedTerm.ToArray());
+        }
+
+        public static bool CheckIfTermInDictionary(string term, string dicFilePath, string affFilePath)
+        {
+            var dictionary = WordList.CreateFromFiles(dicFilePath, affFilePath);
+            return dictionary.Check(term);
+        }
+
+        public static string AutoCorrect(string word, string dicFilePath, string affFilePath)
+        {
+            var dictionary = WordList.CreateFromFiles(dicFilePath, affFilePath);
+            var suggestions = dictionary.Suggest(word).ToArray<string>();
+
+            foreach (var suggestion in suggestions)
+            {
+                if (suggestion.Length > word.Length)
+                {
+                    return suggestion;
+                }
+            }
+            return word;
+        }
+        
+
+        public static string Stem(string word)
+        {
+            var stemmer = new EnglishStemmer();
+
+            stemmer.Current = word;
+            stemmer.Stem();
+            return stemmer.Current;
+        }
+
         /// <summary>
         /// Convert a hex string to a byte array
         /// </summary>

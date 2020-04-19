@@ -19,6 +19,12 @@ namespace TeamA.Exogredient.Managers
             _loggingManager = loggingManager;
         }
 
+        public async Task<bool> TesterAsync(bool isTemp, UserRecord record, string adminName = Constants.SystemIdentifier, string adminIp = Constants.LocalHost)
+        {
+            return await _userManagementService.CreateUserAsync(isTemp, record, adminName, adminIp).ConfigureAwait(false);
+        }
+
+
         // Time out after X seconds will be conducted in Controllers with Task.Wait
 
         // Re-trying after exceptions occur will be conducted in Controllers, who will check if an exception occurred and how
