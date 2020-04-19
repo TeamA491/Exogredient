@@ -4,6 +4,8 @@ using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.CRUD;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using System.Collections.Generic;
+
 
 namespace TeamA.Exogredient.DAL
 {
@@ -158,5 +160,52 @@ namespace TeamA.Exogredient.DAL
                 return resultstring;
             }
         }
+
+        public async Task<List<List<LogResult>>> ReadSpecificMonthAsync(string year, string month, int amountOfDays)
+        {
+
+            List<List<LogResult>> logsForMonth = new List<List<LogResult>>();
+
+
+            // Get the session inside a using statement to properly dispose/close.
+            using (Session session = MySQLX.GetSession(NOSQLConnection))
+            {
+                // Get log schema.
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
+
+                for (int date = 1; date < amountOfDays + 1; date ++)
+                {
+                    string groupName = year + month;
+                    string day = "";
+
+                    if (date < 10)
+                    {
+                        day += "0";
+                    }
+                    day += Convert.ToString(date);
+
+                    groupName += day;
+
+                    Console.WriteLine(groupName);
+                    var collection = schema.GetCollection(Constants.LogsCollectionPrefix + groupName);
+
+                    // Need to check if collection exists beforehand.
+                    List<LogResult> logsForDay = new List<LogResult>();
+                    if (collection.ExistsInDatabase()) {
+                        Console.WriteLine("Inside");
+                        DocResult result = await collection.Find().ExecuteAsync().ConfigureAwait(false);
+                        while (result.Next())
+                        {
+                            LogResult logObject = new LogResult((string)result.Current[Constants.LogsTimestampField], (string)result.Current[Constants.LogsOperationField],
+                                (string)result.Current[Constants.LogsIdentifierField], (string)result.Current[Constants.LogsIPAddressField], (string)result.Current[Constants.LogsErrorTypeField]);
+                            logsForDay.Add(logObject);
+                        }
+                    }
+                    logsForMonth.Add(logsForDay);
+                }            
+            }
+            return logsForMonth;        
+        }
+    
     }
 }

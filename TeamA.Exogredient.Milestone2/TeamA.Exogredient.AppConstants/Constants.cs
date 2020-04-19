@@ -236,8 +236,16 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
+        public const string CreateSnapshotOperation = "Create Single Snapshot";
+        public const string ReadOneSnapshotOperation = "Read Single Snapshot";
+        public const string ReadMultiSnapshotOperation = "Read Multiple Snapshot";
+        public const string UpvoteOperation = "Upvote Upload";
+        public const string DownvoteOperation = "Downvote Upload";
+        public const string CreateUploadOperation = "Creating Upload";
+        public const string SearchOperation = "Searching";
 
         public const string CustomerUserType = "Customer";
+        public const string StoreOwnerUserType = "Store Owner";
         public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
         public const string AnonymousUserIdentifier = "<Unregistered Customer>";
@@ -483,6 +491,24 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
 
+
+        // SNAPSHOT COLLECTION
+        public const string SnapshotSchemaName = "exogredient_snapshot";
+        public const string SnapshotCollectionPrefix = "snapshot";
+        public const string SnapshotMonth = "_month";
+        public const string SnapshotOperationsDict = "operations";
+        public const string SnapshotUsersDict = "amount_of_customers_and_storeowners";
+        public const string SnapshotTopCityDict = "top_cities_that_uses_application";
+        public const string SnapshotTopUserUploadedDict = "top_users_that_upload";
+        public const string SnapshotTopUploadedIngredientDict = "top_most_uploaded_ingredients";
+        public const string SnapshotTopUploadedstoreDict = "top_most_uploaded_stores";
+        public const string SnapshotTopSearchedIngredientDict = "top_most_searched_ingredients";
+        public const string SnapshotTopSearchedStoreDict = "top_most_searched_stores";
+        public const string SnapshotTopUpvotedUserDict = "top_most_upvoted_users";
+        public const string SnapshotTopDownvotedUserDict = "top_most_downvoted_users";
+
+
+
         // RECORD HELPER DATA STRUCTURES
         public static readonly IDictionary<string, bool> LogsCollectionIsColumnMasked = new Dictionary<string, bool>()
         {
@@ -507,6 +533,22 @@ namespace TeamA.Exogredient.AppConstants
         public const string KeyValueNoDoubleQuotes = "Key or value isn't surrounded by double quotes.";
         public const string KeyValueNotAlphaNum = "Key or value is not alpha-numeric (excluding white-space).";
         public const string MustBeAdmin = "adminName does not exists or is not an admin";
+
+        // UPLOAD TABLE
+        public const string UploadDAOTableName = "upload";
+        public const string UploadDAOUploadIdColumn = "upload_id";
+        public const string UploadDAOStoreIdColumn = "store_id";
+        public const string UploadDAOIngredientNameColumn = "ingredient_name";
+        public const string UploadDAOUploaderColumn = "uploader";
+        public const string UploadDAOPostTimeDateColumn = "post_time_date";
+        public const string UploadDAODescriptionColumn = "description";
+        public const string UploadDAORatingColumn = "rating";
+        public const string UploadDAOPhotoColumn = "photo";
+        public const string UploadDAOPriceColumn = "price";
+        public const string UploadDAOUpvoteColumn = "upvote";
+        public const string UploadDAODownvoteColumn = "downvote";
+        public const string UploadDAOInProgressColumn = "in_progress";
+        public const string UploadDAOUploadNumColumn = "upload_num";
 
         // EXCEPTION MESSAGES -- Data Store Logging
         public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
