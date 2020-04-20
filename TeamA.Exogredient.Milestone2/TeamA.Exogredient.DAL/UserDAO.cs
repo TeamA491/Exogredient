@@ -459,7 +459,7 @@ namespace TeamA.Exogredient.DAL
             int result;
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();

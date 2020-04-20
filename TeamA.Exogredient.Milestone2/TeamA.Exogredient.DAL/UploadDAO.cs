@@ -566,7 +566,7 @@ namespace TeamA.Exogredient.DAL
         {
             Dictionary<string, int> topUpvotedUserDict = new Dictionary<String, int>();
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(SQLConnection))
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();

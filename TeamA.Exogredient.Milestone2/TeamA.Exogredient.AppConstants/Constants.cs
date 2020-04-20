@@ -619,22 +619,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserNotAllowed = "Usertype not authorized";
 
 
-        // UPLOAD TABLE
-        public const string UploadDAOTableName = "upload";
-        public const string UploadDAOUploadIdColumn = "upload_id";
-        public const string UploadDAOStoreIdColumn = "store_id";
-        public const string UploadDAOIngredientNameColumn = "ingredient_name";
-        public const string UploadDAOUploaderColumn = "uploader";
-        public const string UploadDAOPostTimeDateColumn = "post_time_date";
-        public const string UploadDAODescriptionColumn = "description";
-        public const string UploadDAORatingColumn = "rating";
-        public const string UploadDAOPhotoColumn = "photo";
-        public const string UploadDAOPriceColumn = "price";
-        public const string UploadDAOUpvoteColumn = "upvote";
-        public const string UploadDAODownvoteColumn = "downvote";
-        public const string UploadDAOInProgressColumn = "in_progress";
-        public const string UploadDAOUploadNumColumn = "upload_num";
-
         // EXCEPTION MESSAGES -- Data Store Logging
         public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
 
