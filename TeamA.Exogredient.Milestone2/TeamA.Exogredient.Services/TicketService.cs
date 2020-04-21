@@ -1,4 +1,5 @@
 ﻿using System;
+using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using TeamA.Exogredient.DataHelpers;
@@ -8,6 +9,8 @@ namespace TeamA.Exogredient.Services
 {
     public class TicketingService
     {
+        private static readonly string _connection = Constants.SQLConnection;
+
         /// <summary>
         /// Will return all tickets that meet the search criteria
         /// </summary>
@@ -77,7 +80,11 @@ namespace TeamA.Exogredient.Services
         {
             // TODO AUTHORIZE WITH JWT
             // TODO CHECK IF TICKETID EXISTS
-            string sqlString = "";
+            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
+                                    SET {Constants.TicketDAOStatusColumn}
+                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newStatus}";
+            await RunSQLQuery(sqlString).ConfigureAwait(false);
+
             return true;
         }
 
@@ -91,7 +98,11 @@ namespace TeamA.Exogredient.Services
         {
             // TODO AUTHORIZE WITH JWT
             // TODO CHECK IF TICKETID EXISTS
-            string sqlString = "";
+            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
+                                    SET {Constants.TicketDAOCategoryColumn}
+                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newCategory}";
+            await RunSQLQuery(sqlString).ConfigureAwait(false);
+
             return true;
         }
 
@@ -105,7 +116,11 @@ namespace TeamA.Exogredient.Services
         {
             // TODO AUTHORIZE WITH JWT
             // TODO CHECK IF TICKETID EXISTS
-            string sqlString = "";
+            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
+                                    SET {Constants.TicketDAOIsReadColumn}
+                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newReadStatus}";
+            await RunSQLQuery(sqlString).ConfigureAwait(false);
+
             return true;
         }
 
@@ -119,7 +134,11 @@ namespace TeamA.Exogredient.Services
         {
             // TODO AUTHORIZE WITH JWT
             // TODO CHECK IF TICKETID EXISTS
-            string sqlString = "";
+            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
+                                    SET {Constants.TicketDAOFlagColorColumn}
+                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newFlagColor}";
+            await RunSQLQuery(sqlString).ConfigureAwait(false);
+
             return true;
         }
 
@@ -132,6 +151,20 @@ namespace TeamA.Exogredient.Services
         public async Task<bool> SubmitTicketAsync(Constants.TicketCategories category, string description)
         {
             return true;
+        }
+
+        private static async Task RunSQLQuery(string sqlString)
+        {
+            // TODO REUSE SQL CONNECTION
+            MySqlConnection connection = new MySqlConnection(_connection);
+            connection.Open();
+
+            // Create the commmand object and execute/dispose it asynchronously.
+            MySqlCommand command = new MySqlCommand(sqlString, connection);
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            //await command.DisposeAsync().ConfigureAwait(false);
+
+            connection.Close();
         }
 
         /// <summary>
