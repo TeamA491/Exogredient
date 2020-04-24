@@ -33,8 +33,8 @@ namespace TeamA.Exogredient.Managers
         // Encrypted password, encrypted AES key, and AES IV are all in hex string format.
         public async Task<Result<bool>> RegisterAsync(bool scopeAnswer, string firstName, string lastName,
                                                              string email, string username, string phoneNumber,
-                                                             string ipAddress, string encryptedPassword,
-                                                             string encryptedAESKey, string aesIV, int currentNumExceptions)
+                                                             string ipAddress, string hashedPassword, string salt,
+                                                             string proxyPassword, int currentNumExceptions)
         {
             try
             {
@@ -271,7 +271,7 @@ namespace TeamA.Exogredient.Managers
                     return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
                 }
 
-                // Check username uniqueness.
+                // Check phone number uniqueness.
                 if (await _userManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false))
                 {
                     await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
@@ -286,22 +286,22 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Password decryption.
-                byte[] encryptedPasswordBytes = StringUtilityService.HexStringToBytes(encryptedPassword);
-                byte[] encryptedAESKeyBytes = StringUtilityService.HexStringToBytes(encryptedAESKey);
-                byte[] AESIVBytes = StringUtilityService.HexStringToBytes(aesIV);
-                // Get RSA key information.
-                byte[] publicKeyBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
-                byte[] privateKeyBytes = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
+                //byte[] encryptedPasswordBytes = StringUtilityService.HexStringToBytes(encryptedPassword);
+                //byte[] encryptedAESKeyBytes = StringUtilityService.HexStringToBytes(encryptedAESKey);
+                //byte[] AESIVBytes = StringUtilityService.HexStringToBytes(aesIV);
+                //// Get RSA key information.
+                //byte[] publicKeyBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
+                //byte[] privateKeyBytes = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
 
-                byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
+                //byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
 
-                // Get the plain text password from the encrypted one.
-                string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
-                byte[] passwordBytes = StringUtilityService.HexStringToBytes(hexPassword);
-                string plaintextPassword = StringUtilityService.BytesToUTF8String(passwordBytes);
+                //// Get the plain text password from the encrypted one.
+                //string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
+                //byte[] passwordBytes = StringUtilityService.HexStringToBytes(hexPassword);
+                //string plaintextPassword = StringUtilityService.BytesToUTF8String(passwordBytes);
 
                 // Check the length of their password.
-                if (!StringUtilityService.CheckLength(plaintextPassword, Constants.MaximumPasswordCharacters,
+                if (!StringUtilityService.CheckLength(proxyPassword, Constants.MaximumPasswordCharacters,
                                                 Constants.MinimumPasswordCharacters))
                 {
                     await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
@@ -317,92 +317,92 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Check the character requirements of their password.
-                if (!StringUtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (!StringUtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                //}
 
                 // Check if password for context specific words.
-                if (StringUtilityService.ContainsContextSpecificWords(plaintextPassword))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (StringUtilityService.ContainsContextSpecificWords(plaintextPassword))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
+                //                                       registrationSuccess, false, currentNumExceptions);
+                //}
 
                 // Check if password contains sequences or repetitions.
-                if (StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
+                //                                       registrationSuccess, false, currentNumExceptions);
+                //}
 
                 // Check if password contains dictionary words.
-                if (await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordWordsLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
+                //                                       registrationSuccess, false, currentNumExceptions);
+                //}
 
                 // Check if password is a previously corrupted password.
-                if (await SystemUtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (await SystemUtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, registrationSuccess, false, currentNumExceptions);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, registrationSuccess, false, currentNumExceptions);
+                //}
 
                 // Successful registration!
                 registrationSuccess = true;
 
                 // Hash password with salt
-                byte[] saltBytes = SecurityService.GenerateSalt();
-                string saltHex = StringUtilityService.BytesToHexString(saltBytes);
+                //byte[] saltBytes = SecurityService.GenerateSalt();
+                //string saltHex = StringUtilityService.BytesToHexString(saltBytes);
 
-                string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
+                //string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 // Create user record object to represent a user.
 
                 // Email code, email code timestamp, login failures, last login failure timestamp, email code failures, and phone code failures initialized to have no value.
-                UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
-                                                    saltHex, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+                UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, hashedPassword, Constants.EnabledStatus, Constants.CustomerUserType,
+                                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
                 
                 // Create that user.
                 await _userManagementService.CreateUserAsync(true, user, "system", "localhost").ConfigureAwait(false);
