@@ -23,7 +23,8 @@ const store = new Vuex.Store({
       storeView: 1
     },
     username: "username",
-    ipAddress: "127.1.1.0"
+    ipAddress: "",
+    location: ""
   },
   mutations:{
     updateSearchData (state, newSearchData){
@@ -55,6 +56,12 @@ const store = new Vuex.Store({
     },
     updateUsername(state, newUsername) {
       state.username = newUsername;
+    },
+    updateIpAddress(state, newIpAddress){
+      state.ipAddress = newIpAddress;
+    },
+    updateLocation(state, newLocation){
+      state.location = newLocation;
     }
   },
   actions:{
@@ -84,6 +91,12 @@ const store = new Vuex.Store({
     },
     updateStoreViewCurrentPage({commit}, newCurrentPage){
       commit('updateStoreViewCurrentPage', newCurrentPage);
+    },
+    updateIpAddress({commit}, newIpAddress){
+      commit('updateIpAddress', newIpAddress);
+    },
+    updateLocation({commit}, newLocation){
+      commit('updateLocation', newLocation);
     },
     sortStoreResults ({state}, sortOption){
       if(sortOption.by === 'distance'){

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import SearchResultsView from '../views/SearchResultsView';
 import StoreView from '../views/StoreView';
 import ErrorView from '../views/ErrorView';
+import RegistrationView from '../views/RegistrationView';
 
 Vue.use(VueRouter)
 
@@ -10,6 +11,7 @@ const routes = [
   { path: '/SearchResultsView', component: SearchResultsView},
   { path: '/StoreView', component: StoreView},
   { path: '/ErrorView', component: ErrorView}, 
+  { path: '/RegistrationView', component: RegistrationView },
 
   {
     path: "/profile",
