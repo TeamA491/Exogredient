@@ -49,7 +49,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidPasswordLengthUserMessage,
-                                                       updateSuccess, false, currentNumExceptions);
+                                                       updateSuccess, false);
                 }
 
                 // Check the character requirements of their password.
@@ -59,7 +59,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, updateSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, updateSuccess, false);
                 }
 
                 // Check if password for context specific words.
@@ -70,7 +70,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
-                                                       updateSuccess, false, currentNumExceptions);
+                                                       updateSuccess, false);
                 }
 
                 // Check if password contains sequences or repetitions.
@@ -81,7 +81,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
-                                                       updateSuccess, false, currentNumExceptions);
+                                                       updateSuccess, false);
                 }
 
                 // Check if password contains dictionary words.
@@ -92,7 +92,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
-                                                       updateSuccess, false, currentNumExceptions);
+                                                       updateSuccess, false);
                 }
 
                 // Check if password is a previously corrupted password.
@@ -102,7 +102,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.UpdatePasswordOperation, username, ipAddress,
                                                   Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, updateSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, updateSuccess, false);
                 }
 
                 // Successful update!
@@ -119,7 +119,7 @@ namespace TeamA.Exogredient.Managers
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.UpdatePasswordOperation, username, ipAddress).ConfigureAwait(false);
 
-                return SystemUtilityService.CreateResult(Constants.UpdatePasswordSuccessUserMessage, updateSuccess, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.UpdatePasswordSuccessUserMessage, updateSuccess, false);
             }
             catch (Exception e)
             {
@@ -131,7 +131,7 @@ namespace TeamA.Exogredient.Managers
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.UpdatePasswordOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true);
             }
         }
     }

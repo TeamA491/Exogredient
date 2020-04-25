@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.VerifyPhoneOperation, username, ipAddress,
                                                   Constants.MaxPhoneTriesReachedLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.MaxPhoneTriesReachedUserMessage, phoneVerificationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.MaxPhoneTriesReachedUserMessage, phoneVerificationSuccess, false);
                 }
 
                 string verificationStatus = await _verificationService.VerifyPhoneCodeAsync(phoneNumber, inputCode).ConfigureAwait(false);
@@ -56,7 +56,7 @@ namespace TeamA.Exogredient.Managers
                         await _userManagementService.MakeTempPermAsync(username).ConfigureAwait(false);
                     }
 
-                    return SystemUtilityService.CreateResult(Constants.VerifyPhoneSuccessUserMessage, phoneVerificationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.VerifyPhoneSuccessUserMessage, phoneVerificationSuccess, false);
                 }
                 else if (verificationStatus.Equals(Constants.TwilioAuthenticationPendingString))
                 {
@@ -66,7 +66,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.VerifyPhoneOperation, username, ipAddress,
                                                   Constants.WrongPhoneCodeMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.WrongPhoneCodeMessage, phoneVerificationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.WrongPhoneCodeMessage, phoneVerificationSuccess, false);
                 }
                 else
                 {
@@ -77,7 +77,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.VerifyPhoneOperation, username, ipAddress,
                                                   Constants.PhoneCodeExpiredLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PhoneCodeExpiredUserMessage, phoneVerificationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.PhoneCodeExpiredUserMessage, phoneVerificationSuccess, false);
                 }
             }
             catch (Exception e)
@@ -90,7 +90,7 @@ namespace TeamA.Exogredient.Managers
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.VerifyPhoneOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true);
             }
         }
     }

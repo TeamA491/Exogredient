@@ -32,7 +32,7 @@ namespace TeamA.Exogredient.Managers
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendPhoneCodeOperation, username, ipAddress).ConfigureAwait(false);
 
-                return SystemUtilityService.CreateResult(Constants.SendPhoneCodeSuccessUserMessage, true, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.SendPhoneCodeSuccessUserMessage, true, false);
             }
             catch (Exception e)
             {
@@ -44,7 +44,7 @@ namespace TeamA.Exogredient.Managers
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.SendPhoneCodeOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true);
             }
         }
     }
