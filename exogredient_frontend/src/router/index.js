@@ -14,12 +14,12 @@ const routes = [
   {
     path: "/profile",
     name: "profile",
-    component: () => import("@/pages/UserProfile.vue"),
+    component: () => import("@/views/UserProfile.vue"),
   },
   {
     path: "/upload",
     name: "upload",
-    component: () => import("@/pages/Upload.vue"),
+    component: () => import("@/views/Upload.vue"),
   },
   {
     path: "/",

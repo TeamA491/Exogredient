@@ -24,7 +24,7 @@ namespace SearchController.Controllers
         {
             StoreDAO storeDao = new StoreDAO(Constants.SQLConnection);
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
-            var logdao = new LogDAO(Constants.LogSQLConnection);
+            var logdao = new LogDAO(Constants.NOSQLConnection);
             var searchService = new SearchService(storeDao, uploadDAO);
             var mapdao = new MapDAO(Constants.MapSQLConnection);
             var mask = new MaskingService(mapdao);
@@ -63,7 +63,7 @@ namespace SearchController.Controllers
         {
             StoreDAO storeDao = new StoreDAO(Constants.SQLConnection);
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
-            var logdao = new LogDAO(Constants.LogSQLConnection);
+            var logdao = new LogDAO(Constants.NOSQLConnection);
             var searchService = new SearchService(storeDao, uploadDAO);
             var mapdao = new MapDAO(Constants.MapSQLConnection);
             var mask = new MaskingService(mapdao);
@@ -95,7 +95,7 @@ namespace SearchController.Controllers
         {
             StoreDAO storeDao = new StoreDAO(Constants.SQLConnection);
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
-            var logdao = new LogDAO(Constants.LogSQLConnection);
+            var logdao = new LogDAO(Constants.NOSQLConnection);
             var searchService = new SearchService(storeDao, uploadDAO);
             var mapdao = new MapDAO(Constants.MapSQLConnection);
             var mask = new MaskingService(mapdao);
@@ -131,7 +131,7 @@ namespace SearchController.Controllers
         {
             StoreDAO storeDao = new StoreDAO(Constants.SQLConnection);
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
-            var logdao = new LogDAO(Constants.LogSQLConnection);
+            var logdao = new LogDAO(Constants.NOSQLConnection);
             var searchService = new SearchService(storeDao, uploadDAO);
             var mapdao = new MapDAO(Constants.MapSQLConnection);
             var mask = new MaskingService(mapdao);
@@ -157,7 +157,7 @@ namespace SearchController.Controllers
         [HttpGet("storeImage")]
         public IActionResult GetStoreImage(int storeId, string username, string ipAddress)
         {
-            var logdao = new LogDAO(Constants.LogSQLConnection);
+            var logdao = new LogDAO(Constants.NOSQLConnection);
             var mapdao = new MapDAO(Constants.MapSQLConnection);
             var mask = new MaskingService(mapdao);
             var ffLogging = new FlatFileLoggingService(mask);

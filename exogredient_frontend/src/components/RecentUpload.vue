@@ -9,31 +9,34 @@
 </template>
 
 <script>
-import * as global from '../globalExports.js';
+import * as global from "../globalExports.js";
 
 export default {
   props: {
     upload: {
       type: Object,
-      default: {}
+      default: {},
     },
     index: {
       type: Number,
-      default: -1
+      default: -1,
     },
   },
   methods: {
     DeleteRecentUpload(id) {
       // http DELETE on the in progress upload
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/Upload/${this.$store.getters.username}/${id}`,
+        `${global.ApiDomainName}/api/UserProfile/Upload/${this.$store.getters.username}/${id}?ipAddress=${this.$store.state.ipAddress}`,
         { method: "DELETE" }
-      );
+      ).then((response) => {
+        // Display error view based on response status code
+        global.ErrorHandler(this.$router, response);
+      });
 
       // remove this upload from recent upload array.
       this.$parent.recentUploadList.splice(this.Index, 1);
-    }
-  }
+    },
+  },
 };
 </script>
 
