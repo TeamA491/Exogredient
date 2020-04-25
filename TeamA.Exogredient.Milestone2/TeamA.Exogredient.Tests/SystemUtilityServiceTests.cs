@@ -27,7 +27,7 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("message", "data", true, 1)]
+        [DataRow("message", "data", true)]
         public void SystemUtilityService_CreateResult_CreateAccurateResult(string message, string data, bool exceptionOccured)
         {
             // Act
