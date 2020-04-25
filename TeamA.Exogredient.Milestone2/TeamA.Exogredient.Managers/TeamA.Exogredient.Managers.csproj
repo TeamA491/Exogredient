@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj" />
+    <ProjectReference Include="..\TeamA.Exogredient.Exceptions\TeamA.Exogredient.Exceptions.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
   </ItemGroup>
 

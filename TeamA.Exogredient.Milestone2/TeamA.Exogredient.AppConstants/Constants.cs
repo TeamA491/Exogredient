@@ -254,15 +254,26 @@ namespace TeamA.Exogredient.AppConstants
             Other,
         }
 
-        //public static readonly string[] TicketFlagColors = { "red", "blue", "green", "yellow", "orange" };
-        //public static readonly string[] TicketStatuses = { "unresolved", "resolved" };
-        //public static readonly string[] TicketReadStatuses = { "all", "unread", "read" };
-        //public static readonly string[] TicketCategories = { "error", "bug", "other" };
+        public static readonly char[] termSpliters = new char[] { ' ', ',', ':' };
+        public const string termJoiner = " ";
 
         // BUSINESS RULES
         public const string LoggingFormatString = "HH:mm:ss:ff UTC yyyyMMdd";
 
+        public const int OperationRetry = 3;
+
         public const string NoError = "null";
+
+        // BUSINESS RULES: USER PROFILE
+        public const string GetProfileScoreOperation = "Get Profile Score";
+        public const string GetRecentUploadsOperation = "Get Recent Uploads";
+        public const string GetInProgressUploadsOperation = "Get InProgress Uploads";
+        public const string GetSaveListOperation = "Get Save Lists";
+        public const string DeleteSaveListOperation = "Delete Save List";
+        public const string DeleteUploadOperation = "Delete Upload";
+        public const string GetSaveListPagination = "Get SaveList pagination";
+        public const string GetInProgressUploadPagination = "Get In Progress Upload pagination";
+        public const string GetRecentUploadPagination = "Get recent upload pagination";
 
         public const string RegistrationOperation = "Registration";
         public const string LogInOperation = "Log In";
@@ -281,17 +292,25 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
-        public const string GetStoresByIngredientOperation = "Get Stores By Ingredient";
-        public const string GetStoresByStoreOperation = "Get Stores By Store";
+
+        public const string GetTotalStoreResultsNumberOperation = "Get Total StoreResults Number";
+        public const string GetTotalIngredientResultsNumberOperation = "Get Total IngredientResults Number";
         public const string GetIngredientsOperation = "Get Ingredients";
+        public const string GetStoreViewDataOperation = "Get StoreViewData";
+        public const string GetStoreImageOperation = "Get store image";
 
         public const string CustomerUserType = "Customer";
+        public const string StoreOwnerUserType = "Store Owner";
         public const string AdminUserType = "Admin";
         public const string AnonymousUserType = "Unregistered Customer";
         public const string AnonymousUserIdentifier = "<Unregistered Customer>";
         public const string SystemIdentifier = "System";
 
         public const string LocalHost = "127.0.0.1";
+
+        public const int RecentUploadPagination = 10;
+        public const int SavedUploadPagination = 10;
+        public const int SaveListPagination = 20;
 
         public const int NumOfResultsPerSearchPage = 20;
         public const int NumOfIngredientsPerStorePage = 20;
@@ -301,6 +320,9 @@ namespace TeamA.Exogredient.AppConstants
         public const long NoValueLong = 0;
         public const int NoValueInt = 0;
         public const string NoValueString = "";
+        public const int UploadInprogress = 1;
+        public const int UploadNotInprogress = 0;
+
 
         public const int MaximumOperationRetries = 3;
 
@@ -311,6 +333,8 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxRegistrationAttempts = 3;
         public const int MaxEmailCodeAttempts = 3;
         public const int MaxPhoneCodeAttempts = 3;
+        public const int MaxSearchRelatedAttempts = 3;
+        public const int InitialFailureCount = 0;
         
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
         public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);
@@ -576,6 +600,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadDAOInProgressColumn = "in_progress";
         public const string UploadDAOUploadNumColumn = "upload_num";
 
+        // SAVELIST TABLE
+        public const string SaveListDAOTableName = "save_list";
+        public const string SaveListDAOStoreColumn = "store";
+        public const string SaveListDAOUsername = "username";
+        public const string SaveListDAOIngredient = "ingredient";
+
+
+
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
         public const string CorruptedPassCollectionName = "passwords";
@@ -615,6 +647,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string KeyValueNoDoubleQuotes = "Key or value isn't surrounded by double quotes.";
         public const string KeyValueNotAlphaNum = "Key or value is not alpha-numeric (excluding white-space).";
         public const string MustBeAdmin = "adminName does not exists or is not an admin";
+        public const string UserNotAllowed = "Usertype not authorized";
+
 
         // EXCEPTION MESSAGES -- Data Store Logging
         public const string TimestampFormatIncorrect = "Timestamp Format Incorrect";
@@ -660,6 +694,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketUpdateDNE = "TicketDAO.UpdateAsync ticket id did not exist";
         public const string TicketUpdateInvalidArgument = "TicketDAO.UpdateAsync record argument must be of type TicketRecord";
 
+        // EXCPETION MESSAGES -- SaveListDAO
+        public const string SaveListDNE = "SaveList does not exists";
+
         // EXCEPTION MESSAGES -- Archiving
         public const string SourceDirectoryDNE = "Archiving failed on because source directory did not exist";
         public const string FirstArgumentNotInt = "Archiving failed because first argument must be an integer";
@@ -688,5 +725,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string CreateUsersRecordMasked = "CreateUsersAsync record was masked";
         public const string UpdateUserRecordMasked = "UpdateUserAsync record was masked";
         public const string BulkUpdateUsersRecordMasked = "UpdateUserAsync record was masked";
+
+        // EXCEPTION MESSAGE -- Uploads
+        public const string UploadIdsDNE = "One or more of the uploads Ids does not exist";
+
+
+
     }
 }

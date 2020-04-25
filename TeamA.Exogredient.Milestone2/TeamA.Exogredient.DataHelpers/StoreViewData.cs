@@ -1,5 +1,4 @@
-﻿using System;
-namespace TeamA.Exogredient.DataHelpers
+﻿namespace TeamA.Exogredient.DataHelpers
 {
     public class StoreViewData
     {

@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.Services;
 
-namespace TeamA.Exogredient.Services
+namespace TeamA.Exogredient.Managers
 {
     /// <summary>
     /// Performs a complete loggging action to both the data store and a flat file.

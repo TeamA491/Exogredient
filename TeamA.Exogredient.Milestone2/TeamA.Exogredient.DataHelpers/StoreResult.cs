@@ -1,7 +1,4 @@
-﻿using System;
-using TeamA.Exogredient.AppConstants;
-
-namespace TeamA.Exogredient.DataHelpers
+﻿namespace TeamA.Exogredient.DataHelpers
 {
     public class StoreResult
     {
