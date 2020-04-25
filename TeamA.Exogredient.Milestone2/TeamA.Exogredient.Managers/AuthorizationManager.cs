@@ -6,7 +6,6 @@ namespace TeamA.Exogredient.Managers
 {
     public class AuthorizationManager
     {
-
         readonly AuthorizationService _authorizationService;
         readonly SessionService _sessionService;
 

@@ -13,7 +13,7 @@ namespace TeamA.Exogredient.DAL
     /// <summary>
     /// DAO for the data store containing Ticket information
     /// </summary>
-    public class TicketDAO : IMasterSQLDAO<string>
+    public class TicketDAO : IMasterSQLDAO<uint>
     {
         private string _SQLConnection;
 
@@ -110,7 +110,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="idsOfRows">The list of ids of rows to delete (List(string))</param>
         /// <returns>Task (bool) whether the function executed without exception.</returns>
-        public async Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
+        public async Task<bool> DeleteByIdsAsync(List<uint> idsOfRows)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -118,7 +118,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 // Loop through the ids of rows.
-                foreach (string ticketID in idsOfRows)
+                foreach (uint ticketID in idsOfRows)
                 {
                     if (!await CheckTicketExistenceAsync(ticketID).ConfigureAwait(false))
                         throw new ArgumentException(Constants.TicketDeleteDNE);
@@ -141,7 +141,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ticketID">The ticket ID of the row to read (string)</param>
         /// <returns>Task (IDataObject) the information represented as an object</returns>
-        public async Task<IDataObject> ReadByIdAsync(string ticketID)
+        public async Task<IDataObject> ReadByIdAsync(uint ticketID)
         {
             if (!await CheckTicketExistenceAsync(ticketID).ConfigureAwait(false))
                 throw new ArgumentException(Constants.TicketReadDNE);
@@ -189,7 +189,6 @@ namespace TeamA.Exogredient.DAL
         public async Task<bool> UpdateAsync(ISQLRecord record)
         {
             TicketRecord ticketRecord;
-
             try
             {
                 ticketRecord = (TicketRecord)record;
@@ -215,7 +214,7 @@ namespace TeamA.Exogredient.DAL
                     // exception if it doesn't exist.
                     if (pair.Key == Constants.TicketDAOTicketIDColumn)
                     {
-                        if (!await CheckTicketExistenceAsync((string)pair.Value).ConfigureAwait(false))
+                        if (!await CheckTicketExistenceAsync((uint)pair.Value).ConfigureAwait(false))
                             throw new ArgumentException(Constants.TicketUpdateDNE);
                     }
 
@@ -285,7 +284,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ticketID">ticket id to be checked </param>
         /// <returns> true if ticket id exists, otherwise false </returns>
-        public async Task<bool> CheckTicketExistenceAsync(string ticketID)
+        public async Task<bool> CheckTicketExistenceAsync(uint ticketID)
         {
             // Get the connection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -309,6 +308,13 @@ namespace TeamA.Exogredient.DAL
 
                 return result;
             }
+        }
+
+        public async Task<List<TicketRecord>> FilterTicketsAsync(Dictionary<Constants.TicketSearchFilter, string> filterParams)
+        {
+            // Temp
+            List<TicketRecord> tickets = new List<TicketRecord>();
+            return tickets;
         }
     }
 }

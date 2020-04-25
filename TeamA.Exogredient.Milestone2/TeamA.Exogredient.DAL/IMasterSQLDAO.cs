@@ -16,7 +16,7 @@ namespace TeamA.Exogredient.DAL
     {
         Task<bool> CreateAsync(ISQLRecord record);
 
-        Task<bool> DeleteByIdsAsync(List<string> idsOfRows);
+        Task<bool> DeleteByIdsAsync(List<T> idsOfRows);
 
         Task<IDataObject> ReadByIdAsync(T id);
 

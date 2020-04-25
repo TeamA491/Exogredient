@@ -155,11 +155,11 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
 
                     PRIMARY KEY (`{Constants.TicketDAOTicketIDColumn}`),
                     FOREIGN KEY (`{Constants.TicketDAOCategoryColumn}`)
-                        REFERENCES `{Constants.TicketCategoryDAOTableName}`(`{Constants.TicketDAOCategoryColumn}`) ON DELETE CASCADE,
+                        REFERENCES `{Constants.TicketCategoryDAOTableName}`(`{Constants.TicketDAOCategoryColumn}`),
                     FOREIGN KEY (`{Constants.TicketDAOStatusColumn}`)
-                      REFERENCES `{Constants.TicketStatusDAOTableName}`(`{Constants.TicketDAOStatusColumn}`) ON DELETE CASCADE,
+                      REFERENCES `{Constants.TicketStatusDAOTableName}`(`{Constants.TicketDAOStatusColumn}`),
                     FOREIGN KEY (`{Constants.TicketDAOFlagColorColumn}`)
-                      REFERENCES `{Constants.TicketFlagColorDAOTableName}`(`{Constants.TicketDAOFlagColorColumn}`) ON DELETE CASCADE
+                      REFERENCES `{Constants.TicketFlagColorDAOTableName}`(`{Constants.TicketDAOFlagColorColumn}`)
                 );
                 
                 {insertCategoriesQuery}

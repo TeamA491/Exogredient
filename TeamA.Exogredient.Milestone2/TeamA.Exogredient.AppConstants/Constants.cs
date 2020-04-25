@@ -226,6 +226,7 @@ namespace TeamA.Exogredient.AppConstants
 
         public enum TicketFlagColors
         {
+            None,
             Red,
             Blue,
             Green,

@@ -1,5 +1,5 @@
 ﻿using System;
-using MySql.Data.MySqlClient;
+using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using TeamA.Exogredient.DataHelpers;
@@ -7,19 +7,23 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
-    public class TicketingService
+    public class TicketService
     {
-        private static readonly string _connection = Constants.SQLConnection;
+        private readonly TicketDAO ticketDAO;
+
+        public TicketService(TicketDAO ticketDAO)
+        {
+            this.ticketDAO = ticketDAO;
+        }
 
         /// <summary>
         /// Will return all tickets that meet the search criteria
         /// </summary>
         /// <param name="filterParams">A dictionary containing search criteria</param>
         /// <returns>Array of TicketRecords that meet the search criteria</returns>
-        public async Task<TicketRecord[]> GetTicketsByFilterAsync(Dictionary<Constants.TicketSearchFilter, string> filterParams)
+        public async Task<List<TicketRecord>> GetTicketsByFilterAsync(Dictionary<Constants.TicketSearchFilter, string> filterParams)
         {
             // TODO AUTHORIZE WITH JWT
-            string sqlString = $"SELECT * FROM `{Constants.TicketDAOTableName}` WHERE ";
 
             // Go through all the search params
             foreach (KeyValuePair<Constants.TicketSearchFilter, string> filter in filterParams)
@@ -66,7 +70,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Temp
-            TicketRecord[] tickets = {new TicketRecord(1,"","","","")};
+            List<TicketRecord> tickets = new List<TicketRecord>();
             return tickets;
         }
 
@@ -79,11 +83,15 @@ namespace TeamA.Exogredient.Services
         public async Task<bool> UpdateTicketStatusAsync(uint ticketID, Constants.TicketStatuses newStatus)
         {
             // TODO AUTHORIZE WITH JWT
-            // TODO CHECK IF TICKETID EXISTS
-            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
-                                    SET {Constants.TicketDAOStatusColumn}
-                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newStatus}";
-            await RunSQLQuery(sqlString).ConfigureAwait(false);
+
+            // Make sure the ticket exists first
+            bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
+            if (!ticketExists)
+                throw new ArgumentException("");
+
+            // Update the ticket
+            TicketRecord ticketRecord = new TicketRecord(ticketID, null, newStatus.ToString(), null, null);
+            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
 
             return true;
         }
@@ -97,11 +105,14 @@ namespace TeamA.Exogredient.Services
         public async Task<bool> UpdateTicketCategoryAsync(uint ticketID, Constants.TicketCategories newCategory)
         {
             // TODO AUTHORIZE WITH JWT
-            // TODO CHECK IF TICKETID EXISTS
-            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
-                                    SET {Constants.TicketDAOCategoryColumn}
-                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newCategory}";
-            await RunSQLQuery(sqlString).ConfigureAwait(false);
+            // Make sure the ticket exists first
+            bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
+            if (!ticketExists)
+                throw new ArgumentException("");
+
+            // Update the ticket
+            TicketRecord ticketRecord = new TicketRecord(ticketID, newCategory.ToString(), null, null, null);
+            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
 
             return true;
         }
@@ -112,14 +123,17 @@ namespace TeamA.Exogredient.Services
         /// <param name="ticketID">The id of the ticket</param>
         /// <param name="newReadStatus">The new read status to use</param>
         /// <returns>Whether the read status succesfully changed or not</returns>
-        public async Task<bool> UpdateTicketReadStatusAsync(uint ticketID, Constants.TicketReadStatuses newReadStatus)
+        public async Task<bool> UpdateTicketReadStatusAsync(uint ticketID, bool newReadStatus)
         {
             // TODO AUTHORIZE WITH JWT
-            // TODO CHECK IF TICKETID EXISTS
-            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
-                                    SET {Constants.TicketDAOIsReadColumn}
-                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newReadStatus}";
-            await RunSQLQuery(sqlString).ConfigureAwait(false);
+            // Make sure the ticket exists first
+            bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
+            if (!ticketExists)
+                throw new ArgumentException("");
+
+            // Update the ticket
+            TicketRecord ticketRecord = new TicketRecord(ticketID, null, null, null, null, newReadStatus);
+            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
 
             return true;
         }
@@ -133,11 +147,14 @@ namespace TeamA.Exogredient.Services
         public async Task<bool> UpdateTicketFlagColorAsync(uint ticketID, Constants.TicketFlagColors newFlagColor)
         {
             // TODO AUTHORIZE WITH JWT
-            // TODO CHECK IF TICKETID EXISTS
-            string sqlString = $@"UPDATE {Constants.TicketDAOTableName}
-                                    SET {Constants.TicketDAOFlagColorColumn}
-                                    WHERE {Constants.TicketDAOTicketIDColumn} = {newFlagColor}";
-            await RunSQLQuery(sqlString).ConfigureAwait(false);
+            // Make sure the ticket exists first
+            bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
+            if (!ticketExists)
+                throw new ArgumentException("");
+
+            // Update the ticket
+            TicketRecord ticketRecord = new TicketRecord(ticketID, null, null, newFlagColor.ToString(), null);
+            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
 
             return true;
         }
@@ -150,21 +167,15 @@ namespace TeamA.Exogredient.Services
         /// <returns>Whether the ticket was saved or not</returns>
         public async Task<bool> SubmitTicketAsync(Constants.TicketCategories category, string description)
         {
+            TicketRecord ticketRecord = new TicketRecord((uint)TimeUtilityService.CurrentUnixTime(),
+                                                        category.ToString(),
+                                                        Constants.TicketStatuses.Unresolved.ToString(),
+                                                        Constants.TicketFlagColors.None.ToString(),
+                                                        description);
+            // TODO CHECK IF DESCRIPTION MEETS MINIMUM OR EXCEEDS MAXIMUM
+            await ticketDAO.CreateAsync(ticketRecord).ConfigureAwait(false);
+
             return true;
-        }
-
-        private static async Task RunSQLQuery(string sqlString)
-        {
-            // TODO REUSE SQL CONNECTION
-            MySqlConnection connection = new MySqlConnection(_connection);
-            connection.Open();
-
-            // Create the commmand object and execute/dispose it asynchronously.
-            MySqlCommand command = new MySqlCommand(sqlString, connection);
-            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-            //await command.DisposeAsync().ConfigureAwait(false);
-
-            connection.Close();
         }
 
         /// <summary>
