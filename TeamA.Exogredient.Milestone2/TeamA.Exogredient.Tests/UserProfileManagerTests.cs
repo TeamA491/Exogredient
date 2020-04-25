@@ -25,14 +25,15 @@ namespace TeamA.Exogredient.Tests
         private readonly static UploadDAO _uploadDAO = new UploadDAO(Constants.SQLConnection);
         private readonly static SaveListDAO _saveListDao = new SaveListDAO(Constants.SQLConnection);
         private readonly static UserDAO _userDAO = new UserDAO(Constants.SQLConnection);
-        private readonly static IPAddressDAO _ipDAO = new IPAddressDAO(Constants.SQLConnection);
+        private readonly static AnonymousUserDAO _ipDAO = new AnonymousUserDAO(Constants.SQLConnection);
         private readonly static MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
         private readonly static LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
+        private readonly static StoreDAO _storeDAO = new StoreDAO(Constants.SQLConnection);
 
         // Init service Layer.
         private readonly static MaskingService _maskingService = new MaskingService(_mapDAO);
         private readonly static UploadService _uploadService = new UploadService(_uploadDAO);
-        private readonly static StoreManagementService _storeManagementService = new StoreManagementService();
+        private readonly static StoreService _storeService = new StoreService(_storeDAO);
         private readonly static SaveListService _saveListService = new SaveListService(_saveListDao);
         private readonly static DataStoreLoggingService _dataStoreLoggingService = new DataStoreLoggingService(_logDAO, _maskingService);
         private readonly static FlatFileLoggingService _flatFileLoggingService = new FlatFileLoggingService(_maskingService);
@@ -42,7 +43,7 @@ namespace TeamA.Exogredient.Tests
 
         // Init Manager Layer.
         private readonly static LoggingManager _loggingManager = new LoggingManager(_flatFileLoggingService, _dataStoreLoggingService);
-        private readonly static UserProfileManager _userProfileManager = new UserProfileManager(_uploadService, _storeManagementService, _saveListService, _loggingManager, _userManagementService);
+        private readonly static UserProfileManager _userProfileManager = new UserProfileManager(_uploadService, _storeService, _saveListService, _loggingManager, _userManagementService);
 
         private static IEnumerable<object[]> ProfileTestDataSuccess =>
             new List<object[]> {

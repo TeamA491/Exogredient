@@ -45,7 +45,6 @@ namespace TeamA.Exogredient.TestController
             //var asasd = "one";
             //Console.WriteLine(asasd.Equals("one"));
 
-            Console.WriteLine(await ud.GetRecentPaginationSize("username").ConfigureAwait(false));
         }
     }
 }
