@@ -12,7 +12,7 @@ namespace TeamA.Exogredient.Tests
     public class VerificationServiceTests
     {
         private static readonly UserDAO _userDAO = new UserDAO(Constants.SQLConnection);
-        private static readonly IPAddressDAO _ipDAO = new IPAddressDAO(Constants.SQLConnection);
+        private static readonly AnonymousUserDAO _ipDAO = new AnonymousUserDAO(Constants.SQLConnection);
         private static readonly LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
         private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
         private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);

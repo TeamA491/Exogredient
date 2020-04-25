@@ -28,7 +28,7 @@ namespace TeamA.Exogredient.Managers
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendEmailCodeOperation, username, ipAddress).ConfigureAwait(false);
 
-                return SystemUtilityService.CreateResult(Constants.SendEmailCodeSuccessUserMessage, true, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.SendEmailCodeSuccessUserMessage, true, false);
             }
             catch (Exception e)
             {
@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.Managers
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.SendEmailCodeOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true);
             }
         }
     }

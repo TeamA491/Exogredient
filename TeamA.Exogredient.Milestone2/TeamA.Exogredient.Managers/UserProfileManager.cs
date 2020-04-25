@@ -12,16 +12,16 @@ namespace TeamA.Exogredient.Managers
     public class UserProfileManager
     {
         private readonly UploadService _uploadService;
-        private readonly StoreManagementService _storeManagementService;
+        private readonly StoreService _storeService;
         private readonly SaveListService _saveListService;
         private readonly LoggingManager _loggingManager;
         private readonly UserManagementService _userManagementService;
 
-        public UserProfileManager(UploadService uploadService, StoreManagementService storeManagementService, SaveListService saveListService,
+        public UserProfileManager(UploadService uploadService, StoreService storeManagementService, SaveListService saveListService,
                                   LoggingManager loggingmanager, UserManagementService userManagementService)
         {
             _uploadService = uploadService;
-            _storeManagementService = storeManagementService;
+            _storeService = storeManagementService;
             _saveListService = saveListService;
             _loggingManager = loggingmanager;
             _userManagementService = userManagementService;

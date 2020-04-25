@@ -15,14 +15,14 @@ namespace TeamA.Exogredient.Services
     public class UserManagementService
     {
         private readonly UserDAO _userDAO;
-        private readonly IPAddressDAO _ipDAO;
+        private readonly AnonymousUserDAO _ipDAO;
         private readonly MaskingService _maskingService;
         private readonly DataStoreLoggingService _dsLoggingService;
         private readonly FlatFileLoggingService _ffLoggingService;
         /// <summary>
         /// Initiates the object and its dependencies.
         /// </summary>
-        public UserManagementService(UserDAO userDAO, IPAddressDAO ipAddressDAO,
+        public UserManagementService(UserDAO userDAO, AnonymousUserDAO ipAddressDAO,
                                      DataStoreLoggingService dsLoggingService, FlatFileLoggingService ffLoggingService,
                                      MaskingService maskingService)
         {
@@ -130,9 +130,9 @@ namespace TeamA.Exogredient.Services
             }
 
             // If the column is masked, mask the ip.
-            string id = ipRecord.GetData()[Constants.IPAddressDAOIPColumn] as string;
+            string id = ipRecord.GetData()[Constants.AnonymousUserDAOIPColumn] as string;
 
-            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            if (Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn])
             {
                 id = _maskingService.MaskString(id);
             }
@@ -163,7 +163,7 @@ namespace TeamA.Exogredient.Services
             // If the column is masked, mask the ip.
             string id = ipAddress;
 
-            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            if (Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn])
             {
                 id = _maskingService.MaskString(ipAddress);
             }
@@ -553,7 +553,7 @@ namespace TeamA.Exogredient.Services
         {
             string value = ipAddress;
 
-            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            if (Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn])
             {
                 value = _maskingService.MaskString(ipAddress);
             }
@@ -597,7 +597,7 @@ namespace TeamA.Exogredient.Services
         {
             string id = ipAddress;
 
-            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            if (Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn])
             {
                 id = _maskingService.MaskString(ipAddress);
             }

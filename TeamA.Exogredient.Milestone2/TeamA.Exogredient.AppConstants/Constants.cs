@@ -35,6 +35,31 @@ namespace TeamA.Exogredient.AppConstants
             { 11, 30 }, { 12, 31 }
         };
 
+        // LOCATION UTILITY SERVICE
+        public const double Pi = 3.14159265;
+
+        public static readonly List<Tuple<double, double>> CaliforniaPolygon = new List<Tuple<double, double>>()
+        {
+            Tuple.Create(42.038438, -124.647630),
+            Tuple.Create(40.186258, -124.725089),
+            Tuple.Create(32.511603, -119.495974),
+            Tuple.Create(32.534522, -117.123677),
+            Tuple.Create(32.718633, -114.720097),
+            Tuple.Create(32.769296, -114.453729),
+            Tuple.Create(34.001919, -114.450017),
+            Tuple.Create(34.270853, -114.110334),
+            Tuple.Create(34.851785, -114.607464),
+            Tuple.Create(35.003049, -114.633567),
+            Tuple.Create(36.963035, -117.152444),
+            Tuple.Create(38.999551, -120.000929),
+            Tuple.Create(41.995239, -119.999262)
+        };
+
+        public const double LatDegree400ft = 0.0009;
+        public const double LongDegree400ft = 0.0011111;
+        
+        public static readonly List<Tuple<double, double>> CurrentScopePolygon = CaliforniaPolygon;
+
         // TODO: CONVERT THESE TO ARRAYS
         // No < or > to protect from SQL injections.
         public static readonly List<char> ANSNoAngleBrackets = new List<char>()
@@ -98,6 +123,63 @@ namespace TeamA.Exogredient.AppConstants
             {17, 'Q'}, {18, 'R'}, {19, 'S'}, {20, 'T'}, {21, 'U'}, {22, 'V'}, {23, 'W'}, {24, 'X'},
             {25, 'Y'}, {26, 'Z'}
         };
+
+        // UPLOAD
+        public const string ManufacturedCategory = "packaged/bottled products";
+        public const string PlantCategory = "plant products";
+        public const string AnimalCategory = "animal products";
+        public const string NoCategory = "NO CATEGORY";
+
+        public const int MaximumUploadDescriptionCharacters = 200;
+        public const int MinimumUploadDescriptionCharacters = 1;
+        public const int MaximumRatingDigits = 1;
+        public const int MaximumPhotoCharacters = 200;
+        public const int MaximumPriceDigits = 5;
+        public const int PriceAccuracyDigits = 2;
+        public const int MaximumIngredientNameCharacters = 200;
+        public const int MinimumIngredientNameCharacters = 1;
+        public const int MaximumCategoryCharacters = 20;
+
+        public static readonly List<string> ManufacturedKeywords = new List<string>()
+        {
+            "product", "package", "bottle", "drink", "liqueur", "dish", "cuisine", "frozen food", "seasoning"
+        };
+
+        public static readonly List<string> PlantKeywords = new List<string>()
+        {
+            "plant", "fruit", "vegetable", "produce", "solanum", "citrus", "vegetarian", "flower"
+        };
+
+        public static readonly List<string> AnimalKeywords = new List<string>()
+        {
+            "meat", "fish", "animal", "flesh", "seafood", "pork"
+        };
+
+        public static readonly List<string> InvalidSuggestions = new List<string>()
+        {
+            "meat", "fish", "animal", "flesh", "seafood", "pork", "plant", "fruit", "vegetable", "produce", "solanum",
+            "product", "package", "hand", "local food", "food", "citrus", "cuisine", "ingredient", "dish", "finger",
+            "superfood", "drink", "liqueur", "instant noodles", "vegan nutrition", "vegetarian nutrition", "frozen food",
+            "seasoning", "finger", "natural foods", "material property", "lotion", "skin care", "animal fat", "seasoned salt",
+            "flower"
+        };
+
+        public static readonly IDictionary<string, List<string>> AllCategoriesToKeywords = new Dictionary<string, List<string>>()
+        {
+            { ManufacturedCategory, ManufacturedKeywords }, { PlantCategory, PlantKeywords }, { AnimalCategory, AnimalKeywords }
+        };
+
+        public static readonly List<string> ExogredientCategories = new List<string>()
+        { ManufacturedCategory, PlantCategory, AnimalCategory };
+
+        public const string AnalyzeImageOperation = "Analyze image";
+        public const string AnalyzationFailedMessage = "Image analysis failed";
+        public const string AnalyzationSuccessMessage = "Image analysis succeeded!";
+
+        public const string CreateUploadOperation = "Create upload";
+        public const string UploadCreationErrorMessage = "A system error occurred. Please try again later.";
+        public const string UploadCreationSuccessMessage = "Upload created!";
+        public const string UploadImageNotWithinScopeMessage = "The image was not taken within California, our currently serviced area.";
 
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
@@ -173,7 +255,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string CsvProtection = @"\t";
 
         // SECURITY SERVICE
-        public const int DefaultSaltLength = 8;
+        public const int DefaultSaltLength = 16;
         public const int DefaultHashIterations = 10000;
         public const int DefaultHashCharacterLength = 64;
         public const int DefaultHashByteLength = 32;
@@ -491,19 +573,19 @@ namespace TeamA.Exogredient.AppConstants
         };
 
         // IP ADDRESS TABLE
-        public const string IPAddressDAOtableName = "ip_address";
-        public const string IPAddressDAOIPColumn = "ip";                                         // VARCHAR(15)
-        public const string IPAddressDAOtimestampLockedColumn = "timestamp_locked";              // BIGINT -- unix
-        public const string IPAddressDAOregistrationFailuresColumn = "registration_failures";    // INT
-        public const string IPAddressDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT -- unix
+        public const string AnonymousUserDAOTableName = "anonymous_user";
+        public const string AnonymousUserDAOIPColumn = "ip";                                         // VARCHAR(15)
+        public const string AnonymousUserDAOtimestampLockedColumn = "timestamp_locked";              // BIGINT -- unix
+        public const string AnonymousUserDAOregistrationFailuresColumn = "registration_failures";    // INT
+        public const string AnonymousUserDAOlastRegFailTimestampColumn = "last_reg_fail_timestamp";  // BIGINT -- unix
 
         // RECORD HELPER DATA STRUCTURES
-        public static readonly IDictionary<string, bool> IPAddressDAOIsColumnMasked = new Dictionary<string, bool>()
+        public static readonly IDictionary<string, bool> AnonymousUserDAOIsColumnMasked = new Dictionary<string, bool>()
         {
-            {IPAddressDAOIPColumn, true},
-            {IPAddressDAOtimestampLockedColumn, false},
-            {IPAddressDAOregistrationFailuresColumn, false},
-            {IPAddressDAOlastRegFailTimestampColumn, false}
+            {AnonymousUserDAOIPColumn, true},
+            {AnonymousUserDAOtimestampLockedColumn, false},
+            {AnonymousUserDAOregistrationFailuresColumn, false},
+            {AnonymousUserDAOlastRegFailTimestampColumn, false}
         };
 
         // MAP TABLE
@@ -515,18 +597,21 @@ namespace TeamA.Exogredient.AppConstants
         // STORE TABLE
         public const string StoreDAOTableName = "store";
         public const string StoreDAOStoreIdColumn = "store_id";
-        public const string StoreDAOOwnerColumn = "owner";
         public const string StoreDAOStoreNameColumn = "store_name";
         public const string StoreDAOLatitudeColumn = "latitude";
         public const string StoreDAOLongitudeColumn = "longitude";
         public const string StoreDAOStoreDescriptionColumn = "store_description";
+        public const string StoreDAOPlaceIdColumn = "place_id";
+
         public const string StoreDAODistanceColumn = "distance";
         public const string StoreDAOIngredientNumColumn = "ingredient_num";
-        public const string StoreDAOPlaceIdColumn = "place_id";
         public const string StoreDAOTotalResultsNum = "total_results_num";
 
         //STORE DISTANCE HOW MANY DIGITS AFTER DECIMAL POINT
         public const int FractionalDigits = 2;
+        public const int StoreNameMaxCharacters = 100;
+        public const int StoreDescriptionMaxCharacters = 200;
+        public const int PlaceIDCharacters = 255;
 
         // UPLOAD TABLE
         public const string UploadDAOTableName = "upload";
@@ -543,6 +628,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadDAODownvoteColumn = "downvote";
         public const string UploadDAOInProgressColumn = "in_progress";
         public const string UploadDAOUploadNumColumn = "upload_num";
+        public const string UploadDAOCategoryColumn = "category";
 
         // SAVELIST TABLE
         public const string SaveListDAOTableName = "save_list";
@@ -576,6 +662,9 @@ namespace TeamA.Exogredient.AppConstants
             {LogsIPAddressField, true},
             {LogsErrorTypeField, false}
         };
+
+        // EXCEPTION MESSAGES -- Upload
+        public const string InvalidCategories = "One of the categories passed to GoogleImageAnalysisService.Analyze() was invalid.";
 
         // EXCEPTION MESSAGES -- Authorization
         public const string UserTypeIdNotProvided = "UserType or ID was not provided.";

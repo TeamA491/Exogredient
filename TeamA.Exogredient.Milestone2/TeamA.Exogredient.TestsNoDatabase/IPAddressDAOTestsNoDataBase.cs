@@ -16,10 +16,10 @@ namespace TeamA.Exogredient.TestsNoDatabase
         {
             IDictionary<string, object> recordData = ipRecord.GetData();
 
-            if (recordData[Constants.IPAddressDAOIPColumn].Equals(ipObject.IP) &&
-                recordData[Constants.IPAddressDAOtimestampLockedColumn].Equals(ipObject.TimestampLocked) &&
-                recordData[Constants.IPAddressDAOregistrationFailuresColumn].Equals(ipObject.RegistrationFailures) &&
-                recordData[Constants.IPAddressDAOlastRegFailTimestampColumn].Equals(ipObject.LastRegFailTimestamp))
+            if (recordData[Constants.AnonymousUserDAOIPColumn].Equals(ipObject.IP) &&
+                recordData[Constants.AnonymousUserDAOtimestampLockedColumn].Equals(ipObject.TimestampLocked) &&
+                recordData[Constants.AnonymousUserDAOregistrationFailuresColumn].Equals(ipObject.RegistrationFailures) &&
+                recordData[Constants.AnonymousUserDAOlastRegFailTimestampColumn].Equals(ipObject.LastRegFailTimestamp))
             {
                 return true;
             }

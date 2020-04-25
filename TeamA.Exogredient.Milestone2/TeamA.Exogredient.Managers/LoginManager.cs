@@ -49,7 +49,7 @@ namespace TeamA.Exogredient.Managers
 
                     // Return the result of the login failure.
                     AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
-                    return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false);
                 }
 
                 userExist = true;
@@ -67,7 +67,7 @@ namespace TeamA.Exogredient.Managers
 
                     // Return the result of the disabled username's login try.
                     AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
-                    return SystemUtilityService.CreateResult(Constants.UserDisableUserMessage, authenResult, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.UserDisableUserMessage, authenResult, false);
                 }
 
                 // Convert the encrypted password hex string to byte array.
@@ -117,7 +117,7 @@ namespace TeamA.Exogredient.Managers
 
                     // Return the result of the successful login.
                     AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
-                    return SystemUtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenResult, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenResult, false);
                 }
                 // If the password doesn't match.
                 else
@@ -133,7 +133,7 @@ namespace TeamA.Exogredient.Managers
 
                     // Return the result of the unsuccessful login.
                     AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
-                    return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false);
                 }
             }
             // Catch exceptions.
@@ -152,7 +152,7 @@ namespace TeamA.Exogredient.Managers
 
                 // Return the result of the exception occured.
                 AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, authenResult, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, authenResult, true);
             }
         }
     }

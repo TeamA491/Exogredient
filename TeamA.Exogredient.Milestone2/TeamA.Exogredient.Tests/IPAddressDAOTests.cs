@@ -11,25 +11,25 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class IPAddressDAOTests
     {
-        IPAddressDAO ipDAO = new IPAddressDAO(Constants.SQLConnection);
+        AnonymousUserDAO ipDAO = new AnonymousUserDAO(Constants.SQLConnection);
         string NonExistingIP = "192.1.1";
 
         private bool DataEquals(IPAddressRecord ipRecord, IPAddressObject ipObject)
         {
             IDictionary<string, object> recordData = ipRecord.GetData();
-            Console.WriteLine(recordData[Constants.IPAddressDAOIPColumn]);
-            Console.WriteLine(recordData[Constants.IPAddressDAOtimestampLockedColumn]);
-            Console.WriteLine(recordData[Constants.IPAddressDAOregistrationFailuresColumn]);
-            Console.WriteLine(recordData[Constants.IPAddressDAOlastRegFailTimestampColumn]);
+            Console.WriteLine(recordData[Constants.AnonymousUserDAOIPColumn]);
+            Console.WriteLine(recordData[Constants.AnonymousUserDAOtimestampLockedColumn]);
+            Console.WriteLine(recordData[Constants.AnonymousUserDAOregistrationFailuresColumn]);
+            Console.WriteLine(recordData[Constants.AnonymousUserDAOlastRegFailTimestampColumn]);
             Console.WriteLine(ipObject.IP);
             Console.WriteLine(ipObject.TimestampLocked);
             Console.WriteLine(ipObject.RegistrationFailures);
             Console.WriteLine(ipObject.LastRegFailTimestamp);
 
-            if (((string)recordData[Constants.IPAddressDAOIPColumn]).Equals(ipObject.IP) &&
-                ((long)recordData[Constants.IPAddressDAOtimestampLockedColumn]).Equals(ipObject.TimestampLocked) &&
-                ((int)recordData[Constants.IPAddressDAOregistrationFailuresColumn]).Equals(ipObject.RegistrationFailures) &&
-                ((long)recordData[Constants.IPAddressDAOlastRegFailTimestampColumn]).Equals(ipObject.LastRegFailTimestamp))
+            if (((string)recordData[Constants.AnonymousUserDAOIPColumn]).Equals(ipObject.IP) &&
+                ((long)recordData[Constants.AnonymousUserDAOtimestampLockedColumn]).Equals(ipObject.TimestampLocked) &&
+                ((int)recordData[Constants.AnonymousUserDAOregistrationFailuresColumn]).Equals(ipObject.RegistrationFailures) &&
+                ((long)recordData[Constants.AnonymousUserDAOlastRegFailTimestampColumn]).Equals(ipObject.LastRegFailTimestamp))
             {
                 return true;
             }

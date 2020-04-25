@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -49,13 +48,12 @@ namespace TeamA.Exogredient.Services
         /// <param name="exceptionOccurred">The fact of whether an exception occurred (bool)</param>
         /// <param name="numExceptions">The number of exceptions that have occurred within a logical execution (int)</param>
         /// <returns>The resulting Result(T)</returns>
-        public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred, int numExceptions)
+        public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred)
         {
             Result<T> result = new Result<T>(message)
             {
                 Data = data,
                 ExceptionOccurred = exceptionOccurred,
-                NumExceptions = numExceptions
             };
 
             return result;
@@ -88,10 +86,11 @@ namespace TeamA.Exogredient.Services
             message.Body = bodyBuilder.ToMessageBody();
 
             // Create the SMTP client with the default certificate validation callback to prevent man in the middle attacks.
-            var client = new SmtpClient
-            {
-                ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
-            };
+            //var client = new SmtpClient
+            //{
+            //    ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
+            //};
+            var client = new SmtpClient();
 
             // Connect over google SMTP, provide credentials, and asynchronously send and disconnect the client.
             await client.ConnectAsync(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);

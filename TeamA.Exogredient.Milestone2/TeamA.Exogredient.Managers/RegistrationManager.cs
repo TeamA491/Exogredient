@@ -66,7 +66,7 @@ namespace TeamA.Exogredient.Managers
                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                  Constants.IPLockedLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.IPLockedUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.IPLockedUserMessage, registrationSuccess, false);
                 }
 
                 // If user is not within our scope incremenent and log the failure to register. 
@@ -80,7 +80,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidScopeLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidScopeUserMassage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidScopeUserMassage, registrationSuccess, false);
                 }
 
                 // Check the length of their first name.
@@ -95,7 +95,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidFirstNameLengthLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidFirstNameLengthUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidFirstNameLengthUserMessage, registrationSuccess, false);
                 }
 
                 // Check the character requirements of their first name.
@@ -109,7 +109,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidFirstNameCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidFirstNameCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidFirstNameCharactersUserMessage, registrationSuccess, false);
                 }
 
                 // Check the length of their last name.
@@ -124,7 +124,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidLastNameLengthLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidLastNameLengthUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidLastNameLengthUserMessage, registrationSuccess, false);
                 }
 
                 // Check the character requirements of their last name.
@@ -138,7 +138,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidLastNameCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidLastNameCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidLastNameCharactersUserMessage, registrationSuccess, false);
                 }
 
                 // Check the length of their email.
@@ -153,7 +153,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailLengthLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidEmailLengthUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidEmailLengthUserMessage, registrationSuccess, false);
                 }
 
                 // Check the character requirements of their email.
@@ -167,7 +167,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidEmailCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidEmailCharactersUserMessage, registrationSuccess, false);
                 }
 
                 // Check the format of their email.
@@ -181,7 +181,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidEmailFormatMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidEmailFormatMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidEmailFormatMessage, registrationSuccess, false);
                 }
 
                 // Email must be unique after canonicalization.
@@ -197,7 +197,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.EmailExistsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false);
                 }
 
                 // Check the length of their username.
@@ -212,7 +212,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidUsernameLengthLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidUsernameLengthUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidUsernameLengthUserMessage, registrationSuccess, false);
                 }
 
                 // Check the character requirements of their username.
@@ -226,7 +226,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidUsernameCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidUsernameCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidUsernameCharactersUserMessage, registrationSuccess, false);
                 }
 
                 // Check username uniqueness.
@@ -240,7 +240,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.UsernameExistsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false);
                 }
 
                 // Check the length of their phone number.
@@ -254,7 +254,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPhoneNumberLengthLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberLengthUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberLengthUserMessage, registrationSuccess, false);
                 }
 
                 // Check the character requirements of their phone number.
@@ -268,7 +268,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPhoneNumberCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberCharactersUserMessage, registrationSuccess, false);
                 }
 
                 // Check username uniqueness.
@@ -282,7 +282,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PhoneNumberExistsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false);
                 }
 
                 // Password decryption.
@@ -313,7 +313,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidPasswordLengthUserMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
+                                                       registrationSuccess, false);
                 }
 
                 // Check the character requirements of their password.
@@ -327,7 +327,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, registrationSuccess, false);
                 }
 
                 // Check if password for context specific words.
@@ -342,7 +342,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
+                                                       registrationSuccess, false);
                 }
 
                 // Check if password contains sequences or repetitions.
@@ -357,7 +357,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
+                                                       registrationSuccess, false);
                 }
 
                 // Check if password contains dictionary words.
@@ -372,7 +372,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
-                                                       registrationSuccess, false, currentNumExceptions);
+                                                       registrationSuccess, false);
                 }
 
                 // Check if password is a previously corrupted password.
@@ -386,7 +386,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                   Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, registrationSuccess, false, currentNumExceptions);
+                    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, registrationSuccess, false);
                 }
 
                 // Successful registration!
@@ -410,7 +410,7 @@ namespace TeamA.Exogredient.Managers
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress).ConfigureAwait(false);
 
-                return SystemUtilityService.CreateResult(Constants.RegistrationSuccessUserMessage, registrationSuccess, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.RegistrationSuccessUserMessage, registrationSuccess, false);
             }
             catch (Exception e)
             {
@@ -422,7 +422,7 @@ namespace TeamA.Exogredient.Managers
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.RegistrationOperation} failed a maximum number of times for {ipAddress}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true);
             }
         }
     }
