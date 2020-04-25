@@ -310,8 +310,98 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public async Task<List<TicketRecord>> FilterTicketsAsync(Dictionary<Constants.TicketSearchFilter, string> filterParams)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filterParams"></param>
+        /// <returns></returns>
+        public async Task<List<TicketRecord>> FilterTicketsAsync(Dictionary<Constants.TicketSearchFilter, object> filterParams)
         {
+            // Make sure we have at least one filter parameter
+            if (filterParams.Count == 0)
+                throw new ArgumentException("");
+
+            List<string> queryConditions = new List<string>();
+
+            // Go through all the search params
+            foreach (KeyValuePair<Constants.TicketSearchFilter, object> filter in filterParams)
+            {
+                if (filter.Key == Constants.TicketSearchFilter.Category)
+                {
+                    // Make sure we are using a correct Enum value
+                    if (!(filter.Value is Constants.TicketCategories))
+                        throw new ArgumentException("");
+
+                    queryConditions.Add(
+                        $"`{Constants.TicketDAOCategoryColumn}` = `{filter.Value}`"
+                    );
+                }
+                else if (filter.Key == Constants.TicketSearchFilter.DateFrom)
+                {
+                    // Make sure we are using an int
+                    if (!(filter.Value is int i && i > 0))
+                        throw new ArgumentException("");
+
+                    queryConditions.Add(
+                        $"`{Constants.TicketDAOSubmitTimestampColumn}` >= {filter.Value}"
+                    );
+                }
+                else if (filter.Key == Constants.TicketSearchFilter.DateTo)
+                {
+                    // Make sure we are using an int
+                    if (!(filter.Value is int i && i > 0))
+                        throw new ArgumentException("");
+
+                    queryConditions.Add(
+                        $"`{Constants.TicketDAOSubmitTimestampColumn}` <= {filter.Value}"
+                    );
+                }
+                else if (filter.Key == Constants.TicketSearchFilter.FlagColor)
+                {
+                    // Make sure we are using a correct Enum value
+                    if (!(filter.Value is Constants.TicketFlagColors))
+                        throw new ArgumentException("");
+
+                    queryConditions.Add(
+                        $"`{Constants.TicketDAOFlagColorColumn}` = `{filter.Value}`"
+                    );
+                }
+                else if (filter.Key == Constants.TicketSearchFilter.ReadStatus)
+                {
+                    // Make sure we are using a correct Enum value
+                    if (filter.Value is Constants.TicketReadStatuses ticketReadStatus)
+                    {
+                        // If we want to see both read and unread, then skip this condition
+                        if (ticketReadStatus == Constants.TicketReadStatuses.All)
+                            continue;
+                    }
+                    else
+                        throw new ArgumentException("");
+
+                    bool isRead = ticketReadStatus == Constants.TicketReadStatuses.Read;
+                    queryConditions.Add(
+                        $"`{Constants.TicketDAOIsReadColumn}` = `{isRead}`"
+                    );
+                }
+                else if (filter.Key == Constants.TicketSearchFilter.Status)
+                {
+                    // Make sure we are using a correct Enum value
+                    if (!(filter.Value is Constants.TicketStatuses))
+                        throw new ArgumentException("");
+
+                    queryConditions.Add(
+                        $"`{Constants.TicketDAOStatusColumn}` = `{filter.Value}`"
+                    );
+                }
+            }
+
+            // Construct the query string
+            string sqlString = $"SELECT * FROM {Constants.TicketDAOTableName} WHERE " +
+                                string.Join(" AND ", queryConditions) +
+                                ";";
+
+            // Fetch the data from the database
+
             // Temp
             List<TicketRecord> tickets = new List<TicketRecord>();
             return tickets;

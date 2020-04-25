@@ -40,7 +40,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
-            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.UserDAOtableName}` (" +
+            string sqlString = @$"CREATE TABLE IF NOT EXISTS `{_exogredientSchema}`.`{Constants.UserDAOtableName}` (" +
                                $@"`{Constants.UserDAOusernameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOusernameColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumUsernameCharacters)}) NOT NULL," +
                                $@"`{Constants.UserDAOnameColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOnameColumn] ? Constants.DefaultHashCharacterLength : (Constants.MaximumFirstNameCharacters + Constants.MaximumLastNameCharacters + 1))}) NOT NULL," +
                                $@"`{Constants.UserDAOemailColumn}` VARCHAR({(Constants.UserDAOIsColumnMasked[Constants.UserDAOemailColumn] ? Constants.DefaultHashCharacterLength : Constants.MaximumEmailCharacters)}) NOT NULL," +
@@ -79,7 +79,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
-            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.IPAddressDAOtableName}` (" +
+            string sqlString = @$"CREATE TABLE IF NOT EXISTS `{_exogredientSchema}`.`{Constants.IPAddressDAOtableName}` (" +
                                $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({(Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn] ? Constants.DefaultHashCharacterLength : Constants.IPAddressLength)}) NOT NULL," +
                                $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
                                $@"`{Constants.IPAddressDAOregistrationFailuresColumn}` INT NOT NULL," +
@@ -101,7 +101,7 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
-            string sqlString = @$"CREATE TABLE `{_mapSchema}`.`{Constants.MapDAOTableName}` (" +
+            string sqlString = @$"CREATE TABLE IF NOT EXISTS `{_mapSchema}`.`{Constants.MapDAOTableName}` (" +
                                $@"`{Constants.MapDAOHashColumn}` VARCHAR({Constants.DefaultHashCharacterLength}) NOT NULL," +
                                $@"`{Constants.MapDAOActualColumn}` LONGTEXT NOT NULL," +
                                $@"`{Constants.MapDAOoccurrencesColumn}` INT NOT NULL," +
@@ -120,6 +120,10 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             return true;
         }
 
+        /// <summary>
+        /// Creates the ticket tables, including its enumeration tables
+        /// </summary>
+        /// <returns>Whether the tables were created successfully</returns>
         private static async Task<bool> CreateTicketTables()
         {
             MySqlConnection connection = new MySqlConnection(_connection);
