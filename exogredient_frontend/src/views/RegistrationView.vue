@@ -1,5 +1,6 @@
 <template>
-    <form>
+    <div id="form">
+        <span class='registerError'></span>
         <div class='field'>
             <label class='label' for="fname">First Name:</label><br>
             <input class="input" type="text" name="fname" id="fnameInput" placeholder="First Name" v-model="firstName" @blur='checkFirstName'><br>
@@ -44,11 +45,14 @@
             <span class='errorMessage' id="rePasswordError"></span><br>
         </div>
 
-        <input class="button" type="submit" value="Submit" :disabled="isSubmitDisabled">
-    </form>
+        <span class='registerError'></span><br>
+        <input class="button" type="submit" value="Submit" :disabled="isSubmitDisabled" @click="submit">
+    </div>
 </template>
 
 <script>
+import * as global from "../globalExports.js";
+
 export default {
     name: "RegistrationView",
 
@@ -113,11 +117,11 @@ export default {
             document.getElementById('fnameInput').classList.remove('inputError');
             var noError = true;
             // Check first name length
-            if (this.firstName.length < 1) {
+            if (this.firstName.length < global.FirstNameMin) {
                 document.getElementById('fnameError').innerText += 'First name required.\n';
                 document.getElementById('fnameInput').classList.add('inputError');
                 noError = false;
-            }else if(this.firstName.length > 200){
+            }else if(this.firstName.length > global.FirstNameMax){
                 document.getElementById('fnameError').innerText += "First Name must be max 200 characters.\n";
                 document.getElementById('fnameInput').classList.add('inputError');
                 noError = false;
@@ -137,11 +141,11 @@ export default {
             document.getElementById('lnameInput').classList.remove('inputError');
             var noError = true;
             // Check last name length
-            if (this.lastName.length < 1) {
+            if (this.lastName.length < global.LastNameMin) {
                 document.getElementById('lnameError').innerText += 'Last name required.\n';
                 document.getElementById('lnameInput').classList.add('inputError');
                 noError = false;
-            }else if(this.lastName.length > 200){
+            }else if(this.lastName.length > global.LastNameMax){
                 document.getElementById('lnameError').innerText += "Last Name must be max 200 characters.\n";
                 document.getElementById('lnameInput').classList.add('inputError');
                 noError = false;
@@ -161,11 +165,11 @@ export default {
             document.getElementById('emailInput').classList.remove('inputError');
             var noError = true;
             // Check email length
-            if (this.email.length < 1) {
+            if (this.email.length < global.EmailMin) {
                 document.getElementById('emailError').innerText += 'Email required.\n';
                 document.getElementById('emailInput').classList.add('inputError');
                 noError = false;
-            }else if(this.email.length > 200){
+            }else if(this.email.length > global.EmailMax){
                 document.getElementById('emailError').innerText += "Email must be max 200 characters.\n";
                 document.getElementById('emailInput').classList.add('inputError');
                 noError = false;
@@ -194,11 +198,11 @@ export default {
             var noError = true;
 
             // Check username length
-            if (this.username.length < 1) {
+            if (this.username.length < global.UsernameMin) {
                 document.getElementById('usernameError').innerText += 'Username required.\n';
                 document.getElementById('usernameInput').classList.add('inputError');
                 noError = false;
-            }else if(this.username.length > 200){
+            }else if(this.username.length > global.UsernameMax){
                 document.getElementById('usernameError').innerText += "Username must be max 200 characters.\n";
                 document.getElementById('usernameInput').classList.add('inputError');
                 noError = false;
@@ -219,7 +223,7 @@ export default {
             var noError = true;
 
             // Check phone number length
-            if (this.phoneNumber.length !== 10) {
+            if (this.phoneNumber.length !== global.PhoneNumberLength) {
                 document.getElementById('phoneError').innerText += 'Phone number must be 10 digits.\n';
                 document.getElementById('phoneInput').classList.add('inputError');
                 noError = false;
@@ -242,11 +246,11 @@ export default {
             var noError = true;
 
             // Check password length
-            if (this.password.length < 12) {
+            if (this.password.length < global.PasswordMin) {
                 document.getElementById('passwordError').innerText += 'Password must be at least 12 characters.\n';
                 document.getElementById('passwordInput').classList.add('inputError');
                 noError = false;
-            } else if (this.password.length > 2000) {
+            } else if (this.password.length > global.PasswordMax) {
                 document.getElementById('passwordError').innerText += 'Username can\'t be longer than 2000 characters\n';
                 document.getElementById('passwordInput').classList.add('inputError');
                 noError = false;
@@ -277,94 +281,70 @@ export default {
 
             this.fieldsValidation.rePassword = noError;
         },
-        checkForm: function (e) {
-            this.errors = [];
-
-            // Check first name length
-            if (this.firstName.length < 1) {
-                this.errors.push("First Name required.");
-            }else if(this.firstName.length > 200){
-                this.errors.push("First Name must be max 200 characters");
+        generateSalt: function(len){
+            var saltArray = new Uint8Array(len);
+            for(var i=0; i<len; i++){
+                var random = Math.floor(Math.random() * global.MaxByte) + 1;
+                saltArray[i] = random;
             }
-
-            // Check first name characters
-            if (!/^[\x00-\x7F]*$/.test(this.firstName) || /[<,>]/.test(this.firstName)) {
-                this.errors.push("First Name must be alphanumeric" 
-                + "or special characters (Except < and >)");
+            return saltArray;
+        },
+        getKeyMaterial: function(password){
+            let enc = new TextEncoder();
+            return window.crypto.subtle.importKey(
+                "raw",
+                enc.encode(password),
+                "PBKDF2",
+                false,
+                ["deriveBits", "deriveKey"]
+            );
+        },
+        byteArrayToHex: function(array){
+            var temp = [];
+            for(var i=0; i<array.length; i++){
+                temp.push(array[i].toString(16).padStart(2,'0'));
             }
+            return temp.join("");
+        },
+        submit: async function(){
+            
+            let saltArray = this.generateSalt(8);
+            let keyMaterial = await this.getKeyMaterial(this.password);
 
-            // Check last name length
-            if (this.lastName.length < 1) {
-                this.errors.push("Last Name required.");
-            }else if(this.lastName.length > 200){
-                this.errors.push("Last Name must be max 200 characters");
-            }
+            let key = await window.crypto.subtle.deriveKey(
+                    {
+                        "name": "PBKDF2",
+                        salt: saltArray,
+                        "iterations": global.HashIteration,
+                        "hash": global.HashAlgorithm
+                    },
+                    keyMaterial,
+                    { "name": "AES-GCM", "length": global.DigestByteLength*8},
+                    true,
+                    [ "encrypt", "decrypt" ]
+                );
 
-            // Check last name characters
-            if (!/^[\x00-\x7F]*$/.test(this.lastName) || /[<,>]/.test(this.lastName)) {
-                this.errors.push("Last Name must be alphanumeric" 
-                + "or special characters (Except < and >)");
-            }
+            let exportedKey = await window.crypto.subtle.exportKey("raw",key);
+            var keyBuffer = new Uint8Array(exportedKey);
+            var hashedPassword = this.byteArrayToHex(keyBuffer);
+            var salt = this.byteArrayToHex(saltArray);
+            var proxyPassword = "0".repeat(this.password.length);
+            
+            var registrationResponse = await fetch(`${global.ApiDomainName}/api/registration/register?`
+                +`firstName=${this.firstName}&lastName=${this.lastName}&`
+                +`email=${this.email}&username=${this.username}&`
+                +`phoneNumber=${this.phoneNumber}&ipAddress=${this.$store.state.ipAddress}&`
+                +`hashedPassword=${hashedPassword}&salt=${salt}&proxyPassword=${proxyPassword}`);
 
-            // Check Email length
-            if (this.email.length < 1) {
-                this.errors.push('Email required.');
-            } else if (this.email.length > 200) {
-                this.errors.push('Email must be max length 200 characters');
+            var registrationJson = await registrationResponse.json();
+            console.log(registrationJson);
+            if(!registrationJson.successful){
+                var elements = document.getElementsByClassName("registerError");
+                for(let i=0; i<elements.length; i++){
+                    elements[i].innerText = registrationJson.message;
+                }
+                return;
             }
-
-            // Check Email characters
-            if (!/^[\x00-\x7F]*$/.test(this.lastName) || /[<,>]/.test(this.lastName)) {
-                this.errors.push("Email must be alphanumeric" 
-                + "or special characters (Except < and >)");
-            }
-
-            // Check Email format
-            if(!validateEmailFormat(this.email)){
-                this.errors.push("Email format is wrong");
-            }
-
-            // Check username length
-            if (this.username.length < 1) {
-                this.errors.push('Username required.');
-            } else if (this.username.length > 200) {
-                this.errors.push('Username must be max length 200 characters');
-            }
-
-            // Check username characters
-            if (!/^[\x00-\x7F]*$/.test(this.username) || /[<,>]/.test(this.username)) {
-                this.errors.push("Username must be alphanumeric" 
-                + "or special characters (Except < and >)");
-            }
-
-            // Check phone number length
-            if (this.phoneNumber.length !== 10) {
-                this.errors.push('Phone number must be 10 digits.');
-            }
-
-            // Check phone number characters
-            if (/[^0-9]/.test(this.phoneNumber)){
-                this.errors.push('Phone number must be only digits');
-            }
-
-            // Check password length
-            if (this.password.length < 12) {
-                this.errors.push('Username required.');
-            } else if (this.password.length > 2000) {
-                this.errors.push('Username must be max length 200 characters');
-            }
-
-            // Check password characters
-            if (!/^[\x00-\x7F]*$/.test(this.password)) {
-                this.errors.push("Password must be alphanumeric" 
-                + "or special characters");
-            }
-
-            // Check Re-entered password
-            if(this.password !== this.rePassword){
-                this.errors.push('Re-entered password does not match the password.')
-            }
-            e.preventDefault();
         }
     }
 
@@ -378,13 +358,18 @@ export default {
         color: red;
         font-weight: bold;
     }
+    .registerError{
+        font-size:13px;
+        color: red;
+        font-weight: bold;
+    }
     .inputError{
         border-color: red;
     }
     input{
         border-style:solid;
     }
-    form{
+    #form{
         text-align: center;
         align-content: center;
     }
