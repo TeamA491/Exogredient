@@ -258,6 +258,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetIngredientsOperation = "Get Ingredients";
         public const string GetStoreViewDataOperation = "Get StoreViewData";
         public const string GetStoreImageOperation = "Get store image";
+        
+        public const string GetUploadsByIngredientNameandStoreIdOperation = "Get Uploads by IngredientName and StoreId";
+        public const string EditUpvotesonUploadOperation = "Edit the upvotes value on an Upload";
+        public const string EditDownvotesonUploadOperation = "Edit the downvotes value on an Upload";
+
 
         public const string CustomerUserType = "Customer";
         public const string StoreOwnerUserType = "Store Owner";
@@ -271,6 +276,7 @@ namespace TeamA.Exogredient.AppConstants
         public const int RecentUploadPagination = 10;
         public const int SavedUploadPagination = 10;
         public const int SaveListPagination = 20;
+        public const int IngredientViewPagination = 10;
 
         public const int NumOfResultsPerSearchPage = 20;
         public const int NumOfIngredientsPerStorePage = 20;

@@ -273,6 +273,123 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
+        /// Add an upvote to an Upload.
+        /// </summary>
+        public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
+        {
+            // Open connection.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                //SQL command for increasing upvotes
+                var sqlString =
+                    $"UPDATE {Constants.UploadDAOTableName}" +
+                    $"SET {Constants.UploadDAOUpvoteColumn} = {Constants.UploadDAOUpvoteColumn} + @VOTEVALUE" +
+                    $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString,connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        // Add the parameters to the sql string. 
+                        command.Parameters.AddWithValue("@UPLOADID", uploadId);
+                        command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
+
+                        // Execute the command
+                        var result = await command.ExecuteReaderAsync().ConfigureAwait(false);
+
+                        // The command should return the number of rows affected. Returns true if only 1 row is changed. 
+                        return Convert.ToInt32(result) == 1;
+                    }
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Add a downvote to an Upload.
+        /// </summary>
+        /// <param name="voteValue"> The number added to the current number of Downvotes. </param>
+        /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
+        /// <returns> A boolean showing whether or not the function executed properly. </returns>
+        public async Task<bool> IncrementDownvotesonUpload(int voteValue, int uploadId)
+        {
+            // Open connection.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                //SQL command for increasing upvotes
+                var sqlString =
+                    $"UPDATE {Constants.UploadDAOTableName}" +
+                    $"SET {Constants.UploadDAODownvoteColumn} = {Constants.UploadDAODownvoteColumn} + @VOTEVALUE" +
+                    $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        // Add the parameters to the sql string. 
+                        command.Parameters.AddWithValue("@UPLOADID", uploadId);
+                        command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
+
+                        // Execute the command
+                        var result = await command.ExecuteReaderAsync().ConfigureAwait(false);
+
+                        // The command should return the number of rows affected. Returns true if only 1 row is changed. 
+                        return Convert.ToInt32(result) == 1;
+                    }
+                }
+
+            }
+        }
+
+        ///<summary> Return all uploads based on ingredientname and storeId.</summary>
+        ///<param name="ingredientName"> The name of the ingredient.</param>
+        ///<param name="storeId"> Store Id.</param>
+        public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
+        {
+            var uploads = new List<UploadResult>();
+
+            //Open Connection properly.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                var sqlString =
+                    $"SELECT * " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOIngredientNameColumn} = @INGREDIENTNAME AND {Constants.UploadDAOStoreIdColumn} = @STOREID " +
+                    $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
+                    $"LIMIT @OFFSET, @AMOUNT;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        command.Parameters.AddWithValue("@INGREDIENTNAME", ingredientName);
+                        command.Parameters.AddWithValue("@STOREID", storeId);
+                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.IngredientViewPagination);
+                        command.Parameters.AddWithValue("@AMOUNT", Constants.IngredientViewPagination);
+
+                        // Execute the command.
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        datatable.Load(reader);
+
+                        foreach(DataRow row in datatable.Rows)
+                        {
+                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
+                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
+                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        }
+                    }
+                }
+            }
+            return uploads;
+        }
+
+        /// <summary>
         /// Get the recent upload's by a user.
         /// </summary>
         /// <param name="username">User to perform operation on.</param>

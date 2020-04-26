@@ -57,6 +57,25 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
+        /// Change the number of upvotes on an Upload.
+        /// </summary>
+        /// 
+        public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
+        {
+            return await _uploadDao.IncrementUpvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
+        }
+
+        public async Task<bool> IncrementDownvotesonUpload(int voteValue, int uploadId)
+        {
+            return await _uploadDao.IncrementDownvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
+        }
+
+        public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
+        {
+            return await _uploadDao.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Get the recent uploads by a user.
         /// </summary>
         /// <param name="username">User to perform operation on.</param>
