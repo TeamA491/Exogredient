@@ -28,6 +28,11 @@ namespace TeamA.Exogredient.Services
             return tickets;
         }
 
+        public async Task<List<TicketRecord>> GetAllTickets()
+        {
+            return await ticketDAO.GetAllTickets().ConfigureAwait(false);
+        }
+
         /// <summary>
         /// Updates a ticket's status
         /// </summary>

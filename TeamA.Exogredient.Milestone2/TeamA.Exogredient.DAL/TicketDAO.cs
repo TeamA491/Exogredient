@@ -396,7 +396,7 @@ namespace TeamA.Exogredient.DAL
             }
 
             // Construct the query string
-            string sqlString = $"SELECT * FROM {Constants.TicketDAOTableName} WHERE " +
+            string sqlString = $"SELECT * FROM `{Constants.TicketDAOTableName}` WHERE " +
                                 string.Join(" AND ", queryConditions) +
                                 ";";
 
@@ -405,6 +405,12 @@ namespace TeamA.Exogredient.DAL
             // Temp
             List<TicketRecord> tickets = new List<TicketRecord>();
             return tickets;
+        }
+
+        public async Task<List<TicketRecord>> GetAllTickets()
+        {
+            string sqlString = $"SELECT * FROM `{Constants.TicketDAOTableName}`;";
+            return new List<TicketRecord>();
         }
     }
 }

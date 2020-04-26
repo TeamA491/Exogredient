@@ -133,15 +133,16 @@ namespace TeamA.Exogredient.AppConstants
             // <operation> : <user level allowed>
             // NOTE: Users with a higher user number are allowed to access
             // the operations that lower leveled users can
-            { "login", 0 },
-            { "register", 0 },
-            { "search", 1 },
-            { "upload", 1 },
-            { "claimBusiness", 2 },
-            { "createAd", 2 },
-            { "createUser", 3 },
-            { "deleteUser", 3 },
-            { "createSysAdmin", 4 },
+            { "login", (int)USER_TYPE.UNREGISTERED  },
+            { "register", (int)USER_TYPE.UNREGISTERED },
+            { "search", (int)USER_TYPE.REGISTERED },
+            { "upload", (int)USER_TYPE.REGISTERED },
+            { "claimBusiness", (int)USER_TYPE.STORE_OWNER },
+            { "createAd", (int)USER_TYPE.STORE_OWNER },
+            { "createUser", (int)USER_TYPE.ADMIN },
+            { "deleteUser", (int)USER_TYPE.ADMIN },
+            { "createSysAdmin", (int)USER_TYPE.SYS_ADMIN },
+            { "getTickets",  (int)USER_TYPE.SYS_ADMIN},
         };
 
         // ARCHIVING 
