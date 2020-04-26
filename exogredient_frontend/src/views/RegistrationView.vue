@@ -336,8 +336,10 @@ export default {
                 +`phoneNumber=${this.phoneNumber}&ipAddress=${this.$store.state.ipAddress}&`
                 +`hashedPassword=${hashedPassword}&salt=${salt}&proxyPassword=${proxyPassword}`);
 
+            global.ErrorHandler(this.$router,registrationResponse);
+
             var registrationJson = await registrationResponse.json();
-            console.log(registrationJson);
+
             if(!registrationJson.successful){
                 var elements = document.getElementsByClassName("registerError");
                 for(let i=0; i<elements.length; i++){
@@ -345,6 +347,19 @@ export default {
                 }
                 return;
             }
+
+            this.$store.dispatch('updateRegistrationUsername',this.username);
+            this.$store.dispatch('updateRegistrationPhoneNum', this.phoneNumber);
+
+            fetch(`${global.ApiDomainName}/api/registration/sendEmailCode?`
+            + `username=${this.username}&email=${this.email}`
+            + `&ipAddress=${this.$store.state.ipAddress}`);
+
+            fetch(`${global.ApiDomainName}/api/registration/sendPhoneCode?`
+            + `username=${this.username}&phoneNumber=${this.phoneNumber}`
+            + `&ipAddress=${this.$store.state.ipAddress}`);
+
+            this.$router.push('/verify');
         }
     }
 

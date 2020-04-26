@@ -12,6 +12,11 @@ const routes = [
   { path: '/StoreView', component: StoreView},
   { path: '/ErrorView', component: ErrorView}, 
   { path: '/RegistrationView', component: RegistrationView },
+  { 
+    path: '/verify',
+    name: 'verify',
+    component: () => import('../views/VerificationView.vue')
+  },
 
   {
     path: "/profile",
