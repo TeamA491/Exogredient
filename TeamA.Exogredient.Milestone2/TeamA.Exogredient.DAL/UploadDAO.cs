@@ -389,6 +389,46 @@ namespace TeamA.Exogredient.DAL
             return uploads;
         }
 
+        public async Task<List<UploadResult>> GetIngredientsfromStore(int storeId, int pagination)
+        {
+            var uploads = new List<UploadResult>();
+
+            //Open Connection properly.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                var sqlString =
+                    $"SELECT * " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOStoreIdColumn} = @STOREID " +
+                    $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
+                    $"LIMIT @OFFSET, @AMOUNT;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        command.Parameters.AddWithValue("@STOREID", storeId);
+                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.IngredientViewPagination);
+                        command.Parameters.AddWithValue("@AMOUNT", Constants.IngredientViewPagination);
+
+                        // Execute the command.
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        datatable.Load(reader);
+
+                        foreach (DataRow row in datatable.Rows)
+                        {
+                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
+                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
+                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        }
+                    }
+                }
+            }
+            return uploads;
+        }
+
         /// <summary>
         /// Get the recent upload's by a user.
         /// </summary>

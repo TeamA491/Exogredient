@@ -260,6 +260,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetStoreImageOperation = "Get store image";
         
         public const string GetUploadsByIngredientNameandStoreIdOperation = "Get Uploads by IngredientName and StoreId";
+        public const string GetIngredientsfromStoreOperation = "Get all uploads from a store.";
         public const string EditUpvotesonUploadOperation = "Edit the upvotes value on an Upload";
         public const string EditDownvotesonUploadOperation = "Edit the downvotes value on an Upload";
 

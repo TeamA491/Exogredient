@@ -36,12 +36,12 @@ namespace IngredientViewController.Controllers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
             var ingredientManager = new IngredientManager( uploadService, loggingManager);
 
-            return Ok(ingredientManager.GetUploadsByIngredientNameandStoreId(ingredientName, storeID, pagination, Constants.InitialFailureCount, username, ipAddress));
+            return Ok(await ingredientManager.GetUploadsByIngredientNameandStoreId(ingredientName, storeID, pagination, Constants.InitialFailureCount, username, ipAddress).ConfigureAwait(false));
         }
 
         [HttpGet("StoreView")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetIngredientsFromStore(string storeID, string username, string ipAddress)
+        public async Task<IActionResult> GetIngredientsFromStore(int storeId, int pagination, string username, string ipAddress)
         {
             // New up DAL
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
@@ -57,7 +57,7 @@ namespace IngredientViewController.Controllers
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
             var ingredientManager = new IngredientManager(uploadService, loggingManager);
-            return Ok(ingredientManager);
+            return Ok(await ingredientManager.GetIngredientsfromStore(storeId,pagination,Constants.InitialFailureCount,username,ipAddress).ConfigureAwait(false));
         }
     }
 }
