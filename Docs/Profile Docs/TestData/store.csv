@@ -1,0 +1,5 @@
+store_id,owner,store_name,latitude,longitude,store_description,place_id
+1,username,storename,12.00000100,12.34567800,NULL,ChIJSS_igpMx3YARx1tKEo5jxre
+2,username,storename1,12.00000200,12.34567800,NULL,ChIJrTLr-GyuEmsRBfy61i59si0
+3,username,storename2,12.00000300,12.34567800,NULL,EisxMyBNYXJrZXQgU3RyZWV0LCBXaWxtaW5ndG9uLCBOQyAyODQwMSwgVVNB
+4,username,storename,33.79175860,-118.13877190,description,ChIJSS_igpMx3YARx1tKEo5jxrU

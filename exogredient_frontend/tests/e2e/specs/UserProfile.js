@@ -27,7 +27,7 @@ describe("Get profile score negative", () => {
 
     // Assert
     cy.url().should("include", "/profile");
-    cy.contains("h1", "-4");
+    cy.contains("h1", "-");
   });
 });
 

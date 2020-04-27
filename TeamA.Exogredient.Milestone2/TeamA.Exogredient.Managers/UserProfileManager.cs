@@ -384,7 +384,7 @@ namespace TeamA.Exogredient.Managers
                                Constants.GetSaveListPagination, username, ipAddress, e.ToString()).ConfigureAwait(false);
 
                 // Retry operation Constant.OperationRetry amount of times when there is exception.
-                await GetSaveListPaginationSizeAsync(username, ipAddress, failureCount, e).ConfigureAwait(false);
+                await GetSaveListPaginationSizeAsync(username, ipAddress, ++failureCount, e).ConfigureAwait(false);
             }
 
             // Operation successfull, log that operation.
@@ -432,7 +432,7 @@ namespace TeamA.Exogredient.Managers
                                Constants.GetInProgressUploadPagination, username, ipAddress, e.ToString()).ConfigureAwait(false);
 
                 // Retry operation Constant.OperationRetry amount of times when there is exception.
-                await GetInProgressUploadPaginationSizeAsync(username, ipAddress, failureCount, e).ConfigureAwait(false);
+                await GetInProgressUploadPaginationSizeAsync(username, ipAddress, ++failureCount, e).ConfigureAwait(false);
             }
 
             // Operation successfull, log that operation.
@@ -478,7 +478,7 @@ namespace TeamA.Exogredient.Managers
                                Constants.GetRecentUploadPagination, username, ipAddress, e.ToString()).ConfigureAwait(false);
 
                 // Retry operation Constant.OperationRetry amount of times when there is exception.
-                await GetRecentUploadPaginationSizeAsync(username, ipAddress, failureCount, e).ConfigureAwait(false);
+                await GetRecentUploadPaginationSizeAsync(username, ipAddress, ++failureCount, e).ConfigureAwait(false);
             }
 
             // Operation successfull, log that operation.

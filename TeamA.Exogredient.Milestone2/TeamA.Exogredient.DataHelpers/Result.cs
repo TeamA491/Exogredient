@@ -16,8 +16,6 @@
 
         public bool ExceptionOccurred { get; set; }
 
-        public int NumExceptions { get; set; }
-
         /// <summary>
         /// Constructs the Result object with a message.
         /// </summary>

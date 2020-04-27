@@ -49,13 +49,12 @@ namespace TeamA.Exogredient.Services
         /// <param name="exceptionOccurred">The fact of whether an exception occurred (bool)</param>
         /// <param name="numExceptions">The number of exceptions that have occurred within a logical execution (int)</param>
         /// <returns>The resulting Result(T)</returns>
-        public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred, int numExceptions)
+        public static Result<T> CreateResult<T>(string message, T data, bool exceptionOccurred)
         {
             Result<T> result = new Result<T>(message)
             {
                 Data = data,
                 ExceptionOccurred = exceptionOccurred,
-                NumExceptions = numExceptions
             };
 
             return result;

@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import * as global from '../globalExports.js';
+import * as global from "../globalExports.js";
 
 import SaveList from "@/components/SaveList.vue";
 import InProgressUpload from "@/components/InProgressUpload.vue";
@@ -78,7 +78,7 @@ export default {
   components: {
     SaveList,
     InProgressUpload,
-    RecentUpload
+    RecentUpload,
   },
   data() {
     return {
@@ -98,7 +98,7 @@ export default {
       recentUploadList: [],
       recentUploadStatus: false,
       recentUploadPage: 1,
-      recentUploadPageLength: 1
+      recentUploadPageLength: 1,
     };
   },
   methods: {
@@ -109,24 +109,35 @@ export default {
 
         // Fetch the RecentUploads
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
         )
-          .then(response => response.json())
-          .then(data => {
-            data.forEach(i => {
+          .then((response) => {
+            // Display error view based on response status code
+            global.ErrorHandler(this.$router, response);
+            return response.json();
+          })
+          .then((data) => {
+            // Loop the JSON array and update the view
+            data.forEach((i) => {
               this.recentUploadList.push(i);
             });
           });
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
         )
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => {
+            // Display error view based on response status code
+            global.ErrorHandler(this.$router, response);
+            return response.json();
+          })
+          .then((data) => {
+            // Update the pagination
             this.recentUploadPageLength = data;
           });
       } else {
+        // When the button is closed update message and empty results.
         this.recentUploadStatus = false;
         this.recentUploadList = [];
       }
@@ -139,24 +150,35 @@ export default {
 
         // Fetch the InProgress uploads
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
         )
-          .then(response => response.json())
-          .then(data => {
-            data.forEach(i => {
+          .then((response) => {
+            // Display error view based on response status code
+            global.ErrorHandler(this.$router, response);
+            return response.json();
+          })
+          .then((data) => {
+            // Loop the JSON array and update the view
+            data.forEach((i) => {
               this.inProgressList.push(i);
             });
           });
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
         )
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => {
+            // Display error view based on response status code
+            global.ErrorHandler(this.$router, response);
+            return response.json();
+          })
+          .then((data) => {
+            // Update the pagination
             this.recentUploadPageLength = data;
           });
       } else {
+        // When the button is closed update message and empty results.
         this.inProgressStatus = false;
         this.inProgressList = [];
       }
@@ -169,28 +191,39 @@ export default {
 
         // Fetch the save lists for a user
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.username}/${page}`
+          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
         )
-          .then(response => response.json())
-          .then(data => {
-            // Add the first page of the savelist to the saveList data object
-            data.forEach(i => {
+          .then((response) => {
+            // Display error view based on response status code
+            global.ErrorHandler(this.$router, response);
+            return response.json();
+          })
+          .then((data) => {
+            // Loop the JSON array and update the view
+            data.forEach((i) => {
               this.saveList.push(i);
             });
           });
+
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.username}`
+          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
         )
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => {
+            // Display error view based on response status code
+            global.ErrorHandler(this.$router, response);
+            return response.json();
+          })
+          .then((data) => {
+            // Update the pagination
             this.recentUploadPageLength = data;
           });
       } else {
+        // When the button is closed update message and empty results.
         this.saveListStatus = false;
         this.saveList = [];
       }
-    }
+    },
   },
   watch: {
     saveListPage(newValue, oldValue) {
@@ -198,13 +231,17 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/SaveList/${
           this.$store.state.username
-        }/${newValue - 1}`
+        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
       )
-        .then(response => response.json())
-        .then(data => {
-          // Add the first page of the savelist to the saveList data object
+        .then((response) => {
+          // Display error view based on response status code
+          global.ErrorHandler(this.$router, response);
+          return response.json();
+        })
+        .then((data) => {
+          // Add the page of the savelist to the saveList data object
           this.saveList = [];
-          data.forEach(i => {
+          data.forEach((i) => {
             this.saveList.push(i);
           });
         });
@@ -214,13 +251,17 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${
           this.$store.state.username
-        }/${newValue - 1}`
+        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
       )
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => {
+          // Display error view based on response status code
+          global.ErrorHandler(this.$router, response);
+          return response.json();
+        })
+        .then((data) => {
           // Reset the in progress list for new pagination.
           this.inProgressList = [];
-          data.forEach(i => {
+          data.forEach((i) => {
             this.inProgressList.push(i);
           });
         });
@@ -230,17 +271,21 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/Userprofile/Recentuploads/${
           this.$store.state.username
-        }/${newValue - 1}`
+        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
       )
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => {
+          // Display error view based on response status code
+          global.ErrorHandler(this.$router, response);
+          return response.json();
+        })
+        .then((data) => {
           // Reset the recent upload list when page changes.
           this.recentUploadList = [];
-          data.forEach(i => {
+          data.forEach((i) => {
             this.recentUploadList.push(i);
           });
         });
-    }
+    },
   },
   created() {
     // Retrieve user name from the vuex store.
@@ -248,11 +293,15 @@ export default {
 
     // Make an API call to calculate the score for this user \.
     fetch(
-      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.username}`
+      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
     )
-      .then(response => response.json())
-      .then(data => {
-        // Loop through the array and sum
+      .then((response) => {
+        // Display error view based on response status code
+        global.ErrorHandler(this.$router, response);
+        return response.json();
+      })
+      .then((data) => {
+        // Loop through the array and sum scores
         let upvotes = 0;
         let downvotes = 0;
         data.forEach((element, index) => {
@@ -261,7 +310,7 @@ export default {
         });
         this.score = upvotes - downvotes;
       });
-  }
+  },
 };
 </script>
 
