@@ -799,6 +799,9 @@ namespace TeamA.Exogredient.AppConstants
             {LogsErrorTypeField, false}
         };
 
+        // EXCEPTION MESSAGES -- TICKETING
+
+
         // EXCEPTION MESSAGES -- Upload
         public const string InvalidCategories = "One of the categories passed to GoogleImageAnalysisService.Analyze() was invalid.";
 
@@ -862,13 +865,18 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapUpdateDNE = "MapDAO.UpdateAsync hash did not exist";
         public const string MapUpdateInvalidArgument = "MapDAO.UpdateAsync record argument must be of type MapRecord";
 
-        // EXCEPTION MESSAGES -- TicketDAO
+        // EXCEPTION MESSAGES -- Ticketing
         public const string TicketCreateInvalidArgument = "TicketDAO.CreateAsync record argument must be of type TicketRecord";
         public const string TicketRecordNoNull = "All columns in Ticket must not be null";
         public const string TicketDeleteDNE = "TicketDAO.DeleteByIdsAsync ticket id did not exist";
         public const string TicketReadDNE = "TicketDAO.ReadByIdAsync ticket id did not exist";
         public const string TicketUpdateDNE = "TicketDAO.UpdateAsync ticket id did not exist";
         public const string TicketUpdateInvalidArgument = "TicketDAO.UpdateAsync record argument must be of type TicketRecord";
+        public const string TicketFilterNeedsParameter = "TicketDAO.FilterTicketsAsync requires at least one filter parameter";
+        public const string TicketIncorrectEnum = "TicketDAO.FilterTicketsAsync an unsupported enum was given";
+        public const string TicketIncorrectInt = "TicketDAO.FilterTicketsAsync an unsupported value was given";
+        public const string TicketUpdateNotExists = "TicketService the ticketID does not exist";
+        public const string Ticket = "";
 
         // EXCPETION MESSAGES -- SaveListDAO
         public const string SaveListDNE = "SaveList does not exists";

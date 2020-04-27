@@ -319,7 +319,7 @@ namespace TeamA.Exogredient.DAL
         {
             // Make sure we have at least one filter parameter
             if (filterParams.Count == 0)
-                throw new ArgumentException("");
+                throw new ArgumentException(Constants.TicketFilterNeedsParameter);
 
             List<string> queryConditions = new List<string>();
 
@@ -330,7 +330,7 @@ namespace TeamA.Exogredient.DAL
                 {
                     // Make sure we are using a correct Enum value
                     if (!(filter.Value is Constants.TicketCategories))
-                        throw new ArgumentException("");
+                        throw new ArgumentException(Constants.TicketIncorrectEnum);
 
                     queryConditions.Add(
                         $"`{Constants.TicketDAOCategoryColumn}` = `{filter.Value}`"
@@ -338,9 +338,9 @@ namespace TeamA.Exogredient.DAL
                 }
                 else if (filter.Key == Constants.TicketSearchFilter.DateFrom)
                 {
-                    // Make sure we are using an int
+                    // Make sure we are using an positive int
                     if (!(filter.Value is int i && i > 0))
-                        throw new ArgumentException("");
+                        throw new ArgumentException(Constants.TicketIncorrectInt);
 
                     queryConditions.Add(
                         $"`{Constants.TicketDAOSubmitTimestampColumn}` >= {filter.Value}"
@@ -348,9 +348,9 @@ namespace TeamA.Exogredient.DAL
                 }
                 else if (filter.Key == Constants.TicketSearchFilter.DateTo)
                 {
-                    // Make sure we are using an int
+                    // Make sure we are using an positive int
                     if (!(filter.Value is int i && i > 0))
-                        throw new ArgumentException("");
+                        throw new ArgumentException(Constants.TicketIncorrectInt);
 
                     queryConditions.Add(
                         $"`{Constants.TicketDAOSubmitTimestampColumn}` <= {filter.Value}"
@@ -360,7 +360,7 @@ namespace TeamA.Exogredient.DAL
                 {
                     // Make sure we are using a correct Enum value
                     if (!(filter.Value is Constants.TicketFlagColors))
-                        throw new ArgumentException("");
+                        throw new ArgumentException(Constants.TicketIncorrectEnum);
 
                     queryConditions.Add(
                         $"`{Constants.TicketDAOFlagColorColumn}` = `{filter.Value}`"
@@ -376,7 +376,7 @@ namespace TeamA.Exogredient.DAL
                             continue;
                     }
                     else
-                        throw new ArgumentException("");
+                        throw new ArgumentException(Constants.TicketIncorrectEnum);
 
                     bool isRead = ticketReadStatus == Constants.TicketReadStatuses.Read;
                     queryConditions.Add(
@@ -387,7 +387,7 @@ namespace TeamA.Exogredient.DAL
                 {
                     // Make sure we are using a correct Enum value
                     if (!(filter.Value is Constants.TicketStatuses))
-                        throw new ArgumentException("");
+                        throw new ArgumentException(Constants.TicketIncorrectEnum);
 
                     queryConditions.Add(
                         $"`{Constants.TicketDAOStatusColumn}` = `{filter.Value}`"

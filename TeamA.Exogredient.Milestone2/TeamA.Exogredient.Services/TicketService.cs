@@ -44,7 +44,7 @@ namespace TeamA.Exogredient.Services
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
             if (!ticketExists)
-                throw new ArgumentException("");
+                throw new ArgumentException(Constants.TicketUpdateNotExists);
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, null, newStatus.ToString(), null, null);
@@ -64,7 +64,7 @@ namespace TeamA.Exogredient.Services
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
             if (!ticketExists)
-                throw new ArgumentException("");
+                throw new ArgumentException(Constants.TicketUpdateNotExists);
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, newCategory.ToString(), null, null, null);
@@ -84,7 +84,7 @@ namespace TeamA.Exogredient.Services
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
             if (!ticketExists)
-                throw new ArgumentException("");
+                throw new ArgumentException(Constants.TicketUpdateNotExists);
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, null, null, null, null, newReadStatus);
@@ -104,7 +104,7 @@ namespace TeamA.Exogredient.Services
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
             if (!ticketExists)
-                throw new ArgumentException("");
+                throw new ArgumentException(Constants.TicketUpdateNotExists);
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, null, null, newFlagColor.ToString(), null);
