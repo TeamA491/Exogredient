@@ -16,7 +16,6 @@
 
         public bool ExceptionOccurred { get; set; }
 
-
         /// <summary>
         /// Constructs the Result object with a message.
         /// </summary>

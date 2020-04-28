@@ -49,7 +49,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidPasswordLengthUserMessage,
-                                                             updateSuccess, false);
+                                                       updateSuccess, false);
                 }
 
                 // Check the character requirements of their password.
@@ -81,7 +81,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
-                                                             updateSuccess, false);
+                                                       updateSuccess, false);
                 }
 
                 // Check if password contains dictionary words.
@@ -92,7 +92,7 @@ namespace TeamA.Exogredient.Managers
                                                   Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
-                                                             updateSuccess, false);
+                                                       updateSuccess, false);
                 }
 
                 // Check if password is a previously corrupted password.

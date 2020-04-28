@@ -11,15 +11,13 @@ namespace TeamA.Exogredient.Managers
 
         private readonly UserManagementService _userManagementService;
         private readonly LoggingManager _loggingManager;
-        private readonly AuthenticationService _authenticationService;
         private readonly VerificationService _verificationService;
 
         public VerifyPhoneCodeManager(UserManagementService userManagementService,LoggingManager loggingManager,
-                                      AuthenticationService authenticationService,VerificationService verificationService)
+                                      VerificationService verificationService)
         {
             _userManagementService = userManagementService;
             _loggingManager = loggingManager;
-            _authenticationService = authenticationService;
             _verificationService = verificationService;
 
         }
@@ -36,9 +34,9 @@ namespace TeamA.Exogredient.Managers
 
                 if (user.PhoneCodeFailures >= Constants.MaxPhoneCodeAttempts)
                 {
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyPhoneOperation, username, ipAddress,
-                                                  Constants.MaxPhoneTriesReachedLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyPhoneOperation, username, ipAddress,
+                                                 Constants.MaxPhoneTriesReachedLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.MaxPhoneTriesReachedUserMessage, phoneVerificationSuccess, false);
                 }
@@ -48,8 +46,8 @@ namespace TeamA.Exogredient.Managers
                 if (verificationStatus.Equals(Constants.TwilioAuthenticationApprovedString))
                 {
                     phoneVerificationSuccess = true;
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyPhoneOperation, username, ipAddress).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyPhoneOperation, username, ipAddress).ConfigureAwait(false);
 
                     if (duringRegistration)
                     {
@@ -62,9 +60,9 @@ namespace TeamA.Exogredient.Managers
                 {
                     await _userManagementService.IncrementPhoneCodeFailuresAsync(username).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyPhoneOperation, username, ipAddress,
-                                                  Constants.WrongPhoneCodeMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyPhoneOperation, username, ipAddress,
+                                                 Constants.WrongPhoneCodeMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.WrongPhoneCodeMessage, phoneVerificationSuccess, false);
                 }
@@ -73,17 +71,17 @@ namespace TeamA.Exogredient.Managers
                     // Failed
                     await _userManagementService.IncrementPhoneCodeFailuresAsync(username).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyPhoneOperation, username, ipAddress,
-                                                  Constants.PhoneCodeExpiredLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyPhoneOperation, username, ipAddress,
+                                                 Constants.PhoneCodeExpiredLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.PhoneCodeExpiredUserMessage, phoneVerificationSuccess, false);
                 }
             }
             catch (Exception e)
             {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.VerifyPhoneOperation, username, ipAddress, e.Message).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.VerifyPhoneOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
                 {

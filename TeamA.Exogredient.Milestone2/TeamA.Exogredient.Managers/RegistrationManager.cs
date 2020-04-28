@@ -31,10 +31,10 @@ namespace TeamA.Exogredient.Managers
         // many exceptions have currently occured after a manager has returned.
 
         // Encrypted password, encrypted AES key, and AES IV are all in hex string format.
-        public async Task<Result<bool>> RegisterAsync(bool scopeAnswer, string firstName, string lastName,
-                                                             string email, string username, string phoneNumber,
-                                                             string ipAddress, string encryptedPassword,
-                                                             string encryptedAESKey, string aesIV, int currentNumExceptions)
+        public async Task<Result<bool>> RegisterAsync(string firstName, string lastName,
+                                                      string email, string username, string phoneNumber,
+                                                      string ipAddress, string hashedPassword, string salt,
+                                                      string proxyPassword, int currentNumExceptions)
         {
             try
             {
@@ -62,26 +62,26 @@ namespace TeamA.Exogredient.Managers
 
                 if (await _userManagementService.CheckIfIPLockedAsync(ipAddress).ConfigureAwait(false))
                 {
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
                                                  Constants.IPLockedLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.IPLockedUserMessage, registrationSuccess, false);
                 }
 
-                // If user is not within our scope incremenent and log the failure to register. 
-                if (!scopeAnswer)
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //// If user is not within our scope incremenent and log the failure to register. 
+                //if (!scopeAnswer)
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidScopeLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.InvalidScopeLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidScopeUserMassage, registrationSuccess, false);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.InvalidScopeUserMassage, registrationSuccess, false);
+                //}
 
                 // Check the length of their first name.
                 if (!StringUtilityService.CheckLength(firstName, Constants.MaximumFirstNameCharacters,
@@ -91,9 +91,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidFirstNameLengthLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidFirstNameLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidFirstNameLengthUserMessage, registrationSuccess, false);
                 }
@@ -105,9 +105,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidFirstNameCharactersLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidFirstNameCharactersLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidFirstNameCharactersUserMessage, registrationSuccess, false);
                 }
@@ -120,9 +120,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidLastNameLengthLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidLastNameLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidLastNameLengthUserMessage, registrationSuccess, false);
                 }
@@ -134,9 +134,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidLastNameCharactersLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidLastNameCharactersLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidLastNameCharactersUserMessage, registrationSuccess, false);
                 }
@@ -149,9 +149,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidEmailLengthLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidEmailLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidEmailLengthUserMessage, registrationSuccess, false);
                 }
@@ -163,9 +163,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidEmailCharactersLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidEmailCharactersLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidEmailCharactersUserMessage, registrationSuccess, false);
                 }
@@ -177,9 +177,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidEmailFormatMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidEmailFormatMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidEmailFormatMessage, registrationSuccess, false);
                 }
@@ -193,10 +193,11 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.EmailExistsLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.EmailExistsLogMessage).ConfigureAwait(false);
 
+                    Console.WriteLine("Email");
                     return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false);
                 }
 
@@ -208,9 +209,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidUsernameLengthLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidUsernameLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidUsernameLengthUserMessage, registrationSuccess, false);
                 }
@@ -222,9 +223,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidUsernameCharactersLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidUsernameCharactersLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidUsernameCharactersUserMessage, registrationSuccess, false);
                 }
@@ -236,10 +237,11 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.UsernameExistsLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.UsernameExistsLogMessage).ConfigureAwait(false);
 
+                    Console.WriteLine("username");
                     return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false);
                 }
 
@@ -250,9 +252,9 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidPhoneNumberLengthLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidPhoneNumberLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberLengthUserMessage, registrationSuccess, false);
                 }
@@ -264,158 +266,161 @@ namespace TeamA.Exogredient.Managers
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidPhoneNumberCharactersLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidPhoneNumberCharactersLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidPhoneNumberCharactersUserMessage, registrationSuccess, false);
                 }
 
-                // Check username uniqueness.
+                // Check phone number uniqueness.
                 if (await _userManagementService.CheckPhoneNumberExistenceAsync(phoneNumber).ConfigureAwait(false))
                 {
                     await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PhoneNumberExistsLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.PhoneNumberExistsLogMessage).ConfigureAwait(false);
 
+                    Console.WriteLine("phone");
                     return SystemUtilityService.CreateResult(Constants.UniqueIdExistsRegistrationUserMessage, registrationSuccess, false);
                 }
 
                 // Password decryption.
-                byte[] encryptedPasswordBytes = StringUtilityService.HexStringToBytes(encryptedPassword);
-                byte[] encryptedAESKeyBytes = StringUtilityService.HexStringToBytes(encryptedAESKey);
-                byte[] AESIVBytes = StringUtilityService.HexStringToBytes(aesIV);
-                // Get RSA key information.
-                byte[] publicKeyBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
-                byte[] privateKeyBytes = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
+                //byte[] encryptedPasswordBytes = StringUtilityService.HexStringToBytes(encryptedPassword);
+                //byte[] encryptedAESKeyBytes = StringUtilityService.HexStringToBytes(encryptedAESKey);
+                //byte[] AESIVBytes = StringUtilityService.HexStringToBytes(aesIV);
+                //// Get RSA key information.
+                //byte[] publicKeyBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
+                //byte[] privateKeyBytes = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
 
-                byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
+                //byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
 
-                // Get the plain text password from the encrypted one.
-                string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
-                byte[] passwordBytes = StringUtilityService.HexStringToBytes(hexPassword);
-                string plaintextPassword = StringUtilityService.BytesToUTF8String(passwordBytes);
+                //// Get the plain text password from the encrypted one.
+                //string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
+                //byte[] passwordBytes = StringUtilityService.HexStringToBytes(hexPassword);
+                //string plaintextPassword = StringUtilityService.BytesToUTF8String(passwordBytes);
 
                 // Check the length of their password.
-                if (!StringUtilityService.CheckLength(plaintextPassword, Constants.MaximumPasswordCharacters,
+                if (!StringUtilityService.CheckLength(proxyPassword, Constants.MaximumPasswordCharacters,
                                                 Constants.MinimumPasswordCharacters))
                 {
                     await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
                                                                                    Constants.RegistrationTriesResetTime,
                                                                                    Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidPasswordLengthLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.InvalidPasswordLengthUserMessage,
                                                        registrationSuccess, false);
                 }
 
                 // Check the character requirements of their password.
-                if (!StringUtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (!StringUtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, registrationSuccess, false);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, registrationSuccess, false);
+                //}
 
                 // Check if password for context specific words.
-                if (StringUtilityService.ContainsContextSpecificWords(plaintextPassword))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (StringUtilityService.ContainsContextSpecificWords(plaintextPassword))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
-                                                       registrationSuccess, false);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
+                //                                       registrationSuccess, false);
+                //}
 
                 // Check if password contains sequences or repetitions.
-                if (StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
-                                                       registrationSuccess, false);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
+                //                                       registrationSuccess, false);
+                //}
 
                 // Check if password contains dictionary words.
-                if (await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordWordsLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordWordsLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
-                                                       registrationSuccess, false);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
+                //                                       registrationSuccess, false);
+                //}
 
                 // Check if password is a previously corrupted password.
-                if (await SystemUtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
-                {
-                    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
-                                                                                   Constants.RegistrationTriesResetTime,
-                                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
+                //if (await SystemUtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
+                //{
+                //    await _userManagementService.IncrementRegistrationFailuresAsync(ipAddress,
+                //                                                                   Constants.RegistrationTriesResetTime,
+                //                                                                   Constants.MaxRegistrationAttempts).ConfigureAwait(false);
 
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
+                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //                                  Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                //                                  Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
 
-                    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, registrationSuccess, false);
-                }
+                //    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, registrationSuccess, false);
+                //}
 
                 // Successful registration!
                 registrationSuccess = true;
 
                 // Hash password with salt
-                byte[] saltBytes = SecurityService.GenerateSalt();
-                string saltHex = StringUtilityService.BytesToHexString(saltBytes);
+                //byte[] saltBytes = SecurityService.GenerateSalt();
+                //string saltHex = StringUtilityService.BytesToHexString(saltBytes);
 
-                string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
+                //string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 // Create user record object to represent a user.
 
                 // Email code, email code timestamp, login failures, last login failure timestamp, email code failures, and phone code failures initialized to have no value.
-                UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, digest, Constants.EnabledStatus, Constants.CustomerUserType,
-                                                    saltHex, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
+                UserRecord user = new UserRecord(username, firstName + " " + lastName, canonicalizedEmail, phoneNumber, hashedPassword, Constants.EnabledStatus, Constants.CustomerUserType,
+                                                    salt, Constants.NoValueLong, Constants.NoValueString, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueLong, Constants.NoValueInt, Constants.NoValueInt);
                 
                 // Create that user.
-                await _userManagementService.CreateUserAsync(true, user, "system", "localhost").ConfigureAwait(false);
+                await _userManagementService.CreateUserAsync(true, user).ConfigureAwait(false);
 
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress).ConfigureAwait(false);
 
                 return SystemUtilityService.CreateResult(Constants.RegistrationSuccessUserMessage, registrationSuccess, false);
             }
             catch (Exception e)
             {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.RegistrationOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
                 {

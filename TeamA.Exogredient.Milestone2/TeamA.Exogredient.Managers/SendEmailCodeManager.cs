@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.Managers
         private readonly LoggingManager _loggingManager;
         private readonly VerificationService _verificationService;
 
-        public SendEmailCodeManager(LoggingManager loggingManager, AuthenticationService authenticationService,
+        public SendEmailCodeManager(LoggingManager loggingManager,
                                     VerificationService verificationService)
         {
             _loggingManager = loggingManager;
@@ -25,15 +25,15 @@ namespace TeamA.Exogredient.Managers
             {
                 await _verificationService.SendEmailVerificationAsync(username, emailAddress).ConfigureAwait(false);
 
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.SendEmailCodeOperation, username, ipAddress).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.SendEmailCodeOperation, username, ipAddress).ConfigureAwait(false);
 
                 return SystemUtilityService.CreateResult(Constants.SendEmailCodeSuccessUserMessage, true, false);
             }
             catch (Exception e)
             {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.SendEmailCodeOperation, username, ipAddress, e.Message).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.SendEmailCodeOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
                 {

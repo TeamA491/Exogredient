@@ -28,9 +28,9 @@ namespace TeamA.Exogredient.Managers
 
                 if (user.EmailCodeFailures >= Constants.MaxEmailCodeAttempts)
                 {
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyEmailOperation, username, ipAddress,
-                                                  Constants.MaxEmailTriesReachedLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyEmailOperation, username, ipAddress,
+                                                 Constants.MaxEmailTriesReachedLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.MaxEmailTriesReachedUserMessage, emailVerificationSuccess, false);
                 }
@@ -40,9 +40,9 @@ namespace TeamA.Exogredient.Managers
 
                 if (user.EmailCodeTimestamp + maxValidTimeSeconds < currentUnix)
                 {
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyEmailOperation, username, ipAddress,
-                                                  Constants.EmailCodeExpiredLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyEmailOperation, username, ipAddress,
+                                                 Constants.EmailCodeExpiredLogMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.EmailCodeExpiredUserMessage, emailVerificationSuccess, false);
                 }
@@ -57,9 +57,9 @@ namespace TeamA.Exogredient.Managers
                 }
                 else
                 {
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.VerifyEmailOperation, username, ipAddress,
-                                                  Constants.WrongEmailCodeMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.VerifyEmailOperation, username, ipAddress,
+                                                 Constants.WrongEmailCodeMessage).ConfigureAwait(false);
 
                     await _userManagementService.IncrementEmailCodeFailuresAsync(username).ConfigureAwait(false);
 
@@ -68,8 +68,8 @@ namespace TeamA.Exogredient.Managers
             }
             catch (Exception e)
             {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.VerifyEmailOperation, username, ipAddress, e.Message).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.VerifyEmailOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
                 {
