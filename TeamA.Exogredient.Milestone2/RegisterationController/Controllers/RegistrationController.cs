@@ -15,13 +15,13 @@ namespace RegisterationController.Controllers
     public class RegistrationController : Controller
     {
         static UserDAO userDAO = new UserDAO(Constants.SQLConnection);
-        static IPAddressDAO ipAddressDAO = new IPAddressDAO(Constants.SQLConnection);
+        static AnonymousUserDAO anonymousUserDAO = new AnonymousUserDAO(Constants.SQLConnection);
         static LogDAO logdao = new LogDAO(Constants.NOSQLConnection);
         static MapDAO mapdao = new MapDAO(Constants.MapSQLConnection);
         static MaskingService mask = new MaskingService(mapdao);
         static DataStoreLoggingService dsLogging = new DataStoreLoggingService(logdao, mask);
         static FlatFileLoggingService ffLogging = new FlatFileLoggingService(mask);
-        static UserManagementService usermanagementService = new UserManagementService(userDAO, ipAddressDAO, dsLogging, ffLogging, mask);
+        static UserManagementService usermanagementService = new UserManagementService(userDAO, anonymousUserDAO, dsLogging, ffLogging, mask);
         static LoggingManager loggingManager = new LoggingManager(ffLogging, dsLogging);
 
         [EnableCors]
