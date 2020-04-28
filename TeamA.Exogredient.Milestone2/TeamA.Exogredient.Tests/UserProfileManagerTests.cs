@@ -234,7 +234,7 @@ namespace TeamA.Exogredient.Tests
  
         [TestMethod]
         [DynamicData(nameof(DeleteUploadExist))]
-        public async Task UserProfileManager_DeleteUploadsAsync_Pass(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        public async Task UserProfileManager_DeleteUploadsAsync_Pass(List<int> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
         {
             // Act: Delete upload for a user.
             var deleteResult = await _userProfileManager.DeleteUploadsAsync(ids, performingUser, ipAddress, failureCount, ex);
@@ -251,7 +251,7 @@ namespace TeamA.Exogredient.Tests
 
         [TestMethod]
         [DynamicData(nameof(DeleteUploadUserDNE))]
-        public async Task UserProfileManager_DeleteUploadsAsync_FailUserDNE(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        public async Task UserProfileManager_DeleteUploadsAsync_FailUserDNE(List<int> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
         {
             try
             {
@@ -272,7 +272,7 @@ namespace TeamA.Exogredient.Tests
 
         [TestMethod]
         [DynamicData(nameof(DeleteUploadUploadIdDNE))]
-        public async Task UserProfileManager_DeleteUploadsAsync_FailUploadIdrDNE(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        public async Task UserProfileManager_DeleteUploadsAsync_FailUploadIdrDNE(List<int> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
         {
             try
             {
@@ -293,7 +293,7 @@ namespace TeamA.Exogredient.Tests
 
         [TestMethod]
         [DynamicData(nameof(DeleteUploadTestDataInvalidUser))]
-        public async Task UserProfileManager_DeleteUploadsAsync_FailNotAuthz(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        public async Task UserProfileManager_DeleteUploadsAsync_FailNotAuthz(List<int> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
         {
             try
             {

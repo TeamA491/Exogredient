@@ -15,19 +15,19 @@ namespace TeamA.Exogredient.Services
     public class UserManagementService
     {
         private readonly UserDAO _userDAO;
-        private readonly AnonymousUserDAO _ipDAO;
+        private readonly AnonymousUserDAO _anonymousUserDAO;
         private readonly MaskingService _maskingService;
         private readonly DataStoreLoggingService _dsLoggingService;
         private readonly FlatFileLoggingService _ffLoggingService;
         /// <summary>
         /// Initiates the object and its dependencies.
         /// </summary>
-        public UserManagementService(UserDAO userDAO, AnonymousUserDAO ipAddressDAO,
+        public UserManagementService(UserDAO userDAO, AnonymousUserDAO anonymousUserDAO,
                                      DataStoreLoggingService dsLoggingService, FlatFileLoggingService ffLoggingService,
                                      MaskingService maskingService)
         {
             _userDAO = userDAO;
-            _ipDAO = ipAddressDAO;
+            _anonymousUserDAO = anonymousUserDAO;
             _dsLoggingService = dsLoggingService;
             _ffLoggingService = ffLoggingService;
             _maskingService = maskingService;
@@ -113,7 +113,7 @@ namespace TeamA.Exogredient.Services
             IPAddressRecord resultRecord = await _maskingService.MaskAsync(record, true).ConfigureAwait(false) as IPAddressRecord;
 
             // Asynchronously call the create method via the IP DAO with the record.
-            return await _ipDAO.CreateAsync(resultRecord).ConfigureAwait(false);
+            return await _anonymousUserDAO.CreateAsync(resultRecord).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -140,11 +140,11 @@ namespace TeamA.Exogredient.Services
             IPAddressRecord maskedRecord = await _maskingService.MaskAsync(ipRecord, false).ConfigureAwait(false) as IPAddressRecord;
 
             // Get the masked object from the ipDAO and decrement its mapping before updating.
-            IPAddressObject maskedObj = await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
+            IPAddressObject maskedObj = await _anonymousUserDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
 
             await _maskingService.DecrementMappingForUpdateAsync(maskedRecord, maskedObj).ConfigureAwait(false);
 
-            return await _ipDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
+            return await _anonymousUserDAO.UpdateAsync(maskedRecord).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -169,11 +169,11 @@ namespace TeamA.Exogredient.Services
             }
 
             // Get the masked object from the ipDAO and decrement its mapping before deleteing.
-            IPAddressObject maskedObj = await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
+            IPAddressObject maskedObj = await _anonymousUserDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
 
             await _maskingService.DecrementMappingForDeleteAsync(maskedObj).ConfigureAwait(false);
 
-            await _ipDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
+            await _anonymousUserDAO.DeleteByIdsAsync(new List<string>() { id }).ConfigureAwait(false);
 
             return true;
         }
@@ -559,7 +559,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Asynchronously call the check method via the IP DAO with the ip address.
-            return await _ipDAO.CheckIPExistenceAsync(value).ConfigureAwait(false);
+            return await _anonymousUserDAO.CheckIPExistenceAsync(value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -603,7 +603,7 @@ namespace TeamA.Exogredient.Services
             }
 
             // Cast the return result of asynchronously reading by the ip address into the IP object.
-            IPAddressObject ip = await _ipDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
+            IPAddressObject ip = await _anonymousUserDAO.ReadByIdAsync(id).ConfigureAwait(false) as IPAddressObject;
 
             return await _maskingService.UnMaskAsync(ip).ConfigureAwait(false) as IPAddressObject;
         }

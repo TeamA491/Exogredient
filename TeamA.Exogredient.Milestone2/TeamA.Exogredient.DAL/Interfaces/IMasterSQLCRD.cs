@@ -10,6 +10,6 @@ namespace TeamA.Exogredient.DAL
 
         Task<IDataObject> ReadByIdAsync(T id);
 
-        Task<bool> DeleteByIdsAsync(List<string> idsOfRows);
+        Task<bool> DeleteByIdsAsync(List<T> idsOfRows);
     }
 }

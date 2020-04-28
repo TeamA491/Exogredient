@@ -280,7 +280,7 @@ namespace TeamA.Exogredient.Managers
         /// <param name="failureCount">Current failure count of the operation.</param>
         /// <param name="ex">Exception that is thrown.</param>
         /// <returns>bool that represents whether the operation passed.</returns>
-        public async Task<bool> DeleteUploadsAsync(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        public async Task<bool> DeleteUploadsAsync(List<int> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
         {
             // Escape condition for recursive call if exception is thrown.
             if (failureCount >= Constants.OperationRetry)

@@ -23,9 +23,9 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         {
             // Directions: Uncomment the specific create function that you do not want to execute.
 
-            await CreateUserTable().ConfigureAwait(false);
-            await CreateAnonymousUserTable().ConfigureAwait(false);
-            await CreateStoreTable().ConfigureAwait(false);
+            //await CreateUserTable().ConfigureAwait(false);
+            //await CreateAnonymousUserTable().ConfigureAwait(false);
+            //await CreateStoreTable().ConfigureAwait(false);
             await CreateUploadTable().ConfigureAwait(false);
 
             //await CreateMapTable().ConfigureAwait(false);
@@ -114,15 +114,16 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
                                $@"`{Constants.UploadDAOUploaderColumn}` VARCHAR({Constants.MaximumUsernameCharacters}) NOT NULL," +
                                $@"`{Constants.UploadDAOStoreIdColumn}` INT NOT NULL," +
                                $@"`{Constants.UploadDAODescriptionColumn}` VARCHAR({Constants.MaximumUploadDescriptionCharacters}) NOT NULL," +
+                               $@"`{Constants.UploadDAORatingColumn}` VARCHAR({Constants.MaxRatingDigits}) NOT NULL," +
                                $@"`{Constants.UploadDAOPhotoColumn}` VARCHAR({Constants.MaximumPhotoCharacters}) NOT NULL," +
                                $@"`{Constants.UploadDAOPriceColumn}` DOUBLE({Constants.MaximumPriceDigits},{Constants.PriceAccuracyDigits}) NOT NULL," +
+                               $@"`{Constants.UploadDAOPriceUnitColumn}` VARCHAR({Constants.PriceUnitMaxCharacters}) NOT NULL," +
                                $@"`{Constants.UploadDAOIngredientNameColumn}` VARCHAR({Constants.MaximumIngredientNameCharacters}) NOT NULL," +
                                $@"`{Constants.UploadDAOUpvoteColumn}` INT NOT NULL," +
                                $@"`{Constants.UploadDAODownvoteColumn}` INT NOT NULL," +
                                $@"`{Constants.UploadDAOInProgressColumn}` TINYINT(1) NOT NULL," +
                                $@"`{Constants.UploadDAOCategoryColumn}` VARCHAR({Constants.MaximumCategoryCharacters}) NOT NULL," +
                                $@"PRIMARY KEY(`{Constants.UploadDAOUploadIdColumn}`)," +
-                               $@"UNIQUE INDEX unique_post ({Constants.UploadDAOUploaderColumn}, {Constants.UploadDAOPostTimeDateColumn})," +
                                $@"INDEX `{Constants.UploadDAOStoreIdColumn}_idx` (`{Constants.UploadDAOStoreIdColumn}` ASC) INVISIBLE," +
                                $@"CONSTRAINT `{Constants.UploadDAOUploaderColumn}`" +
                                $@"  FOREIGN KEY (`{Constants.UploadDAOUploaderColumn}`)" +

@@ -8,35 +8,51 @@ namespace TeamA.Exogredient.Services
 {
     public static class LocationUtilityService
     {
+        // https://stackoverflow.com/questions/4983766/getting-gps-data-from-an-images-exif-in-c-sharp
         public static Tuple<double, double> GetImageLatitudeAndLongitude(Bitmap image)
         {
-            PropertyItem latitudeProperty = image.GetPropertyItem(0x0002);
+            PropertyItem latitudePropertyRef = image.GetPropertyItem(1);
+            PropertyItem latitudeProperty = image.GetPropertyItem(2);
 
             // Typecasts are NOT redundant
-            var latDegrees = (double)(BitConverter.ToUInt32(latitudeProperty.Value, 0)) / (double)(BitConverter.ToUInt32(latitudeProperty.Value, 4));
-            var latMinutes = (double)(BitConverter.ToUInt32(latitudeProperty.Value, 8)) / (double)(BitConverter.ToUInt32(latitudeProperty.Value, 12));
-            var latSeconds = (double)(BitConverter.ToUInt32(latitudeProperty.Value, 16)) / (double)(BitConverter.ToUInt32(latitudeProperty.Value, 20));
+            var latDegrees = (double)(BitConverter.ToUInt32(latitudeProperty.Value, Constants.DegreesNumerator)) / (double)(BitConverter.ToUInt32(latitudeProperty.Value, Constants.DegreesDenominator));
+            var latMinutes = (double)(BitConverter.ToUInt32(latitudeProperty.Value, Constants.MinutesNumerator)) / (double)(BitConverter.ToUInt32(latitudeProperty.Value, Constants.MinutesDenominator));
+            var latSeconds = (double)(BitConverter.ToUInt32(latitudeProperty.Value, Constants.SecondsNumerator)) / (double)(BitConverter.ToUInt32(latitudeProperty.Value, Constants.SecondsDenominator));
             var latitudeDD = latDegrees + (latMinutes / Constants.MinutesInAnHour) + (latSeconds / Constants.SecondsInAnHour);
 
-            PropertyItem longitudeProperty = image.GetPropertyItem(0x0004);
+            string gps = System.Text.Encoding.ASCII.GetString(new byte[1] { latitudePropertyRef.Value[0] });
+            if (gps.Equals(Constants.SouthIdentifier) || gps.Equals(Constants.WestIdentifier))
+            {
+                latitudeDD *= -1;
+            }
+
+            PropertyItem longitudePropertyRef = image.GetPropertyItem(3);
+            PropertyItem longitudeProperty = image.GetPropertyItem(4);
 
             // Typecasts are NOT redundant
-            var longDegrees = (double)(BitConverter.ToUInt32(longitudeProperty.Value, 0)) / (double)(BitConverter.ToUInt32(longitudeProperty.Value, 4));
-            var longMinutes = (double)(BitConverter.ToUInt32(longitudeProperty.Value, 8)) / (double)(BitConverter.ToUInt32(longitudeProperty.Value, 12));
-            var longSeconds = (double)(BitConverter.ToUInt32(longitudeProperty.Value, 16)) / (double)(BitConverter.ToUInt32(longitudeProperty.Value, 20));
+            var longDegrees = (double)(BitConverter.ToUInt32(longitudeProperty.Value, Constants.DegreesNumerator)) / (double)(BitConverter.ToUInt32(longitudeProperty.Value, Constants.DegreesDenominator));
+            var longMinutes = (double)(BitConverter.ToUInt32(longitudeProperty.Value, Constants.MinutesNumerator)) / (double)(BitConverter.ToUInt32(longitudeProperty.Value, Constants.MinutesDenominator));
+            var longSeconds = (double)(BitConverter.ToUInt32(longitudeProperty.Value, Constants.SecondsNumerator)) / (double)(BitConverter.ToUInt32(longitudeProperty.Value, Constants.SecondsDenominator));
             var longitudeDD = longDegrees + (longMinutes / Constants.MinutesInAnHour) + (longSeconds / Constants.SecondsInAnHour);
+
+            gps = System.Text.Encoding.ASCII.GetString(new byte[1] { longitudePropertyRef.Value[0] });
+            if (gps.Equals(Constants.SouthIdentifier) || gps.Equals(Constants.WestIdentifier))
+            {
+                longitudeDD *= -1;
+            }
 
             return Tuple.Create(latitudeDD, longitudeDD);
         }
 
         public static List<Tuple<double, double>> GetStorePolygon(double latitude, double longitude)
         {
-            var result = new List<Tuple<double, double>>();
-
-            result.Add(Tuple.Create(latitude - Constants.LatDegree400ft, longitude + Constants.LongDegree400ft));
-            result.Add(Tuple.Create(latitude + Constants.LatDegree400ft, longitude + Constants.LongDegree400ft));
-            result.Add(Tuple.Create(latitude + Constants.LatDegree400ft, longitude - Constants.LongDegree400ft));
-            result.Add(Tuple.Create(latitude - Constants.LatDegree400ft, longitude - Constants.LongDegree400ft));
+            var result = new List<Tuple<double, double>>
+            {
+                Tuple.Create(latitude - Constants.LatDegree400ft, longitude + Constants.LongDegree400ft),
+                Tuple.Create(latitude + Constants.LatDegree400ft, longitude + Constants.LongDegree400ft),
+                Tuple.Create(latitude + Constants.LatDegree400ft, longitude - Constants.LongDegree400ft),
+                Tuple.Create(latitude - Constants.LatDegree400ft, longitude - Constants.LongDegree400ft)
+            };
 
             return result;
         }

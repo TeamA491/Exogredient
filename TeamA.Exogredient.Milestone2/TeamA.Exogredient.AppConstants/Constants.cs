@@ -20,6 +20,7 @@ namespace TeamA.Exogredient.AppConstants
         public static readonly string AuthzPrivateKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PRIVATE_KEY", EnvironmentVariableTarget.User);
         public static readonly string AuthzPublicKey = Environment.GetEnvironmentVariable("AUTHORIZATION_PUBLIC_KEY", EnvironmentVariableTarget.User);
         public static readonly string ProjectStatus = Environment.GetEnvironmentVariable("PROJECT_STATUS", EnvironmentVariableTarget.User);
+        public static readonly string GoogleApiKey = Environment.GetEnvironmentVariable("GOOGLE_API_KEY", EnvironmentVariableTarget.User);
 
         // PROJECT STATUSES
         public static readonly string StatusDev = "DEVELOPMENT";
@@ -125,24 +126,42 @@ namespace TeamA.Exogredient.AppConstants
         };
 
         // UPLOAD
+        public const int InProgressStatus = 1;
+        public const int NotInProgressStatus = 0;
+
         public const string ManufacturedCategory = "packaged/bottled products";
         public const string PlantCategory = "plant products";
         public const string AnimalCategory = "animal products";
         public const string NoCategory = "NO CATEGORY";
 
+        public const string SouthIdentifier = "S";
+        public const string WestIdentifier = "W";
+
+        public const int DegreesNumerator = 0;
+        public const int DegreesDenominator = 4;
+        public const int MinutesNumerator = 8;
+        public const int MinutesDenominator = 12;
+        public const int SecondsNumerator = 16;
+        public const int SecondsDenominator = 20;
+
+        public const double FractionOfMile300Feet = 0.0568181818181818;
+
+        public const int NoStoreFoundCode = -1;
+
         public const int MaximumUploadDescriptionCharacters = 200;
         public const int MinimumUploadDescriptionCharacters = 1;
         public const int MaximumRatingDigits = 1;
         public const int MaximumPhotoCharacters = 200;
+        public const int MinimumPhotoCharacters = 4;
         public const int MaximumPriceDigits = 5;
         public const int PriceAccuracyDigits = 2;
         public const int MaximumIngredientNameCharacters = 200;
         public const int MinimumIngredientNameCharacters = 1;
-        public const int MaximumCategoryCharacters = 20;
+        public const int MaximumCategoryCharacters = 25;
 
         public static readonly List<string> ManufacturedKeywords = new List<string>()
         {
-            "product", "package", "bottle", "drink", "liqueur", "dish", "cuisine", "frozen food", "seasoning"
+            "product", "bottle", "drink", "liqueur", "dish", "cuisine", "frozen food", "seasoning", "snack", "convenience food"
         };
 
         public static readonly List<string> PlantKeywords = new List<string>()
@@ -171,15 +190,61 @@ namespace TeamA.Exogredient.AppConstants
 
         public static readonly List<string> ExogredientCategories = new List<string>()
         { ManufacturedCategory, PlantCategory, AnimalCategory };
+        public const double MinimumImageSizeMB = 0.5;
+        public const double MaximumImageSizeMB = 5.0;
+        public static readonly List<string> ValidImageExtensions = new List<string>()
+        {
+            ".jpg"
+        };
+        public const int IngredientNameMaximumCharacters = 100;
+        public const int IngredientNameMinimumCharacters = 1;
+        public const double MaximumIngredientPrice = 1000.00;
+        public const int DescriptionMaximumCharacters = 200;
+        public const int DescriptionMinimumCharacters = 1;
+        public static readonly List<string> ExogredientPriceUnits = new List<string>()
+        {
+            "item", "pound", "gram", "oz"
+        };
+        public const int ValidTimeBufferMinutes = 5;
+        public const int MaximumRating = 5;
+        public const int MinimumRating = 1;
+
+        public const double ToMBConversionFactor = 0.000001;
+
+        public const string ContinueDraftOperation = "Continue draft";
 
         public const string AnalyzeImageOperation = "Analyze image";
         public const string AnalyzationFailedMessage = "Image analysis failed";
         public const string AnalyzationSuccessMessage = "Image analysis succeeded!";
 
+        public const string UploadRetrievalFailedMessage = "Couldn't fetch draft data";
+        public const string UploadRetrievalSuccessMessage = "Upload data retrieved!";
+
         public const string CreateUploadOperation = "Create upload";
+        public const string DraftUploadOperation = "Create upload";
         public const string UploadCreationErrorMessage = "A system error occurred. Please try again later.";
         public const string UploadCreationSuccessMessage = "Upload created!";
-        public const string UploadImageNotWithinScopeMessage = "The image was not taken within California, our currently serviced area.";
+        public const string DraftCreationSuccessMessage = "Draft created!";
+        public const string ImageNotWithinScopeUserMessage = "The image was not taken within California, our currently serviced area.";
+        public const string ImageNotWithinScopeSystemMessage = "Image uploaded not within scope";
+        public const string NoStoreFoundUserMessage = "The image was not taken within a valid store.";
+        public const string NoStoreFoundSystemMessage = "No store found within vicinity of image";
+        public const string UploadUserDNEUserMessage = "Invalid username detected";
+        public const string UploadUserDNESystemMessage = "Upload creation, user did not exist";
+        public const string UploadNotValidSystemMessage = "UploadDTO not valid";
+
+        public const string GooglePlacesApiFailureMessage = "Places Api details response failed";
+
+        public const string ImagePathInvalidMessage = "An error occurred with the image";
+        public const string ImageNotWithinSizeMessage = "Image not within size requirments, at least 0.5MB, less than 4MB";
+        public const string ExtensionNotValidMessage = "Image file extension not valid (must be JPG)";
+        public const string IngredientNameLengthInvalidMessage = "Ingredient name length invalid, maximum 100 characters";
+        public const string PriceInvalidMessage = "Ingredient price invalid, maximum of 1000 (any unit)";
+        public const string DescriptionLengthInvalidMessage = "Description length invalid, maximum 200 characters";
+        public const string CategoryNotValidMessage = "Category not valid (animal products, plant products, packaged/bottled products)";
+        public const string PriceUnitNotValidMessage = "Price unit not valid (per item/pound/gram/oz)";
+        public const string TimeNotValidMessage = "Time posted not valid, more than 5 minutes have passed";
+        public const string InvalidRatingMessage = "Invalid rating, must be between 1 and 5 stars";
 
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
@@ -359,9 +424,18 @@ namespace TeamA.Exogredient.AppConstants
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
+        public const bool NoValueBool = false;
         public const long NoValueLong = 0;
+        public const double NoValueDouble = 0.0;
         public const int NoValueInt = 0;
         public const string NoValueString = "";
+
+        public const int NoValueDateTimeYear = 2000;
+        public const int NoValueDateTimeMonth = 1;
+        public const int NoValueDateTimeDay = 1;
+
+        public static readonly DateTime NoValueDatetime = new DateTime(NoValueDateTimeYear, NoValueDateTimeMonth, NoValueDateTimeDay);
+
         public const int UploadInprogress = 1;
         public const int UploadNotInprogress = 0;
 
@@ -624,11 +698,15 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadDAORatingColumn = "rating";
         public const string UploadDAOPhotoColumn = "photo";
         public const string UploadDAOPriceColumn = "price";
+        public const string UploadDAOPriceUnitColumn = "price_unit";
         public const string UploadDAOUpvoteColumn = "upvote";
         public const string UploadDAODownvoteColumn = "downvote";
         public const string UploadDAOInProgressColumn = "in_progress";
         public const string UploadDAOUploadNumColumn = "upload_num";
         public const string UploadDAOCategoryColumn = "category";
+
+        public const int MaxRatingDigits = 1;
+        public const int PriceUnitMaxCharacters = 5;
 
         // SAVELIST TABLE
         public const string SaveListDAOTableName = "save_list";
@@ -711,6 +789,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string UserDeleteDNE = "UserDAO.DeleteByIdsAsync username did not exist";
         public const string UserReadDNE = "UserDAO.ReadByIdAsync username did not exist";
         public const string UserUpdateDNE = "UserDAO.UpdateAsync username did not exist";
+
+        // EXCEPTION MESSAGES - StoreDAO
+        public const string StoreCreateInvalidArgument = "StoreDAO.CreateAsync record argument must be of type StoreRecord";
+
+        // EXCEPTION MESSAGES - UploadDAO
+        public const string UploadCreateInvalidArgument = "UploadDAO.CreateAsync record argument must be of type UploadRecord";
+        public const string UploadReadDNE = "UploadDAO.ReadByIDAsync upload id did not exist";
 
         // EXCEPTION MESSAGES -- MapDAO
         public const string MapCreateInvalidArgument = "MapDAO.CreateAsync record argument must be of type MapRecord";
