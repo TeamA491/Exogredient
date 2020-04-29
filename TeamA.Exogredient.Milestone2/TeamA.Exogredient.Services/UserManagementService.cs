@@ -912,9 +912,14 @@ namespace TeamA.Exogredient.Services
             return await UpdateIPAsync(record).ConfigureAwait(false);
         }
 
-        public async Task<String> GetUserType(String username)
+        public async Task<String> GetUserTypeAsync(String username)
         {
-            return await _userDAO.ReadUserType(username).ConfigureAwait(false);
+            return await _userDAO.ReadUserTypeAsync(username).ConfigureAwait(false);
+        }
+
+        public async Task<string> GetSaltAsync(string username)
+        {
+            return await _userDAO.ReadSaltAsync(username).ConfigureAwait(false);
         }
     }
 }

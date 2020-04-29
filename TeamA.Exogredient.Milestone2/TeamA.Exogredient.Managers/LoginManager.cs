@@ -12,19 +12,16 @@ namespace TeamA.Exogredient.Managers
 
         private readonly UserManagementService _userManagementService;
         private readonly LoggingManager _loggingManager;
-        private readonly AuthorizationService _authorizationService;
         private readonly IAuthenticationService _authenticationService;
         private readonly SessionService _sessionService;
 
         public LogInManager(UserManagementService userManagementService,
                             LoggingManager loggingManager,
-                            AuthorizationService authorizationService,
                             IAuthenticationService authenService,
                             SessionService sessionService)
         {
             _userManagementService = userManagementService;
             _loggingManager = loggingManager;
-            _authorizationService = authorizationService;
             _authenticationService = authenService;
             _sessionService = sessionService;
         }
@@ -34,7 +31,7 @@ namespace TeamA.Exogredient.Managers
         public async Task<Result<AuthenticationResult>> LogInAsync(string username, string ipAddress,
                                                           string password, int currentNumExceptions)
         {
-            bool authenticationSuccess = false;
+            bool authenticationSuccessful = false;
             bool userExist = false;
             try
             {
@@ -43,12 +40,12 @@ namespace TeamA.Exogredient.Managers
                 {
 
                     // Log the action.
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.UsernameDNELogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.UsernameDNELogMessage).ConfigureAwait(false);
 
                     // Return the result of the login failure.
-                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccessful, userExist);
                     return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false);
                 }
 
@@ -61,12 +58,12 @@ namespace TeamA.Exogredient.Managers
                 if (user.Disabled == 1)
                 {
                     // Log the action.
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.UserDisableLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.UserDisableLogMessage).ConfigureAwait(false);
 
                     // Return the result of the disabled username's login try.
-                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccessful, userExist);
                     return SystemUtilityService.CreateResult(Constants.UserDisableUserMessage, authenResult, false);
                 }
 
@@ -91,15 +88,21 @@ namespace TeamA.Exogredient.Managers
                 // Hash the password hex string with the username's salt.
                 //string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
 
-                // If the username's stored password matches the hashed password.
+               
                 AuthenticationDTO existing = new AuthenticationDTO(username, user.Password);
                 AuthenticationDTO credentials = new AuthenticationDTO(username, password);
+
+                // If the username's stored password matches the hashed password.
                 if (_authenticationService.Authenticate(existing,credentials))
                 {
-                    authenticationSuccess = true;
+                    authenticationSuccessful = true;
 
                     // Create a token for the username.
                     string token = await _sessionService.CreateTokenAsync(username).ConfigureAwait(false);
+
+                    // Get user type.
+                    string userType = await _userManagementService.GetUserTypeAsync(username).ConfigureAwait(false);
+                    Console.WriteLine(userType);
 
                     // Get the path to store the token.
                     string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -112,11 +115,11 @@ namespace TeamA.Exogredient.Managers
                     }
 
                     // Log the action.
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                                   Constants.LogInOperation, username, ipAddress).ConfigureAwait(false);
 
                     // Return the result of the successful login.
-                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccessful, userExist, token, userType);
                     return SystemUtilityService.CreateResult(Constants.LogInSuccessUserMessage, authenResult, false);
                 }
                 // If the password doesn't match.
@@ -127,12 +130,12 @@ namespace TeamA.Exogredient.Managers
                                                                             Constants.LogInTriesResetTime,
                                                                             Constants.MaxLogInAttempts).ConfigureAwait(false);
                     // Log the action.
-                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                  Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
-                                                  Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
+                    _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                 Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                                 Constants.InvalidPasswordLogMessage).ConfigureAwait(false);
 
                     // Return the result of the unsuccessful login.
-                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                    AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccessful, userExist);
                     return SystemUtilityService.CreateResult(Constants.InvalidLogInUserMessage, authenResult, false);
                 }
             }
@@ -140,8 +143,8 @@ namespace TeamA.Exogredient.Managers
             catch (Exception e)
             {
                 // Log the exception.
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress, e.Message).ConfigureAwait(false);
 
                 // If the current number of consecutive exceptions has reached the maximum number of retries.
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
@@ -151,9 +154,23 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Return the result of the exception occured.
-                AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccess, userExist);
+                AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccessful, userExist);
                 return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, authenResult, true);
             }
+        }
+
+        public async Task<string> GetSaltAsync(string username, string ipAddress)
+        {
+            if (!await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
+            {
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                             Constants.LogInOperation, Constants.AnonymousUserIdentifier, ipAddress,
+                                             Constants.UsernameDNELogMessage).ConfigureAwait(false);
+
+                return null;
+            }
+
+            return await _userManagementService.GetSaltAsync(username).ConfigureAwait(false);
         }
     }
 }

@@ -306,7 +306,7 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Get user type.
-                var userType = await _userManagementService.GetUserType(performingUser).ConfigureAwait(false);
+                var userType = await _userManagementService.GetUserTypeAsync(performingUser).ConfigureAwait(false);
 
                 // Check is user is admin. if true then let him perform
                 if (userType.Equals(Constants.AdminUserType))

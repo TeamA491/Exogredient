@@ -62,6 +62,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SearchController", "SearchC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegisterationController", "RegisterationController\RegisterationController.csproj", "{CDC327B5-18DA-48BB-A1A6-1DE8C88A9C33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoginController", "LoginController\LoginController.csproj", "{241C557C-F746-4DC0-B19C-1A3ABA118CA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +134,10 @@ Global
 		{CDC327B5-18DA-48BB-A1A6-1DE8C88A9C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDC327B5-18DA-48BB-A1A6-1DE8C88A9C33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDC327B5-18DA-48BB-A1A6-1DE8C88A9C33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{241C557C-F746-4DC0-B19C-1A3ABA118CA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{241C557C-F746-4DC0-B19C-1A3ABA118CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{241C557C-F746-4DC0-B19C-1A3ABA118CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{241C557C-F746-4DC0-B19C-1A3ABA118CA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -154,6 +160,7 @@ Global
 		{017BD27D-B70F-49BC-B650-8E67E353453C} = {DD596409-603B-4CB6-9497-467E2BB44775}
 		{E31DA6C2-E82F-4B04-933E-9AB49D5F7487} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 		{CDC327B5-18DA-48BB-A1A6-1DE8C88A9C33} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
+		{241C557C-F746-4DC0-B19C-1A3ABA118CA1} = {D44CE01E-6359-4BAE-A800-065E77FFB1E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A67D26EE-42F3-4231-8991-BDE591B4C5CD}
