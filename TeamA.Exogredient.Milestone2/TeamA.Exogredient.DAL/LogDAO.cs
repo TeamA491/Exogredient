@@ -54,7 +54,7 @@ namespace TeamA.Exogredient.DAL
                 }
 
                 // Create the collection if it doesn't exist, then store the result in a variable.
-                var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + groupName, ReuseExistingObject: true);
+                var collection = schema.CreateCollection(Constants.LogsCollectionPrefix + groupName, ReuseExisting: true);
 
                 // Create json string to insert into the data store.
                 string document = $@"{{""{Constants.LogsTimestampField}"": ""{logRecord.Timestamp}"", " +

@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controllers", "Controllers", "{D44CE01E-6359-4BAE-A800-065E77FFB1E2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1__Controllers", "1__Controllers", "{D44CE01E-6359-4BAE-A800-065E77FFB1E2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Tests", "_Tests", "{ABA97013-760C-4F3A-9BF3-3AE4744A5095}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__Tests__", "__Tests__", "{ABA97013-760C-4F3A-9BF3-3AE4744A5095}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.TestController", "TeamA.Exogredient.TestController\TeamA.Exogredient.TestController.csproj", "{CA4BA115-6992-446F-B7F5-734951BF99F6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DAL", "DAL", "{4A2FF568-6425-437D-B3A9-59A1AD81BF50}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4__DAL", "4__DAL", "{4A2FF568-6425-437D-B3A9-59A1AD81BF50}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{28611C63-BE9A-4A35-AE66-C79EB3B10F3C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2__Managers", "2__Managers", "{28611C63-BE9A-4A35-AE66-C79EB3B10F3C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{448E6539-B3AC-46CA-8E06-952D4D6C25F4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3__Services", "3__Services", "{448E6539-B3AC-46CA-8E06-952D4D6C25F4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DAL", "TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj", "{79A9AEED-F013-4AF2-8A3B-57986E6AE05A}"
 EndProject
@@ -23,15 +23,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Services"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.Tests", "TeamA.Exogredient.Tests\TeamA.Exogredient.Tests.csproj", "{69100CF2-CDA4-4ABC-8671-8E4BDFEAFBDB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Scripts", "_Scripts", "{F8AF24C4-D01C-4CA7-BE27-0B37C99C46A9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{F8AF24C4-D01C-4CA7-BE27-0B37C99C46A9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.ArchivingConsoleApp", "TeamA.Exogredient.ArchivingConsoleApp\TeamA.Exogredient.ArchivingConsoleApp.csproj", "{612C32B2-E9F0-4A95-B58B-D95A28578615}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Constants", "_Constants", "{55D63373-D39C-4D9D-88A5-4876FF79145A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Constants", "Constants", "{55D63373-D39C-4D9D-88A5-4876FF79145A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.AppConstants", "TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj", "{A3622C74-EF76-4E83-9D5A-B32FF4577D9E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_HelperObjects", "_HelperObjects", "{3E7FFB8E-CE6D-48EF-82E8-1E7E5184F6B8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HelperObjects", "HelperObjects", "{3E7FFB8E-CE6D-48EF-82E8-1E7E5184F6B8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamA.Exogredient.DataHelpers", "TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj", "{905325F5-4FE1-4246-8A65-DDF49CA7A50D}"
 EndProject

@@ -8,7 +8,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class UploadDAO : IMasterSQLDAO<string>
+    public class UploadDAO : IMasterSQLCRD<int>
     {
         private string _SQLConnection;
 
@@ -19,7 +19,65 @@ namespace TeamA.Exogredient.DAL
 
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
-            throw new NotImplementedException();
+            // Try casting the record to a UserRecord, throw an argument exception if it fails.
+            try
+            {
+                var temp = (UploadRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException(Constants.UploadCreateInvalidArgument);
+            }
+
+            var uploadRecord = (UploadRecord)record;
+            var recordData = uploadRecord.GetData();
+
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct the sql string .. start by inserting into the table name
+                var sqlString = $"INSERT INTO {Constants.UploadDAOTableName} (";
+
+                foreach (var pair in recordData)
+                {
+                    sqlString += $"{pair.Key},";
+                }
+
+                // Remove the last comma, add the VALUES keyword
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += ") VALUES (";
+
+                // Loop through the data once again, but instead of constructing the string with user input, use
+                // @PARAM0, @PARAM1 parameters to prevent against sql injections from user input.
+                int count = 0;
+                foreach (var pair in recordData)
+                {
+                    sqlString += $"@PARAM{count},";
+                    count++;
+                }
+
+                // Remove the last comma and add the last ) and ;
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += ");";
+
+                using (var command = new MySqlCommand(sqlString, connection))
+                {
+                    count = 0;
+
+                    // Loop through the data again to add the parameter values to the corresponding @PARAMs in the string.
+                    foreach (var pair in recordData)
+                    {
+                        command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        count++;
+                    }
+
+                    // Asynchronously execute the non query.
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                }
+
+                return true;
+            }
         }
 
         /// <summary>
@@ -27,7 +85,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ids">list of ids of uploads to delete.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> DeleteByIdsAsync(List<string> ids)
+        public async Task<bool> DeleteByIdsAsync(List<int> ids)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -67,9 +125,47 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public async Task<IDataObject> ReadByIdAsync(string id)
+        public async Task<IDataObject> ReadByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            // Check if the id exists in the table, and throw an argument exception if it doesn't.
+            if (!await CheckUploadsExistenceAsync(new List<int>() { id }).ConfigureAwait(false))
+            {
+                throw new ArgumentException(Constants.UploadReadDNE);
+            }
+
+            // Object to return -- UploadObject
+            UploadObject result;
+
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct the sql string to get the record where the id column equals the id parameter.
+                var sqlString = $"SELECT * FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} = @ID;";
+
+                using (var command = new MySqlCommand(sqlString, connection))
+                using (var dataTable = new DataTable())
+                {
+                    // Add the value to the id parameter, execute the reader asynchronously, load the reader into
+                    // the data table, and get the first row (the result).
+                    command.Parameters.AddWithValue("@ID", id);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    dataTable.Load(reader);
+                    DataRow row = dataTable.Rows[0];
+
+                    // Construct the UserObject by casting the values of the columns to their proper data types.
+                    result = new UploadObject((DateTime)row[Constants.UploadDAOPostTimeDateColumn], (string)row[Constants.UploadDAOUploaderColumn],
+                                              (int)row[Constants.UploadDAOStoreIdColumn], (string)row[Constants.UploadDAODescriptionColumn],
+                                              Int32.Parse((string)row[Constants.UploadDAORatingColumn]), (string)row[Constants.UploadDAOPhotoColumn],
+                                              (double)row[Constants.UploadDAOPriceColumn], (string)row[Constants.UploadDAOPriceUnitColumn],
+                                              (string)row[Constants.UploadDAOIngredientNameColumn], (int)row[Constants.UploadDAOUpvoteColumn],
+                                              (int)row[Constants.UploadDAODownvoteColumn], (((int)row[Constants.UploadDAOInProgressColumn] == Constants.InProgressStatus) ? true : false),
+                                              (string)row[Constants.UploadDAOCategoryColumn]);
+                                              
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -221,11 +317,6 @@ namespace TeamA.Exogredient.DAL
 
                 return ingredients;
             }
-        }
-
-        public async Task<bool> UpdateAsync(ISQLRecord record)
-        {
-            throw new NotImplementedException();
         }
 
         // <summary>
@@ -380,7 +471,7 @@ namespace TeamA.Exogredient.DAL
         /// <param name="ids">Ids of the uploads to check.</param>
         /// <param name="owner">user to test.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> CheckUploadsOwnerAsync(List<string> ids, string owner)
+        public async Task<bool> CheckUploadsOwnerAsync(List<int> ids, string owner)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -430,7 +521,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ids">Ids of the uploads.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> CheckUploadsExistenceAsync(List<string> ids)
+        public async Task<bool> CheckUploadsExistenceAsync(List<int> ids)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
