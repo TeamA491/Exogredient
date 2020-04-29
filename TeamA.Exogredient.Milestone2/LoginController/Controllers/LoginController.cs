@@ -16,7 +16,7 @@ namespace LoginController.Controllers
     public class LoginController : Controller
     {
         static UserDAO userDAO = new UserDAO(Constants.SQLConnection);
-        static IPAddressDAO ipAddressDAO = new IPAddressDAO(Constants.SQLConnection);
+        static AnonymousUserDAO ipAddressDAO = new AnonymousUserDAO(Constants.SQLConnection);
         static LogDAO logdao = new LogDAO(Constants.NOSQLConnection);
         static MapDAO mapdao = new MapDAO(Constants.MapSQLConnection);
         static MaskingService mask = new MaskingService(mapdao);
@@ -72,6 +72,7 @@ namespace LoginController.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
