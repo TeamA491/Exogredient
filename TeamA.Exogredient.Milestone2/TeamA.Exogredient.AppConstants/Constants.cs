@@ -274,6 +274,22 @@ namespace TeamA.Exogredient.AppConstants
             SYS_ADMIN = 4,
         };
 
+        public enum Operations
+        {
+            Login,
+            Register,
+            Search,
+            Upload,
+            ClaimBusiness,
+            CreateAd,
+            CreateUser,
+            DeleteUser,
+            CreateSysAdmin,
+            GetTickets,
+            SubmitTicket,
+            UpdateTicket,
+        }
+
         public static readonly Dictionary<string, int> UserOperations = new Dictionary<string, int>
         {
             // Format:
@@ -772,8 +788,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string SaveListDAOUsername = "username";
         public const string SaveListDAOIngredient = "ingredient";
 
-
-
         // CORRUPTED PASSWORDS COLLECTION
         public const string CorruptedPassSchemaName = "corrupted_passwords";
         public const string CorruptedPassCollectionName = "passwords";
@@ -798,9 +812,6 @@ namespace TeamA.Exogredient.AppConstants
             {LogsIPAddressField, true},
             {LogsErrorTypeField, false}
         };
-
-        // EXCEPTION MESSAGES -- TICKETING
-
 
         // EXCEPTION MESSAGES -- Upload
         public const string InvalidCategories = "One of the categories passed to GoogleImageAnalysisService.Analyze() was invalid.";
@@ -913,7 +924,21 @@ namespace TeamA.Exogredient.AppConstants
         // EXCEPTION MESSAGE -- Uploads
         public const string UploadIdsDNE = "One or more of the uploads Ids does not exist";
 
+        // RESULT MESSAGES -- Ticketing
+        public const string TicketManagerUnauthorizedGetTickets = "The user is not authorized to access TicketManager.GetTicketsAsync";
+        public const string TicketManagerUnauthorizedUpdateTickets = "The user is not authorized to access TicketManager.UpdateTicket";
+        public const string TicketManagerFailedFetchingTickets = "";
+        public const string TicketManagerFailedUpdateCategory = "";
+        public const string TicketManagerFailedUpdateFlagColor = "";
+        public const string TicketManagerFailedUpdateStatus = "";
+        public const string TicketManagerFailedUpdateReadStatus = "";
+        public const string TicketManagerFailedSubmitTicket = "";
 
-
+        public const string TicketManagerSuccessFetchTickets = "";
+        public const string TicketManagerSuccessUpdateCategory = "";
+        public const string TicketManagerSuccessUpdateFlagColor = "";
+        public const string TicketManagerSuccessUpdateStatus = "";
+        public const string TicketManagerSuccessUpdateReadStatus = "";
+        public const string TicketManagerSuccessSubmitTicket = "";
     }
 }
