@@ -1,9 +1,12 @@
 <template>
   <v-app id='app'>
     <div id='static'>
+      <span v-if="this.$store.state.userType !== 'Anonymous'" id="username">Username: {{this.$store.state.username}}</span>
+      <span v-if="this.$store.state.userType !== 'Anonymous'" id="logout"><a @click="logout">Log out</a></span>
       <nav>
         <v-btn to="upload">Upload</v-btn>
         <v-btn to="profile">Profile</v-btn>
+        <v-btn to="login/false">Login</v-btn>
         <v-btn @click="goToRegistration">Register</v-btn>
       </nav>
       <h1><a @click="goToHomePage">exogredient</a></h1>
@@ -52,8 +55,7 @@
           lng: null,
           radius: null,
           searchBy: "ingredient",
-          address: '',
-          username: "anonymous",
+          address: ''
         },
         searchPlaceholder: "Ingredient Search...",
         isPlaceSelected: false
@@ -61,6 +63,11 @@
       }
     },
     methods:{
+      logout: function(){
+        this.$store.dispatch('updateUsername', 'Anonymous');
+        this.$store.dispatch('updateUserType', 'Anonymous');
+        this.$store.dispatch('updateToken', '');
+      },
       goToHomePage: function(){
         if(this.$router.currentRoute.path !== '/'){
           this.$router.push('/');
@@ -192,5 +199,11 @@
 }
 #searchButton{
   width:20%
+}
+#username{
+  padding-right: 2%;
+}
+#logout{
+  padding-left: 2%;
 }
 </style>

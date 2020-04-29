@@ -350,6 +350,7 @@ export default {
 
             this.$store.dispatch('updateRegistrationUsername',this.username);
             this.$store.dispatch('updateRegistrationPhoneNum', this.phoneNumber);
+            this.$store.dispatch('updateEmail', this.email);
 
             fetch(`${global.ApiDomainName}/api/registration/sendEmailCode?`
             + `username=${this.username}&email=${this.email}`
