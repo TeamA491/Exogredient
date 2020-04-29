@@ -15,11 +15,20 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class TicketDAO : IMasterSQLDAO<uint>
     {
-        private string _SQLConnection;
+        private MySqlConnection dbConnection;
 
         public TicketDAO(string connection)
         {
-            _SQLConnection = connection;
+            dbConnection = new MySqlConnection(connection);
+            dbConnection.Open();
+        }
+
+        /// <summary>
+        /// Used to free up resources
+        /// </summary>
+        ~TicketDAO()
+        {
+            dbConnection.Close();
         }
 
         /// <summary>
@@ -42,67 +51,65 @@ namespace TeamA.Exogredient.DAL
 
             IDictionary<string, object> recordData = ticketRecord.GetData();
 
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+
+            StringBuilder sqlString = new StringBuilder($"INSERT INTO {Constants.TicketDAOTableName} (");
+
+            foreach (KeyValuePair<string, object> pair in recordData)
             {
-                connection.Open();
-                StringBuilder sqlString = new StringBuilder($"INSERT INTO {Constants.TicketDAOTableName} (");
-
-                foreach (KeyValuePair<string, object> pair in recordData)
+                // Check for null values in the data (string == null, numeric == -1)
+                if (pair.Value is int || pair.Value is long)
                 {
-                    // Check for null values in the data (string == null, numeric == -1)
-                    if (pair.Value is int || pair.Value is long)
+                    if ((int)pair.Value < 0)
                     {
-                        if ((int)pair.Value < 0)
-                        {
-                            throw new NoNullAllowedException(Constants.TicketRecordNoNull);
-                        }
+                        throw new NoNullAllowedException(Constants.TicketRecordNoNull);
                     }
-                    else if (pair.Value is string)
+                }
+                else if (pair.Value is string)
+                {
+                    if (pair.Value == null)
                     {
-                        if (pair.Value == null)
-                        {
-                            throw new NoNullAllowedException(Constants.TicketRecordNoNull);
-                        }
+                        throw new NoNullAllowedException(Constants.TicketRecordNoNull);
                     }
-
-                    // Otherwise add the key to the string (column name).
-                    sqlString.Append($"{pair.Key},");
                 }
 
-                // Remove the last comma, add the VALUES keyword
-                sqlString.Length--;
-                sqlString.Append(") VALUES (");
+                // Otherwise add the key to the string (column name).
+                sqlString.Append($"{pair.Key},");
+            }
 
-                // Loop through the data once again, but instead of constructing the string with user input, use
-                // @PARAM0, @PARAM1 parameters to prevent against sql injections from user input.
-                int count = 0;
+            // Remove the last comma, add the VALUES keyword
+            sqlString.Length--;
+            sqlString.Append(") VALUES (");
+
+            // Loop through the data once again, but instead of constructing the string with user input, use
+            // @PARAM0, @PARAM1 parameters to prevent against sql injections from user input.
+            int count = 0;
+            foreach (KeyValuePair<string, object> pair in recordData)
+            {
+                sqlString.Append($"@PARAM{count},");
+                count++;
+            }
+
+            // Remove the last comma and add the last ) and ;
+            sqlString.Length--;
+            sqlString.Append(");");
+
+            // Get the command object inside a using statement to properly dispose/close.
+            using (MySqlCommand command = new MySqlCommand(sqlString.ToString(), dbConnection))
+            {
+                count = 0;
+                // Loop through the data again to add the parameter values to the corresponding @PARAMs in the string.
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    sqlString.Append($"@PARAM{count},");
+                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
                     count++;
                 }
 
-                // Remove the last comma and add the last ) and ;
-                sqlString.Length--;
-                sqlString.Append(");");
-
-                // Get the command object inside a using statement to properly dispose/close.
-                using (MySqlCommand command = new MySqlCommand(sqlString.ToString(), connection))
-                {
-                    count = 0;
-                    // Loop through the data again to add the parameter values to the corresponding @PARAMs in the string.
-                    foreach (KeyValuePair<string, object> pair in recordData)
-                    {
-                        command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
-                        count++;
-                    }
-
-                    // Asynchronously execute the non query.
-                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                }
-
-                return true;
+                // Asynchronously execute the non query.
+                await command.ExecuteNonQueryAsync();
             }
+
+            return true;
+
         }
 
         /// <summary>
@@ -112,28 +119,22 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task (bool) whether the function executed without exception.</returns>
         public async Task<bool> DeleteByIdsAsync(List<uint> idsOfRows)
         {
-            // Get the connnection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            // Loop through the ids of rows.
+            foreach (uint ticketID in idsOfRows)
             {
-                connection.Open();
+                if (!await CheckTicketExistenceAsync(ticketID))
+                    throw new ArgumentException(Constants.TicketDeleteDNE);
 
-                // Loop through the ids of rows.
-                foreach (uint ticketID in idsOfRows)
+                string sqlString = $"DELETE FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID;";
+                using (MySqlCommand command = new MySqlCommand(sqlString, dbConnection))
                 {
-                    if (!await CheckTicketExistenceAsync(ticketID).ConfigureAwait(false))
-                        throw new ArgumentException(Constants.TicketDeleteDNE);
-
-                    string sqlString = $"DELETE FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID;";
-                    using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                    {
-                        // Add the value of the ticket id to the parameter and execute the non query asynchronously
-                        command.Parameters.AddWithValue("@TICKETID", ticketID);
-                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                    }
+                    // Add the value of the ticket id to the parameter and execute the non query asynchronously
+                    command.Parameters.AddWithValue("@TICKETID", ticketID);
+                    await command.ExecuteNonQueryAsync();
                 }
-
-                return true;
             }
+
+            return true;
         }
 
         /// <summary>
@@ -143,39 +144,35 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task (IDataObject) the information represented as an object</returns>
         public async Task<IDataObject> ReadByIdAsync(uint ticketID)
         {
-            if (!await CheckTicketExistenceAsync(ticketID).ConfigureAwait(false))
+            if (!await CheckTicketExistenceAsync(ticketID))
                 throw new ArgumentException(Constants.TicketReadDNE);
 
             // Object to return -- TicketObject
             TicketObject result;
 
-            // Get the connection inside of a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            // Construct the sql string to get the record where the id column equals the id parameter.
+            string sqlString = $"SELECT * FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID;";
+
+            // Get the command and data table objects inside using statements to properly dispose/close.
+            using (MySqlCommand command = new MySqlCommand(sqlString, dbConnection))
+            using (DataTable dataTable = new DataTable())
             {
-                connection.Open();
+                // Add the value to the id parameter, execute the reader asynchronously, load the reader into
+                // the data table, and get the first row (the result).
+                command.Parameters.AddWithValue("@TICKETID", ticketID);
+                DbDataReader reader = await command.ExecuteReaderAsync();
+                dataTable.Load(reader);
 
-                // Construct the sql string to get the record where the id column equals the id parameter.
-                string sqlString = $"SELECT * FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID;";
+                // Return the first result
+                DataRow row = dataTable.Rows[0];
 
-                // Get the command and data table objects inside using statements to properly dispose/close.
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
-                {
-                    // Add the value to the id parameter, execute the reader asynchronously, load the reader into
-                    // the data table, and get the first row (the result).
-                    command.Parameters.AddWithValue("@TICKETID", ticketID);
-                    DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    dataTable.Load(reader);
-                    DataRow row = dataTable.Rows[0];
-
-                    // Construct the TicketObject by casting the values of the columns to their proper data types.
-                    result = new TicketObject((uint)row[Constants.TicketDAOSubmitTimestampColumn],
-                                              (string)row[Constants.TicketDAOCategoryColumn],
-                                              (string)row[Constants.TicketDAOStatusColumn],
-                                              (string)row[Constants.TicketDAOFlagColorColumn],
-                                              (string)row[Constants.TicketDAODescriptionColumn],
-                                              (bool)row[Constants.TicketDAOIsReadColumn]);
-                }
+                // Construct the TicketObject by casting the values of the columns to their proper data types.
+                result = new TicketObject((uint)row[Constants.TicketDAOSubmitTimestampColumn],
+                                          (string)row[Constants.TicketDAOCategoryColumn],
+                                          (string)row[Constants.TicketDAOStatusColumn],
+                                          (string)row[Constants.TicketDAOFlagColorColumn],
+                                          (string)row[Constants.TicketDAODescriptionColumn],
+                                          (bool)row[Constants.TicketDAOIsReadColumn]);
             }
 
             return result;
@@ -201,39 +198,66 @@ namespace TeamA.Exogredient.DAL
             ticketRecord = (TicketRecord)record;
             IDictionary<string, object> recordData = ticketRecord.GetData();
 
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            int count = 0;
+            StringBuilder sqlString = new StringBuilder($"UPDATE {Constants.TicketDAOTableName} SET ");
+
+            foreach (KeyValuePair<string, object> pair in recordData)
             {
-                connection.Open();
+                // Check if the value at the ticket id column is contained within the table, throw an argument
+                // exception if it doesn't exist.
+                if (pair.Key == Constants.TicketDAOTicketIDColumn)
+                {
+                    if (!await CheckTicketExistenceAsync((uint)pair.Value))
+                        throw new ArgumentException(Constants.TicketUpdateDNE);
+                }
 
-                int count = 0;
-                StringBuilder sqlString = new StringBuilder($"UPDATE {Constants.TicketDAOTableName} SET ");
+                // Update only the values where the record value is not null (string == null, numeric == -1).
+                // Again, use parameters to prevent against sql injections.
+                if (pair.Key != Constants.TicketDAOTicketIDColumn)
+                {
+                    if (pair.Value is int || pair.Value is long)
+                    {
+                        if ((int)pair.Value != -1)
+                        {
+                            sqlString.Append($"{pair.Key} = @PARAM{count},");
+                        }
+                    }
+                    else if (pair.Value is string)
+                    {
+                        if (pair.Value != null)
+                        {
+                            sqlString.Append($"{pair.Key} = @PARAM{count},");
+                        }
+                    }
+                }
 
+                count++;
+            }
+
+            // Remove the last comma and identify the record by its ticket id column
+            sqlString.Length--;
+            sqlString.Append($" WHERE {Constants.TicketDAOTicketIDColumn} = '{recordData[Constants.TicketDAOTicketIDColumn]}';");
+
+            using (MySqlCommand command = new MySqlCommand(sqlString.ToString(), dbConnection))
+            {
+                // Loop through the record data again to add values to the parameters.
+                count = 0;
                 foreach (KeyValuePair<string, object> pair in recordData)
                 {
-                    // Check if the value at the ticket id column is contained within the table, throw an argument
-                    // exception if it doesn't exist.
-                    if (pair.Key == Constants.TicketDAOTicketIDColumn)
-                    {
-                        if (!await CheckTicketExistenceAsync((uint)pair.Value).ConfigureAwait(false))
-                            throw new ArgumentException(Constants.TicketUpdateDNE);
-                    }
-
-                    // Update only the values where the record value is not null (string == null, numeric == -1).
-                    // Again, use parameters to prevent against sql injections.
                     if (pair.Key != Constants.TicketDAOTicketIDColumn)
                     {
                         if (pair.Value is int || pair.Value is long)
                         {
                             if ((int)pair.Value != -1)
                             {
-                                sqlString.Append($"{pair.Key} = @PARAM{count},");
+                                command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
                             }
                         }
-                        else if (pair.Value is string)
+                        if (pair.Value is string)
                         {
                             if (pair.Value != null)
                             {
-                                sqlString.Append($"{pair.Key} = @PARAM{count},");
+                                command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
                             }
                         }
                     }
@@ -241,42 +265,11 @@ namespace TeamA.Exogredient.DAL
                     count++;
                 }
 
-                // Remove the last comma and identify the record by its ticket id column
-                sqlString.Length--;
-                sqlString.Append($" WHERE {Constants.TicketDAOTicketIDColumn} = '{recordData[Constants.TicketDAOTicketIDColumn]}';");
-
-                using (MySqlCommand command = new MySqlCommand(sqlString.ToString(), connection))
-                {
-                    // Loop through the record data again to add values to the parameters.
-                    count = 0;
-                    foreach (KeyValuePair<string, object> pair in recordData)
-                    {
-                        if (pair.Key != Constants.TicketDAOTicketIDColumn)
-                        {
-                            if (pair.Value is int || pair.Value is long)
-                            {
-                                if ((int)pair.Value != -1)
-                                {
-                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
-                                }
-                            }
-                            if (pair.Value is string)
-                            {
-                                if (pair.Value != null)
-                                {
-                                    command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
-                                }
-                            }
-                        }
-
-                        count++;
-                    }
-
-                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                }
-
-                return true;
+                await command.ExecuteNonQueryAsync();
             }
+
+            return true;
+
         }
 
         /// <summary>
@@ -286,36 +279,32 @@ namespace TeamA.Exogredient.DAL
         /// <returns> true if ticket id exists, otherwise false </returns>
         public async Task<bool> CheckTicketExistenceAsync(uint ticketID)
         {
-            // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+
+
+            // Check if the row exists for the ticket id
+            string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID);";
+            bool result;
+
+            // Open the command inside a using statement to properly dispose/close.
+            using (MySqlCommand command = new MySqlCommand(sqlString, dbConnection))
             {
-                // Open the connection.
-                connection.Open();
-
-                // Check if the row exists for the ticket id
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID);";
-                bool result;
-
-                // Open the command inside a using statement to properly dispose/close.
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
-                    command.Parameters.AddWithValue("@TICKETID", ticketID);
-                    DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                    await reader.ReadAsync().ConfigureAwait(false);
-                    result = reader.GetBoolean(0);
-                }
-
-                return result;
+                // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
+                command.Parameters.AddWithValue("@TICKETID", ticketID);
+                DbDataReader reader = await command.ExecuteReaderAsync();
+                await reader.ReadAsync();
+                result = reader.GetBoolean(0);
             }
+
+            return result;
+
         }
 
         /// <summary>
-        /// 
+        /// Filters through tickets to get all the tickets matching the criteria
         /// </summary>
-        /// <param name="filterParams"></param>
-        /// <returns></returns>
-        public async Task<List<TicketRecord>> FilterTicketsAsync(Dictionary<Constants.TicketSearchFilter, object> filterParams)
+        /// <param name="filterParams">Filter parameters used for the sql query</param>
+        /// <returns>All the returned data</returns>
+        public async Task<List<DataRow>> FilterTicketsAsync(Dictionary<Constants.TicketSearchFilter, object> filterParams)
         {
             // Make sure we have at least one filter parameter
             if (filterParams.Count == 0)
@@ -400,17 +389,41 @@ namespace TeamA.Exogredient.DAL
                                 string.Join(" AND ", queryConditions) +
                                 ";";
 
-            // Fetch the data from the database
-
-            // Temp
-            List<TicketRecord> tickets = new List<TicketRecord>();
-            return tickets;
+            // Fetch the data from the database and return it
+            return await RunSQLQuery(sqlString);
         }
 
-        public async Task<List<TicketRecord>> GetAllTickets()
+        /// <summary>
+        /// Gets all the tickets in the database
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<DataRow>> GetAllTickets()
         {
             string sqlString = $"SELECT * FROM `{Constants.TicketDAOTableName}`;";
-            return new List<TicketRecord>();
+            return await RunSQLQuery(sqlString);
+        }
+
+        /// <summary>
+        /// Runs an sql query
+        /// </summary>
+        /// <param name="sqlString">The rows queried from the command</param>
+        /// <returns></returns>
+        private async Task<List<DataRow>> RunSQLQuery(string sqlString)
+        {
+            List<DataRow> data = new List<DataRow>();
+            using (var command = new MySqlCommand(sqlString, dbConnection))
+            using (var dataTable = new DataTable())
+            {
+                var reader = await command.ExecuteReaderAsync();
+                dataTable.Load(reader);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    data.Add(row);
+                }
+            }
+
+            return data;
         }
     }
 }

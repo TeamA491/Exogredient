@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using TeamA.Exogredient.DAL;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -23,14 +24,20 @@ namespace TeamA.Exogredient.Services
         /// <returns>Array of TicketRecords that meet the search criteria</returns>
         public async Task<List<TicketRecord>> GetTicketsByFilterAsync(Dictionary<Constants.TicketSearchFilter, object> filterParams)
         {
-            // TODO AUTHORIZE WITH JWT
-            List<TicketRecord> tickets = await ticketDAO.FilterTicketsAsync(filterParams).ConfigureAwait(false);
+            List<DataRow> ticketsRaw = await ticketDAO.FilterTicketsAsync(filterParams);
+            FormatDataRow(ref ticketsRaw, out List<TicketRecord> tickets);
             return tickets;
         }
 
+        /// <summary>
+        /// Returns all tickets in the database
+        /// </summary>
+        /// <returns>A list of TicketRecord objects</returns>
         public async Task<List<TicketRecord>> GetAllTickets()
         {
-            return await ticketDAO.GetAllTickets().ConfigureAwait(false);
+            List<DataRow> ticketsRaw = await ticketDAO.GetAllTickets();
+            FormatDataRow(ref ticketsRaw, out List<TicketRecord> tickets);
+            return tickets;
         }
 
         /// <summary>
@@ -48,7 +55,7 @@ namespace TeamA.Exogredient.Services
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, null, newStatus.ToString(), null, null);
-            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
+            await ticketDAO.UpdateAsync(ticketRecord);
 
             return true;
         }
@@ -68,7 +75,7 @@ namespace TeamA.Exogredient.Services
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, newCategory.ToString(), null, null, null);
-            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
+            await ticketDAO.UpdateAsync(ticketRecord);
 
             return true;
         }
@@ -88,7 +95,7 @@ namespace TeamA.Exogredient.Services
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, null, null, null, null, newReadStatus);
-            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
+            await ticketDAO.UpdateAsync(ticketRecord);
 
             return true;
         }
@@ -108,7 +115,7 @@ namespace TeamA.Exogredient.Services
 
             // Update the ticket
             TicketRecord ticketRecord = new TicketRecord(ticketID, null, null, newFlagColor.ToString(), null);
-            await ticketDAO.UpdateAsync(ticketRecord).ConfigureAwait(false);
+            await ticketDAO.UpdateAsync(ticketRecord);
 
             return true;
         }
@@ -126,10 +133,32 @@ namespace TeamA.Exogredient.Services
                                                         Constants.TicketStatuses.Unresolved.ToString(),
                                                         Constants.TicketFlagColors.None.ToString(),
                                                         description);
-            // TODO CHECK IF DESCRIPTION MEETS MINIMUM OR EXCEEDS MAXIMUM
-            await ticketDAO.CreateAsync(ticketRecord).ConfigureAwait(false);
+            await ticketDAO.CreateAsync(ticketRecord);
 
             return true;
+        }
+
+        /// <summary>
+        /// Used to convert DataRow to TicketRecord
+        /// </summary>
+        /// <param name="data">The raw data to be formatted</param>
+        /// <param name="tickets">Where to save the formatted data</param>
+        private void FormatDataRow(ref List<DataRow> data, out List<TicketRecord> tickets)
+        {
+            tickets = new List<TicketRecord>();
+
+            // Construct the data
+            foreach (DataRow row in data)
+            {
+                tickets.Add(
+                    new TicketRecord((uint)row[Constants.TicketDAOSubmitTimestampColumn],
+                    (string)row[Constants.TicketDAOCategoryColumn],
+                    (string)row[Constants.TicketDAOStatusColumn],
+                    (string)row[Constants.TicketDAOFlagColorColumn],
+                    (string)row[Constants.TicketDAODescriptionColumn],
+                    (bool)row[Constants.TicketDAOIsReadColumn])
+                );
+            }
         }
     }
 }
