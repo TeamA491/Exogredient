@@ -4,7 +4,7 @@
       <!-- SIDE NAV -->
       <aside class="hero is-fullheight-with-navbar column is-2" id="sidebar">
         <nav class="menu">
-          <h1 class="menu-label">Filters</h1>
+          <h1>Search Filters</h1>
 
           <hr class="divider" />
 
@@ -136,7 +136,8 @@
           </ul>
         </nav>
 
-        <div class="container is-fluid has-background-grey-lighter">
+        <!-- CURRENT TICKET VIEW -->
+        <div class="container is-fluid has-background-grey-lighter" id="cur-ticket-view">
           <!-- CURRENT TICKET HEADER -->
           <div class="level">
             <div class="level-left">
@@ -172,12 +173,15 @@
             <div class="level-left">
               <!-- CURRENT TICKET READ STATUS TOGGLE BUTTON -->
               <div class="level-item has-text-centered">
-                <button class="button is-success">Mark as read</button>
+                <button class="button is-success" id="cur-ticket-mark-read-button">Mark as unread</button>
               </div>
 
               <!-- CURRENT TICKET STATUS BUTTON -->
               <div class="level-item has-text-centered">
-                <button class="button is-success">Mark as resolved</button>
+                <button
+                  class="button is-success"
+                  id="cur-ticket-mark-resolved-button"
+                >Mark as resolved</button>
               </div>
             </div>
           </div>
@@ -185,6 +189,8 @@
           <h3>Submitted: 05/01/2020</h3>
 
           <textarea readonly class="textarea" rows="10" id="current-ticket-description">asdfasdfasd</textarea>
+
+          <button class="button" id="cur-ticket-back-button">Back</button>
         </div>
       </div>
     </div>
@@ -214,7 +220,12 @@ var ticketsTable;
 var noTicketsDisplay;
 var pagination;
 
-var curTicketFlagColors;
+var curTicketView;
+var curTicketFlagColorsDropdown;
+var curTicketCategoryDropdown;
+var curTicketMarkReadButton;
+var curTicketMarkResolvedButton;
+var curTicketBackButton;
 
 // On document ready...
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -224,11 +235,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
   flagColorsDropdown = document.getElementById("flag-colors-dropdown");
   readStatusDropdown = document.getElementById("read-status-dropdown");
   pagination = document.getElementById("pagination");
+  curTicketMarkReadButton = document.getElementById(
+    "cur-ticket-mark-read-button"
+  );
+  curTicketMarkResolvedButton = document.getElementById(
+    "cur-ticket-mark-resolved-button"
+  );
 
   noTicketsDisplay = document.getElementById("no-tickets-display");
   ticketsTable = document.getElementById("tickets-table");
 
-  curTicketFlagColors = document.getElementById("cur-ticket-flag-colors");
+  curTicketView = document.getElementById("cur-ticket-view");
+  curTicketFlagColorsDropdown = document.getElementById(
+    "cur-ticket-flag-colors"
+  );
+  curTicketCategoryDropdown = document.getElementById(
+    "cur-ticket-category-dropdown"
+  );
+  curTicketBackButton = document.getElementById("cur-ticket-back-button");
 
   // Add event listeners
   statusDropdown.addEventListener("change", onStatusDropdownChange);
@@ -236,12 +260,38 @@ document.addEventListener("DOMContentLoaded", function(event) {
   flagColorsDropdown.addEventListener("change", onFlagColorsDropdownChange);
   readStatusDropdown.addEventListener("change", readStatusDropdown);
 
+  curTicketFlagColorsDropdown.addEventListener(
+    "change",
+    onCurTicketFlagColorsDropdownChange
+  );
+  curTicketCategoryDropdown.addEventListener(
+    "change",
+    onCurTicketCategoryDropdownChange
+  );
+
+  curTicketMarkReadButton.addEventListener(
+    "click",
+    onCurTicketMarkReadButtonClick
+  );
+  curTicketMarkResolvedButton.addEventListener(
+    "click",
+    onCurTicketMarkResolvedButtonClick
+  );
+  curTicketBackButton.addEventListener("click", onCurTicketBackButtonClick);
+
   // TODO: IF TABLE IS EMPTY, PUT EMPTY MESSAGE
 
   // Check if there are tickets or not
-  displayTicketView();
+  // displayTicketView();
+  showTable();
+  hideTicketView();
 });
 
+/*
+******************
+CHANGE EVENTS
+******************
+*/
 function onStatusDropdownChange() {}
 
 function onCategoryDropdownChange() {}
@@ -250,6 +300,32 @@ function onFlagColorsDropdownChange() {}
 
 function onReadStatusDropdownChange() {}
 
+function onCurTicketFlagColorsDropdownChange() {}
+
+function onCurTicketCategoryDropdownChange() {}
+
+/*
+******************
+CLICK EVENTS
+******************
+*/
+
+function onCurTicketMarkReadButtonClick() {}
+
+function onCurTicketMarkResolvedButtonClick() {}
+
+function onCurTicketBackButtonClick() {
+  hideTicketView();
+  // Show the table because if we were looking at a ticket, then
+  // that means there was at least one ticket
+  showTable();
+}
+
+/*
+******************
+OTHER
+******************
+*/
 function showTable() {
   noTicketsDisplay.classList.add("is-hidden");
   ticketsTable.classList.remove("is-hidden");
@@ -263,15 +339,11 @@ function hideTable() {
 }
 
 function displayTicketView() {
-  noTicketsDisplay.classList.add("is-hidden");
-  ticketsTable.classList.add("is-hidden");
-  pagination.classList.add("is-hidden");
+  curTicketView.classList.remove("is-hidden");
 }
 
 function hideTicketView() {
-  ticketsTable.classList.remove("is-hidden");
-  noTicketsDisplay.classList.remove("is-hidden");
-  pagination.classList.remove("is-hidden");
+  curTicketView.classList.add("is-hidden");
 }
 </script>
 
