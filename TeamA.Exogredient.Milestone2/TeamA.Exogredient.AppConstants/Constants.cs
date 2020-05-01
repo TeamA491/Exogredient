@@ -126,6 +126,8 @@ namespace TeamA.Exogredient.AppConstants
         };
 
         // UPLOAD
+        public const string PhotoFolder = @"C:\Photos";
+
         public const int InProgressStatus = 1;
         public const int NotInProgressStatus = 0;
 
@@ -220,8 +222,12 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadRetrievalFailedMessage = "Couldn't fetch draft data";
         public const string UploadRetrievalSuccessMessage = "Upload data retrieved!";
 
+        public const string UploadDeletionFailedMessage = "Couldn't delete upload";
+        public const string UploadDeletionSuccessMessage = "Upload deleted!";
+
+        public const string DeleteUploadOperation = "Delete upload";
         public const string CreateUploadOperation = "Create upload";
-        public const string DraftUploadOperation = "Create upload";
+        public const string DraftUploadOperation = "Draft upload";
         public const string UploadCreationErrorMessage = "A system error occurred. Please try again later.";
         public const string UploadCreationSuccessMessage = "Upload created!";
         public const string DraftCreationSuccessMessage = "Draft created!";
@@ -377,7 +383,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetInProgressUploadsOperation = "Get InProgress Uploads";
         public const string GetSaveListOperation = "Get Save Lists";
         public const string DeleteSaveListOperation = "Delete Save List";
-        public const string DeleteUploadOperation = "Delete Upload";
         public const string GetSaveListPagination = "Get SaveList pagination";
         public const string GetInProgressUploadPagination = "Get In Progress Upload pagination";
         public const string GetRecentUploadPagination = "Get recent upload pagination";

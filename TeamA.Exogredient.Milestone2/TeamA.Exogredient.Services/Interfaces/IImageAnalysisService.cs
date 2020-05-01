@@ -2,6 +2,7 @@
 using TeamA.Exogredient.DataHelpers;
 using Google.Cloud.Vision.V1;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace TeamA.Exogredient.Services.Interfaces
 {

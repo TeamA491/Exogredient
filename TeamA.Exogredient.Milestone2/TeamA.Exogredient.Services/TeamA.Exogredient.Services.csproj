@@ -9,7 +9,7 @@
     <PackageReference Include="GoogleApi" Version="3.9.10" />
     <PackageReference Include="MailKit" Version="2.6.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0-preview.3.20214.6" />
-    <PackageReference Include="Twilio" Version="5.39.1" />
+    <PackageReference Include="Twilio" Version="5.40.0" />
     <PackageReference Include="WeCantSpell.Hunspell" Version="3.0.1" />
   </ItemGroup>
 

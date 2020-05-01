@@ -9,6 +9,7 @@ namespace TeamA.Exogredient.DataHelpers
     public class UploadDTO
     {
         public string ImagePath { get; }
+        public Bitmap Image { get; }
         public string Name { get; }
         public DateTime Time { get; }
         public string Username { get; }
@@ -18,10 +19,11 @@ namespace TeamA.Exogredient.DataHelpers
         public double Price { get; }
         public string PriceUnit { get; }
 
-        public UploadDTO(string imagePath, string category, string name, DateTime time,
+        public UploadDTO(string imagePath, Bitmap image, string category, string name, DateTime time,
                          string username, string description, int rating, double price, string priceUnit)
         {
             ImagePath = imagePath;
+            Image = image;
             Category = category;
             Name = name;
             Time = time;

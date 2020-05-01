@@ -5,6 +5,7 @@ using System;
 using Google.Cloud.Vision.V1;
 using TeamA.Exogredient.AppConstants;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace TeamA.Exogredient.Services
 {

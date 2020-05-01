@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Drawing;
 using TeamA.Exogredient.AppConstants;
 using Image = Google.Cloud.Vision.V1.Image;
+using System.IO;
+using UploadController;
+using Microsoft.AspNetCore.Http;
 
 namespace TeamA.Exogredient.Managers
 {
@@ -27,8 +30,7 @@ namespace TeamA.Exogredient.Managers
             _userManagementService = userManagementService;
         }
 
-        public async Task<Result<bool>> CreateUploadAsync(string imagePath, string category, string username, string ipAddress, DateTime postTime,
-                                                          string name, string description, int rating, double price, string priceUnit, int failureCount)
+        public async Task<Result<bool>> CreateUploadAsync(UploadPost post, int failureCount)
         {
             var result = false;
 
@@ -40,21 +42,32 @@ namespace TeamA.Exogredient.Managers
 
             try
             {
-                if (postTime.Equals(null))
+                var postTime = new DateTime();
+
+                if (post.PostTime.Equals(null))
                 {
                     postTime = Constants.NoValueDatetime;
                 }
 
-                if (!await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false))
+                if (!await _userManagementService.CheckUserExistenceAsync(post.Username).ConfigureAwait(false))
                 {
                     // Log the fact user was invalid.
                     await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                   Constants.CreateUploadOperation, username, ipAddress, Constants.UploadUserDNESystemMessage).ConfigureAwait(false);
+                                                   Constants.CreateUploadOperation, post.Username, post.IPAddress, Constants.UploadUserDNESystemMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.UploadUserDNEUserMessage, result, false);
                 }
 
-                var image = new Bitmap(imagePath);
+                Console.WriteLine("hi");
+
+                Bitmap image;
+
+                using (var ms = new MemoryStream(post.ImageBytes))
+                {
+                    image = new Bitmap(ms);
+                }
+
+                var imageExtension = ".jpg";
 
                 var latLong = LocationUtilityService.GetImageLatitudeAndLongitude(image);
                 var latitude = latLong.Item1;
@@ -66,7 +79,7 @@ namespace TeamA.Exogredient.Managers
                 {
                     // Log the fact that scope was violated.
                     await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                   Constants.CreateUploadOperation, username, ipAddress, Constants.ImageNotWithinScopeSystemMessage).ConfigureAwait(false);
+                                                   Constants.CreateUploadOperation, post.Username, post.IPAddress, Constants.ImageNotWithinScopeSystemMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.ImageNotWithinScopeUserMessage, result, false);
                 }
@@ -77,12 +90,15 @@ namespace TeamA.Exogredient.Managers
                 {
                     // Log the fact that scope was violated.
                     await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                   Constants.CreateUploadOperation, username, ipAddress, Constants.NoStoreFoundSystemMessage).ConfigureAwait(false);
+                                                   Constants.CreateUploadOperation, post.Username, post.IPAddress, Constants.NoStoreFoundSystemMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(Constants.NoStoreFoundUserMessage, result, false);
                 }
 
-                var uploadDTO = new UploadDTO(imagePath, category, name, (DateTime)postTime, username, description, rating, price, priceUnit);
+                var imagePath = Constants.PhotoFolder + "\\" + post.Username + "_" + TimeUtilityService.CurrentUnixTime() + imageExtension;
+
+                var uploadDTO = new UploadDTO(imagePath, image, post.Category, post.Name, (DateTime)postTime, post.Username, post.Description,
+                                              post.Rating, post.Price, post.PriceUnit);
 
                 var verification = _uploadService.VerifyUpload(uploadDTO, Constants.MaximumPhotoCharacters, Constants.MinimumPhotoCharacters, Constants.MinimumImageSizeMB, Constants.MaximumImageSizeMB, Constants.ValidImageExtensions,
                                                                Constants.IngredientNameMaximumCharacters, Constants.IngredientNameMinimumCharacters, Constants.MaximumIngredientPrice,
@@ -93,13 +109,15 @@ namespace TeamA.Exogredient.Managers
                 {
                     // Log the fact that scope was violated.
                     await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                                   Constants.CreateUploadOperation, username, ipAddress, Constants.UploadNotValidSystemMessage).ConfigureAwait(false);
+                                                   Constants.CreateUploadOperation, post.Username, post.IPAddress, Constants.UploadNotValidSystemMessage).ConfigureAwait(false);
 
                     return SystemUtilityService.CreateResult(verification.Message, result, false);
                 }
 
-                var uploadRecord = new UploadRecord((DateTime)postTime, username, storeID, description, rating.ToString(), imagePath,
-                                                    price, priceUnit, name, Constants.NoValueInt, Constants.NoValueInt, Constants.NotInProgressStatus, category);
+                image.Save(imagePath);
+
+                var uploadRecord = new UploadRecord((DateTime)postTime, post.Username, storeID, post.Description, post.Rating.ToString(), imagePath,
+                                                    post.Price, post.PriceUnit, post.Name, Constants.NoValueInt, Constants.NoValueInt, Constants.NotInProgressStatus, post.Category);
 
                 await _uploadService.CreateUploadAsync(uploadRecord).ConfigureAwait(false);
 
@@ -107,17 +125,19 @@ namespace TeamA.Exogredient.Managers
             }
             catch (Exception ex)
             {
+                throw ex;
+
                 // Log exception.
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                               Constants.CreateUploadOperation, username, ipAddress, ex.ToString()).ConfigureAwait(false);
+                                               Constants.CreateUploadOperation, post.Username, post.IPAddress, ex.ToString()).ConfigureAwait(false);
 
                 // Recursively retry the operation until the maximum amount of retries is reached.
-                await CreateUploadAsync(imagePath, category, username, ipAddress, postTime, name, description, rating, price, priceUnit, ++failureCount).ConfigureAwait(false);
+                await CreateUploadAsync(post, ++failureCount).ConfigureAwait(false);
             }
 
             // Log the fact that the operation was successful.
             await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                            Constants.CreateUploadOperation, username, ipAddress).ConfigureAwait(false);
+                                            Constants.CreateUploadOperation, post.Username, post.IPAddress).ConfigureAwait(false);
 
             return SystemUtilityService.CreateResult(Constants.UploadCreationSuccessMessage, result, false);
         }
@@ -178,7 +198,7 @@ namespace TeamA.Exogredient.Managers
                     return SystemUtilityService.CreateResult(Constants.NoStoreFoundUserMessage, result, false);
                 }
 
-                var uploadDTO = new UploadDTO(imagePath, category, name, (DateTime)postTime, username, description, rating, price, priceUnit);
+                var uploadDTO = new UploadDTO(imagePath, image, category, name, (DateTime)postTime, username, description, rating, price, priceUnit);
 
                 var verification = _uploadService.VerifyUpload(uploadDTO, Constants.MaximumPhotoCharacters, Constants.MinimumPhotoCharacters, Constants.MinimumImageSizeMB, Constants.MaximumImageSizeMB, Constants.ValidImageExtensions,
                                                                Constants.IngredientNameMaximumCharacters, Constants.IngredientNameMinimumCharacters, Constants.MaximumIngredientPrice,
@@ -218,7 +238,7 @@ namespace TeamA.Exogredient.Managers
             return SystemUtilityService.CreateResult(Constants.DraftCreationSuccessMessage, result, false);
         }
 
-        public async Task<Result<AnalysisResult>> AnalyzeImageAsync(string username, string ipAddress, Image image, int failureCount)
+        public async Task<Result<AnalysisResult>> AnalyzeImageAsync(string username, Image image, string ipAddress, int failureCount)
         {
             var result = new AnalysisResult(new List<string>(), Constants.NoValueString, Constants.NoValueString);
 
@@ -239,7 +259,7 @@ namespace TeamA.Exogredient.Managers
                                                Constants.AnalyzeImageOperation, username, ipAddress, ex.ToString()).ConfigureAwait(false);
 
                 // Recursively retry the operation until the maximum amount of retries is reached.
-                await AnalyzeImageAsync(username, ipAddress, image, ++failureCount).ConfigureAwait(false);
+                await AnalyzeImageAsync(username, image, ipAddress, ++failureCount).ConfigureAwait(false);
             }
 
 
@@ -250,7 +270,7 @@ namespace TeamA.Exogredient.Managers
             return SystemUtilityService.CreateResult(Constants.AnalyzationSuccessMessage, result, false);
         }
 
-        public async Task<Result<UploadObject>> AnalyzeImageAsync(string username, string ipAddress, int id, int failureCount)
+        public async Task<Result<UploadObject>> ContinueUploadProgressAsync(string username, int id, string ipAddress, int failureCount)
         {
             var result = new UploadObject(Constants.NoValueDatetime, Constants.NoValueString, Constants.NoValueInt, Constants.NoValueString,
                                           Constants.NoValueInt, Constants.NoValueString, Constants.NoValueDouble, Constants.NoValueString,
@@ -265,7 +285,7 @@ namespace TeamA.Exogredient.Managers
 
             try
             {
-                result = await _uploadService.ContinueProgressUploadAsync(id).ConfigureAwait(false);
+                result = await _uploadService.ContinueUploadProgressAsync(id).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -274,7 +294,7 @@ namespace TeamA.Exogredient.Managers
                                                Constants.ContinueDraftOperation, username, ipAddress, ex.ToString()).ConfigureAwait(false);
 
                 // Recursively retry the operation until the maximum amount of retries is reached.
-                await AnalyzeImageAsync(username, ipAddress, id, ++failureCount).ConfigureAwait(false);
+                await ContinueUploadProgressAsync(username, id, ipAddress, ++failureCount).ConfigureAwait(false);
             }
 
 
@@ -283,6 +303,38 @@ namespace TeamA.Exogredient.Managers
                                            Constants.ContinueDraftOperation, username, ipAddress).ConfigureAwait(false);
 
             return SystemUtilityService.CreateResult(Constants.UploadRetrievalSuccessMessage, result, false);
+        }
+
+        public async Task<Result<bool>> DeleteUploadAsync(string username, int id, string ipAddress, int failureCount)
+        {
+            var result = false;
+
+            // Escape condition for recursive call if exception is thrown.
+            if (failureCount >= Constants.OperationRetry)
+            {
+                return SystemUtilityService.CreateResult(Constants.UploadDeletionFailedMessage, result, true);
+            }
+
+            try
+            {
+                result = await _uploadService.DeleteUploadsAsync(new List<int>() { id }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // Log exception.
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                               Constants.DeleteUploadOperation, username, ipAddress, ex.ToString()).ConfigureAwait(false);
+
+                // Recursively retry the operation until the maximum amount of retries is reached.
+                await ContinueUploadProgressAsync(username, id, ipAddress, ++failureCount).ConfigureAwait(false);
+            }
+
+
+            // Log the fact that the operation was successful.
+            await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                           Constants.DeleteUploadOperation, username, ipAddress).ConfigureAwait(false);
+
+            return SystemUtilityService.CreateResult(Constants.UploadDeletionSuccessMessage, result, false);
         }
     }
 }

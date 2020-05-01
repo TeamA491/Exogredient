@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.Services
             return await _uploadDAO.CreateAsync(uploadRecord).ConfigureAwait(false);
         }
 
-        public async Task<UploadObject> ContinueProgressUploadAsync(int id)
+        public async Task<UploadObject> ContinueUploadProgressAsync(int id)
         {
             return (UploadObject)await _uploadDAO.ReadByIdAsync(id).ConfigureAwait(false);
         }
