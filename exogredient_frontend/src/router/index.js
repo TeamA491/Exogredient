@@ -4,7 +4,6 @@ import SearchResultsView from '../views/SearchResultsView';
 import StoreView from '../views/StoreView';
 import ErrorView from '../views/ErrorView';
 import RegistrationView from '../views/RegistrationView';
-import LoginView from '../views/LoginView';
 
 Vue.use(VueRouter)
 
@@ -13,13 +12,24 @@ const routes = [
   { path: '/StoreView', component: StoreView},
   { path: '/ErrorView', component: ErrorView}, 
   { path: '/RegistrationView', component: RegistrationView },
+  {
+    path: '/resetPassword/:token',
+    name: 'resetPassword',
+    component: () => import('../views/ResetPasswordView.vue'),
+    props: true
+  },
+  { 
+    path: '/sendResetLink',
+    name: 'sendResetLink',
+    component: () => import('../views/SendResetLink.vue')
+  },
   { 
     path: '/verify',
     name: 'verify',
     component: () => import('../views/VerificationView.vue')
   },
   {
-    path: '/login/:afterRegistered',
+    path: '/login/:after',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),
     props: true

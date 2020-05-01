@@ -77,7 +77,7 @@ export default {
             }
 
             if(verifyEmailCodeJson.successful && verifyPhoneCodeJson.successful){
-                this.$router.push('/login/true');
+                this.$router.push('/login/registered');
             }
         }
     }

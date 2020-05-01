@@ -1,6 +1,7 @@
 <template>
     <div id="form">
-        <p v-if="afterRegistered === 'true'" id="afterRegistration">Verification Success!</p>
+        <p v-if="after === 'registered'" id="after">Verification Success!</p>
+        <p v-if="after === 'reset'" id="after">Password Reset Success!</p>
         <div class='field'>
             <label class='label' for="username">Username:</label><br>
             <input class="input" type="text" name="username" id="usernameInput" placeholder="username" v-model="username"><br>
@@ -11,7 +12,9 @@
             <input class="input" type="password" name="password" id="passwordInput" placeholder="password" v-model="password"><br>
         </div>
         <span id="loginError"></span><br>
-        <input class="button" type="submit" value="Submit" :disabled="isSubmitDisabled" @click="submit">
+        <input class="button" type="submit" value="Register" @click="goToRegistration">
+        <input class="button" type="submit" value="Login" :disabled="isSubmitDisabled" @click="submit"><br>
+        <input class="button" type="submit" value="Reset Password" @click="goToSendResetLink">
     </div>
 </template>
 
@@ -19,7 +22,7 @@
 import * as global from "../globalExports.js";
 export default {
     name: "LoginView",
-    props:["afterRegistered"],
+    props:["after"],
     data(){
         return{
             username: "",
@@ -32,6 +35,16 @@ export default {
         }
     },
     methods:{
+        goToSendResetLink: function(){
+            this.$router.push("/sendResetLink");
+        },
+        goToRegistration: function(){
+            if(this.$store.state.location === "California"){
+                this.$router.push('/RegistrationView');
+            }else{
+                alert("You must be in California to register!");
+            }
+        },
         byteArrayToHex: function(array){
             var temp = [];
             for(var i=0; i<array.length; i++){
@@ -113,7 +126,7 @@ export default {
         color: red;
         font-weight: bold;
     }
-    #afterRegistration{
+    #after{
         text-align: center;
         font-weight: bold;
     }
