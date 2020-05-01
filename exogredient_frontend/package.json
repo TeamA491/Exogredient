@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "bulma": "^0.8.2",
+    "bulma-calendar": "^6.0.7",
     "chai": "^4.2.0",
     "node-sass": "^4.13.1",
     "register-service-worker": "^1.7.1",

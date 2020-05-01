@@ -4,20 +4,23 @@
       <!-- SIDE NAV -->
       <aside class="hero is-fullheight-with-navbar column is-2" id="sidebar">
         <nav class="menu">
+          <h1 class="menu-label">Filters</h1>
+
+          <hr class="divider" />
+
+          <!-- STATUS DROPDOWN -->
           <p class="menu-label">Status</p>
-          <ul class="menu-list">
-            <li>
-              <a class="is-active">Unresolved</a>
-            </li>
+          <div class="select is-fullwidth">
+            <select id="status-dropdown">
+              <option>Unresolved</option>
+              <option>Resolved</option>
+            </select>
+          </div>
 
-            <li>
-              <a>Resolved</a>
-            </li>
-          </ul>
-
+          <!-- CATEGORY DROPDOWN -->
           <p class="menu-label">Category</p>
           <div class="select is-fullwidth">
-            <select>
+            <select id="category-dropdown">
               <option>All</option>
               <option>Bug</option>
               <option>Error</option>
@@ -26,12 +29,28 @@
             </select>
           </div>
 
+          <!-- <button class="button menu-label">Select Dates</button> -->
+
+          <!-- READ STATUS DROPDOWN -->
           <p class="menu-label">Read Status</p>
           <div class="select is-fullwidth">
-            <select>
+            <select id="read-status-dropdown">
               <option>All</option>
               <option>Read</option>
               <option>Unread</option>
+            </select>
+          </div>
+
+          <!-- FLAG COLOR DROPDOWN -->
+          <p class="menu-label">Flag Color</p>
+          <div class="select is-fullwidth">
+            <select id="flag-colors-dropdown">
+              <option>All</option>
+              <option>Red</option>
+              <option>Purple</option>
+              <option>Blue</option>
+              <option>Green</option>
+              <option>Orange</option>
             </select>
           </div>
         </nav>
@@ -39,32 +58,24 @@
 
       <!-- MAIN VIEW -->
       <div class="column">
-        <!-- TOP OPTIONS -->
-        <nav class="level">
-          <div class="level-left">
-            <!-- SELECT ALL CHECK BOX -->
-            <div class="level-item">
-              <button class="button">Date range</button>
-              <span class="tag is-large">04/1/20 - 05/1/20</span>
-            </div>
+        <h1 class="title is-1">Tickets</h1>
 
-            <!-- FLAG COLOR SELECTION -->
-            <div class="level-item">Flag Colors</div>
-            <div class="level-item">
-              <div class="buttons has-addons">
-                <button class="button">all</button>
-                <button class="button is-info is-selected">red</button>
-                <button class="button">green</button>
-                <button class="button">blue</button>
-              </div>
+        <div class="hero" id="no-tickets-display">
+          <div class="hero-body">
+            <div class="container has-text-centered">
+              <h1 class="title">No Tickets</h1>
+              <h2 class="subtitle">View all your tickets here</h2>
             </div>
           </div>
-        </nav>
+        </div>
 
         <!-- TICKETS TABLE -->
-        <table class="table is-hoverable is-fullwidth" id="ticket-table">
+        <table class="table is-hoverable is-fullwidth is-hidden" id="tickets-table">
           <thead>
             <tr>
+              <th>
+                <input type="checkbox" id="select-all-checkbox" />
+              </th>
               <th>
                 <abbr title="Ticket ID">ID</abbr>
               </th>
@@ -75,6 +86,7 @@
           </thead>
 
           <tfoot>
+            <th></th>
             <th>
               <abbr title="Ticket ID">ID</abbr>
             </th>
@@ -84,35 +96,20 @@
           </tfoot>
 
           <tbody>
-            <tr>
-              <th>1</th>
-              <td>2</td>
-              <td>3</td>
-              <td>Bug</td>
-            </tr>
-            <tr>
-              <th>1</th>
-              <td>2</td>
-              <td>3</td>
-              <td>Error</td>
-            </tr>
-            <tr>
-              <th>1</th>
-              <td>2</td>
-              <td>3</td>
-              <td>Report</td>
-            </tr>
-            <tr>
-              <th>1</th>
-              <td>2</td>
-              <td>3</td>
-              <td>Bug</td>
+            <tr v-for="ticket in tickets" :key="ticket.id">
+              <th>
+                <input type="checkbox" id="select-all-checkbox" />
+              </th>
+              <td>{{ ticket.id }}</td>
+              <td>{{ ticket.flagColor }}</td>
+              <td>{{ ticket.readStatus }}</td>
+              <td>{{ ticket.category }}</td>
             </tr>
           </tbody>
         </table>
 
         <!-- PAGINATION -->
-        <nav class="pagination" role="navigation" aria-label="pagination">
+        <nav class="pagination" role="navigation" aria-label="pagination" id="pagination">
           <a class="pagination-previous">Previous</a>
           <a class="pagination-next">Next page</a>
           <ul class="pagination-list">
@@ -146,12 +143,83 @@
 
 <!-- ================================================= -->
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 
 export default Vue.extend({
-  name: "tickets-view"
+  name: "tickets-view",
+  props: {
+    tickets: [
+      {
+        id: 1,
+        flagColor: "red",
+        readStatus: "read",
+        category: "bug"
+      },
+      {
+        id: 2,
+        flagColor: "green",
+        readStatus: "unread",
+        category: "error"
+      }
+    ]
+  }
 });
+
+var statusDropdown;
+var categoryDropdown;
+var flagColorsDropdown;
+var readStatusDropdown;
+
+var ticketsTable;
+var noTicketsDisplay;
+var pagination;
+
+// On document ready...
+document.addEventListener("DOMContentLoaded", function(event) {
+  // Initializing
+  statusDropdown = document.getElementById("status-dropdown");
+  categoryDropdown = document.getElementById("category-dropdown");
+  flagColorsDropdown = document.getElementById("flag-colors-dropdown");
+  readStatusDropdown = document.getElementById("read-status-dropdown");
+  pagination = document.getElementById('pagination');
+
+  noTicketsDisplay = document.getElementById('no-tickets-display');
+  ticketsTable = document.getElementById('tickets-table');
+
+  // Add event listeners
+  statusDropdown.addEventListener("change", onStatusDropdownChange);
+  categoryDropdown.addEventListener("change", onCategoryDropdownChange);
+  flagColorsDropdown.addEventListener("change", onFlagColorsDropdownChange);
+  readStatusDropdown.addEventListener("change", readStatusDropdown);
+
+  // TODO: IF TABLE IS EMPTY, PUT EMPTY MESSAGE
+
+  // Check if there are tickets or not
+  showTable();
+});
+
+function onStatusDropdownChange() {}
+
+function onCategoryDropdownChange() {}
+
+function onFlagColorsDropdownChange() {}
+
+function onReadStatusDropdownChange() {}
+
+function showTable()
+{
+  noTicketsDisplay.classList.add('is-hidden');
+  ticketsTable.classList.remove('is-hidden');
+  pagination.classList.remove('is-hidden');
+}
+
+function hideTable()
+{
+  ticketsTable.classList.add('is-hidden');
+  noTicketsDisplay.classList.remove('is-hidden');
+  pagination.classList.add('is-hidden');
+}
 </script>
 
 <!-- ================================================= -->
@@ -159,5 +227,8 @@ export default Vue.extend({
 <style scoped>
 #sidebar {
   background-color: #fafafa;
+}
+#divider {
+  background-color: darkgrey;
 }
 </style>
