@@ -4,7 +4,7 @@
       <!-- SIDE NAV -->
       <aside class="hero is-fullheight-with-navbar column is-2" id="sidebar">
         <nav class="menu">
-          <h1>Search Filters</h1>
+          <h1 class="title">Search Filters</h1>
 
           <hr class="divider" />
 
@@ -228,7 +228,7 @@ var curTicketMarkResolvedButton;
 var curTicketBackButton;
 
 // On document ready...
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function() {
   // Initializing
   statusDropdown = document.getElementById("status-dropdown");
   categoryDropdown = document.getElementById("category-dropdown");
