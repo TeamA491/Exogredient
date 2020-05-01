@@ -39,6 +39,16 @@ namespace UploadController.Controllers
         //}
 
 
+        [HttpPost("fuckme")]
+        [Consumes("multipart/form-data")]
+        [Produces("application/json")]
+        public IActionResult insidePost(IFormFile formFile)
+        {
+            return Ok(formFile.FileName);
+        }
+
+
+
         [HttpPost("Vision")]
         [Produces("application/json")]
         public async Task<IActionResult> AnalyzeImageAsync(VisionPost post)
