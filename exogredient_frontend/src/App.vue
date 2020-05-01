@@ -30,6 +30,7 @@
 
 <script>
   import * as global from "./globalExports.js";
+
   export default {
     name: "App",
     async mounted(){
@@ -174,6 +175,7 @@
     }
   }
 </script>
+
 <style>
 #static {
   font-family: Avenir, Helvetica, Arial, sans-serif;

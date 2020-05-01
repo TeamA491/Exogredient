@@ -12,12 +12,12 @@ export default {
   props: {
     saveItem: {
       type: Object,
-      default: {},
+      default: {}
     },
     index: {
       type: Number,
-      default: -1,
-    },
+      default: -1
+    }
   },
   methods: {
     DeleteSaveItem(saveItem) {
@@ -25,15 +25,15 @@ export default {
       fetch(
         `${global.ApiDomainName}/api/UserProfile/SaveList/${saveItem.username}/${saveItem.storeId}/${saveItem.ingredientName}?ipAddress=${this.$store.state.ipAddress}`,
         { method: "DELETE" }
-      ).then((response) => {
+      ).then(response => {
         // Display error view based on response status code
         global.ErrorHandler(this.$router, response);
       });
 
       // remove this save list item from the parent saveList array
       this.$parent.saveList.splice(this.Index, 1);
-    },
-  },
+    }
+  }
 };
 </script>
 
