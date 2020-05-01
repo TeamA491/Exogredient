@@ -29,8 +29,6 @@
             </select>
           </div>
 
-          <!-- <button class="button menu-label">Select Dates</button> -->
-
           <!-- READ STATUS DROPDOWN -->
           <p class="menu-label">Read Status</p>
           <div class="select is-fullwidth">
@@ -60,6 +58,7 @@
       <div class="column">
         <h1 class="title is-1">Tickets</h1>
 
+        <!-- NO TICKETS MESSAGE -->
         <div class="hero" id="no-tickets-display">
           <div class="hero-body">
             <div class="container has-text-centered">
@@ -136,6 +135,57 @@
             </li>
           </ul>
         </nav>
+
+        <div class="container is-fluid has-background-grey-lighter">
+          <!-- CURRENT TICKET HEADER -->
+          <div class="level">
+            <div class="level-left">
+              <!-- CURRENT TICKET CATEGORY DROPDOWN -->
+              <div class="level-item has-text-centered">
+                <p>Category</p>
+                <div class="select">
+                  <select id="cur-ticket-category-dropdown">
+                    <option>Bug</option>
+                    <option>Error</option>
+                    <option>Report</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- CURRENT TICKET FLAG COLOR DROPDOWN -->
+              <div class="level-item has-text-centered">
+                <p>Flag color</p>
+                <div class="select" id="cur-ticket-flag-colors">
+                  <select>
+                    <option>None</option>
+                    <option>Red</option>
+                    <option>Purple</option>
+                    <option>Blue</option>
+                    <option>Green</option>
+                    <option>Orange</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="level-left">
+              <!-- CURRENT TICKET READ STATUS TOGGLE BUTTON -->
+              <div class="level-item has-text-centered">
+                <button class="button is-success">Mark as read</button>
+              </div>
+
+              <!-- CURRENT TICKET STATUS BUTTON -->
+              <div class="level-item has-text-centered">
+                <button class="button is-success">Mark as resolved</button>
+              </div>
+            </div>
+          </div>
+
+          <h3>Submitted: 05/01/2020</h3>
+
+          <textarea readonly class="textarea" rows="10" id="current-ticket-description">asdfasdfasd</textarea>
+        </div>
       </div>
     </div>
   </div>
@@ -148,11 +198,11 @@ import Vue from "vue";
 
 export default {
   name: "tickets-view",
-  data(){
-      return{
-          tickets: []
-      }
-  },
+  data() {
+    return {
+      tickets: []
+    };
+  }
 };
 
 var statusDropdown;
@@ -163,6 +213,8 @@ var readStatusDropdown;
 var ticketsTable;
 var noTicketsDisplay;
 var pagination;
+
+var curTicketFlagColors;
 
 // On document ready...
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -176,6 +228,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   noTicketsDisplay = document.getElementById("no-tickets-display");
   ticketsTable = document.getElementById("tickets-table");
 
+  curTicketFlagColors = document.getElementById("cur-ticket-flag-colors");
+
   // Add event listeners
   statusDropdown.addEventListener("change", onStatusDropdownChange);
   categoryDropdown.addEventListener("change", onCategoryDropdownChange);
@@ -185,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   // TODO: IF TABLE IS EMPTY, PUT EMPTY MESSAGE
 
   // Check if there are tickets or not
-  showTable();
+  displayTicketView();
 });
 
 function onStatusDropdownChange() {}
@@ -206,6 +260,18 @@ function hideTable() {
   ticketsTable.classList.add("is-hidden");
   noTicketsDisplay.classList.remove("is-hidden");
   pagination.classList.add("is-hidden");
+}
+
+function displayTicketView() {
+  noTicketsDisplay.classList.add("is-hidden");
+  ticketsTable.classList.add("is-hidden");
+  pagination.classList.add("is-hidden");
+}
+
+function hideTicketView() {
+  ticketsTable.classList.remove("is-hidden");
+  noTicketsDisplay.classList.remove("is-hidden");
+  pagination.classList.remove("is-hidden");
 }
 </script>
 
