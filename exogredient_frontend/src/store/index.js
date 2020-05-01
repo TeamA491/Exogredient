@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     searchData:{},
     storeResults: [],
     ingredientResults: [],
+    ingredientsList: [],
     storeViewData: {},
     totalResultsNum:{
       storeResultsTotalNum: null,
@@ -72,7 +73,10 @@ const store = new Vuex.Store({
     },
     updateRegistrationPhoneNum(state, newPhoneNum){
       state.registration.phoneNumber = newPhoneNum;
-    }
+    },
+    updateIngredientsList(state, newIngredientsList) {
+      state.ingredientsList = newIngredientsList;
+    },
   },
   actions:{
     updateSearchData ({commit}, newSearchData){
@@ -135,7 +139,10 @@ const store = new Vuex.Store({
     },
     updateUsername({commit}, newUsername) {
       commit("updateUsername", newUsername)
-    }
+    },
+    updateIngredientsList({ commit }, newIngredientsList) {
+      commit("updateIngredientsList", newIngredientsList);
+    },
   },
   getters:{
     storeResults: state=> {

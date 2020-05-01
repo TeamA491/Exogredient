@@ -102,7 +102,7 @@ export default {
           this.$store.commit('updateIngredientsList', ingredientsList);
 
           this.$store.dispatch('updateStoreViewData', storeViewData);  
-            this.$router.push("/IngredientsView");
+            this.$router.push("/ingredientView");
         },
 
         openMap: function(){

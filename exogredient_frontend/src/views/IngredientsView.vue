@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h1>HELLO WORLD</h1>
         ingredient view
         <v-btn @click="view">see ingreditnes</v-btn>
        <div v-for="ingredient in ingredients" :key=ingredient.ingredientName>
@@ -26,9 +27,11 @@ export default {
     },
     methods: {
         view: function(){
-                        fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=beef&storeId=1`)
+            fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=beef&storeId=1`)
             .then((response) =>
             {
+                console.log("inside of ");
+                
                 // error if(!respone.statuscode.ok) thrwo er
                 return response.json();
             })
@@ -46,7 +49,23 @@ export default {
         }
     },
     created () {
-        this.view();
+        fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}`)
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            for(let index in data)
+            {
+                console.log(data);
+                this.ingredients.push(data[index])
+            }
+
+        })
+
+
+
+
+
     }
 }
 
