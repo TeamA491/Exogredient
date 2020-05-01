@@ -26,8 +26,8 @@ namespace TeamA.Exogredient.Managers
             {
                 var uploads = await _uploadService.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
 
-                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.GetUploadsByIngredientNameandStoreIdOperation, username, ipAddress).ConfigureAwait(false);
+                //_ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //   Constants.GetUploadsByIngredientNameandStoreIdOperation, username, ipAddress).ConfigureAwait(false);
 
                 return uploads;
             }
@@ -111,15 +111,15 @@ namespace TeamA.Exogredient.Managers
             {
                 var uploads = await _uploadService.GetIngredientsfromStore(storeId, pagination).ConfigureAwait(false);
 
-                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.GetIngredientsfromStoreOperation, username, ipAddress).ConfigureAwait(false);
+                //_ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //  Constants.GetIngredientsfromStoreOperation, username, ipAddress).ConfigureAwait(false);
 
                 return uploads;
             }
             catch (Exception e)
             {
-                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.GetIngredientsfromStoreOperation, username, ipAddress).ConfigureAwait(false);
+                //_ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                //    Constants.GetIngredientsfromStoreOperation, username, ipAddress).ConfigureAwait(false);
 
                 failurecount += 1;
 

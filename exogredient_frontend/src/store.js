@@ -13,6 +13,7 @@ export default new Vuex.Store({
     state: {
       storeResults: [],
       ingredientResults: [],
+      ingredientsList: [],
       storeViewData: null,
       username: "username",
       ipAddress: "127.1.1.0",
@@ -25,6 +26,9 @@ export default new Vuex.Store({
       },
       updateIngredientResults(state, newIngredientResults) {
         state.ingredientResults = newIngredientResults;
+      },
+      updateIngredientsList(state, newIngredientsList) {
+        state.ingredientsList = newIngredientsList;
       },
       updateIngredientName(state, newIngredientName) {
         state.ingredientName = newIngredientName;
@@ -43,6 +47,9 @@ export default new Vuex.Store({
       updateIngredientResults({ commit }, newIngredientResults) {
         commit("updateIngredientResults", newIngredientResults);
       },
+      updateIngredientsList({ commit }, newIngredientsList) {
+        commit("updateIngredientsList", newIngredientsList);
+      },
       updateIngredientName({ commit }, newIngredientName) {
         commit("updateIngredientName", newIngredientName);
       },
@@ -59,6 +66,9 @@ export default new Vuex.Store({
       },
       ingredientResults: state => {
         return state.ingredientResults;
+      },
+      ingredientsList: state => {
+        return state.ingredientsList;
       },
       username: state => {
         return state.username;
