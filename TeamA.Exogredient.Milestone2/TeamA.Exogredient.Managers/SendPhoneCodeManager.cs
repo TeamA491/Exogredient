@@ -10,14 +10,12 @@ namespace TeamA.Exogredient.Managers
     {
 
         private readonly LoggingManager _loggingManager;
-        private readonly AuthenticationService _authenticationService;
         private readonly VerificationService _verificationService;
 
-        public SendPhoneCodeManager(LoggingManager loggingManager, AuthenticationService authenticationService,
+        public SendPhoneCodeManager(LoggingManager loggingManager,
                                     VerificationService verificationService)
         {
             _loggingManager = loggingManager;
-            _authenticationService = authenticationService;
             _verificationService = verificationService;
         }
 
@@ -28,14 +26,16 @@ namespace TeamA.Exogredient.Managers
             {
                 await _verificationService.SendCallVerificationAsync(username, phoneNumber).ConfigureAwait(false);
 
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendPhoneCodeOperation, username, ipAddress).ConfigureAwait(false);
 
-                return SystemUtilityService.CreateResult(Constants.SendPhoneCodeSuccessUserMessage, true, false, currentNumExceptions);
+                return SystemUtilityService.CreateResult(Constants.SendPhoneCodeSuccessUserMessage, true, false);
             }
             catch (Exception e)
             {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                               Constants.SendPhoneCodeOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
                 if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
@@ -43,7 +43,7 @@ namespace TeamA.Exogredient.Managers
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.SendPhoneCodeOperation} failed a maximum number of times for {username}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
 
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
+                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true);
             }
         }
     }

@@ -4,31 +4,141 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.AppConstants;
+using System.Linq;
 
 namespace TeamA.Exogredient.Services
 {
     public class UploadService
     {
-        private readonly UploadDAO _uploadDao;
+        private readonly UploadDAO _uploadDAO;
         public UploadService(UploadDAO uploadDAO)
         {
-            _uploadDao = uploadDAO;
+            _uploadDAO = uploadDAO;
         }
 
-        public async Task<bool> CreateUpload(UploadRecord uploadRecord)
+        public async Task<bool> CreateUploadAsync(UploadRecord uploadRecord)
         {
-            throw new NotImplementedException();
+            return await _uploadDAO.CreateAsync(uploadRecord).ConfigureAwait(false);
         }
 
-        public async Task<bool> SaveProgessUpload(UploadRecord uploadRecord)
+        public async Task<UploadObject> ContinueProgressUploadAsync(int id)
         {
-            // Set column in_progress in uploadRecord. 
-            throw new NotImplementedException();
+            return (UploadObject)await _uploadDAO.ReadByIdAsync(id).ConfigureAwait(false);
         }
 
-        public async Task<IDataObject> ContinueProgressUpload(String id)
+        public VerifyUploadResult VerifyUpload(UploadDTO dto, int maxPhotoChars, int minPhotoChars, double minimumImageSizeMB, double maximumImageSizeMB, List<string> validExtensions,
+                                               int ingredientNameMaxChars, int ingredientNameMinChars, double maxIngredientPrice, int descriptionMaxChars,
+                                               int descriptionMinChars, List<string> validCategories, List<string> validPriceUnits, int validTimeBufferMinutes,
+                                               int maxRating, int minRating)
         {
-            throw new NotImplementedException();
+            var validPhotoPath = StringUtilityService.CheckLength(dto.ImagePath, maxPhotoChars, minPhotoChars);
+
+            if (!validPhotoPath)
+            {
+                return new VerifyUploadResult(Constants.ImagePathInvalidMessage, false);
+            }
+
+            var sizeBytes = (new System.IO.FileInfo(dto.ImagePath)).Length;
+            var sizeMB = sizeBytes * Constants.ToMBConversionFactor;
+            var validSize = sizeMB >= minimumImageSizeMB && sizeMB <= maximumImageSizeMB;
+
+            if (!validSize)
+            {
+                return new VerifyUploadResult(Constants.ImageNotWithinSizeMessage, false);
+            }
+
+            var fileExtension = "." + dto.ImagePath.Split('.').Last();
+            var validExt = false;
+
+            foreach (var ext in validExtensions)
+            {
+                validExt = validExt || (fileExtension.ToLower().Equals(ext.ToLower()));
+            }
+
+            if (!validExt)
+            {
+                return new VerifyUploadResult(Constants.ExtensionNotValidMessage, false);
+            }
+
+            var validCat = false;
+
+            foreach (var cat in validCategories)
+            {
+                validCat = validCat || (dto.Category.ToLower().Equals(cat.ToLower()));
+            }
+
+            if (!validCat)
+            {
+                return new VerifyUploadResult(Constants.CategoryNotValidMessage, false);
+            }
+
+            if (!dto.Name.Equals(Constants.NoValueString))
+            {
+                var validNameLength = StringUtilityService.CheckLength(dto.Name, ingredientNameMaxChars, ingredientNameMinChars);
+
+                if (!validNameLength)
+                {
+                    return new VerifyUploadResult(Constants.IngredientNameLengthInvalidMessage, false);
+                }
+            }
+
+            if (!dto.Price.Equals(Constants.NoValueDouble))
+            {
+                var validPrice = dto.Price > Constants.NoValueDouble && dto.Price <= maxIngredientPrice;
+
+                if (!validPrice)
+                {
+                    return new VerifyUploadResult(Constants.PriceInvalidMessage, false);
+                }
+            }
+
+            if (!dto.Description.Equals(Constants.NoValueString))
+            {
+                var validDescriptionLength = StringUtilityService.CheckLength(dto.Description, descriptionMaxChars, descriptionMinChars);
+
+                if (!validDescriptionLength)
+                {
+                    return new VerifyUploadResult(Constants.DescriptionLengthInvalidMessage, false);
+                }
+            }
+            
+            if (!dto.PriceUnit.Equals(Constants.NoValueString))
+            {
+                var validUnit = false;
+
+                foreach (var unit in validPriceUnits)
+                {
+                    validUnit = validUnit || (dto.PriceUnit.ToLower().Equals(unit.ToLower()));
+                }
+
+                if (!validUnit)
+                {
+                    return new VerifyUploadResult(Constants.PriceUnitNotValidMessage, false);
+                }
+            }
+            
+            if (!dto.Time.Equals(Constants.NoValueDatetime))
+            {
+                var validTime = (DateTime.Now - dto.Time).TotalMinutes <= validTimeBufferMinutes;
+
+                if (!validTime)
+                {
+                    return new VerifyUploadResult(Constants.TimeNotValidMessage, false);
+                }
+            }
+            
+            if (!dto.Rating.Equals(Constants.NoValueInt))
+            {
+                var validRating = dto.Rating >= minRating && dto.Rating <= maxRating;
+
+                if (!validRating)
+                {
+                    return new VerifyUploadResult(Constants.InvalidRatingMessage, false);
+                }
+            }
+
+            return new VerifyUploadResult(Constants.NoValueString, true);
         }
 
         /// <summary>
@@ -36,15 +146,11 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="ids">Ids of the upload to delete.</param>
         /// <returns></returns>
-        public async Task<bool> DeleteUploadsAsync(List<string> ids)
+        public async Task<bool> DeleteUploadsAsync(List<int> ids)
         {
-            return await _uploadDao.DeleteByIdsAsync(ids).ConfigureAwait(false);   
+            return await _uploadDAO.DeleteByIdsAsync(ids).ConfigureAwait(false);   
         }
 
-        public async Task<bool> ReportUpload(UploadRecord uploadRecord)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Get all the upload vote's for a user.
@@ -53,7 +159,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>List of ProfileScoreResult.</returns>
         public async Task<List<ProfileScoreResult>> getUploadVotesAsync(string username)
         {
-            return await _uploadDao.ReadUploadVotesAsync(username).ConfigureAwait(false);
+            return await _uploadDAO.ReadUploadVotesAsync(username).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -64,7 +170,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>List of UploadResult.</returns>
         public async Task<List<UploadResult>> GetRecentByUploaderAsync(string username, int pagination)
         {
-            return await _uploadDao.ReadRecentByUploaderAsync(username, pagination).ConfigureAwait(false);
+            return await _uploadDAO.ReadRecentByUploaderAsync(username, pagination).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -75,7 +181,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>List of UploadResult.</returns>
         public async Task<List<UploadResult>> GetInProgressUploadsByUploaderAsync(string username, int pagination)
         {
-            return await _uploadDao.ReadInProgressUploadsByUploaderAsync(username, pagination).ConfigureAwait(false);
+            return await _uploadDAO.ReadInProgressUploadsByUploaderAsync(username, pagination).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -84,9 +190,9 @@ namespace TeamA.Exogredient.Services
         /// <param name="ids">Ids of the uploads to check.</param>
         /// <param name="owner">User to perform operation on.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> CheckUploadOwnerAsync(List<string> ids, string owner)
+        public async Task<bool> CheckUploadOwnerAsync(List<int> ids, string owner)
         {
-            return await _uploadDao.CheckUploadsOwnerAsync(ids, owner).ConfigureAwait(false);
+            return await _uploadDAO.CheckUploadsOwnerAsync(ids, owner).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -94,9 +200,9 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="ids">Ids of the upload to check.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> CheckUploadsExistenceAsync(List<String> ids)
+        public async Task<bool> CheckUploadsExistenceAsync(List<int> ids)
         {
-            return await _uploadDao.CheckUploadsExistenceAsync(ids).ConfigureAwait(false);
+            return await _uploadDAO.CheckUploadsExistenceAsync(ids).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -106,7 +212,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>int representing pagination size.</returns>
         public async Task<int> GetInProgressPaginationSizeAsync(string username)
         {
-            return await _uploadDao.GetInProgressPaginationSizeAsync(username).ConfigureAwait(false);
+            return await _uploadDAO.GetInProgressPaginationSizeAsync(username).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -116,7 +222,12 @@ namespace TeamA.Exogredient.Services
         /// <returns>int representing pagination size.</returns>
         public async Task<int> GetRecentPaginationSizeAsync(string username)
         {
-            return await _uploadDao.GetRecentPaginationSizeAsync(username).ConfigureAwait(false);
+            return await _uploadDAO.GetRecentPaginationSizeAsync(username).ConfigureAwait(false);
+        }
+
+        public async Task<bool> ReportUpload(UploadRecord uploadRecord)
+        {
+            throw new NotImplementedException();
         }
     }
 }

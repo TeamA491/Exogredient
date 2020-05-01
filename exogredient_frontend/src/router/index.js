@@ -1,16 +1,29 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import SearchResultsView from '../views/SearchResultsView';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 import StoreView from '../views/StoreView';
 import ErrorView from '../views/ErrorView';
+import LoginView from '../views/LoginView';
+import RegistrationView from '../views/RegistrationView';
+import SearchResultsView from '../views/SearchResultsView';
 
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/SearchResultsView', component: SearchResultsView},
-  { path: '/StoreView', component: StoreView},
-  { path: '/ErrorView', component: ErrorView}, 
-
+  { path: '/SearchResultsView', component: SearchResultsView },
+  { path: '/StoreView', component: StoreView },
+  { path: '/ErrorView', component: ErrorView },
+  { path: '/RegistrationView', component: RegistrationView },
+  {
+    path: '/verify',
+    name: 'verify',
+    component: () => import('../views/VerificationView.vue')
+  },
+  {
+    path: '/login/:afterRegistered',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue'),
+    props: true
+  },
   {
     path: "/profile",
     name: "profile",
@@ -25,8 +38,7 @@ const routes = [
     path: "/",
     name: "home",
   },
-  
-]
+];
 
 const router = new VueRouter({
   mode: 'history',
@@ -35,4 +47,4 @@ const router = new VueRouter({
 });
 
 
-export default router
+export default router;

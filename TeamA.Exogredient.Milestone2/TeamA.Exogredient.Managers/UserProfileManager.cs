@@ -12,16 +12,16 @@ namespace TeamA.Exogredient.Managers
     public class UserProfileManager
     {
         private readonly UploadService _uploadService;
-        private readonly StoreManagementService _storeManagementService;
+        private readonly StoreService _storeService;
         private readonly SaveListService _saveListService;
         private readonly LoggingManager _loggingManager;
         private readonly UserManagementService _userManagementService;
 
-        public UserProfileManager(UploadService uploadService, StoreManagementService storeManagementService, SaveListService saveListService,
+        public UserProfileManager(UploadService uploadService, StoreService storeManagementService, SaveListService saveListService,
                                   LoggingManager loggingmanager, UserManagementService userManagementService)
         {
             _uploadService = uploadService;
-            _storeManagementService = storeManagementService;
+            _storeService = storeManagementService;
             _saveListService = saveListService;
             _loggingManager = loggingmanager;
             _userManagementService = userManagementService;
@@ -280,7 +280,7 @@ namespace TeamA.Exogredient.Managers
         /// <param name="failureCount">Current failure count of the operation.</param>
         /// <param name="ex">Exception that is thrown.</param>
         /// <returns>bool that represents whether the operation passed.</returns>
-        public async Task<bool> DeleteUploadsAsync(List<string> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
+        public async Task<bool> DeleteUploadsAsync(List<int> ids, string performingUser, string ipAddress, int failureCount, Exception ex)
         {
             // Escape condition for recursive call if exception is thrown.
             if (failureCount >= Constants.OperationRetry)
@@ -306,7 +306,7 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Get user type.
-                var userType = await _userManagementService.GetUserType(performingUser).ConfigureAwait(false);
+                var userType = await _userManagementService.GetUserTypeAsync(performingUser).ConfigureAwait(false);
 
                 // Check is user is admin. if true then let him perform
                 if (userType.Equals(Constants.AdminUserType))

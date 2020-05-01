@@ -11,10 +11,10 @@ namespace TeamA.Exogredient.DAL
     /// <summary>
     /// DAO for the data store containing IP Address information.
     /// </summary>
-    public class IPAddressDAO : IMasterSQLDAO<string>
+    public class AnonymousUserDAO : IMasterSQLDAO<string>
     {
         private string SQLConnection;
-        public IPAddressDAO(string connection)
+        public AnonymousUserDAO(string connection)
         {
             SQLConnection = connection;
         }
@@ -47,7 +47,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 // Construct the sql string .. start by inserting into the table name
-                string sqlString = $"INSERT INTO {Constants.IPAddressDAOtableName} (";
+                string sqlString = $"INSERT INTO {Constants.AnonymousUserDAOTableName} (";
 
                 // Loop through the data.
                 foreach (KeyValuePair<string, object> pair in recordData)
@@ -140,7 +140,7 @@ namespace TeamA.Exogredient.DAL
                     }
 
                     // Construct the sql string for deleteing where the ip column equals the @IPADDRESS parameter.
-                    string sqlString = $"DELETE FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS;";
+                    string sqlString = $"DELETE FROM {Constants.AnonymousUserDAOTableName} WHERE {Constants.AnonymousUserDAOIPColumn} = @IPADDRESS;";
 
                     // Get the command object inside a using statement to properly dispose/close.
                     using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -178,7 +178,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 // Construct the sql string to get the record where the id column equals the id parameter.
-                string sqlString = $"SELECT * FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @ID;";
+                string sqlString = $"SELECT * FROM {Constants.AnonymousUserDAOTableName} WHERE {Constants.AnonymousUserDAOIPColumn} = @ID;";
 
                 // Get the command and data table objects inside using statements to properly dispose/close.
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -192,10 +192,10 @@ namespace TeamA.Exogredient.DAL
                     DataRow row = dataTable.Rows[0];
 
                     // Construct the IPAddressObject by casting the values of the columns to their proper data types.
-                    result = new IPAddressObject((string)row[Constants.IPAddressDAOIPColumn],
-                                                 (long)row[Constants.IPAddressDAOtimestampLockedColumn],
-                                                 (int)row[Constants.IPAddressDAOregistrationFailuresColumn],
-                                                 (long)row[Constants.IPAddressDAOlastRegFailTimestampColumn]);
+                    result = new IPAddressObject((string)row[Constants.AnonymousUserDAOIPColumn],
+                                                 (long)row[Constants.AnonymousUserDAOtimestampLockedColumn],
+                                                 (int)row[Constants.AnonymousUserDAOregistrationFailuresColumn],
+                                                 (long)row[Constants.AnonymousUserDAOlastRegFailTimestampColumn]);
                 }
             }
 
@@ -230,7 +230,7 @@ namespace TeamA.Exogredient.DAL
                 connection.Open();
 
                 // Construct the sql string to update the table name where..
-                string sqlString = $"UPDATE {Constants.IPAddressDAOtableName} SET ";
+                string sqlString = $"UPDATE {Constants.AnonymousUserDAOTableName} SET ";
 
                 // Loop through the record data.
                 int count = 0;
@@ -238,7 +238,7 @@ namespace TeamA.Exogredient.DAL
                 {
                     // Check if the value at the ip column is contained within the table, throw an argument
                     // exception if it doesn't exist.
-                    if (pair.Key == Constants.IPAddressDAOIPColumn)
+                    if (pair.Key == Constants.AnonymousUserDAOIPColumn)
                     {
                         if (!await CheckIPExistenceAsync((string)pair.Value).ConfigureAwait(false))
                         {
@@ -248,7 +248,7 @@ namespace TeamA.Exogredient.DAL
 
                     // Update only the values where the record value is not null (string == null, numeric == -1).
                     // Again, use parameters to prevent against sql injections.
-                    if (pair.Key != Constants.IPAddressDAOIPColumn)
+                    if (pair.Key != Constants.AnonymousUserDAOIPColumn)
                     {
                         if (pair.Value is int)
                         {
@@ -278,7 +278,7 @@ namespace TeamA.Exogredient.DAL
 
                 // Remove the last comma and identify the record by its ip column.
                 sqlString = sqlString.Remove(sqlString.Length - 1);
-                sqlString += $" WHERE {Constants.IPAddressDAOIPColumn} = '{recordData[Constants.IPAddressDAOIPColumn]}';";
+                sqlString += $" WHERE {Constants.AnonymousUserDAOIPColumn} = '{recordData[Constants.AnonymousUserDAOIPColumn]}';";
 
                 // Get the command inside a using statement to properly dispose/close.
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -287,7 +287,7 @@ namespace TeamA.Exogredient.DAL
                     count = 0;
                     foreach (KeyValuePair<string, object> pair in recordData)
                     {
-                        if (pair.Key != Constants.IPAddressDAOIPColumn)
+                        if (pair.Key != Constants.AnonymousUserDAOIPColumn)
                         {
                             if (pair.Value is int)
                             {
@@ -338,7 +338,7 @@ namespace TeamA.Exogredient.DAL
 
                 // Construct the sql string to select all from the table where the ip column matches the ipAddress,
                 // then check if at least 1 row exists. Use a parameter to protect against sql injections.
-                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.IPAddressDAOtableName} WHERE {Constants.IPAddressDAOIPColumn} = @IPADDRESS);";
+                string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.AnonymousUserDAOTableName} WHERE {Constants.AnonymousUserDAOIPColumn} = @IPADDRESS);";
 
                 bool result;
 

@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0-preview.3.20214.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
   </ItemGroup>
 

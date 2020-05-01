@@ -87,11 +87,11 @@ namespace controller.Controllers
         }
 
         [HttpDelete("Upload/{performingUser}/{uploadId}")]
-        public async Task<IActionResult> DeleteUploadAsync(string performingUser, string uploadId, string ipAddress = Constants.LocalHost)
+        public async Task<IActionResult> DeleteUploadAsync(string performingUser, int uploadId, string ipAddress = Constants.LocalHost)
         {
             try
             {
-                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<string>() { uploadId}, performingUser, ipAddress, 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<int>() { uploadId}, performingUser, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {

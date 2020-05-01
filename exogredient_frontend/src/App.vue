@@ -1,17 +1,21 @@
 <template>
   <v-app id='app'>
     <div id='static'>
+      <span v-if="this.$store.state.userType !== 'Anonymous'" id="username">Username: {{this.$store.state.username}}</span>
+      <span v-if="this.$store.state.userType !== 'Anonymous'" id="logout"><a @click="logout">Log out</a></span>
       <nav>
         <v-btn to="upload">Upload</v-btn>
         <v-btn to="profile">Profile</v-btn>
+        <v-btn to="login/false">Login</v-btn>
+        <v-btn @click="goToRegistration">Register</v-btn>
       </nav>
       <h1><a @click="goToHomePage">exogredient</a></h1>
       <div>
-        <input style="border-style:solid" size="65" maxlength="100" ref="autocomplete" type="text" placeholder="Street Address..." name="street" v-model="searchData.address">
+        <input id="address" style="border-style:solid" maxlength="100" ref="autocomplete" type="text" placeholder="Street Address..." name="street" v-model="searchData.address">
         <br/>
-        <input style="border-style:solid" type="text" maxlength="100" :placeholder="searchPlaceholder" name="search" v-model="searchData.searchTerm">
-        <input style="border-style:solid" type="text" placeholder="Mile Range..." name="mile" v-model="searchData.radius">
-        <button class="button is-light" @click="search">Search</button>
+        <input id="searchTerm" style="border-style:solid" type="text" maxlength="100" :placeholder="searchPlaceholder" name="search" v-model="searchData.searchTerm">
+        <input id="radius" style="border-style:solid" type="text" placeholder="Mile Range..." name="mile" v-model="searchData.radius">
+        <button id="searchButton" class="button is-light" @click="search">Search</button>
       </div>
       <div>
         <button class="button is-light" @click="setToIngredientSearch">Ingredient</button>
@@ -28,7 +32,11 @@
   import * as global from "./globalExports.js";
   export default {
     name: "App",
-    mounted(){
+    async mounted(){
+      var ipAddressResponse = await fetch("https://ipapi.co/json");
+      var ipAddressJson = await ipAddressResponse.json();
+      this.$store.dispatch('updateIpAddress',ipAddressJson.ip);
+      this.$store.dispatch('updateLocation',ipAddressJson.region);
       this.autocomplete = new google.maps.places.Autocomplete(this.$refs.autocomplete);
       this.autocomplete.setFields(['geometry.location','formatted_address']);
       this.autocomplete.addListener('place_changed',()=>{
@@ -47,9 +55,7 @@
           lng: null,
           radius: null,
           searchBy: "ingredient",
-          address: '',
-          username: "anonymous",
-          ipAddress: "127.1.1.0",
+          address: ''
         },
         searchPlaceholder: "Ingredient Search...",
         isPlaceSelected: false
@@ -57,6 +63,11 @@
       }
     },
     methods:{
+      logout: function(){
+        this.$store.dispatch('updateUsername', 'Anonymous');
+        this.$store.dispatch('updateUserType', 'Anonymous');
+        this.$store.dispatch('updateToken', '');
+      },
       goToHomePage: function(){
         if(this.$router.currentRoute.path !== '/'){
           this.$router.push('/');
@@ -65,7 +76,13 @@
           location.reload();
         }
       },
-      
+      goToRegistration: function(){
+        if(this.$store.state.location === "California"){
+          this.$router.push('/RegistrationView');
+        }else{
+          alert("You must be in California to register!");
+        }
+      },
       search: async function(){
         // Check if an address was selected from autocompletes.
         if(!this.$data.isPlaceSelected){
@@ -165,5 +182,28 @@
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+#app{
+  padding:5% 10% 10% 10%;
+}
+#address{
+  width:100%;
+}
+#searchTerm{
+  width:38%;
+  margin: 1%;
+}
+#radius{
+  width:38%;
+  margin: 1%;
+}
+#searchButton{
+  width:20%
+}
+#username{
+  padding-right: 2%;
+}
+#logout{
+  padding-left: 2%;
 }
 </style>

@@ -4,11 +4,12 @@ using System.Data;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.DAL.Interfaces;
 using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class StoreDAO: IMasterSQLDAO<int>
+    public class StoreDAO: IMasterSQLCAI<int>
     {
         private readonly string _SQLConnection;
 
@@ -17,19 +18,114 @@ namespace TeamA.Exogredient.DAL
             _SQLConnection = connection;
         }
 
-        public Task<bool> CreateAsync(ISQLRecord record)
+        public async Task<int> CreateAsync(ISQLRecord record)
         {
-            throw new NotImplementedException();
+            // Try casting the record to a StoreRecord, throw an argument exception if it fails.
+            try
+            {
+                var temp = (StoreRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException(Constants.StoreCreateInvalidArgument);
+            }
+
+            var storeRecord = (StoreRecord)record;
+            var recordData = storeRecord.GetData();
+
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct the sql string .. start by inserting into the table name
+                var sqlString = $"INSERT INTO {Constants.StoreDAOTableName} (";
+
+                foreach (var pair in recordData)
+                {
+                    sqlString += $"{pair.Key},";
+                }
+
+                // Remove the last comma, add the VALUES keyword
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += ") VALUES (";
+
+                // Loop through the data once again, but instead of constructing the string with user input, use
+                // @PARAM0, @PARAM1 parameters to prevent against sql injections from user input.
+                var count = 0;
+                foreach (KeyValuePair<string, object> pair in recordData)
+                {
+                    sqlString += $"@PARAM{count},";
+                    count++;
+                }
+
+                // Remove the last comma and add the last ) and ;
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += ");";
+
+                // Get the command object inside a using statement to properly dispose/close.
+                using (var command = new MySqlCommand(sqlString, connection))
+                {
+                    count = 0;
+
+                    // Loop through the data again to add the parameter values to the corresponding @PARAMs in the string.
+                    foreach (var pair in recordData)
+                    {
+                        command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        count++;
+                    }
+
+                    // Asynchronously execute the non query.
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                }
+
+                var selectString = "SELECT LAST_INSERT_ID();";
+
+                using (var command = new MySqlCommand(selectString, connection))
+                using (var dataTable = new DataTable())
+                {
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    dataTable.Load(reader);
+                    var row = dataTable.Rows[0];
+
+                    return Convert.ToInt32(row[0]);
+                }
+            }
         }
 
-        public Task<bool> DeleteByIdsAsync(List<string> idsOfRows)
+        // https://intellipaat.com/community/10373/latitude-longitude-find-nearest-latitude-longitude-complex-sql-or-complex-calculation
+        public async Task<int> FindStoreAsync(double latitude, double longitude)
         {
-            throw new NotImplementedException();
-        }
+            var result = 0;
 
-        public Task<IDataObject> ReadByIdAsync(int id)
-        {
-            throw new NotImplementedException();
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct the sql string to get the id of the store closest to
+                var sqlString = $"SELECT {Constants.StoreDAOStoreIdColumn}, {Constants.StoreDAOLatitudeColumn}, {Constants.StoreDAOLongitudeColumn}, " +
+                                   $"SQRT(POW(69.1 * ({Constants.StoreDAOLatitudeColumn} - @LAT), 2) + POW(69.1 * (@LONG - {Constants.StoreDAOLongitudeColumn}) * COS(latitude / 57.3), 2))" +
+                                   $"AS distance FROM {Constants.StoreDAOTableName} HAVING distance < {Constants.FractionOfMile300Feet} ORDER BY distance;";
+
+                using (var command = new MySqlCommand(sqlString, connection))
+                using (var dataTable = new DataTable())
+                {
+                    command.Parameters.AddWithValue("@LAT", latitude);
+                    command.Parameters.AddWithValue("@LONG", longitude);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    dataTable.Load(reader);
+                    try
+                    {
+                        var row = dataTable.Rows[0];
+                        result = (int)row[Constants.StoreDAOStoreIdColumn];
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        result = Constants.NoStoreFoundCode;
+                    }
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -45,10 +141,10 @@ namespace TeamA.Exogredient.DAL
         public async Task<int> GetTotalStoreResultsNumberAsync(string searchTerm, double latitude,
             double longitude, double radius, string searchBy)
         {
-            int totalResultsNum;
+            var totalResultsNum = 0;
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            using (var connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -77,8 +173,8 @@ namespace TeamA.Exogredient.DAL
                     $"SELECT COUNT(DISTINCT x.{Constants.StoreDAOStoreIdColumn}) " +
                     $"AS {Constants.StoreDAOTotalResultsNum} FROM ({subQuery}) AS x";
 
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
+                using (var command = new MySqlCommand(sqlString, connection))
+                using (var dataTable = new DataTable())
                 {
                     // Inject arguments to query.
                     command.Parameters.AddWithValue("@SEARCH_TERM", "%" + searchTerm + "%");
@@ -137,7 +233,7 @@ namespace TeamA.Exogredient.DAL
             var isSkipPagesNeg = skipPages < 0;
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            using (var connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -231,8 +327,8 @@ namespace TeamA.Exogredient.DAL
 
                 sqlString += $"LIMIT @OFFSET, @COUNT;";
 
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
+                using (var command = new MySqlCommand(sqlString, connection))
+                using (var dataTable = new DataTable())
                 {
                     command.Parameters.AddWithValue("@SEARCH_TERM", "%" + searchTerm + "%");
                     command.Parameters.AddWithValue("@LATITUDE", latitude);
@@ -286,7 +382,7 @@ namespace TeamA.Exogredient.DAL
             StoreViewData storeViewData = null;
 
             // Get the connection inside a using statement to properly dispose/close.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            using (var connection = new MySqlConnection(_SQLConnection))
             {
                 // Open the connection.
                 connection.Open();
@@ -298,8 +394,8 @@ namespace TeamA.Exogredient.DAL
                     $"{Constants.StoreDAOStoreDescriptionColumn}, {Constants.StoreDAOPlaceIdColumn} " +
                     $"FROM {Constants.StoreDAOTableName} " +
                     $"WHERE {Constants.StoreDAOStoreIdColumn} = @ID;";
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                using (DataTable dataTable = new DataTable())
+                using (var command = new MySqlCommand(sqlString, connection))
+                using (var dataTable = new DataTable())
                 {
                     // Inject argument to query.
                     command.Parameters.AddWithValue("@ID", id);
@@ -319,11 +415,6 @@ namespace TeamA.Exogredient.DAL
                 }
             }
             return storeViewData;
-        }
-
-        public Task<bool> UpdateAsync(ISQLRecord record)
-        {
-            throw new NotImplementedException();
         }
     }
 }
