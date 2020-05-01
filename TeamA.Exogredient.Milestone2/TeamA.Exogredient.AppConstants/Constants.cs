@@ -246,6 +246,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string TimeNotValidMessage = "Time posted not valid, more than 5 minutes have passed";
         public const string InvalidRatingMessage = "Invalid rating, must be between 1 and 5 stars";
 
+        public const string ResetLinkExpired = "Reset Link is expired!";
+        public const string UsernameNotMatchResetLink = "The username is invalid for this link!";
+
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
 
@@ -389,6 +392,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SendPhoneCodeOperation = "Send Phone Code";
         public const string SendEmailCodeOperation = "Send Email Code";
         public const string UpdatePasswordOperation = "Update Password";
+        public const string SendResetLinkOperation = "Send Reset Password Link";
         public const string SingleUserCreateOperation = "Single User Create";
         public const string BulkUserCreateOperation = "Bulk User Create";
         public const string SingleUserDeleteOperation = "Single Delete Create";
@@ -414,6 +418,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SystemIdentifier = "System";
 
         public const string LocalHost = "127.0.0.1";
+        public const string WebPageDomain = "http://localhost:8080";
 
         public const int RecentUploadPagination = 10;
         public const int SavedUploadPagination = 10;
