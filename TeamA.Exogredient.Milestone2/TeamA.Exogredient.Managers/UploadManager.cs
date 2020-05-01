@@ -238,7 +238,7 @@ namespace TeamA.Exogredient.Managers
             return SystemUtilityService.CreateResult(Constants.DraftCreationSuccessMessage, result, false);
         }
 
-        public async Task<Result<AnalysisResult>> AnalyzeImageAsync(string username, Image image, string ipAddress, int failureCount)
+        public async Task<Result<AnalysisResult>> AnalyzeImageAsync(VisionPost post, int failureCount)
         {
             var result = new AnalysisResult(new List<string>(), Constants.NoValueString, Constants.NoValueString);
 
@@ -250,22 +250,27 @@ namespace TeamA.Exogredient.Managers
 
             try
             {
-                result = await _googleImageAnalysisService.AnalyzeAsync(image, Constants.ExogredientCategories).ConfigureAwait(false);
+                using (var memoryStream = new MemoryStream())
+                {
+                    await post.File.CopyToAsync(memoryStream);
+                    var image = Image.FromStream(memoryStream);
+                    result = await _googleImageAnalysisService.AnalyzeAsync(image, Constants.ExogredientCategories).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
                 // Log exception.
                 await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                               Constants.AnalyzeImageOperation, username, ipAddress, ex.ToString()).ConfigureAwait(false);
+                                               Constants.AnalyzeImageOperation, post.Username, post.IPAddress, ex.ToString()).ConfigureAwait(false);
 
                 // Recursively retry the operation until the maximum amount of retries is reached.
-                await AnalyzeImageAsync(username, image, ipAddress, ++failureCount).ConfigureAwait(false);
+                await AnalyzeImageAsync(post, ++failureCount).ConfigureAwait(false);
             }
 
 
             // Log the fact that the operation was successful.
             await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                           Constants.AnalyzeImageOperation, username, ipAddress).ConfigureAwait(false);
+                                           Constants.AnalyzeImageOperation, post.Username, post.IPAddress).ConfigureAwait(false);
 
             return SystemUtilityService.CreateResult(Constants.AnalyzationSuccessMessage, result, false);
         }

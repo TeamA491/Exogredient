@@ -17,7 +17,7 @@ import * as global from "../globalExports.js";
 export default {
   data() {
     return {
-      files: new FormData(),
+      file: [],
     };
   },
   methods: {
@@ -27,13 +27,19 @@ export default {
       // fetch post request 
 
       // ${44383}
-      fetch(`https://localhost:44383/api/Vision/${this.$store.state.username}/${this.files}/${this.$store.state.ipAddress}`, {
-        method: "GET",
+      fetch(`https://localhost:44383/api/Upload/Vision`, {
+        method: "POST",
         mode: "cors",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
+
+        body: JSON.stringify({
+          Username: this.$store.state.username,
+          File: this.file,
+          IPAddress: this.$store.state.IPAddress,
+        })
       })
       .then((response) =>{
         // erro handle if !response.ok
@@ -46,8 +52,8 @@ export default {
       })
     },
     ImageUpload_OnChange(event) {
-      this.files.append("photo", event.target.files[0])
-      console.log(this.files)
+      this.file = event.target.files[0]
+      console.log(this.file)
     }
 
   },

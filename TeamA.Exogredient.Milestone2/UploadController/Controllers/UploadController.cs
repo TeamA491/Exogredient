@@ -39,20 +39,13 @@ namespace UploadController.Controllers
         //}
 
 
-        [HttpGet("Vision/{username}/{collection}/{ipAddress}")]
+        [HttpPost("Vision")]
         [Produces("application/json")]
-        public async Task<IActionResult> AnalyzeImageAsync(string username, IFormCollection collection, string ipAddress)
+        public async Task<IActionResult> AnalyzeImageAsync(VisionPost post)
         {
             try
             {
-                IFormFile file = collection.Files.Last();
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    await file.CopyToAsync(memoryStream);
-                    var image = Image.FromStream(memoryStream);
-                    return Ok(await _uploadManager.AnalyzeImageAsync(username, image, ipAddress, Constants.NoValueInt).ConfigureAwait(false));
-                }
+                return Ok(await _uploadManager.AnalyzeImageAsync(post, Constants.NoValueInt).ConfigureAwait(false));
             }
             catch
             {
