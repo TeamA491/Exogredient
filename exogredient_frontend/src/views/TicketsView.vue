@@ -146,25 +146,14 @@
 <script>
 import Vue from "vue";
 
-export default Vue.extend({
+export default {
   name: "tickets-view",
-  props: {
-    tickets: [
-      {
-        id: 1,
-        flagColor: "red",
-        readStatus: "read",
-        category: "bug"
-      },
-      {
-        id: 2,
-        flagColor: "green",
-        readStatus: "unread",
-        category: "error"
+  data(){
+      return{
+          tickets: []
       }
-    ]
-  }
-});
+  },
+};
 
 var statusDropdown;
 var categoryDropdown;
@@ -182,10 +171,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
   categoryDropdown = document.getElementById("category-dropdown");
   flagColorsDropdown = document.getElementById("flag-colors-dropdown");
   readStatusDropdown = document.getElementById("read-status-dropdown");
-  pagination = document.getElementById('pagination');
+  pagination = document.getElementById("pagination");
 
-  noTicketsDisplay = document.getElementById('no-tickets-display');
-  ticketsTable = document.getElementById('tickets-table');
+  noTicketsDisplay = document.getElementById("no-tickets-display");
+  ticketsTable = document.getElementById("tickets-table");
 
   // Add event listeners
   statusDropdown.addEventListener("change", onStatusDropdownChange);
@@ -207,18 +196,16 @@ function onFlagColorsDropdownChange() {}
 
 function onReadStatusDropdownChange() {}
 
-function showTable()
-{
-  noTicketsDisplay.classList.add('is-hidden');
-  ticketsTable.classList.remove('is-hidden');
-  pagination.classList.remove('is-hidden');
+function showTable() {
+  noTicketsDisplay.classList.add("is-hidden");
+  ticketsTable.classList.remove("is-hidden");
+  pagination.classList.remove("is-hidden");
 }
 
-function hideTable()
-{
-  ticketsTable.classList.add('is-hidden');
-  noTicketsDisplay.classList.remove('is-hidden');
-  pagination.classList.add('is-hidden');
+function hideTable() {
+  ticketsTable.classList.add("is-hidden");
+  noTicketsDisplay.classList.remove("is-hidden");
+  pagination.classList.add("is-hidden");
 }
 </script>
 

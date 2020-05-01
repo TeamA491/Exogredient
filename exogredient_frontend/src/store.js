@@ -13,6 +13,7 @@ export default new Vuex.Store({
     state: {
         storeResults: [],
         ingredientResults: [],
+        tickets: [],
         storeViewData: null,
         username: 'username',
         ipAddress: '127.1.1.0',
@@ -35,6 +36,9 @@ export default new Vuex.Store({
         updateUsername(state, newUsername) {
             state.username = newUsername;
         },
+        setTickets(tickets) {
+            state.tickets = tickets;
+        },
     },
     actions: {
         updateStoreResults({ commit }, newStoreResults) {
@@ -52,6 +56,9 @@ export default new Vuex.Store({
         updateUsername({ commit }, newUsername) {
             commit('updateUsername', newUsername);
         },
+        setTickets({ commit }, tickets) {
+            commit('setTickets', tickets);
+        },
     },
     getters: {
         storeResults: (state) => {
@@ -62,6 +69,9 @@ export default new Vuex.Store({
         },
         username: (state) => {
             return state.username;
+        },
+        tickets: (state) => {
+            return state.tickets;
         },
     },
 });
