@@ -1,6 +1,6 @@
 <template>
   <v-app id='app'>
-    <div id='static'>
+    <!-- <div id='static'>
       <span v-if="this.$store.state.userType !== 'Anonymous'" id="username">Username: {{this.$store.state.username}}</span>
       <span v-if="this.$store.state.userType !== 'Anonymous'" id="logout"><a @click="logout">Log out</a></span>
       <nav>
@@ -23,7 +23,7 @@
       </div>
       <span>Search by: <strong>{{searchData.searchBy}}</strong></span>
       <div id="demo">___________________________</div>
-    </div>
+    </div> -->
     <router-view></router-view>
   </v-app>
 </template>
@@ -186,7 +186,7 @@
   margin-top: 60px;
 }
 #app{
-  padding:5% 10% 10% 10%;
+  /* padding:5% 10% 10% 10%; */
 }
 #address{
   width:100%;

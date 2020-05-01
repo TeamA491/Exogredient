@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import StoreView from '../views/StoreView';
 import ErrorView from '../views/ErrorView';
 import LoginView from '../views/LoginView';
+import TicketsView from '../views/TicketsView';
 import RegistrationView from '../views/RegistrationView';
 import SearchResultsView from '../views/SearchResultsView';
 
@@ -38,6 +39,11 @@ const routes = [
     path: "/",
     name: "home",
   },
+  {
+    path: "/viewTickets",
+    name: "tickets-view",
+    component: TicketsView,
+  }
 ];
 
 const router = new VueRouter({
