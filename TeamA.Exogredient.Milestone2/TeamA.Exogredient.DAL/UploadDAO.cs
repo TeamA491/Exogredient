@@ -562,9 +562,9 @@ namespace TeamA.Exogredient.DAL
         }
 
 
-        public async Task<Dictionary<string, int>> GetUsersWithUploadsAsync(Dictionary<String, int> affectedUploadsDict)
+        public async Task<Dictionary<string, string>> GetUsersWithUploadsAsync(Dictionary<String, int> affectedUploadsDict)
         {
-            Dictionary<string, int> topUpvotedUserDict = new Dictionary<String, int>();
+            var votedUserDict = new Dictionary<string, string>();
             // Get the connection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
             {
@@ -575,7 +575,6 @@ namespace TeamA.Exogredient.DAL
                 {
                     string user;
                     string uploadID = upload.Key;
-                    int upvoteAmount = upload.Value;
 
                     string sqlString = $"SELECT {Constants.UploadDAOUploaderColumn} FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
 
@@ -588,9 +587,10 @@ namespace TeamA.Exogredient.DAL
                         await reader.ReadAsync().ConfigureAwait(false);
                         user = reader.GetString(0);
                     }
-                    topUpvotedUserDict.Add(user, upvoteAmount);
+                    
+                    votedUserDict.Add(uploadID, user);
                 }
-                return topUpvotedUserDict;
+                return votedUserDict;
             }
         }
 

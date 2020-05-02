@@ -257,6 +257,8 @@ namespace TeamA.Exogredient.AppConstants
         public const string ReadMultiSnapshotOperation = "Read Multiple Snapshot";
         public const string UpvoteOperation = "Upvote Upload";
         public const string DownvoteOperation = "Downvote Upload";
+        public const string UndoUpvoteOperation = "Undo Upvote Upload";
+        public const string UndoDownvoteOperation = "Undo Downvote Upload";
         public const string CreateUploadOperation = "Creating Upload";
         public const string SearchOperation = "Searching";
 
@@ -580,7 +582,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SnapshotCollectionPrefix = "snapshot";
         public const string SnapshotMonth = "_month";
         public const string SnapshotOperationsDict = "operations";
-        public const string SnapshotUsersDict = "amount_of_customers_and_storeowners";
+        public const string SnapshotUsersDict = "count_of_registered_users";
         public const string SnapshotTopCityDict = "top_cities_that_uses_application";
         public const string SnapshotTopUserUploadedDict = "top_users_that_upload";
         public const string SnapshotTopUploadedIngredientDict = "top_most_uploaded_ingredients";
@@ -692,6 +694,8 @@ namespace TeamA.Exogredient.AppConstants
         // EXCEPTION MESSAGE -- Uploads
         public const string UploadIdsDNE = "One or more of the uploads Ids does not exist";
 
+        // EXCEPTION MESSAGE -- Snapshots
+        public const string FailCreateSnapShot = "Failed to create a snapshot";
 
 
     }

@@ -4,6 +4,7 @@
       <nav>
         <v-btn to="upload">Upload</v-btn>
         <v-btn to="profile">Profile</v-btn>
+        <v-btn to="useranalysis">Analysis</v-btn>
       </nav>
       <h1><a @click="goToHomePage">exogredient</a></h1>
       <div>

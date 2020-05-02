@@ -18,57 +18,73 @@ namespace TeamA.Exogredient.Managers
             _snapshotService = snapshotService;
         }
 
-        public async Task<SnapShotResult> ReadOneSnapshotAsync(int currentNumExceptions, int year, int month)
+        /// <summary>
+        /// Manager method to read one snapshot.
+        /// There are 3 retries, after the retries fail it will notify system admin.
+        /// </summary>
+        /// <param name="year">The year to get the snapshot/</param>
+        /// <param name="month">The month to get the snapshot.</param>
+        /// <returns>The snapshot object.</returns>
+        public async Task<SnapShotResult> ReadOneSnapshotAsync(int year, int month)
         {
-            bool readOneSnapshotSuccess = false;
+            int currentNumExceptions = 0;
             var snapshot = new SnapShotResult(null, null, null, null, null, null, null, null, null, null, null);
-            try 
-            { 
-                snapshot = await _snapshotService.ReadOneSnapshotAsync(2020, 4).ConfigureAwait(false);
-                readOneSnapshotSuccess = true;
-            }
-            catch (Exception e)
+
+            while (currentNumExceptions < 4)
             {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.ReadOneSnapshotOperation,
-                                              Constants.SystemIdentifier,
-                                              Constants.LocalHost, e.Message).ConfigureAwait(false);
-
-                if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
+                currentNumExceptions++;
+                try
                 {
-                    await SystemUtilityService.NotifySystemAdminAsync($"{Constants.ReadOneSnapshotOperation} failed a maximum number of times for {Constants.LocalHost}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    snapshot = await _snapshotService.ReadOneSnapshotAsync(year, month).ConfigureAwait(false);
                 }
-
+                catch (Exception e)
+                {
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                  Constants.ReadOneSnapshotOperation,
+                                                  Constants.SystemIdentifier,
+                                                  Constants.LocalHost, e.Message).ConfigureAwait(false);
+                    if (currentNumExceptions >= Constants.MaximumOperationRetries)
+                    {
+                        await SystemUtilityService.NotifySystemAdminAsync($"{Constants.ReadOneSnapshotOperation} failed a maximum number of times for {Constants.LocalHost}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    }
+                }
             }
-
             return snapshot;
         }
 
-        public async Task<List<SnapShotResult>> ReadMultiSnapshotAsync(int currentNumExceptions, int year)
+        /// <summary>
+        /// Manager method to read multiple snapshots.
+        /// There are 3 retries, after the retries fail it will notify system admin.
+        /// </summary>
+        /// <param name="year">The year to get all the snapshots.</param>
+        /// <returns>A string formatted result with all the snapshots data.</returns>
+        public async Task<String> ReadMultiSnapshotAsync(int year)
         {
-            bool readMultiSnapshotSuccess = false;
-            var snapshotList = new List<SnapShotResult>();
-            try
-            {
-                snapshotList = await _snapshotService.ReadMultiSnapshotAsync(2020).ConfigureAwait(false);
-                readMultiSnapshotSuccess = true;
-            }
-            catch (Exception e)
-            {
-                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                              Constants.ReadMultiSnapshotOperation,
-                                              Constants.SystemIdentifier,
-                                              Constants.LocalHost, e.Message).ConfigureAwait(false);
+            int currentNumExceptions = 0;
+            string snapshots = "";
 
-                if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
+            while (currentNumExceptions < 4)
+            {
+                currentNumExceptions++;
+                try
                 {
-                    await SystemUtilityService.NotifySystemAdminAsync($"{Constants.ReadMultiSnapshotOperation} failed a maximum number of times for {Constants.LocalHost}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    snapshots = await _snapshotService.ReadMultiSnapshotAsync(year).ConfigureAwait(false);
                 }
-
+                catch (Exception e)
+                {
+                    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                                                  Constants.ReadMultiSnapshotOperation,
+                                                  Constants.SystemIdentifier,
+                                                  Constants.LocalHost, e.Message).ConfigureAwait(false);
+                    currentNumExceptions++;
+                    if (currentNumExceptions >= Constants.MaximumOperationRetries)
+                    {
+                        await SystemUtilityService.NotifySystemAdminAsync($"{Constants.ReadMultiSnapshotOperation} failed a maximum number of times for {Constants.LocalHost}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
+                    }
+                }
             }
-            return snapshotList;
+            return snapshots;
         }
-
 
     }
 }

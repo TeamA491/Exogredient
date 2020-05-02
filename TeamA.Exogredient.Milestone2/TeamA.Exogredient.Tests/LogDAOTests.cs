@@ -11,9 +11,8 @@ namespace TeamA.Exogredient.Tests
     public class LogDAOTests
     {
         readonly LogDAO logDAO = new LogDAO(Constants.NOSQLConnection);
-        
         [DataTestMethod]
-        [DataRow("00:21:29:91 UTC", "Creating Upload/1/apple", "David", "213.173.5.62", "success", "20200430")]
+        [DataRow("", "Creating Upload/1/apple", "David", "213.173.5.62", "success", "20200430")]
         public async Task LogDAO_CreateAsync_SuccessfulCreation(string timestamp, string operation, string identifier, string ipAddress, string errorType, string date)
         {
             // Arrange: 

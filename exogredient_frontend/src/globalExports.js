@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-export const ApiDomainName = "https://localhost:44392";
+export const ApiDomainName = "https://localhost:44389";
 
 export const SortByDistance = 'distance';
 export const SortByIngredientNum = 'ingredientNum';

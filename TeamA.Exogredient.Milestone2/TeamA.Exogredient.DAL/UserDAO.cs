@@ -452,8 +452,11 @@ namespace TeamA.Exogredient.DAL
 
         }
 
-
-        
+        /// <summary>
+        /// Method to count how many users of a specific user type.
+        /// </summary>
+        /// <param name="userType">The type of users a user can be.</param>
+        /// <returns>A integer value for the amount.</returns>
         public async Task<int> CountUsersTypeAsync(String userType)
         {
             int result;

@@ -17,9 +17,15 @@ namespace TeamA.Exogredient.DAL
             NOSQLConnection = connection;
         }
 
-        public async Task<bool> StoreSnapshotAsync(List<string> snapshot, string year, string month)
+        /// <summary>
+        /// Method to store a snapshot.
+        /// </summary>
+        /// <param name="year">Year needed to be specific for storing.</param>
+        /// <param name="month">Month needed to be specific for storing.</param>
+        /// <param name="snapshot">The list of string(data) that pertains to the snapshot.</param>
+        /// <returns>A bool result of true or false depending on if it succeeded of not.</returns>
+        public async Task<bool> StoreSnapshotAsync(string year, string month, List<string> snapshot)
         {
-
             using (Session session = MySQLX.GetSession(NOSQLConnection))
             {
                 Schema schema = session.GetSchema(Constants.SnapshotSchemaName);
@@ -49,10 +55,17 @@ namespace TeamA.Exogredient.DAL
 
                 await collection.Add(document).ExecuteAsync().ConfigureAwait(false);
 
+
                 return true;
             }
         }
 
+        /// <summary>
+        /// Method to read a snapshot pertaining to a specific month.
+        /// </summary>
+        /// <param name="year">Year needed to get specific snapshot.</param>
+        /// <param name="month">Month needed to get specific snapshot.</param>
+        /// <returns>A SnapShotResult object that has all the information.</returns>
         public async Task<SnapShotResult> ReadMonthlySnapshotAsync(string year, string month)
         {
             using (Session session = MySQLX.GetSession(NOSQLConnection))
@@ -76,6 +89,11 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        /// <summary>
+        /// Method to read all of the snapshots in specific year.
+        /// </summary>
+        /// <param name="year">Year needed to get all snapshots pertaining to it.</param>
+        /// <returns>A list of SnapShotResult objects.</returns>
         public async Task<List<SnapShotResult>> ReadYearlySnapshotAsync(string year)
         {
             using (Session session = MySQLX.GetSession(NOSQLConnection))

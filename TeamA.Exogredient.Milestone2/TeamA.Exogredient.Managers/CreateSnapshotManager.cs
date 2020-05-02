@@ -3,6 +3,7 @@ using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.AppConstants;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TeamA.Exogredient.Managers
 {
@@ -17,12 +18,57 @@ namespace TeamA.Exogredient.Managers
             _snapshotService = snapshotService;
         }
 
-        public async Task<Result<bool>> CreateSnapshotAsync(int currentNumExceptions, int year, int month)
+        /// <summary>
+        /// Method to create a snapshot with given year and month.
+        /// </summary>
+        /// <param name="currentNumExceptions"></param>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateSnapshotAsync(int currentNumExceptions, int year, int month)
         {
             bool createSnapshotSuccess = false;
             try
             {
-                createSnapshotSuccess = await _snapshotService.CreateSnapShotAsync(2020, 4, 30).ConfigureAwait(false);
+                // Get the amount of days in the specific month.
+                var amountOfDays = _snapshotService.GetDaysInMonth(year, month);
+
+                // Get all the logs pertaining to the specific month.
+                var logResults = await _snapshotService.GetLogsInMonth(year, month, amountOfDays).ConfigureAwait(false);
+
+                var snapshot = new List<string>();
+
+                // Calling the snapshot service methods to format the data in logresults to dictionaries.
+                var operationsDict = _snapshotService.GetOperationDict(logResults, amountOfDays);
+                var usersDict = await _snapshotService.GetUsersDict().ConfigureAwait(false);
+                var cityDict = await _snapshotService.GetCityDictAsync(logResults).ConfigureAwait(false);
+                var userUploadedDict = _snapshotService.GetUserUploadedDict(logResults);
+                var uploadedIngredientDict = _snapshotService.GetUploadedIngredientDict(logResults);
+                var uploadedStoreDict = _snapshotService.GetUploadedStoreDict(logResults);
+                var searchedIngredientDict = _snapshotService.GetSearchedIngredientDict(logResults);
+                var searchedStoreDict = _snapshotService.GetSearchedStoreDict(logResults);
+                var upvotedUserDict = await _snapshotService.GetUpvotedUserDict(logResults).ConfigureAwait(false);
+                var downvotedUserDict = await _snapshotService.GetDownvotedUserDict(logResults).ConfigureAwait(false);
+
+                // Finalizing the data and then adding it to the snapshot List.
+                snapshot.Add(_snapshotService.FormatOperationsDict(operationsDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(usersDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(cityDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(userUploadedDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(uploadedIngredientDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(uploadedStoreDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(searchedIngredientDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(searchedStoreDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(upvotedUserDict));
+                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(downvotedUserDict));
+
+                // Call the method to create the snapshot in the snapshot service.
+                createSnapshotSuccess = await _snapshotService.CreateSnapShotAsync(year, month, snapshot).ConfigureAwait(false);
+
+                await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                              Constants.CreateSnapshotOperation,
+                              Constants.SystemIdentifier,
+                              Constants.LocalHost).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -31,15 +77,12 @@ namespace TeamA.Exogredient.Managers
                                               Constants.SystemIdentifier, 
                                               Constants.LocalHost, e.Message).ConfigureAwait(false);
 
-                if (currentNumExceptions + 1 >= Constants.MaximumOperationRetries)
+                if (currentNumExceptions >= Constants.MaximumOperationRetries)
                 {
                     await SystemUtilityService.NotifySystemAdminAsync($"{Constants.CreateSnapshotOperation} failed a maximum number of times for {Constants.LocalHost}.", Constants.SystemAdminEmailAddress).ConfigureAwait(false);
                 }
-
-                return SystemUtilityService.CreateResult(Constants.SystemErrorUserMessage, false, true, currentNumExceptions + 1);
             }
-
-            return SystemUtilityService.CreateResult(Constants.WrongEmailCodeMessage, createSnapshotSuccess, false, currentNumExceptions);
+            return createSnapshotSuccess;
         }
 
     }

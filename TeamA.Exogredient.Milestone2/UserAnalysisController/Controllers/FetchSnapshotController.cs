@@ -15,11 +15,15 @@ namespace UserAnalysisController.Controllers
     [Route("api/[controller]")]
     public class FetchSnapshotController : Controller
     {
+        /// <summary>
+        /// Controller method to get snapshot specific to the year and month value and format it to send up.
+        /// </summary>
+        /// <param name="year">The year to get the snapshot.</param>
+        /// <param name="month">The month to get the snapshot.</param>
+        /// <returns>The status.</returns>
         [HttpGet("FetchSingle/{year}/{month}")]
         public async Task<IActionResult> GetSingleSnapshotAsync(int year, int month)
         {
-            int tries = 0;
-
             var uploaddao = new UploadDAO(Constants.SQLConnection);
             var logdao = new LogDAO(Constants.NOSQLConnection);
             var userdao = new UserDAO(Constants.SQLConnection);
@@ -30,33 +34,26 @@ namespace UserAnalysisController.Controllers
             var dsLogging = new DataStoreLoggingService(logdao, mask);
             var loggingManager = new LoggingManager(ffLogging, dsLogging);
             var snapshotService = new SnapshotService(logdao, userdao, uploaddao, snapshotdao);
-
             var readsnapshotManager = new ReadSnapshotManager(loggingManager, snapshotService);
-
-            var snapshot = await readsnapshotManager.ReadOneSnapshotAsync(tries, 2020, 4).ConfigureAwait(false);
-            Console.WriteLine(snapshot._month);
 
             try
             {
-                // HACK ONLY FOR TESTING PURPOSE. MUST BE REMOVED IN PRODUCTION.
-                if (month <= 0 || month > 12)
-                {
-                    throw new Exception("error");
-                }
-
-                return Ok(await readsnapshotManager.ReadOneSnapshotAsync(tries, year, month).ConfigureAwait(false));
+                return Ok(await readsnapshotManager.ReadOneSnapshotAsync(year, month).ConfigureAwait(false));
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
+        /// <summary>
+        /// Controller method to get multiple snapshot specfici to the year and format it to send up.
+        /// </summary>
+        /// <param name="year">The year to get all the snapshots.</param>
+        /// <returns>The status.</returns>
         [HttpGet("FetchMulti/{year}")]
         public async Task<IActionResult> GetMultiSnapshotAsync(int year)
         {
-            int tries = 0;
-
             var uploaddao = new UploadDAO(Constants.SQLConnection);
             var logdao = new LogDAO(Constants.NOSQLConnection);
             var userdao = new UserDAO(Constants.SQLConnection);
@@ -70,20 +67,13 @@ namespace UserAnalysisController.Controllers
 
             var readsnapshotManager = new ReadSnapshotManager(loggingManager, snapshotService);
 
-            var snapshots = await readsnapshotManager.ReadMultiSnapshotAsync(tries, 2020).ConfigureAwait(false);
-
-            foreach (var snaps in snapshots)
-            {
-                Console.WriteLine(snaps._month);
-            }
-
             try
             {
-                return Ok(await readsnapshotManager.ReadMultiSnapshotAsync(tries, year).ConfigureAwait(false));
+                return Ok(await readsnapshotManager.ReadMultiSnapshotAsync(year).ConfigureAwait(false));
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 

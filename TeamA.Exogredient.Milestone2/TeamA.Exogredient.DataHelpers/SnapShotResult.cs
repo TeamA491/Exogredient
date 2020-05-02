@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.DataHelpers
     {
         public string _month { get; }
         public string operations { get; }
-        public string amount_of_customers_and_storeowners { get; }
+        public string count_of_registered_users { get; }
         public string top_cities_that_uses_application { get; }
         public string top_users_that_upload { get; }
         public string top_most_uploaded_ingredients { get; }
@@ -23,7 +23,7 @@ namespace TeamA.Exogredient.DataHelpers
         {
             _month = month;
             operations = operationsDict;
-            amount_of_customers_and_storeowners = usersDict;
+            count_of_registered_users = usersDict;
             top_cities_that_uses_application = topCitiesDict;
             top_users_that_upload = topUploadedUsersDict;
             top_most_uploaded_ingredients = topUploadedIngredientDict;
