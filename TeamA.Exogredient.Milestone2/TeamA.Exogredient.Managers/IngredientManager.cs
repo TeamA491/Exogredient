@@ -105,11 +105,67 @@ namespace TeamA.Exogredient.Managers
             }
         }
 
-        public async Task<List<UploadResult>> GetIngredientsfromStore(int storeId, int pagination, int failurecount, string username, string ipAddress)
+        public async Task<bool> UndoUpvote(int votevalue, int uploadId, int failurecount, string username, string ipAddress)
         {
             try
             {
-                var uploads = await _uploadService.GetIngredientsfromStore(storeId, pagination).ConfigureAwait(false);
+                bool result = await _uploadService.IncrementUpvotesonUpload(votevalue, uploadId).ConfigureAwait(false);
+
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    Constants.UndoUpvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    Constants.UndoUpvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+                failurecount += 1;
+
+                if (failurecount >= Constants.LoggingRetriesAmount)
+                {
+                    throw e;
+                }
+                else
+                {
+                    return await EditUpvotesonUpload(votevalue, uploadId, failurecount, username, ipAddress).ConfigureAwait(false);
+                }
+            }
+        }
+
+        public async Task<bool> UndoDownvote(int votevalue, int uploadId, int failurecount, string username, string ipAddress)
+        {
+            try
+            {
+                bool result = await _uploadService.IncrementUpvotesonUpload(votevalue, uploadId).ConfigureAwait(false);
+
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    Constants.UndoDownvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    Constants.UndoDownvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+                failurecount += 1;
+
+                if (failurecount >= Constants.LoggingRetriesAmount)
+                {
+                    throw e;
+                }
+                else
+                {
+                    return await EditUpvotesonUpload(votevalue, uploadId, failurecount, username, ipAddress).ConfigureAwait(false);
+                }
+            }
+        }
+
+        public async Task<int> GetTotalIngredientsfromStore(int storeId, string ingredientName, int failurecount, string username, string ipAddress)
+        {
+            try
+            {
+                var uploads = await _uploadService.GetTotalIngredientsfromStore(storeId, ingredientName).ConfigureAwait(false);
 
                 //_ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                 //  Constants.GetIngredientsfromStoreOperation, username, ipAddress).ConfigureAwait(false);
@@ -129,7 +185,7 @@ namespace TeamA.Exogredient.Managers
                 }
                 else
                 {
-                    return await GetIngredientsfromStore(storeId, pagination, failurecount, username, ipAddress).ConfigureAwait(false);
+                    return await GetTotalIngredientsfromStore(storeId, ingredientName, failurecount, username, ipAddress).ConfigureAwait(false);
                 }
             }
         }

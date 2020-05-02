@@ -75,6 +75,11 @@ namespace TeamA.Exogredient.Services
             return await _uploadDao.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
         }
 
+        public async Task<int> GetTotalIngredientsfromStore(int storeId, string ingredientName)
+        {
+            return await _uploadDao.GetTotalIngredientResultsNumberAsync(storeId, ingredientName).ConfigureAwait(false);
+        }
+
         public async Task<List<UploadResult>> GetIngredientsfromStore(int storeId, int pagination)
         {
             return await _uploadDao.GetIngredientsfromStore(storeId, pagination);

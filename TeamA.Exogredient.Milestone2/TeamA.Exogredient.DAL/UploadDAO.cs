@@ -275,6 +275,9 @@ namespace TeamA.Exogredient.DAL
         /// <summary>
         /// Add an upvote to an Upload.
         /// </summary>
+        /// <param name="voteValue"> The number added to the current number of Downvotes. </param>
+        /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
+        /// <returns> A boolean showing whether or not the function executed properly. </returns>
         public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
         {
             // Open connection.
@@ -284,8 +287,8 @@ namespace TeamA.Exogredient.DAL
 
                 //SQL command for increasing upvotes
                 var sqlString =
-                    $"UPDATE {Constants.UploadDAOTableName}" +
-                    $"SET {Constants.UploadDAOUpvoteColumn} = {Constants.UploadDAOUpvoteColumn} + @VOTEVALUE" +
+                    $"UPDATE {Constants.UploadDAOTableName} " +
+                    $"SET {Constants.UploadDAOUpvoteColumn} = {Constants.UploadDAOUpvoteColumn} + @VOTEVALUE " +
                     $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString,connection))
@@ -297,7 +300,7 @@ namespace TeamA.Exogredient.DAL
                         command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
 
                         // Execute the command
-                        var result = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         // The command should return the number of rows affected. Returns true if only 1 row is changed. 
                         return Convert.ToInt32(result) == 1;
@@ -322,8 +325,8 @@ namespace TeamA.Exogredient.DAL
 
                 //SQL command for increasing upvotes
                 var sqlString =
-                    $"UPDATE {Constants.UploadDAOTableName}" +
-                    $"SET {Constants.UploadDAODownvoteColumn} = {Constants.UploadDAODownvoteColumn} + @VOTEVALUE" +
+                    $"UPDATE {Constants.UploadDAOTableName} " +
+                    $"SET {Constants.UploadDAODownvoteColumn} = {Constants.UploadDAODownvoteColumn} + @VOTEVALUE " +
                     $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
 
                 using (MySqlCommand command = new MySqlCommand(sqlString, connection))
@@ -335,7 +338,7 @@ namespace TeamA.Exogredient.DAL
                         command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
 
                         // Execute the command
-                        var result = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         // The command should return the number of rows affected. Returns true if only 1 row is changed. 
                         return Convert.ToInt32(result) == 1;

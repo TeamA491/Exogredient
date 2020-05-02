@@ -99,7 +99,7 @@ export default {
 
           let storeViewData = this.$store.state.storeViewData;
 
-          this.$store.commit('updateIngredientsList', ingredientsList);
+          this.$store.dispatch('updateIngredientsList', ingredientsList);
 
           this.$store.dispatch('updateStoreViewData', storeViewData);  
             this.$router.push("/ingredientView");
