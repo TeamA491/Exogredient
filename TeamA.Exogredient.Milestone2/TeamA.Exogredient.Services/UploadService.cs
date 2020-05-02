@@ -39,8 +39,7 @@ namespace TeamA.Exogredient.Services
                 return new VerifyUploadResult(Constants.ImagePathInvalidMessage, false);
             }
 
-            var sizeBytes = (new System.IO.FileInfo(dto.ImagePath)).Length;
-            var sizeMB = sizeBytes * Constants.ToMBConversionFactor;
+            var sizeMB = dto.ImageSize * Constants.ToMBConversionFactor;
             var validSize = sizeMB >= minimumImageSizeMB && sizeMB <= maximumImageSizeMB;
 
             if (!validSize)

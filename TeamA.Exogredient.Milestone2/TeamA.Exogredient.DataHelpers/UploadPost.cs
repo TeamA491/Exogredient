@@ -6,7 +6,7 @@ namespace UploadController
 {
     public class UploadPost
     {
-        public byte[] ImageBytes { get; set; }
+        public Bitmap Image { get; set; }
         public string Category { get; set; }
         public string Username { get; set; }
         public string IPAddress { get; set; }
@@ -16,11 +16,13 @@ namespace UploadController
         public int Rating { get; set; }
         public double Price { get; set; }
         public string PriceUnit { get; set; }
+        public string FileExtension { get; set; }
+        public int ImageSize { get; set; }
 
-        public UploadPost(byte[] imageBytes, string category, string username, string ipAddress, DateTime postTime,
-                          string name, string description, int rating, double price, string priceUnit)
+        public UploadPost(Bitmap image, string category, string username, string ipAddress, DateTime postTime,
+                          string name, string description, int rating, double price, string priceUnit, string fileExtension, int imageSize)
         {
-            ImageBytes = imageBytes;
+            Image = image;
             Category = category;
             Username = username;
             IPAddress = ipAddress;
@@ -30,6 +32,8 @@ namespace UploadController
             Rating = rating;
             Price = price;
             PriceUnit = priceUnit;
+            FileExtension = fileExtension;
+            ImageSize = imageSize;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace TeamA.Exogredient.AppConstants
 {
     /// <summary>
-    /// The constants, reaonly values, and other literal values used throughout our system.
+    /// The constants, readonly values, and other literal values used throughout our system.
     /// </summary>
     public static class Constants
     {
@@ -126,6 +126,19 @@ namespace TeamA.Exogredient.AppConstants
         };
 
         // UPLOAD
+        public const string NaN = "NaN";
+
+        public const string UsernameKey = "username";
+        public const string IPAddressKey = "ipAddress";
+        public const string CategoryKey = "category";
+        public const string NameKey = "name";
+        public const string DescriptionKey = "description";
+        public const string RatingKey = "rating";
+        public const string PriceKey = "price";
+        public const string PriceUnitKey = "priceUnit";
+        public const string ExtensionKey = "fileExtension";
+        public const string ImageSizeKey = "imageSize";
+
         public const string PhotoFolder = @"C:\Photos";
 
         public const int InProgressStatus = 1;
@@ -176,6 +189,9 @@ namespace TeamA.Exogredient.AppConstants
             "meat", "fish", "animal", "flesh", "seafood", "pork"
         };
 
+        public static readonly List<string> NoCatKeywords = new List<string>()
+        { };
+
         public static readonly List<string> InvalidSuggestions = new List<string>()
         {
             "meat", "fish", "animal", "flesh", "seafood", "pork", "plant", "fruit", "vegetable", "produce", "solanum",
@@ -187,11 +203,11 @@ namespace TeamA.Exogredient.AppConstants
 
         public static readonly IDictionary<string, List<string>> AllCategoriesToKeywords = new Dictionary<string, List<string>>()
         {
-            { ManufacturedCategory, ManufacturedKeywords }, { PlantCategory, PlantKeywords }, { AnimalCategory, AnimalKeywords }
+            { ManufacturedCategory, ManufacturedKeywords }, { PlantCategory, PlantKeywords }, { AnimalCategory, AnimalKeywords }, { NoCategory, NoCatKeywords }
         };
 
         public static readonly List<string> ExogredientCategories = new List<string>()
-        { ManufacturedCategory, PlantCategory, AnimalCategory };
+        { ManufacturedCategory, PlantCategory, AnimalCategory, NoCategory };
         public const double MinimumImageSizeMB = 0.5;
         public const double MaximumImageSizeMB = 5.0;
         public static readonly List<string> ValidImageExtensions = new List<string>()

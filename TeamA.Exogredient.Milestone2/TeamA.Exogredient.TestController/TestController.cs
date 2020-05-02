@@ -8,6 +8,7 @@ using TeamA.Exogredient.Services;
 using System.Drawing;
 using UploadController;
 using System.IO;
+using Image = Google.Cloud.Vision.V1.Image;
 
 namespace TeamA.Exogredient.TestController
 {
@@ -39,14 +40,16 @@ namespace TeamA.Exogredient.TestController
             byte[] byteArray = File.ReadAllBytes(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg");
 
 
-            UploadPost post = new UploadPost(byteArray, "packaged/bottled products", "thesmokinggun42", "172.88.196.101", DateTime.Now, "Nutter Butter", "deez nutz", 5, 4.20, "item");
+            await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
+
+            //UploadPost post = new UploadPost(byteArray, "packaged/bottled products", "thesmokinggun42", "172.88.196.101", DateTime.Now, "Nutter Butter", "deez nutz", 5, 4.20, "item");
 
             //UserRecord urecord = new UserRecord("thesmokinggun42", "eli gomez", "elithegolfer@gmail.com", "9499815506", "fausto42", 0, "admin",
             //                                    "salt", 5, "6787", 5, 5, 5, 5, 5);
 
             //await umanage.CreateUserAsync(false, urecord).ConfigureAwait(false);
 
-            await manager.CreateUploadAsync(post, 0);
+            //await manager.CreateUploadAsync(post, 0);
             //await manager.DraftUploadAsync(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_184614.jpg", "packaged/bottled products", "thesmokinggun42", "172.88.196.101", price: 5.6789);
 
             //Console.WriteLine(await sdao.FindStoreAsync(33.834045, -118.168047972222).ConfigureAwait(false));

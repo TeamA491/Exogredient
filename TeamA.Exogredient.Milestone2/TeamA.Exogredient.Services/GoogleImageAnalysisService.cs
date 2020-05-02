@@ -6,6 +6,7 @@ using Google.Cloud.Vision.V1;
 using TeamA.Exogredient.AppConstants;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Image = Google.Cloud.Vision.V1.Image;
 
 namespace TeamA.Exogredient.Services
 {
@@ -77,6 +78,8 @@ namespace TeamA.Exogredient.Services
             {
                 bestLabel = "";
             }
+
+            Console.WriteLine(category);
 
             var name = bestLabel;
 
