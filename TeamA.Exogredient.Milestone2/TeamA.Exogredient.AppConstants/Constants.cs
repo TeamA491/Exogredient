@@ -432,7 +432,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string DownvoteOperation = "Downvote Upload";
         public const string UndoUpvoteOperation = "Undo Upvote Upload";
         public const string UndoDownvoteOperation = "Undo Downvote Upload";
-        public const string CreateUploadOperation = "Creating Upload";
         public const string SearchOperation = "Searching";
 
         public const string GetTotalStoreResultsNumberOperation = "Get Total StoreResults Number";
