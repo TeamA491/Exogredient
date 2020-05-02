@@ -51,4 +51,7 @@
     <Compile Remove="Test\Program.cs" />
     <Compile Remove="Test\obj\Debug\netcoreapp3.1\Test.AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Google.Cloud.Vision.V1" Version="2.0.0" />
+  </ItemGroup>
 </Project>

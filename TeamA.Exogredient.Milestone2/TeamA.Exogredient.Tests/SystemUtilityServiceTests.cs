@@ -27,16 +27,16 @@ namespace TeamA.Exogredient.Tests
         }
 
         [DataTestMethod]
-        [DataRow("message", "data", true, 1)]
-        public void SystemUtilityService_CreateResult_CreateAccurateResult(string message, string data, bool exceptionOccured, int numException)
+        [DataRow("message", "data", true)]
+        public void SystemUtilityService_CreateResult_CreateAccurateResult(string message, string data, bool exceptionOccured)
         {
             // Act
-            Result<string> resultObject = SystemUtilityService.CreateResult<string>(message, data, exceptionOccured, numException);
+            Result<string> resultObject = SystemUtilityService.CreateResult<string>(message, data, exceptionOccured);
 
             // Assert: Check that the result we created matches the inputs. 
             bool result;
             if (resultObject.Message == message && resultObject.Data == data &&
-                resultObject.ExceptionOccurred == exceptionOccured && resultObject.NumExceptions == numException)
+                resultObject.ExceptionOccurred == exceptionOccured)
             {
                 result = true;
             }

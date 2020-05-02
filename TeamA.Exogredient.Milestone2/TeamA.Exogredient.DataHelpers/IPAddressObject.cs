@@ -72,10 +72,10 @@ namespace TeamA.Exogredient.DataHelpers
         {
             List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
             {
-                new Tuple<object, bool>(IP, Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn]),
-                new Tuple<object, bool>(TimestampLocked, Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOtimestampLockedColumn]),
-                new Tuple<object, bool>(RegistrationFailures, Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOregistrationFailuresColumn]),
-                new Tuple<object, bool>(LastRegFailTimestamp, Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOlastRegFailTimestampColumn])
+                new Tuple<object, bool>(IP, Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn]),
+                new Tuple<object, bool>(TimestampLocked, Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOtimestampLockedColumn]),
+                new Tuple<object, bool>(RegistrationFailures, Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOregistrationFailuresColumn]),
+                new Tuple<object, bool>(LastRegFailTimestamp, Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOlastRegFailTimestampColumn])
             };
 
             return result;

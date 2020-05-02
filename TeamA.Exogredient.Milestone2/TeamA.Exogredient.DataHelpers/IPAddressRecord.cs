@@ -26,10 +26,10 @@ namespace TeamA.Exogredient.DataHelpers
         public IPAddressRecord(string ip, long timestampLocked = -1, int registrationFailures = -1,
                                long lastRegFailTimestamp = -1)
         {
-            _data.Add(Constants.IPAddressDAOIPColumn, ip);
-            _data.Add(Constants.IPAddressDAOtimestampLockedColumn, timestampLocked);
-            _data.Add(Constants.IPAddressDAOregistrationFailuresColumn, registrationFailures);
-            _data.Add(Constants.IPAddressDAOlastRegFailTimestampColumn, lastRegFailTimestamp);
+            _data.Add(Constants.AnonymousUserDAOIPColumn, ip);
+            _data.Add(Constants.AnonymousUserDAOtimestampLockedColumn, timestampLocked);
+            _data.Add(Constants.AnonymousUserDAOregistrationFailuresColumn, registrationFailures);
+            _data.Add(Constants.AnonymousUserDAOlastRegFailTimestampColumn, lastRegFailTimestamp);
         }
 
         /// <summary>
@@ -81,10 +81,10 @@ namespace TeamA.Exogredient.DataHelpers
         {
             List<Tuple<object, bool>> result = new List<Tuple<object, bool>>
             {
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOIPColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn]),
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOtimestampLockedColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOtimestampLockedColumn]),
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOregistrationFailuresColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOregistrationFailuresColumn]),
-                new Tuple<object, bool>(_data[Constants.IPAddressDAOlastRegFailTimestampColumn], Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOlastRegFailTimestampColumn])
+                new Tuple<object, bool>(_data[Constants.AnonymousUserDAOIPColumn], Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn]),
+                new Tuple<object, bool>(_data[Constants.AnonymousUserDAOtimestampLockedColumn], Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOtimestampLockedColumn]),
+                new Tuple<object, bool>(_data[Constants.AnonymousUserDAOregistrationFailuresColumn], Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOregistrationFailuresColumn]),
+                new Tuple<object, bool>(_data[Constants.AnonymousUserDAOlastRegFailTimestampColumn], Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOlastRegFailTimestampColumn])
             };
 
             return result;

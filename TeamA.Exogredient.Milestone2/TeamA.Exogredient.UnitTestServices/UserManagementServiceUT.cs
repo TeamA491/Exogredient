@@ -312,10 +312,11 @@ namespace TeamA.Exogredient.UnitTestServices
             message.Body = bodyBuilder.ToMessageBody();
 
             // Create the SMTP client with the default certificate validation callback to prevent man in the middle attacks.
-            var client = new SmtpClient
-            {
-                ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
-            };
+            //var client = new SmtpClient
+            //{
+            //    ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
+            //};
+            var client = new SmtpClient();
 
             // Connect over google SMTP, provide credentials, and send and disconnect the client.
             client.Connect(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect);

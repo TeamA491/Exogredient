@@ -67,7 +67,7 @@ namespace TeamA.Exogredient.DAL
             }
 
             // Add to the datastore
-            IPAddress.Add((string)recordData[Constants.IPAddressDAOIPColumn], ipRecord);
+            IPAddress.Add((string)recordData[Constants.AnonymousUserDAOIPColumn], ipRecord);
 
             return true;
         }
@@ -110,10 +110,10 @@ namespace TeamA.Exogredient.DAL
             IDictionary<string, object> data = IPAddress[id].GetData();
 
             // Return an IP object that contains the data.
-            return new IPAddressObject((string)data[Constants.IPAddressDAOIPColumn],
-                                       (long)data[Constants.IPAddressDAOtimestampLockedColumn],
-                                       (int)data[Constants.IPAddressDAOregistrationFailuresColumn],
-                                       (long)data[Constants.IPAddressDAOlastRegFailTimestampColumn]);
+            return new IPAddressObject((string)data[Constants.AnonymousUserDAOIPColumn],
+                                       (long)data[Constants.AnonymousUserDAOtimestampLockedColumn],
+                                       (int)data[Constants.AnonymousUserDAOregistrationFailuresColumn],
+                                       (long)data[Constants.AnonymousUserDAOlastRegFailTimestampColumn]);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace TeamA.Exogredient.DAL
             // Extract the data of the record.
             IDictionary<string, object> newRecordData = ipRecord.GetData();
             // Get the IP Address of the record.
-            string ipAddress = (string)newRecordData[Constants.IPAddressDAOIPColumn];
+            string ipAddress = (string)newRecordData[Constants.AnonymousUserDAOIPColumn];
 
             // Check if the IP Address exists.
             if (!CheckIPExistence(ipAddress))

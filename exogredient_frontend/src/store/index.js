@@ -22,8 +22,16 @@ const store = new Vuex.Store({
       searchResultsView: 1,
       storeView: 1
     },
-    username: "username",
-    ipAddress: "127.1.1.0"
+    registration:{
+      username:"",
+      phoneNumber: "",
+      email: ""
+    },
+    username: "Anonymous",
+    ipAddress: "",
+    location: "",
+    token: "",
+    userType: "Anonymous"
   },
   mutations:{
     updateSearchData (state, newSearchData){
@@ -55,6 +63,27 @@ const store = new Vuex.Store({
     },
     updateUsername(state, newUsername) {
       state.username = newUsername;
+    },
+    updateIpAddress(state, newIpAddress){
+      state.ipAddress = newIpAddress;
+    },
+    updateLocation(state, newLocation){
+      state.location = newLocation;
+    },
+    updateRegistrationUsername(state, newUsername){
+      state.registration.username = newUsername;
+    },
+    updateRegistrationPhoneNum(state, newPhoneNum){
+      state.registration.phoneNumber = newPhoneNum;
+    },
+    updateToken(state, newToken){
+      state.token = newToken;
+    },
+    updateUserType(state, newUserType){
+      state.userType = newUserType;
+    },
+    updateEmail(state, newEmail){
+      state.registration.email = newEmail;
     }
   },
   actions:{
@@ -84,6 +113,27 @@ const store = new Vuex.Store({
     },
     updateStoreViewCurrentPage({commit}, newCurrentPage){
       commit('updateStoreViewCurrentPage', newCurrentPage);
+    },
+    updateIpAddress({commit}, newIpAddress){
+      commit('updateIpAddress', newIpAddress);
+    },
+    updateLocation({commit}, newLocation){
+      commit('updateLocation', newLocation);
+    },
+    updateRegistrationUsername({commit}, newUsername){
+      commit('updateRegistrationUsername', newUsername);
+    },
+    updateRegistrationPhoneNum({commit}, newPhoneNum){
+      commit('updateRegistrationPhoneNum', newPhoneNum);
+    },
+    updateToken({commit}, newToken){
+      commit('updateToken', newToken);
+    },
+    updateUserType({commit}, newUserType){
+      commit('updateUserType', newUserType);
+    },
+    updateEmail({commit}, newEmail){
+      commit('updateEmail', newEmail);
     },
     sortStoreResults ({state}, sortOption){
       if(sortOption.by === 'distance'){
