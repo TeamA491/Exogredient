@@ -185,7 +185,7 @@ export default {
       dialog: false,
       DialogMessage: "",
       yearList: [2020],
-      monthList: [2, 3, 4],
+      monthList: [3, 4],
       operationLists: [
         "Downvote Upload",
         "Upvote Upload",

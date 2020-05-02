@@ -220,7 +220,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadRetrievalFailedMessage = "Couldn't fetch draft data";
         public const string UploadRetrievalSuccessMessage = "Upload data retrieved!";
 
-        public const string CreateUploadOperation = "Create upload";
         public const string DraftUploadOperation = "Create upload";
         public const string UploadCreationErrorMessage = "A system error occurred. Please try again later.";
         public const string UploadCreationSuccessMessage = "Upload created!";
