@@ -1,6 +1,4 @@
 <template>
-
-  
   <div class="section">
     <div class="container">
       <!-- TOP LEVEL NAV BAR -->
@@ -16,7 +14,6 @@
       </nav>
 
       <h1 class="title text-center">Submit a new ticket</h1>
-      <button @click="hello"> click me</button>
       <!-- SUBMIT TICKET FORM -->
       <div class="field is-horizontal">
         <div class="field-label is-normal">
@@ -52,7 +49,12 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <textarea v-model="desc" class="textarea" placeholder="Explain your issue here" id="text-area"></textarea>
+              <textarea
+                v-model="desc"
+                class="textarea"
+                placeholder="Explain your issue here"
+                id="text-area"
+              ></textarea>
             </div>
 
             <p class="help is-danger" id="text-area-error-message"></p>
@@ -69,7 +71,10 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <button  @click ="submitTick" class="button is-primary" id="submit-button">Submit Ticket</button>
+              <button
+                class="button is-primary"
+                id="submit-button"
+              >Submit Ticket</button>
             </div>
           </div>
         </div>
@@ -89,30 +94,6 @@ export default {
       desc: "",
       category: ""
     }
-  },
-  methods: {
-    hello() {
-      fetch("https://localhost:44303/api/ticketsystem/GetTicket")
-      .then((response) => {
-        alert(response)
-        return response.json()
-      })
-      .then((data) => {
-        alert(data)
-      })
-    },
-    submitTicket()
-    {
-      // fetch"(https://localhost:44303/api/ticketsystem/GetTicket", {
-      //   methods:"POST",
-      //   cors: ""
-
-      //   body: JSON.stringify({
-      //     ticketCategory: this.category,
-      //     description : this.desc
-      //   })
-      // })
-    }
   }
 };
 
@@ -127,7 +108,7 @@ var textAreaErrorMessage;
 
 // On document ready...
 document.addEventListener("DOMContentLoaded", function() {
-  submitButton = document.getElementById("submit-button");
+  submitButton = document.querySelector("#submit-button");
   categoryDropdown = document.getElementById("category-dropdown");
   categoryDropdownParent = document.getElementById("category-dropdown-parent");
   categoryErrorMessage = document.getElementById("category-error-message");

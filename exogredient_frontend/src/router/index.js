@@ -7,7 +7,6 @@ import TicketsView from '../views/TicketsView';
 import RegistrationView from '../views/RegistrationView';
 import SearchResultsView from '../views/SearchResultsView';
 import SubmitTicketView from '../views/SubmitTicketView.vue';
-import RegistrationView from '../views/RegistrationView';
 
 Vue.use(VueRouter);
 

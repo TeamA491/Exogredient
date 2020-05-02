@@ -107,8 +107,8 @@
           </tbody>
         </table>
 
-        <!-- PAGINATION -->
-        <nav class="pagination" role="navigation" aria-label="pagination" id="pagination">
+      <!-- PAGINATION -->
+        <!-- <nav class="pagination" role="navigation" aria-label="pagination" id="pagination">
           <a class="pagination-previous">Previous</a>
           <a class="pagination-next">Next page</a>
           <ul class="pagination-list">
@@ -134,10 +134,10 @@
               <a class="pagination-link" aria-label="Goto page 86">86</a>
             </li>
           </ul>
-        </nav>
+        </nav> -->
 
         <!-- CURRENT TICKET VIEW -->
-        <div class="container is-fluid has-background-grey-lighter" id="cur-ticket-view">
+        <div class="container is-fluid has-background-grey-lighter is-hidden" id="cur-ticket-view">
           <!-- CURRENT TICKET HEADER -->
           <div class="level">
             <div class="level-left">
@@ -188,7 +188,7 @@
 
           <h3>Submitted: 05/01/2020</h3>
 
-          <textarea readonly class="textarea" rows="10" id="current-ticket-description">asdfasdfasd</textarea>
+          <textarea readonly class="textarea" rows="10" id="current-ticket-description"></textarea>
 
           <button class="button" id="cur-ticket-back-button">Back</button>
         </div>
@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function() {
   categoryDropdown = document.getElementById("category-dropdown");
   flagColorsDropdown = document.getElementById("flag-colors-dropdown");
   readStatusDropdown = document.getElementById("read-status-dropdown");
-  pagination = document.getElementById("pagination");
+  // pagination = document.getElementById("pagination");
   curTicketMarkReadButton = document.getElementById(
     "cur-ticket-mark-read-button"
   );
@@ -279,11 +279,9 @@ document.addEventListener("DOMContentLoaded", function() {
   );
   curTicketBackButton.addEventListener("click", onCurTicketBackButtonClick);
 
-  // TODO: IF TABLE IS EMPTY, PUT EMPTY MESSAGE
-
   // Check if there are tickets or not
   // displayTicketView();
-  showTable();
+  hideTable();
   hideTicketView();
 });
 
@@ -329,13 +327,11 @@ OTHER
 function showTable() {
   noTicketsDisplay.classList.add("is-hidden");
   ticketsTable.classList.remove("is-hidden");
-  pagination.classList.remove("is-hidden");
 }
 
 function hideTable() {
   ticketsTable.classList.add("is-hidden");
   noTicketsDisplay.classList.remove("is-hidden");
-  pagination.classList.add("is-hidden");
 }
 
 function displayTicketView() {

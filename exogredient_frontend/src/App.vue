@@ -7,6 +7,8 @@
         <v-btn to="upload">Upload</v-btn>
         <v-btn to="profile">Profile</v-btn>
         <v-btn to="useranalysis">Analysis</v-btn>
+        <v-btn to="viewTickets">View Tickets</v-btn>
+        <v-btn to="newTicket">New Ticket</v-btn>
         <v-btn to="login/false">Login</v-btn>
         <v-btn @click="goToRegistration">Register</v-btn>
       </nav>
