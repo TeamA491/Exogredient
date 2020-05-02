@@ -15,10 +15,12 @@ namespace TeamA.Exogredient.Services
     public class VerificationService
     {
         private readonly UserManagementService _userManagementService;
+        private readonly SessionService _sessionService;
 
-        public VerificationService(UserManagementService userManagementService)
+        public VerificationService(UserManagementService userManagementService, SessionService sessionService)
         {
             _userManagementService = userManagementService;
+            _sessionService = sessionService;
         }
 
         /// <summary>
@@ -143,6 +145,92 @@ namespace TeamA.Exogredient.Services
             client.Dispose();
 
             return true;
+        }
+
+
+        public async Task<bool> SendResetPasswordLinkAsync(string username, string emailAddress)
+        {
+            var message = new MimeMessage();
+            var bodyBuilder = new BodyBuilder();
+
+            // From the system email address to the emailAddress.
+            message.From.Add(new MailboxAddress(Constants.SystemEmailAddress));
+            message.To.Add(new MailboxAddress($"{emailAddress}"));
+
+            message.Subject = Constants.EmailVerificationSubject;
+
+            // Generate JWT
+            var token = await _sessionService.CreateTokenAsync(username).ConfigureAwait(false);
+            Console.WriteLine("Token: " + token);
+            // Create the reset link
+            var link = $"{Constants.WebPageDomain}/resetPassword/{token}";
+
+            var tinyUrl = ShrinkURL(link);
+
+            // Html body for the email code.
+            bodyBuilder.HtmlBody = @"<td valign=""top"" align=""center"" bgcolor=""#0d1121"" style=""padding:35px 70px 30px;"" class=""em_padd""><table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">" +
+                @"<tr>" +
+                @"</tr>" +
+                @"<tr>" +
+                @"<td height = ""15"" style = ""font-size:0px; line-height:0px; height:15px;"" > &nbsp;</td>" +
+                            @"</tr>" +
+                            @"<tr>" +
+                            $@"<td align = ""center"" valign = ""top"" style = ""font-family:'Open Sans', Arial, sans-serif; font-size:18px; line-height:22px; color:#fbeb59; letter-spacing:2px; padding-bottom:12px;"">
+                            Click this link to reset password: {tinyUrl}</td>" +
+                @"</tr>" +
+                @"<tr>";
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            // Create the SMTP client with the default certificate validation callback to prevent man in the middle attacks.
+            //var client = new SmtpClient
+            //{
+            //    ServerCertificateValidationCallback = (s, c, h, e) => MailService.DefaultServerCertificateValidationCallback(s, c, h, e)
+            //};
+            var client = new SmtpClient();
+
+            // Connect over google SMTP, provide credentials, and asynchronously send and disconnect the client.
+            await client.ConnectAsync(Constants.GoogleSMTP, Constants.GoogleSMTPPort, SecureSocketOptions.SslOnConnect).ConfigureAwait(false);
+            await client.AuthenticateAsync(Constants.SystemEmailAddress, Constants.SystemEmailPassword).ConfigureAwait(false);
+            await client.SendAsync(message).ConfigureAwait(false);
+            await client.DisconnectAsync(true).ConfigureAwait(false);
+            client.Dispose();
+
+            return true;
+        }
+
+        // Reference: https://www.codeguru.com/csharp/.net/net_general/internet/shortening-your-long-urls-with-the-tinyurl-api-and-.net.html
+        private string ShrinkURL(string strURL)
+        {
+
+            string URL;
+            URL = "http://tinyurl.com/api-create.php?url=" +
+               strURL;
+
+            System.Net.HttpWebRequest objWebRequest;
+            System.Net.HttpWebResponse objWebResponse;
+
+            System.IO.StreamReader srReader;
+
+            string strHTML;
+
+            objWebRequest = (System.Net.HttpWebRequest)System.Net
+               .WebRequest.Create(URL);
+            objWebRequest.Method = "GET";
+
+            objWebResponse = (System.Net.HttpWebResponse)objWebRequest
+               .GetResponse();
+            srReader = new System.IO.StreamReader(objWebResponse
+               .GetResponseStream());
+
+            strHTML = srReader.ReadToEnd();
+
+            srReader.Close();
+            objWebResponse.Close();
+            objWebRequest.Abort();
+
+            return strHTML;
+
         }
 
     }

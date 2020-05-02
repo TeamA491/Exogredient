@@ -23,6 +23,14 @@ namespace RegisterationController.Controllers
         static FlatFileLoggingService ffLogging = new FlatFileLoggingService(mask);
         static UserManagementService usermanagementService = new UserManagementService(userDAO, anonymousUserDAO, dsLogging, ffLogging, mask);
         static LoggingManager loggingManager = new LoggingManager(ffLogging, dsLogging);
+        static AuthorizationService authorizationService = new AuthorizationService();
+        static SessionService sessionService = new SessionService(userDAO, authorizationService);
+        static VerificationService verificationService = new VerificationService(usermanagementService, sessionService);
+        static SendEmailCodeManager sendEmailCodeManger = new SendEmailCodeManager(loggingManager, verificationService);
+        static SendPhoneCodeManager sendPhoneCodeManager = new SendPhoneCodeManager(loggingManager, verificationService);
+        static VerifyEmailCodeManager verifyEmailCodeManager = new VerifyEmailCodeManager(loggingManager, usermanagementService);
+        static VerifyPhoneCodeManager verifyPhoneCodeManager = new VerifyPhoneCodeManager(usermanagementService, loggingManager, verificationService);
+
 
         [EnableCors]
         [HttpGet("register")]
@@ -53,9 +61,6 @@ namespace RegisterationController.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> SendEmailCodeAsync(string username, string email, string ipAddress)
         {
-            var verificationService = new VerificationService(usermanagementService);
-            var sendEmailCodeManger = new SendEmailCodeManager(loggingManager,verificationService);
-
             var emailResult = await sendEmailCodeManger.SendEmailCodeAsync(username,email,ipAddress,Constants.InitialFailureCount);
 
             if(emailResult.ExceptionOccurred)
@@ -74,9 +79,6 @@ namespace RegisterationController.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> SendPhoneCodeAsync(string username, string phoneNumber, string ipAddress)
         {
-            var verificationService = new VerificationService(usermanagementService);
-            var sendPhoneCodeManager = new SendPhoneCodeManager(loggingManager, verificationService);
-
             var phoneReuslt = await sendPhoneCodeManager.SendPhoneCodeAsync(username, phoneNumber, ipAddress, Constants.InitialFailureCount);
 
             if (phoneReuslt.ExceptionOccurred)
@@ -95,8 +97,6 @@ namespace RegisterationController.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> VerifyEmailCodesAsync(string username, string emailCode, string ipAddress)
         {
-            var verifyEmailCodeManager = new VerifyEmailCodeManager(loggingManager,usermanagementService);
-
             var result = await verifyEmailCodeManager.VerifyEmailCodeAsync(username,emailCode,ipAddress,Constants.InitialFailureCount);
 
             if (result.ExceptionOccurred)
@@ -117,9 +117,6 @@ namespace RegisterationController.Controllers
         public async Task<IActionResult> VerifyPhoneCodesAsync(string username, string phoneCode, string phoneNumber,
                                                                string ipAddress, bool duringRegistration)
         {
-            var verificationService = new VerificationService(usermanagementService);
-            var verifyPhoneCodeManager = new VerifyPhoneCodeManager(usermanagementService, loggingManager, verificationService);
-
             var result = await verifyPhoneCodeManager.VerifyPhoneCodeAsync(username, phoneCode, ipAddress, phoneNumber,
                                                               duringRegistration, Constants.InitialFailureCount);
 

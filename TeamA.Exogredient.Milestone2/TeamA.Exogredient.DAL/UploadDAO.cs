@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -649,6 +649,43 @@ namespace TeamA.Exogredient.DAL
                         return paginationSize + 1;
                     }
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Get the Users with the upload.
+        /// </summary>
+        /// <param name="affectedUploadsDict">The dictionary with users that are upvoted or downvoted.</param>
+        /// <returns>A dictionary with upload id and the user.</returns>
+        public async Task<Dictionary<string, string>> GetUsersWithUploadsAsync(Dictionary<String, int> affectedUploadsDict)
+        {
+            var votedUserDict = new Dictionary<string, string>();
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                foreach (var upload in affectedUploadsDict)
+                {
+                    string user;
+                    string uploadID = upload.Key;
+
+                    string sqlString = $"SELECT {Constants.UploadDAOUploaderColumn} FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
+
+                    // Open the command inside a using statement to properly dispose/close.
+                    using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                    {
+                        // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
+                        command.Parameters.AddWithValue("@UPLOADID", uploadID);
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        await reader.ReadAsync().ConfigureAwait(false);
+                        user = reader.GetString(0);
+                    }
+                    
+                    votedUserDict.Add(uploadID, user);
+                }
+                return votedUserDict;
             }
         }
 

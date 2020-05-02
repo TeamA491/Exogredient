@@ -2,13 +2,15 @@
     <div id="form">
         <div class='field'>
             <label class='label' for="phoneCode">Phone Code:</label><br>
-            <input class="input" type="text" name="phoneCode" id="phoneCodeInput" placeholder="ex)1234" v-model="phoneCode"><br>
+            <input class="input" type="text" name="phoneCode" id="phoneCodeInput" placeholder="ex)1234" v-model="phoneCode">
+            <a class='button' @click="sendPhoneCode">Resend</a><br>
             <span class='errorMessage' id="phoneCodeError"></span><br>
         </div>
         
         <div class="field">
-            <label class="label" for="emailCode">Last Name:</label><br>
-            <input class="input" type="text" name="emailCode" id="emailCodeInput" placeholder="ex)123456" v-model="emailCode"><br>
+            <label class="label" for="emailCode">Email Code:</label><br>
+            <input class="input" type="text" name="emailCode" id="emailCodeInput" placeholder="ex)123456" v-model="emailCode">
+            <a class='button' @click="sendEmailCode">Resend</a><br>
             <span class='errorMessage' id="emailCodeError"></span><br>
         </div>
 
@@ -38,6 +40,16 @@ export default {
         }
     },
     methods:{
+        sendPhoneCode: async function(){
+            fetch(`${global.ApiDomainName}/api/registration/sendPhoneCode?`
+            + `username=${this.$store.state.registration.username}&phoneNumber=${this.$store.state.registration.phoneNumber}`
+            + `&ipAddress=${this.$store.state.ipAddress}`);
+        },
+        sendEmailCode: async function(){
+            fetch(`${global.ApiDomainName}/api/registration/sendEmailCode?`
+            + `username=${this.$store.state.registration.username}&email=${this.$store.state.registration.email}`
+            + `&ipAddress=${this.$store.state.ipAddress}`);
+        },
         submit: async function(){
             var verifyEmailCodeResponse = await fetch(`${global.ApiDomainName}/api/registration/verifyEmailCode?`
             +`username=${this.$store.state.registration.username}&emailCode=${this.emailCode}&`
@@ -65,8 +77,7 @@ export default {
             }
 
             if(verifyEmailCodeJson.successful && verifyPhoneCodeJson.successful){
-                alert("Successfully verified!");
-                //this.$router.push('/');
+                this.$router.push('/login/registered');
             }
         }
     }

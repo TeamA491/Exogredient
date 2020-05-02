@@ -12,12 +12,28 @@ const routes = [
   { path: '/StoreView', component: StoreView},
   { path: '/ErrorView', component: ErrorView}, 
   { path: '/RegistrationView', component: RegistrationView },
+  {
+    path: '/resetPassword/:token',
+    name: 'resetPassword',
+    component: () => import('../views/ResetPasswordView.vue'),
+    props: true
+  },
+  { 
+    path: '/sendResetLink',
+    name: 'sendResetLink',
+    component: () => import('../views/SendResetLink.vue')
+  },
   { 
     path: '/verify',
     name: 'verify',
     component: () => import('../views/VerificationView.vue')
   },
-
+  {
+    path: '/login/:after',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue'),
+    props: true
+  },
   {
     path: "/profile",
     name: "profile",
@@ -31,6 +47,11 @@ const routes = [
   {
     path: "/",
     name: "home",
+  },
+  {
+    path: "/useranalysis",
+    name: "useranalysis",
+    component: () => import("@/views/UserAnalysis.vue"),
   },
   
 ]

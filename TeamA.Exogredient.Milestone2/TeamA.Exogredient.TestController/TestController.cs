@@ -9,6 +9,16 @@ using System.Drawing;
 using UploadController;
 using System.IO;
 using Image = Google.Cloud.Vision.V1.Image;
+using TeamA.Exogredient.DataHelpers;
+using TeamA.Exogredient.AppConstants;
+using TeamA.Exogredient.Managers;
+using System.Text;
+using System.Reflection;
+using MySqlX.XDevAPI;
+using MySqlX.XDevAPI.CRUD;
+using System.Reflection.Metadata;
+using System.Linq;
+using WeCantSpell.Hunspell;
 
 namespace TeamA.Exogredient.TestController
 {
@@ -22,7 +32,7 @@ namespace TeamA.Exogredient.TestController
             AnonymousUserDAO adao = new AnonymousUserDAO(Constants.SQLConnection);
             UploadDAO updao = new UploadDAO(Constants.SQLConnection);
             UserDAO udao = new UserDAO(Constants.SQLConnection);
-            
+
             MaskingService mservice = new MaskingService(mdao);
 
             DataStoreLoggingService dsls = new DataStoreLoggingService(ldao, mservice);
@@ -43,25 +53,6 @@ namespace TeamA.Exogredient.TestController
             await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
 
             //UploadPost post = new UploadPost(byteArray, "packaged/bottled products", "thesmokinggun42", "172.88.196.101", DateTime.Now, "Nutter Butter", "deez nutz", 5, 4.20, "item");
-
-            //UserRecord urecord = new UserRecord("thesmokinggun42", "eli gomez", "elithegolfer@gmail.com", "9499815506", "fausto42", 0, "admin",
-            //                                    "salt", 5, "6787", 5, 5, 5, 5, 5);
-
-            //await umanage.CreateUserAsync(false, urecord).ConfigureAwait(false);
-
-            //await manager.CreateUploadAsync(post, 0);
-            //await manager.DraftUploadAsync(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_184614.jpg", "packaged/bottled products", "thesmokinggun42", "172.88.196.101", price: 5.6789);
-
-            //Console.WriteLine(await sdao.FindStoreAsync(33.834045, -118.168047972222).ConfigureAwait(false));
-
-            //var data = await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
-
-            //foreach (var s in data.Suggestions)
-            //{
-            //    Console.WriteLine(s);
-            //}
-
-            //Console.WriteLine(Constants.GoogleApiKey);
         }
     }
 }

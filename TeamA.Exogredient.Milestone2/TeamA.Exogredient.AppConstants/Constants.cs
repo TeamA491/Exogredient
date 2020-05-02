@@ -58,7 +58,7 @@ namespace TeamA.Exogredient.AppConstants
 
         public const double LatDegree400ft = 0.0009;
         public const double LongDegree400ft = 0.0011111;
-        
+
         public static readonly List<Tuple<double, double>> CurrentScopePolygon = CaliforniaPolygon;
 
         // TODO: CONVERT THESE TO ARRAYS
@@ -244,6 +244,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string DeleteUploadOperation = "Delete upload";
         public const string CreateUploadOperation = "Create upload";
         public const string DraftUploadOperation = "Draft upload";
+
         public const string UploadCreationErrorMessage = "A system error occurred. Please try again later.";
         public const string UploadCreationSuccessMessage = "Upload created!";
         public const string DraftCreationSuccessMessage = "Draft created!";
@@ -267,6 +268,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string PriceUnitNotValidMessage = "Price unit not valid (per item/pound/gram/oz)";
         public const string TimeNotValidMessage = "Time posted not valid, more than 5 minutes have passed";
         public const string InvalidRatingMessage = "Invalid rating, must be between 1 and 5 stars";
+
+        public const string ResetLinkExpired = "Reset Link is expired!";
+        public const string UsernameNotMatchResetLink = "The username is invalid for this link!";
 
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
@@ -314,7 +318,7 @@ namespace TeamA.Exogredient.AppConstants
             { "createSysAdmin", 4 },
         };
 
-        // ARCHIVING 
+        // ARCHIVING
         public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
         public const string ArchivePrefixArgument = "a -t7z ";
         public const string ArchivePostfixArgument = " -sdel";
@@ -410,6 +414,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SendPhoneCodeOperation = "Send Phone Code";
         public const string SendEmailCodeOperation = "Send Email Code";
         public const string UpdatePasswordOperation = "Update Password";
+        public const string SendResetLinkOperation = "Send Reset Password Link";
         public const string SingleUserCreateOperation = "Single User Create";
         public const string BulkUserCreateOperation = "Bulk User Create";
         public const string SingleUserDeleteOperation = "Single Delete Create";
@@ -420,6 +425,15 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
+        public const string CreateSnapshotOperation = "Create Single Snapshot";
+        public const string ReadOneSnapshotOperation = "Read Single Snapshot";
+        public const string ReadMultiSnapshotOperation = "Read Multiple Snapshot";
+        public const string UpvoteOperation = "Upvote Upload";
+        public const string DownvoteOperation = "Downvote Upload";
+        public const string UndoUpvoteOperation = "Undo Upvote Upload";
+        public const string UndoDownvoteOperation = "Undo Downvote Upload";
+        public const string CreateUploadOperation = "Creating Upload";
+        public const string SearchOperation = "Searching";
 
         public const string GetTotalStoreResultsNumberOperation = "Get Total StoreResults Number";
         public const string GetTotalIngredientResultsNumberOperation = "Get Total IngredientResults Number";
@@ -435,6 +449,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SystemIdentifier = "System";
 
         public const string LocalHost = "127.0.0.1";
+        public const string WebPageDomain = "http://localhost:8080";
 
         public const int RecentUploadPagination = 10;
         public const int SavedUploadPagination = 10;
@@ -472,7 +487,7 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxPhoneCodeAttempts = 3;
         public const int MaxSearchRelatedAttempts = 3;
         public const int InitialFailureCount = 0;
-        
+
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
         public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan MaxIPLockTime = new TimeSpan(0, 15, 0);
@@ -752,6 +767,24 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
 
+
+        // SNAPSHOT COLLECTION
+        public const string SnapshotSchemaName = "exogredient_snapshot";
+        public const string SnapshotCollectionPrefix = "snapshot";
+        public const string SnapshotMonth = "_month";
+        public const string SnapshotOperationsDict = "operations";
+        public const string SnapshotUsersDict = "count_of_registered_users";
+        public const string SnapshotTopCityDict = "top_cities_that_uses_application";
+        public const string SnapshotTopUserUploadedDict = "top_users_that_upload";
+        public const string SnapshotTopUploadedIngredientDict = "top_most_uploaded_ingredients";
+        public const string SnapshotTopUploadedstoreDict = "top_most_uploaded_stores";
+        public const string SnapshotTopSearchedIngredientDict = "top_most_searched_ingredients";
+        public const string SnapshotTopSearchedStoreDict = "top_most_searched_stores";
+        public const string SnapshotTopUpvotedUserDict = "top_most_upvoted_users";
+        public const string SnapshotTopDownvotedUserDict = "top_most_downvoted_users";
+
+
+
         // RECORD HELPER DATA STRUCTURES
         public static readonly IDictionary<string, bool> LogsCollectionIsColumnMasked = new Dictionary<string, bool>()
         {
@@ -862,6 +895,8 @@ namespace TeamA.Exogredient.AppConstants
         // EXCEPTION MESSAGE -- Uploads
         public const string UploadIdsDNE = "One or more of the uploads Ids does not exist";
 
+        // EXCEPTION MESSAGE -- Snapshots
+        public const string FailCreateSnapShot = "Failed to create a snapshot";
 
 
     }

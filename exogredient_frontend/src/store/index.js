@@ -24,11 +24,14 @@ const store = new Vuex.Store({
     },
     registration:{
       username:"",
-      phoneNumber: ""
+      phoneNumber: "",
+      email: ""
     },
-    username: "anonymous",
+    username: "Anonymous",
     ipAddress: "",
-    location: ""
+    location: "",
+    token: "",
+    userType: "Anonymous"
   },
   mutations:{
     updateSearchData (state, newSearchData){
@@ -72,6 +75,15 @@ const store = new Vuex.Store({
     },
     updateRegistrationPhoneNum(state, newPhoneNum){
       state.registration.phoneNumber = newPhoneNum;
+    },
+    updateToken(state, newToken){
+      state.token = newToken;
+    },
+    updateUserType(state, newUserType){
+      state.userType = newUserType;
+    },
+    updateEmail(state, newEmail){
+      state.registration.email = newEmail;
     }
   },
   actions:{
@@ -113,6 +125,15 @@ const store = new Vuex.Store({
     },
     updateRegistrationPhoneNum({commit}, newPhoneNum){
       commit('updateRegistrationPhoneNum', newPhoneNum);
+    },
+    updateToken({commit}, newToken){
+      commit('updateToken', newToken);
+    },
+    updateUserType({commit}, newUserType){
+      commit('updateUserType', newUserType);
+    },
+    updateEmail({commit}, newEmail){
+      commit('updateEmail', newEmail);
     },
     sortStoreResults ({state}, sortOption){
       if(sortOption.by === 'distance'){
