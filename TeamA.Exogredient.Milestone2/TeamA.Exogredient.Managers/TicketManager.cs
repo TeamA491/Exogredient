@@ -10,17 +10,11 @@ namespace TeamA.Exogredient.Managers
     public class TicketManager
     {
         private readonly TicketService ticketService;
-        private readonly LoggingManager loggingManager;
-        private readonly SessionService sessionService;
-        private readonly AuthorizationService authorizationService;
         private readonly AuthorizationManager authorizationManager;
 
-        public TicketManager(TicketService ticketService, LoggingManager loggingManager, SessionService sessionService, AuthorizationService authorizationService, AuthorizationManager authorizationManager)
+        public TicketManager(TicketService ticketService, AuthorizationManager authorizationManager)
         {
             this.ticketService = ticketService;
-            this.loggingManager = loggingManager;
-            this.sessionService = sessionService;
-            this.authorizationService = authorizationService;
             this.authorizationManager = authorizationManager;
         }
 

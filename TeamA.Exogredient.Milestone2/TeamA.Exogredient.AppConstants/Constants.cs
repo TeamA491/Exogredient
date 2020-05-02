@@ -124,6 +124,9 @@ namespace TeamA.Exogredient.AppConstants
             {25, 'Y'}, {26, 'Z'}
         };
 
+        // REQUEST HEADERS
+        public const string JWTTokenHeader = "Authorization";
+
         // UPLOAD
         public const int InProgressStatus = 1;
         public const int NotInProgressStatus = 0;
