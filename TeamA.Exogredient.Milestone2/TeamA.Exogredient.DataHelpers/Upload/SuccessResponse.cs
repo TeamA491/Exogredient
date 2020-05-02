@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TeamA.Exogredient.DataHelpers.Upload
 {
-    public class CreateResponse
+    public class SuccessResponse
     {
         public string Message { get; set; }
         public bool ExceptionOccurred { get; set; }

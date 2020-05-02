@@ -46,7 +46,7 @@ namespace UploadController.Controllers
 
                 var result = await _uploadManager.CreateUploadAsync(post, Constants.NoValueInt).ConfigureAwait(false);
 
-                return Ok(new CreateResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
+                return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
             catch
             {
@@ -66,10 +66,6 @@ namespace UploadController.Controllers
                 await formFile.CopyToAsync(memoryStream);
                 var image = new Bitmap(memoryStream);
 
-                var test = data[Constants.PriceKey];
-
-                var test2 = test.ToString();
-
                 var post = new UploadPost(image, data[Constants.CategoryKey],
                                           data[Constants.UsernameKey],
                                           data[Constants.IPAddressKey],
@@ -84,11 +80,10 @@ namespace UploadController.Controllers
 
                 var result = await _uploadManager.DraftUploadAsync(post, Constants.NoValueInt).ConfigureAwait(false);
 
-                return Ok(new CreateResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
+                return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
-            catch (Exception e)
+            catch
             {
-                var lol = e.Message;
                 // Return generic server error.
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -134,13 +129,19 @@ namespace UploadController.Controllers
             }
         }
 
-        [HttpGet("DraftUpload/{username}/{id}")]
+        [HttpPost("ContinueUpload")]
+        [Consumes("multipart/form-data")]
         [Produces("application/json")]
-        public async Task<IActionResult> ContinueUploadProgressAsync(string username, int id, string ipAddress = Constants.LocalHost)
+        public async Task<IActionResult> ContinueUploadProgressAsync(IFormCollection data)
         {
             try
             {
-                return Ok(await _uploadManager.ContinueUploadProgressAsync(username, id, ipAddress, Constants.NoValueInt).ConfigureAwait(false));
+                var result = await _uploadManager.ContinueUploadProgressAsync(data[Constants.UsernameKey], Int32.Parse(data[Constants.UniqueIdKey]), data[Constants.IPAddressKey], Constants.NoValueInt).ConfigureAwait(false);
+
+                return Ok(new ContinueResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred,
+                                                   Description = result.Data.Description, Rating = result.Data.Rating,
+                                                   Image = new Bitmap(result.Data.Photo), Price = result.Data.Price,
+                                                   PriceUnit = result.Data.PriceUnit, IngredientName = result.Data.IngredientName});
             }
             catch
             {
@@ -149,13 +150,16 @@ namespace UploadController.Controllers
             }
         }
 
-        [HttpDelete("DeleteUpload/{username}/{id}")]
+        [HttpPost("DeleteUpload")]
+        [Consumes("multipart/form-data")]
         [Produces("application/json")]
-        public async Task<IActionResult> DeleteUploadAsync(string username, int id, string ipAddress = Constants.LocalHost)
+        public async Task<IActionResult> DeleteUploadAsync(IFormCollection data)
         {
             try
             {
-                return Ok(await _uploadManager.DeleteUploadAsync(username, id, ipAddress, Constants.NoValueInt).ConfigureAwait(false));
+                var result = await _uploadManager.DeleteUploadAsync(data[Constants.UsernameKey], Int32.Parse(data[Constants.UniqueIdKey]), data[Constants.IPAddressKey], Constants.NoValueInt).ConfigureAwait(false);
+
+                return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
             catch
             {

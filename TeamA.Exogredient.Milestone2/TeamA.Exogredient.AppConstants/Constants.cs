@@ -138,6 +138,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string PriceUnitKey = "priceUnit";
         public const string ExtensionKey = "fileExtension";
         public const string ImageSizeKey = "imageSize";
+        public const string UniqueIdKey = "id";
 
         public const string PhotoFolder = @"C:\Photos";
 

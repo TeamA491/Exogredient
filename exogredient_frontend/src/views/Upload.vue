@@ -5,7 +5,8 @@
       <div style="font-size: 150%; font-weight: bold; display: block; margin-left: auto; margin-right: auto; width:274px">UPLOAD AN INGREDIENT</div><br />
       <input type="file" id="fileInput" name="formFile" @change="AnalyzeImage" accept="image/*" style="display: block; margin-left: auto; margin-right: auto; width:202px;" required /> <br />
 
-      <img src="../assets/loader.gif" id="loading" style="display: none; margin-left: auto; margin-right: auto; width:150px; padding:40px"></img>
+      <div id="loadingTitle" style="display: none; font-family: Gill Sans; font-size: 120%; font-weight: bold; margin-left: auto; margin-right: auto; width:154px;">Analyzing Image...</div>
+      <img src="../assets/loader.gif" id="loading" style="display: none; margin-left: auto; margin-right: auto; width:150px; padding: 18px"></img>
 
       <div id="theRest" style="display:none">
         <!-- Ingredient Name -->
@@ -86,7 +87,29 @@ export default {
   },
   methods: {
     async AnalyzeImage(event) {
+      var descriptionDOM = document.getElementById("description");
+      descriptionDOM.value = "";
+
+      var nameDOM = document.getElementById("name")
+      nameDOM.value = "";
+
+      var ratingDOM = document.getElementById("rating");
+      ratingDOM.value = "";
+
+      var priceUnitDOM = document.getElementById("priceUnit");
+      priceUnitDOM.value = "";
+
+      var priceDOM = document.getElementById("price");
+      priceDOM.value = "";
+
+      var chars1DOM = document.getElementById("chars1");
+      chars1DOM.innerHTML = global.IngredientNameMaxChars + " characters remaining";
+
+      var chars2DOM = document.getElementById("chars2");
+      chars2DOM.innerHTML = global.DescriptionMaxChars + " characters remaining";;
+
       document.getElementById("loading").style.display = "block";
+      document.getElementById("loadingTitle").style.display = "block";
       document.getElementById("theRest").style.display = "none";
 
       this.file = event.target.files[0];
@@ -94,35 +117,29 @@ export default {
       var splitArray = this.file.name.split(".")
       var ext = "";
 
-      for (var i = 0; i < splitArray.length; i++)
-      {
+      for (var i = 0; i < splitArray.length; i++) {
         ext = splitArray[i];
       }
 
       var validExt = false;
 
-      for (var i = 0; i < global.ValidImageExtensions.length; i++)
-      {
-        if (ext.toUpperCase() === global.ValidImageExtensions[i].toUpperCase())
-        {
+      for (var i = 0; i < global.ValidImageExtensions.length; i++) {
+        if (ext.toUpperCase() === global.ValidImageExtensions[i].toUpperCase()) {
           validExt = true;
         }
       }
 
-      if (!validExt)
-      {
+      if (!validExt) {
         var message = "Error: Invalid image extension (valid: ";
 
-        for (var i = 0; i < global.ValidImageExtensions.length; i++)
-        {
+        for (var i = 0; i < global.ValidImageExtensions.length; i++) {
           message = message + ".";
           message = message + global.ValidImageExtensions[i].toUpperCase();
-          if (i !== global.ValidImageExtensions.length - 1)
-          {
+
+          if (i !== global.ValidImageExtensions.length - 1) {
             message = message + ",";
           }
-          else
-          {
+          else {
             message = message + ")";
           }
         }
@@ -134,11 +151,12 @@ export default {
         formFile.value = null;
 
         document.getElementById("loading").style.display = "none";
+        document.getElementById("loadingTitle").style.display = "none";
 
         return;
       }
 
-      if (this.file.size < global.MinimumPhotoSize || this.file.size > global.MaximumPhotoSize){
+      if (this.file.size < global.MinimumPhotoSize || this.file.size > global.MaximumPhotoSize) {
         this.MakeToast("Error: Your image was not within requirements (" + global.MinimumPhotoSizeString + " to " + global.MaximumPhotoSizeString + ")");
 
         var formFile = document.getElementById("fileInput");
@@ -146,15 +164,15 @@ export default {
         formFile.value = null;
 
         document.getElementById("loading").style.display = "none";
+        document.getElementById("loadingTitle").style.display = "none";
 
         return;
       }
 
-      try{
+      try {
         let output = await exifr.parse(this.file);
-        console.log(output.latitude);
       }
-      catch{
+      catch {
         this.MakeToast("Error: Your image did not have location metadata");
 
         var formFile = document.getElementById("fileInput");
@@ -162,6 +180,7 @@ export default {
         formFile.value = null;
 
         document.getElementById("loading").style.display = "none";
+        document.getElementById("loadingTitle").style.display = "none";
 
         return;
       }
@@ -174,27 +193,34 @@ export default {
       formD.append(global.UsernameKey, "thesmokinggun42");
       formD.append(global.IPAddressKey, this.$store.state.ipAddress);
 
-      fetch(`${global.ApiDomainName}/api/Upload/Vision`,
-      {
+      fetch(`${global.ApiDomainName}/api/Upload/Vision`, {
         method: "POST",
         mode: "cors",
         body: formD
       })
       .then((response) => {
+        if (response > 400) {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("loadingTitle").style.display = "none";
+          
+          this.MakeToast("Server error, please try again later.")
+        }
+
         return response.json();
       })
-      .then((data)=>{
+      .then((data)=> {
         console.log(data);
+
         document.getElementById("loading").style.display = "none";
-        if (data[global.ExceptionOccurredResponseKey])
-        {
+        document.getElementById("loadingTitle").style.display = "none";
+
+        if (data[global.ExceptionOccurredResponseKey]) {
           this.MakeToast(data[global.MessageResponseKey]);
           var formFile = document.getElementById("fileInput");
 
           formFile.value = null;
         }
-        else
-        {
+        else {
           var descriptionDOM = document.getElementById("description");
           var nameDOM = document.getElementById("name")
           var ratingDOM = document.getElementById("rating");
@@ -207,25 +233,23 @@ export default {
           priceDOM.style.border = "1px solid #000000";
 
           document.getElementById("loading").style.display = "none";
+          document.getElementById("loadingTitle").style.display = "none";
           document.getElementById("theRest").style.display = "block";
 
           this.category = data[global.CategoryResponseKey];
-          console.log(this.category);
           this.name = data[global.NameResponseKey];
           this.suggestions = data[global.SuggestionsResponseKey];
 
-          if (this.name === "")
-          {
+          if (this.name === "") {
             this.MakeToast("Couldn't generate ingredient name, please enter it.")
           }
-          else
-          {
+          else {
             document.getElementById("name").value = this.name;
           }
         }
       })
     },   
-    SubmitUpload: function(){
+    SubmitUpload: function() {
       var descriptionDOM = document.getElementById("description");
       var description = descriptionDOM.value;
 
@@ -240,9 +264,6 @@ export default {
 
       var priceDOM = document.getElementById("price");
       var price = priceDOM.value;
-
-      console.log(priceUnit);
-      console.log(price);
 
       descriptionDOM.style.border = "1px solid #000000";
       nameDOM.style.border = "1px solid #000000";
@@ -252,45 +273,36 @@ export default {
 
       var validForm = true;
 
-      if (description.length < global.DescriptionMinChars || description.length > global.DescriptionMaxChars)
-      {
+      if (description.length < global.DescriptionMinChars || description.length > global.DescriptionMaxChars) {
         validForm = false;
         descriptionDOM.style.border = "1px solid red";
       }
 
-      if (name.length < global.IngredientNameMinChars || name.length > global.IngredientNameMaxChars)
-      {
+      if (name.length < global.IngredientNameMinChars || name.length > global.IngredientNameMaxChars) {
         validForm = false;
         nameDOM.style.border = "1px solid red";
       }
 
-      if (rating < global.MinimumRating || rating > global.MaximumRating)
-      {
+      if (rating < global.MinimumRating || rating > global.MaximumRating) {
         validForm = false;
         ratingDOM.style.border = "1px solid red";
       }
 
-      if (price === "")
-      {
+      if (price === "") {
         validForm = false;
         priceDOM.style.border = "1px solid red";
       }
 
-      if (isNaN(price))
-      {
+      if (isNaN(price)) {
         validForm = false;
         priceDOM.style.border = "1px solid red";
         this.MakeToast("Price must be a number");
         
       }
-      else
-      {
+      else {
         var priceValue = parseFloat(price);
 
-        console.log("here");
-
-        if (price < global.MinimumPrice || price > global.MaximumPrice)
-        {
+        if (price < global.MinimumPrice || price > global.MaximumPrice) {
           validForm = false;
           priceDOM.style.border = "1px solid red";
           this.MakeToast("Price value invalid (must be between " + global.MinimumPrice + " and " + global.MaximumPrice + ")");
@@ -298,26 +310,21 @@ export default {
       }
 
       var validPriceUnit = false;
-      for (var i = 0; i < global.ValidPriceUnits.length; i++)
-      {
-        if (global.ValidPriceUnits[i] === priceUnit)
-        {
+      for (var i = 0; i < global.ValidPriceUnits.length; i++) {
+        if (global.ValidPriceUnits[i] === priceUnit) {
           validPriceUnit = true;
         }
       }
 
-      if (!validPriceUnit)
-      {
+      if (!validPriceUnit) {
         validForm = false;
         priceUnitDOM.style.border = "1px solid red";
       }
 
-      if (!validForm)
-      {
+      if (!validForm) {
         return;
       }
-      else
-      {
+      else {
         this.name = name;
         this.description = description;
         this.rating = parseInt(rating);
@@ -337,21 +344,31 @@ export default {
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
 
-        fetch(`${global.ApiDomainName}/api/Upload/NewUpload`,
-        {
+        fetch(`${global.ApiDomainName}/api/Upload/NewUpload`, {
           method: "POST",
           mode: "cors",
           body: formD
         })
         .then((response) => {
+          if (response > 400) {
+            this.MakeToast("Server error, please try again later.")
+          }
+
           return response.json();
         })
-        .then((data)=>{
+        .then((data)=> {
           console.log(data);
+
+          if (data[global.ExceptionOccurredResponseKey] || !data[global.SuccessResponseKey]) {
+            this.MakeToast(data[global.MessageResponseKey]);
+          }
+          else {
+            // Go to profile view
+          }
         })
       }
     },
-    SaveDraft: function(){
+    SaveDraft: function() {
       var descriptionDOM = document.getElementById("description");
       var description = descriptionDOM.value;
 
@@ -369,45 +386,35 @@ export default {
 
       var validForm = true;
 
-      if (description !== "")
-      {
-        if (description.length < global.DescriptionMinChars || description.length > global.DescriptionMaxChars)
-        {
+      if (description !== "") {
+        if (description.length < global.DescriptionMinChars || description.length > global.DescriptionMaxChars) {
           validForm = false;
         }
 
       }
       
-      if (name !== "")
-      {
-        if (name.length < global.IngredientNameMinChars || name.length > global.IngredientNameMaxChars)
-        {
+      if (name !== "") {
+        if (name.length < global.IngredientNameMinChars || name.length > global.IngredientNameMaxChars) {
           validForm = false;
         }
       }
       
-      if (rating !== "")
-      {
-        if (rating < global.MinimumRating || rating > global.MaximumRating)
-        {
+      if (rating !== "") {
+        if (rating < global.MinimumRating || rating > global.MaximumRating) {
           validForm = false;
         }
       }
 
-      if (price !== "")
-      {
-        if (isNaN(price))
-        {
+      if (price !== "") {
+        if (isNaN(price)) {
           validForm = false;
           this.MakeToast("Price must be a number");
           
         }
-        else
-        {
+        else {
           var priceValue = parseFloat(price);
 
-          if (price < global.MinimumPrice || price > global.MaximumPrice)
-          {
+          if (price < global.MinimumPrice || price > global.MaximumPrice) {
             validForm = false;
             this.MakeToast("Price value invalid (must be between " + global.MinimumPrice + " and " + global.MaximumPrice + ")");
           }
@@ -415,28 +422,22 @@ export default {
       }
 
       var validPriceUnit = false;
-      if (priceUnit !== "")
-      {
-        for (var i = 0; i < global.ValidPriceUnits.length; i++)
-        {
-          if (global.ValidPriceUnits[i] === priceUnit)
-          {
+      if (priceUnit !== "") {
+        for (var i = 0; i < global.ValidPriceUnits.length; i++) {
+          if (global.ValidPriceUnits[i] === priceUnit) {
             validPriceUnit = true;
           }
         }
 
-        if (!validPriceUnit)
-        {
+        if (!validPriceUnit) {
           validForm = false;
         }
       }
 
-      if (!validForm)
-      {
+      if (!validForm) {
         return;
       }
-      else
-      {
+      else {
         this.name = name;
         this.description = description;
         this.rating = parseInt(rating);
@@ -456,35 +457,45 @@ export default {
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
         
-        fetch(`${global.ApiDomainName}/api/Upload/DraftUpload`,
-        {
+        fetch(`${global.ApiDomainName}/api/Upload/DraftUpload`, {
           method: "POST",
           mode: "cors",
           body: formD
         })
         .then((response) => {
+          if (response > 400) {
+            this.MakeToast("Server error, please try again later.")
+          }
+
           return response.json();
         })
-        .then((data)=>{
+        .then((data)=> {
           console.log(data);
+
+          if (data[global.ExceptionOccurredResponseKey] || !data[global.SuccessResponseKey]) {
+            this.MakeToast(data[global.MessageResponseKey]);
+          }
+          else {
+            // Go to profile view
+          }
         })
       }
     },
-    MakeToast(data){
+    MakeToast(data) {
       var snackbar = document.getElementById("snackbar");
 
       snackbar.className = "show";
       snackbar.innerHTML = data;
 
       // After 4 seconds, remove the show class from DIV
-      setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 4000);
+      setTimeout(function() { snackbar.className = snackbar.className.replace("show", ""); }, 4000);
     },
-    DescriptionKeyUp: function(){
+    DescriptionKeyUp: function() {
       var length = document.getElementById("description").value.length;
       var length = document.getElementById("description").maxLength - length;
       document.getElementById("chars2").innerHTML = length + " characters remaining";
     },
-    IngredientNameKeyUp: function(){
+    IngredientNameKeyUp: function() {
       var length = document.getElementById("name").value.length;
       var length = document.getElementById("name").maxLength - length;
       document.getElementById("chars1").innerHTML = length + " characters remaining";
