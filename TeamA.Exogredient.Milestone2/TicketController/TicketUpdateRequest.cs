@@ -4,6 +4,6 @@ namespace TicketController
     public class TicketUpdateRequest
     {
         public string fieldUpdate { get; set; }
-        public int ticketID { get; set; }
+        public uint ticketID { get; set; }
     }
 }

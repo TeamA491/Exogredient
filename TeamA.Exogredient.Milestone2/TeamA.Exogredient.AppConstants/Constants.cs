@@ -943,5 +943,12 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketManagerSuccessUpdateStatus = "";
         public const string TicketManagerSuccessUpdateReadStatus = "";
         public const string TicketManagerSuccessSubmitTicket = "";
+
+        // TICKING API RESPONSE MESSAGES
+        public const string UnauthorizedRequest = "A bearer token was not provided.";
+        public const string TicketImproperCategory = "A category that doesn't exist was supplied";
+        public const string TicketImproperFlagColor = "A flag color that doesn't exist was supplied";
+        public const string TicketImproperReadStatus = "A read status that doesn't exist was supplied";
+        public const string TicketImproperStatus = "A status that doesn't exist was supplied.";
     }
 }
