@@ -50,7 +50,13 @@ namespace TeamA.Exogredient.TestController
             byte[] byteArray = File.ReadAllBytes(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg");
 
 
-            await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
+            // DIRECTIONS: comment out the admin check in this method to create the admin
+
+            //await umanage.CreateUserAsync(false, new UserRecord("System", "testname", "testemail@email.com", "9498675309", "password", 0, Constants.AdminUserType, "salt", Constants.NoValueLong, "090909", 0, 0, 0, 0, 0)).ConfigureAwait(false);
+
+            //============================================================================
+
+            //await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
 
             //UploadPost post = new UploadPost(byteArray, "packaged/bottled products", "thesmokinggun42", "172.88.196.101", DateTime.Now, "Nutter Butter", "deez nutz", 5, 4.20, "item");
         }

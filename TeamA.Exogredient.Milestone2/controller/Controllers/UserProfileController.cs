@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TeamA.Exogredient.Managers;
-using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.Exceptions;
-using System.Reflection.Metadata;
 using TeamA.Exogredient.AppConstants;
 
 namespace controller.Controllers

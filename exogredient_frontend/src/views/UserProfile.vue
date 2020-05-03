@@ -109,7 +109,7 @@ export default {
 
         // Fetch the RecentUploads
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
+          `${global.ApiDomainName}/api/Recentuploads/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -125,7 +125,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
+          `${global.ApiDomainName}/api/RecentUploadPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -150,7 +150,7 @@ export default {
 
         // Fetch the InProgress uploads
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
+          `${global.ApiDomainName}/api/InProgressUploads/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -166,7 +166,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
+          `${global.ApiDomainName}/api/InProgressUploadPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -191,7 +191,7 @@ export default {
 
         // Fetch the save lists for a user
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
+          `${global.ApiDomainName}/api/SaveList/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -207,7 +207,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
+          `${global.ApiDomainName}/api/SaveListPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -229,7 +229,7 @@ export default {
     saveListPage(newValue, oldValue) {
       // Recall fetch save list with new pagination.
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/SaveList/${
+        `${global.ApiDomainName}/api/SaveList/${
           this.$store.state.userData.username
         }/${newValue - 1}?ipAddress=${this.$store.state.userData.ipAddress}`
       )
@@ -249,7 +249,7 @@ export default {
     inProgressPage(newValue, oldValue) {
       // Recall fetch in progress with new pagination.
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${
+        `${global.ApiDomainName}/api/InProgressUploads/${
           this.$store.state.userData.username
         }/${newValue - 1}?ipAddress=${this.$store.state.userData.ipAddress}`
       )
@@ -269,7 +269,7 @@ export default {
     recentUploadPage(newValue, oldValue) {
       // Recall fetch in progress for new pagination.
       fetch(
-        `${global.ApiDomainName}/api/Userprofile/Recentuploads/${
+        `${global.ApiDomainName}/api/Recentuploads/${
           this.$store.state.userData.username
         }/${newValue - 1}?ipAddress=${this.$store.state.userData.ipAddress}`
       )
@@ -293,7 +293,7 @@ export default {
 
     // Make an API call to calculate the score for this user \.
     fetch(
-      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
+      `${global.ApiDomainName}/api/ProfileScore/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
     )
       .then((response) => {
         // Display error view based on response status code

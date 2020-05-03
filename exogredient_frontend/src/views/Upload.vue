@@ -193,7 +193,7 @@ export default {
       formD.append(global.UsernameKey, "thesmokinggun42");
       formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
 
-      fetch(`${global.ApiDomainName}/api/Upload/Vision`, {
+      fetch(`${global.ApiDomainName}/api/Vision`, {
         method: "POST",
         mode: "cors",
         body: formD
@@ -344,7 +344,7 @@ export default {
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
 
-        fetch(`${global.ApiDomainName}/api/Upload/NewUpload`, {
+        fetch(`${global.ApiDomainName}/api/NewUpload`, {
           method: "POST",
           mode: "cors",
           body: formD
@@ -457,7 +457,7 @@ export default {
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
         
-        fetch(`${global.ApiDomainName}/api/Upload/DraftUpload`, {
+        fetch(`${global.ApiDomainName}/api/DraftUpload`, {
           method: "POST",
           mode: "cors",
           body: formD
