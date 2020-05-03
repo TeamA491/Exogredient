@@ -7,11 +7,19 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Managers
 {
+    /// <summary>
+    /// Calls services as well as enforces business rules
+    /// </summary>
     public class TicketManager
     {
         private readonly TicketService ticketService;
         private readonly AuthorizationManager authorizationManager;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="ticketService">Copy of the ticket service</param>
+        /// <param name="authorizationManager">Copy of the authorization manager</param>
         public TicketManager(TicketService ticketService, AuthorizationManager authorizationManager)
         {
             this.ticketService = ticketService;
@@ -26,26 +34,19 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Result that holds a list of TicketRecords</returns>
         public async Task<Result<List<TicketRecord>>> GetTicketsAsync(string jwtToken, Dictionary<Constants.TicketSearchFilter, object> filterParams)
         {
-            Result<List<TicketRecord>> result;
-
-            // Authorize user
-            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.GetTickets.ToString(), jwtToken);
-            if (!isAuthorized)
-            {
-                result = new Result<List<TicketRecord>>(Constants.TicketManagerUnauthorizedGetTickets);
-                return result;
-            }
-
             // TODO
             // LOGGING
-            List<TicketRecord> tickets = new List<TicketRecord>();
 
+            Result<List<TicketRecord>> result;
+            List<TicketRecord> tickets = new List<TicketRecord>();
             try
             {
+                AuthorizeUser(jwtToken);
+
                 // If we don't have any filters, then just return all the tickets
                 if (filterParams.Count == 0)
                 {
-                    tickets = await ticketService.GetAllTickets();
+                    tickets = await ticketService.GetAllTicketsAsync();
                 }
                 else
                 {
@@ -53,13 +54,18 @@ namespace TeamA.Exogredient.Managers
                 }
 
                 // Save the result
-                result = new Result<List<TicketRecord>>(Constants.TicketManagerSuccessFetchTickets);
-                result.Data = tickets;
+                result = new Result<List<TicketRecord>>(Constants.TicketManagerSuccessFetchTickets)
+                {
+                    Data = tickets
+                };
             }
-            catch (Exception e)
+            catch
             {
-                result = new Result<List<TicketRecord>>(Constants.TicketManagerFailedFetchingTickets);
-                result.ExceptionOccurred = true;
+                // Save error
+                result = new Result<List<TicketRecord>>(Constants.TicketManagerFailedFetchingTickets)
+                {
+                    ExceptionOccurred = true
+                };
             }
 
             return result;
@@ -72,29 +78,26 @@ namespace TeamA.Exogredient.Managers
         /// <param name="newCategory">The new category to replace</param>
         /// <param name="jwtToken">Authorization token</param>
         /// <returns>Success status</returns>
-        public async Task<Result<bool>> UpdateTicketCategoryAsync(uint ticketID, Constants.TicketCategories newCategory, string jwtToken)
+        public async Task<Result<bool>> UpdateTicketCategoryAsync(long ticketID, Constants.TicketCategories newCategory, string jwtToken)
         {
-            Result<bool> result;
-
-            // Authorize user
-            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.UpdateTicket.ToString(), jwtToken);
-            if (!isAuthorized)
-            {
-                result = new Result<bool>(Constants.TicketManagerUnauthorizedUpdateTickets);
-                return result;
-            }
             // TODO
             // LOGGING
 
+            Result<bool> result;
             try
             {
+                AuthorizeUser(jwtToken);
+
                 await ticketService.UpdateTicketCategoryAsync(ticketID, newCategory);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateCategory);
             }
-            catch (Exception e)
+            catch
             {
-                result = new Result<bool>(Constants.TicketManagerFailedFetchingTickets);
-                result.ExceptionOccurred = true;
+                // Save error
+                result = new Result<bool>(Constants.TicketManagerFailedFetchingTickets)
+                {
+                    ExceptionOccurred = true
+                };
             }
 
             return result;
@@ -107,31 +110,26 @@ namespace TeamA.Exogredient.Managers
         /// <param name="newStatus">The new status to replace</param>
         /// <param name="jwtToken">Authorization token</param>
         /// <returns>Success status</returns>
-        public async Task<Result<bool>> UpdateTicketStatusAsync(uint ticketID, Constants.TicketStatuses newStatus, string jwtToken)
+        public async Task<Result<bool>> UpdateTicketStatusAsync(long ticketID, Constants.TicketStatuses newStatus, string jwtToken)
         {
-            Result<bool> result;
-
-            // Authorize user
-            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.UpdateTicket.ToString(), jwtToken);
-            if (!isAuthorized)
-            {
-                result = new Result<bool>(Constants.TicketManagerUnauthorizedUpdateTickets);
-                return result;
-            }
-
             // TODO
             // LOGGING
 
+            Result<bool> result;
             try
             {
+                AuthorizeUser(jwtToken);
+
                 bool success = await ticketService.UpdateTicketStatusAsync(ticketID, newStatus);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateStatus);
-
             }
-            catch (Exception e)
+            catch
             {
-                result = new Result<bool>(Constants.TicketManagerFailedUpdateStatus);
-                result.ExceptionOccurred = true;
+                // Save error
+                result = new Result<bool>(Constants.TicketManagerFailedUpdateStatus)
+                {
+                    ExceptionOccurred = true
+                };
             }
 
             return result;
@@ -144,30 +142,26 @@ namespace TeamA.Exogredient.Managers
         /// <param name="newReadStatus">The new read status to replace</param>
         /// <param name="jwtToken">Authorization token</param>
         /// <returns>Success status</returns>
-        public async Task<Result<bool>> UpdateTicketReadStatusAsync(uint ticketID, bool newReadStatus, string jwtToken)
+        public async Task<Result<bool>> UpdateTicketReadStatusAsync(long ticketID, bool newReadStatus, string jwtToken)
         {
-            Result<bool> result;
-
-            // Authorize user
-            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.UpdateTicket.ToString(), jwtToken);
-            if (!isAuthorized)
-            {
-                result = new Result<bool>(Constants.TicketManagerUnauthorizedUpdateTickets);
-                return result;
-            }
-
             // TODO
             // LOGGING
 
+            Result<bool> result;
             try
             {
+                AuthorizeUser(jwtToken);
+
                 await ticketService.UpdateTicketReadStatusAsync(ticketID, newReadStatus);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateReadStatus);
             }
-            catch (Exception e)
+            catch
             {
-                result = new Result<bool>(Constants.TicketManagerFailedUpdateReadStatus);
-                result.ExceptionOccurred = true;
+                // Save error
+                result = new Result<bool>(Constants.TicketManagerFailedUpdateReadStatus)
+                {
+                    ExceptionOccurred = true
+                };
             }
 
             return result;
@@ -180,30 +174,26 @@ namespace TeamA.Exogredient.Managers
         /// <param name="newFlagColor">The new flag color to replace</param>
         /// <param name="jwtToken">Authorization token</param>
         /// <returns>Success status</returns>
-        public async Task<Result<bool>> UpdateTicketFlagColorAsync(uint ticketID, Constants.TicketFlagColors newFlagColor, string jwtToken)
+        public async Task<Result<bool>> UpdateTicketFlagColorAsync(long ticketID, Constants.TicketFlagColors newFlagColor, string jwtToken)
         {
-            Result<bool> result;
-
-            // Authorize user
-            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.UpdateTicket.ToString(), jwtToken);
-            if (!isAuthorized)
-            {
-                result = new Result<bool>(Constants.TicketManagerUnauthorizedUpdateTickets);
-                return result;
-            }
-
             // TODO
             // LOGGING
 
+            Result<bool> result;
             try
             {
+                AuthorizeUser(jwtToken);
+                
                 await ticketService.UpdateTicketFlagColorAsync(ticketID, newFlagColor);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateFlagColor);
             }
-            catch (Exception e)
+            catch
             {
-                result = new Result<bool>(Constants.TicketManagerFailedUpdateFlagColor);
-                result.ExceptionOccurred = true;
+                // Save error
+                result = new Result<bool>(Constants.TicketManagerFailedUpdateFlagColor)
+                {
+                    ExceptionOccurred = true
+                };
             }
 
             return result;
@@ -226,13 +216,23 @@ namespace TeamA.Exogredient.Managers
                 await ticketService.SubmitTicketAsync(category, description);
                 result = new Result<bool>(Constants.TicketManagerSuccessSubmitTicket);
             }
-            catch (Exception e)
+            catch
             {
-                result = new Result<bool>(Constants.TicketManagerFailedSubmitTicket);
-                result.ExceptionOccurred = true;
+                // Save error
+                result = new Result<bool>(Constants.TicketManagerFailedSubmitTicket)
+                {
+                    ExceptionOccurred = true
+                };
             }
 
             return result;
+        }
+
+        private void AuthorizeUser(string jwtToken)
+        {
+            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.UpdateTicket.ToString(), jwtToken);
+            if (!isAuthorized)
+                throw new ArgumentException(Constants.TicketManagerUnauthorizedUpdateTickets);
         }
     }
 }

@@ -13,22 +13,17 @@ namespace TeamA.Exogredient.DAL
     /// <summary>
     /// DAO for the data store containing Ticket information
     /// </summary>
-    public class TicketDAO : IMasterSQLDAO<uint>
+    public class TicketDAO : IMasterSQLDAO<long>
     {
         private readonly MySqlConnection dbConnection;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="connection">Connection string to the database</param>
         public TicketDAO(string connection)
         {
             dbConnection = new MySqlConnection(connection);
-            dbConnection.Open();
-        }
-
-        /// <summary>
-        /// Used to free up resources
-        /// </summary>
-        ~TicketDAO()
-        {
-            dbConnection.Close();
         }
 
         /// <summary>
@@ -38,20 +33,7 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task(bool) whether the function executed without exception.</returns>
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
-            // Check if it is a TicketRecord or not
-            TicketRecord ticketRecord;
-            try
-            {
-                ticketRecord = (TicketRecord)record;
-            }
-            catch
-            {
-                throw new ArgumentException(Constants.TicketCreateInvalidArgument);
-            }
-
-            IDictionary<string, object> recordData = ticketRecord.GetData();
-
-
+            IDictionary<string, object> recordData = record.GetData();
             StringBuilder sqlString = new StringBuilder($"INSERT INTO {Constants.TicketDAOTableName} (");
 
             foreach (KeyValuePair<string, object> pair in recordData)
@@ -96,6 +78,8 @@ namespace TeamA.Exogredient.DAL
             // Get the command object inside a using statement to properly dispose/close.
             using (MySqlCommand command = new MySqlCommand(sqlString.ToString(), dbConnection))
             {
+                dbConnection.Open();
+
                 count = 0;
                 // Loop through the data again to add the parameter values to the corresponding @PARAMs in the string.
                 foreach (KeyValuePair<string, object> pair in recordData)
@@ -109,7 +93,6 @@ namespace TeamA.Exogredient.DAL
             }
 
             return true;
-
         }
 
         /// <summary>
@@ -117,10 +100,10 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="idsOfRows">The list of ids of rows to delete (List(string))</param>
         /// <returns>Task (bool) whether the function executed without exception.</returns>
-        public async Task<bool> DeleteByIdsAsync(List<uint> idsOfRows)
+        public async Task<bool> DeleteByIdsAsync(List<long> idsOfRows)
         {
             // Loop through the ids of rows.
-            foreach (uint ticketID in idsOfRows)
+            foreach (long ticketID in idsOfRows)
             {
                 if (!await CheckTicketExistenceAsync(ticketID))
                     throw new ArgumentException(Constants.TicketDeleteDNE);
@@ -142,7 +125,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ticketID">The ticket ID of the row to read (string)</param>
         /// <returns>Task (IDataObject) the information represented as an object</returns>
-        public async Task<IDataObject> ReadByIdAsync(uint ticketID)
+        public async Task<IDataObject> ReadByIdAsync(long ticketID)
         {
             if (!await CheckTicketExistenceAsync(ticketID))
                 throw new ArgumentException(Constants.TicketReadDNE);
@@ -167,7 +150,7 @@ namespace TeamA.Exogredient.DAL
                 DataRow row = dataTable.Rows[0];
 
                 // Construct the TicketObject by casting the values of the columns to their proper data types.
-                result = new TicketObject((uint)row[Constants.TicketDAOSubmitTimestampColumn],
+                result = new TicketObject((long)row[Constants.TicketDAOSubmitTimestampColumn],
                                           (string)row[Constants.TicketDAOCategoryColumn],
                                           (string)row[Constants.TicketDAOStatusColumn],
                                           (string)row[Constants.TicketDAOFlagColorColumn],
@@ -185,18 +168,7 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task (bool) whether the function executed without exception.</returns>
         public async Task<bool> UpdateAsync(ISQLRecord record)
         {
-            TicketRecord ticketRecord;
-            try
-            {
-                ticketRecord = (TicketRecord)record;
-            }
-            catch
-            {
-                throw new ArgumentException(Constants.TicketUpdateInvalidArgument);
-            }
-
-            ticketRecord = (TicketRecord)record;
-            IDictionary<string, object> recordData = ticketRecord.GetData();
+            IDictionary<string, object> recordData = record.GetData();
 
             int count = 0;
             StringBuilder sqlString = new StringBuilder($"UPDATE {Constants.TicketDAOTableName} SET ");
@@ -207,7 +179,7 @@ namespace TeamA.Exogredient.DAL
                 // exception if it doesn't exist.
                 if (pair.Key == Constants.TicketDAOTicketIDColumn)
                 {
-                    if (!await CheckTicketExistenceAsync((uint)pair.Value))
+                    if (!await CheckTicketExistenceAsync((long)pair.Value))
                         throw new ArgumentException(Constants.TicketUpdateDNE);
                 }
 
@@ -269,7 +241,6 @@ namespace TeamA.Exogredient.DAL
             }
 
             return true;
-
         }
 
         /// <summary>
@@ -277,10 +248,8 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ticketID">ticket id to be checked </param>
         /// <returns> true if ticket id exists, otherwise false </returns>
-        public async Task<bool> CheckTicketExistenceAsync(uint ticketID)
+        public async Task<bool> CheckTicketExistenceAsync(long ticketID)
         {
-
-
             // Check if the row exists for the ticket id
             string sqlString = $"SELECT EXISTS (SELECT * FROM {Constants.TicketDAOTableName} WHERE {Constants.TicketDAOTicketIDColumn} = @TICKETID);";
             bool result;
@@ -296,7 +265,6 @@ namespace TeamA.Exogredient.DAL
             }
 
             return result;
-
         }
 
         /// <summary>
@@ -396,10 +364,40 @@ namespace TeamA.Exogredient.DAL
         /// <summary>
         /// Gets all the tickets in the database
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<DataRow>> GetAllTickets()
+        /// <returns>List of raw data from the tickets table</returns>
+        public async Task<List<DataRow>> GetAllTicketsAsync()
         {
             string sqlString = $"SELECT * FROM `{Constants.TicketDAOTableName}`;";
+            return await RunSQLQuery(sqlString);
+        }
+
+        /// <summary>
+        /// Gets all the categories in the database
+        /// </summary>
+        /// <returns>List of raw data from the categories table</returns>
+        public async Task<List<DataRow>> GetAllCategoriesAsync()
+        {
+            string sqlString = $"SELECT * FROM `{Constants.TicketCategoryDAOTableName}`;";
+            return await RunSQLQuery(sqlString);
+        }
+
+        /// <summary>
+        /// Gets all the flag colors in the database
+        /// </summary>
+        /// <returns>List of raw data from the flag colors table</returns>
+        public async Task<List<DataRow>> GetAllFlagColorsAsync()
+        {
+            string sqlString = $"SELECT * FROM `{Constants.TicketFlagColorDAOTableName}`;";
+            return await RunSQLQuery(sqlString);
+        }
+
+        /// <summary>
+        /// Gets all the ticket statuses in the database
+        /// </summary>
+        /// <returns>List of raw data from the ticket statuses table</returns>
+        public async Task<List<DataRow>> GetAllTicketStatusesAsync()
+        {
+            string sqlString = $"SELECT * FROM `{Constants.TicketStatusDAOTableName}`;";
             return await RunSQLQuery(sqlString);
         }
 
@@ -407,16 +405,18 @@ namespace TeamA.Exogredient.DAL
         /// Runs an sql query
         /// </summary>
         /// <param name="sqlString">The rows queried from the command</param>
-        /// <returns></returns>
+        /// <returns>List of raw data from the sql query</returns>
         private async Task<List<DataRow>> RunSQLQuery(string sqlString)
         {
             List<DataRow> data = new List<DataRow>();
             using (var command = new MySqlCommand(sqlString, dbConnection))
             using (var dataTable = new DataTable())
             {
+                // Load the data from the database
                 var reader = await command.ExecuteReaderAsync();
                 dataTable.Load(reader);
 
+                // Fill the List<> with the raw data
                 foreach (DataRow row in dataTable.Rows)
                 {
                     data.Add(row);

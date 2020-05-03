@@ -15,7 +15,7 @@ namespace TicketController.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TicketController : ControllerBase
+    public class TicketController : Controller
     {
         [HttpPost("getTickets")]
         [Produces("application/json")]

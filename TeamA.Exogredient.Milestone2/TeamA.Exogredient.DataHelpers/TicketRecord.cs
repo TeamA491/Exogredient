@@ -8,7 +8,7 @@ namespace TeamA.Exogredient.DataHelpers
     {
         private readonly IDictionary<string, object> _data = new Dictionary<string, object>();
 
-        public TicketRecord(uint submitTimestamp, string category, string status,
+        public TicketRecord(long submitTimestamp, string category, string status,
                             string flagColor, string description, bool isRead = false)
         {
             _data.Add(Constants.TicketDAOSubmitTimestampColumn, submitTimestamp);

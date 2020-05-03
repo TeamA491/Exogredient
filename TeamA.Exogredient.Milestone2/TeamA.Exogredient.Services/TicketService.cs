@@ -8,10 +8,17 @@ using TeamA.Exogredient.AppConstants;
 
 namespace TeamA.Exogredient.Services
 {
+    /// <summary>
+    /// Contains functions to access data from DAL
+    /// </summary>
     public class TicketService
     {
         private readonly TicketDAO ticketDAO;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="ticketDAO">Copy of ticket data access object</param>
         public TicketService(TicketDAO ticketDAO)
         {
             this.ticketDAO = ticketDAO;
@@ -25,19 +32,47 @@ namespace TeamA.Exogredient.Services
         public async Task<List<TicketRecord>> GetTicketsByFilterAsync(Dictionary<Constants.TicketSearchFilter, object> filterParams)
         {
             List<DataRow> ticketsRaw = await ticketDAO.FilterTicketsAsync(filterParams);
-            FormatDataRow(ref ticketsRaw, out List<TicketRecord> tickets);
-            return tickets;
+            return FormatDataRow(ref ticketsRaw);
         }
 
         /// <summary>
         /// Returns all tickets in the database
         /// </summary>
         /// <returns>A list of TicketRecord objects</returns>
-        public async Task<List<TicketRecord>> GetAllTickets()
+        public async Task<List<TicketRecord>> GetAllTicketsAsync()
         {
-            List<DataRow> ticketsRaw = await ticketDAO.GetAllTickets();
-            FormatDataRow(ref ticketsRaw, out List<TicketRecord> tickets);
-            return tickets;
+            List<DataRow> ticketsRaw = await ticketDAO.GetAllTicketsAsync();
+            return FormatDataRow(ref ticketsRaw);
+        }
+
+        /// <summary>
+        /// Returns all the categories in the database
+        /// </summary>
+        /// <returns>A list of TicketRecord objects</returns>
+        public async Task<List<TicketRecord>> GetAllTicketCategoriesAsync()
+        {
+            List<DataRow> categoriesRaw = await ticketDAO.GetAllCategoriesAsync();
+            return FormatDataRow(ref categoriesRaw);
+        }
+
+        /// <summary>
+        /// Returns all the flag colors in the database
+        /// </summary>
+        /// <returns>A list of TicketRecord objects</returns>
+        public async Task<List<TicketRecord>> GetAllFlagColorsAsync()
+        {
+            List<DataRow> flagColorsRaw = await ticketDAO.GetAllFlagColorsAsync();
+            return FormatDataRow(ref flagColorsRaw);
+        }
+
+        /// <summary>
+        /// Returns all ticket statuses in the database
+        /// </summary>
+        /// <returns>A list of TicketRecord objects</returns>
+        public async Task<List<TicketRecord>> GetAllTicketStatuses()
+        {
+            List<DataRow> ticketStatusesRaw = await ticketDAO.GetAllTicketStatusesAsync();
+            return FormatDataRow(ref ticketStatusesRaw);
         }
 
         /// <summary>
@@ -46,7 +81,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="ticketID">The id of the ticket</param>
         /// <param name="newStatus">The new status that we want it to have</param>
         /// <returns>Whether we successfully changed the status or not</returns>
-        public async Task<bool> UpdateTicketStatusAsync(uint ticketID, Constants.TicketStatuses newStatus)
+        public async Task<bool> UpdateTicketStatusAsync(long ticketID, Constants.TicketStatuses newStatus)
         {
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
@@ -66,7 +101,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="ticketID">The id of the ticket</param>
         /// <param name="newCategory">The new ticket category to use</param>
         /// <returns>Whether the ticket category succesfully changed or not</returns>
-        public async Task<bool> UpdateTicketCategoryAsync(uint ticketID, Constants.TicketCategories newCategory)
+        public async Task<bool> UpdateTicketCategoryAsync(long ticketID, Constants.TicketCategories newCategory)
         {
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
@@ -86,7 +121,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="ticketID">The id of the ticket</param>
         /// <param name="newReadStatus">The new read status to use</param>
         /// <returns>Whether the read status succesfully changed or not</returns>
-        public async Task<bool> UpdateTicketReadStatusAsync(uint ticketID, bool newReadStatus)
+        public async Task<bool> UpdateTicketReadStatusAsync(long ticketID, bool newReadStatus)
         {
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
@@ -106,7 +141,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="ticketID">The id of the ticket</param>
         /// <param name="newFlagColor">The new flag color to use</param>
         /// <returns>Whether the flag color succesfully changed or not</returns>
-        public async Task<bool> UpdateTicketFlagColorAsync(uint ticketID, Constants.TicketFlagColors newFlagColor)
+        public async Task<bool> UpdateTicketFlagColorAsync(long ticketID, Constants.TicketFlagColors newFlagColor)
         {
             // Make sure the ticket exists first
             bool ticketExists = await ticketDAO.CheckTicketExistenceAsync(ticketID);
@@ -128,7 +163,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>Whether the ticket was saved or not</returns>
         public async Task<bool> SubmitTicketAsync(Constants.TicketCategories category, string description)
         {
-            TicketRecord ticketRecord = new TicketRecord((uint)TimeUtilityService.CurrentUnixTime(),
+            TicketRecord ticketRecord = new TicketRecord(TimeUtilityService.CurrentUnixTime(),
                                                         category.ToString(),
                                                         Constants.TicketStatuses.Unresolved.ToString(),
                                                         Constants.TicketFlagColors.None.ToString(),
@@ -142,16 +177,15 @@ namespace TeamA.Exogredient.Services
         /// Used to convert DataRow to TicketRecord
         /// </summary>
         /// <param name="data">The raw data to be formatted</param>
-        /// <param name="tickets">Where to save the formatted data</param>
-        private void FormatDataRow(ref List<DataRow> data, out List<TicketRecord> tickets)
+        private List<TicketRecord> FormatDataRow(ref List<DataRow> data)
         {
-            tickets = new List<TicketRecord>();
+            List<TicketRecord> tickets = new List<TicketRecord>();
 
             // Construct the data
             foreach (DataRow row in data)
             {
                 tickets.Add(
-                    new TicketRecord((uint)row[Constants.TicketDAOSubmitTimestampColumn],
+                    new TicketRecord((long)row[Constants.TicketDAOSubmitTimestampColumn],
                     (string)row[Constants.TicketDAOCategoryColumn],
                     (string)row[Constants.TicketDAOStatusColumn],
                     (string)row[Constants.TicketDAOFlagColorColumn],
@@ -159,6 +193,8 @@ namespace TeamA.Exogredient.Services
                     (bool)row[Constants.TicketDAOIsReadColumn])
                 );
             }
+
+            return tickets;
         }
     }
 }
