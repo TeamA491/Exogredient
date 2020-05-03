@@ -125,6 +125,9 @@ namespace TeamA.Exogredient.AppConstants
             {25, 'Y'}, {26, 'Z'}
         };
 
+        public const string AffFileRelativePath = "en_US/en_US.aff";
+        public const string DicFileRelativePath = "en_US/en_US.dic";
+
         // UPLOAD
         public const string NaN = "NaN";
 

@@ -191,7 +191,7 @@ export default {
       var formD = new FormData();
       formD.append(global.FileKey, this.file);
       formD.append(global.UsernameKey, "thesmokinggun42");
-      formD.append(global.IPAddressKey, this.$store.state.ipAddress);
+      formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
 
       fetch(`${global.ApiDomainName}/api/Upload/Vision`, {
         method: "POST",
@@ -334,7 +334,7 @@ export default {
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, "thesmokinggun42");
-        formD.append(global.IPAddressKey, this.$store.state.ipAddress);
+        formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
         formD.append(global.CategoryKey, this.category);
         formD.append(global.NameKey, this.name);
         formD.append(global.DescriptionKey, this.description);
@@ -447,7 +447,7 @@ export default {
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, "thesmokinggun42");
-        formD.append(global.IPAddressKey, this.$store.state.ipAddress);
+        formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
         formD.append(global.CategoryKey, this.category);
         formD.append(global.NameKey, this.name);
         formD.append(global.DescriptionKey, this.description);

@@ -89,7 +89,7 @@ export default {
         {
             // Fetch search results of the given page and sort method.
             let resultsResponse = 
-                    await fetch(`${global.ApiDomainName}/api/search/getStoreResults?`
+                    await fetch(`${global.ApiDomainName}/api/getStoreResults?`
                     + `searchTerm=${searchTerm}&latitude=${latitude}`
                     + `&longitude=${longitude}&radius=${radius}`
                     + `&searchBy=${searchBy}&lastStoreData=${lastStoreData}`
@@ -117,8 +117,8 @@ export default {
         displayStoreView: async function(storeId){
             // Fetch the list of ingredients of the store.
             let ingredientResultsResponse = 
-                await fetch(`${global.ApiDomainName}/api/search/getIngredientResults?` +
-                `username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`
+                await fetch(`${global.ApiDomainName}/api/getIngredientResults?` +
+                `username=${this.$store.state.userData.username}&ipAddress=${this.$store.state.userData.ipAddress}`
                 + `&storeId=${storeId}&skipPages=${global.DefaultSkipPages}&lastIngredientName=`
                 + `&ingredientName=${this.$store.state.searchData.searchBy === global.SearchByIngredient? 
                 this.$store.state.searchData.searchTerm:""}`);
@@ -128,8 +128,8 @@ export default {
 
             // Fetch StoreView data and the number of total ingredients of the store.
             let storeViewDataResponse = 
-                await fetch(`${global.ApiDomainName}/api/search/storeViewData?storeId=${storeId}`
-                + `&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`
+                await fetch(`${global.ApiDomainName}/api/storeViewData?storeId=${storeId}`
+                + `&username=${this.$store.state.userData.username}&ipAddress=${this.$store.state.userData.ipAddress}`
                 + `&ingredientName=${this.$store.state.searchData.searchBy === global.SearchByIngredient? 
                 this.$store.state.searchData.searchTerm:""}`);
 
@@ -152,7 +152,7 @@ export default {
             this.$store.dispatch('updateStoreViewCurrentPage',  global.DefaultPage);
 
             // Route to StoreView.
-            this.$router.push("/StoreView");
+            this.$router.push("/store");
         },
 
         movePage: async function(newPage){
@@ -185,7 +185,7 @@ export default {
                 searchData.searchTerm, searchData.lat, searchData.lng, 
                 searchData.radius, searchData.searchBy,lastStoreData,lastStoreId,
                 lastPageResultsNum,skipPages,this.sortOption.by,this.sortOption.fromSmallest,
-                this.$store.state.username,this.$store.state.ipAddress);
+                this.$store.state.userData.username,this.$store.state.userData.ipAddress);
 
             // Call method to update pagination.
             this.updatePagination(newPage);
@@ -215,8 +215,8 @@ export default {
                     searchData.searchTerm, searchData.lat, searchData.lng, searchData.radius, 
                     searchData.searchBy, global.NoLastStoreData,global.NoLastStoreId,
                     global.NoLastPageResultsNum,global.DefaultSkipPages,this.sortOption.by,
-                    this.sortOption.fromSmallest,this.$store.state.username,
-                    this.$store.state.ipAddress);
+                    this.sortOption.fromSmallest,this.$store.state.userData.username,
+                    this.$store.state.userData.ipAddress);
             }
             this.updatePagination(global.DefaultPage);
             
@@ -245,8 +245,8 @@ export default {
                     searchData.searchTerm, searchData.lat, searchData.lng, searchData.radius, 
                     searchData.searchBy, global.NoLastStoreData,global.NoLastStoreId,
                     global.NoLastPageResultsNum,global.DefaultSkipPages,this.sortOption.by,
-                    this.sortOption.fromSmallest,this.$store.state.username,
-                    this.$store.state.ipAddress);
+                    this.sortOption.fromSmallest,this.$store.state.userData.username,
+                    this.$store.state.userData.ipAddress);
             }
             this.updatePagination(global.DefaultPage);
         }

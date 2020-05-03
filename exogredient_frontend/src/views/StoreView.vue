@@ -60,9 +60,9 @@ export default {
         },
 
         storeImage: function(){
-            var storeImage =`${global.ApiDomainName}/api/search/storeImage?`
-                + `storeId=${this.storeViewData.storeId}&username=${this.$store.state.username}`
-                + `&ipAddress=${this.$store.state.ipAddress}`;
+            var storeImage =`${global.ApiDomainName}/api/storeImage?`
+                + `storeId=${this.storeViewData.storeId}&username=${this.$store.state.userData.username}`
+                + `&ipAddress=${this.$store.state.userData.ipAddress}`;
 
             return this.$data.storeImageLoadError? defaultStoreImage : storeImage;
         },
@@ -122,8 +122,8 @@ export default {
 
             // Fetch list of ingredients for the new page.
             let ingredientResultsResponse = 
-                await fetch(`${global.ApiDomainName}/api/search/getIngredientResults?` 
-                + `username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`
+                await fetch(`${global.ApiDomainName}/api/getIngredientResults?` 
+                + `username=${this.$store.state.userData.username}&ipAddress=${this.$store.state.userData.ipAddress}`
                 + `&storeId=${this.$store.state.storeViewData.storeId}&skipPages=${skipPages}`
                 + `&lastPageResultsNum=${this.ingredients.length}&lastIngredientName=${lastIngredientName}`
                 + `&ingredientName=${this.$store.state.searchData.searchBy === global.SearchByIngredient?
