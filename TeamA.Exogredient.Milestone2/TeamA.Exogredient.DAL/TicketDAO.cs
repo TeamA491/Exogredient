@@ -15,7 +15,7 @@ namespace TeamA.Exogredient.DAL
     /// </summary>
     public class TicketDAO : IMasterSQLDAO<uint>
     {
-        private MySqlConnection dbConnection;
+        private readonly MySqlConnection dbConnection;
 
         public TicketDAO(string connection)
         {
