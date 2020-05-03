@@ -15,7 +15,7 @@ namespace TeamA.Exogredient.Managers
             _sessionService = sessionService;
         }
 
-        public bool AuthorizeUser(string operation, string jwtToken)
+        public bool AuthorizeUser(string operation, ref string jwtToken)
         {
             try
             {

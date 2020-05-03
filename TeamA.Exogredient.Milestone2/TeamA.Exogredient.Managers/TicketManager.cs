@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
+
+// TODO UPDATE JWT TOKEN IN CONTROLLER IN COOKIES
 
 namespace TeamA.Exogredient.Managers
 {
@@ -34,14 +37,12 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Result that holds a list of TicketRecords</returns>
         public async Task<Result<List<TicketRecord>>> GetTicketsAsync(string jwtToken, Dictionary<Constants.TicketSearchFilter, object> filterParams)
         {
-            // TODO
-            // LOGGING
-
+            List<TicketRecord> tickets;
             Result<List<TicketRecord>> result;
-            List<TicketRecord> tickets = new List<TicketRecord>();
+
             try
             {
-                AuthorizeUser(jwtToken);
+                AuthorizeUser(Constants.Operations.GetTickets, ref jwtToken);
 
                 // If we don't have any filters, then just return all the tickets
                 if (filterParams.Count == 0)
@@ -80,13 +81,10 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Success status</returns>
         public async Task<Result<bool>> UpdateTicketCategoryAsync(long ticketID, Constants.TicketCategories newCategory, string jwtToken)
         {
-            // TODO
-            // LOGGING
-
             Result<bool> result;
             try
             {
-                AuthorizeUser(jwtToken);
+                AuthorizeUser(Constants.Operations.UpdateTicket, ref jwtToken);
 
                 await ticketService.UpdateTicketCategoryAsync(ticketID, newCategory);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateCategory);
@@ -112,13 +110,10 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Success status</returns>
         public async Task<Result<bool>> UpdateTicketStatusAsync(long ticketID, Constants.TicketStatuses newStatus, string jwtToken)
         {
-            // TODO
-            // LOGGING
-
             Result<bool> result;
             try
             {
-                AuthorizeUser(jwtToken);
+                AuthorizeUser(Constants.Operations.UpdateTicket, ref jwtToken);
 
                 bool success = await ticketService.UpdateTicketStatusAsync(ticketID, newStatus);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateStatus);
@@ -144,13 +139,10 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Success status</returns>
         public async Task<Result<bool>> UpdateTicketReadStatusAsync(long ticketID, bool newReadStatus, string jwtToken)
         {
-            // TODO
-            // LOGGING
-
             Result<bool> result;
             try
             {
-                AuthorizeUser(jwtToken);
+                AuthorizeUser(Constants.Operations.UpdateTicket, ref jwtToken);
 
                 await ticketService.UpdateTicketReadStatusAsync(ticketID, newReadStatus);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateReadStatus);
@@ -176,13 +168,10 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Success status</returns>
         public async Task<Result<bool>> UpdateTicketFlagColorAsync(long ticketID, Constants.TicketFlagColors newFlagColor, string jwtToken)
         {
-            // TODO
-            // LOGGING
-
             Result<bool> result;
             try
             {
-                AuthorizeUser(jwtToken);
+                AuthorizeUser(Constants.Operations.UpdateTicket, ref jwtToken);
                 
                 await ticketService.UpdateTicketFlagColorAsync(ticketID, newFlagColor);
                 result = new Result<bool>(Constants.TicketManagerSuccessUpdateFlagColor);
@@ -200,6 +189,45 @@ namespace TeamA.Exogredient.Managers
         }
 
         /// <summary>
+        /// Gets all the ticket categories
+        /// </summary>
+        /// <returns>List of ticket categories</returns>
+        public Result<List<string>> GetTicketCategories()
+        {
+            Result<List<string>> result = new Result<List<string>>(Constants.TicketManagerSuccessGetCategories)
+            {
+                Data = Enum.GetNames(typeof(Constants.TicketCategories)).ToList()
+            };
+            return result;
+        }
+
+        /// <summary>
+        /// Gets all the ticket flag colors
+        /// </summary>
+        /// <returns>List of ticket colors</returns>
+        public Result<List<string>> GetTicketFlagColors()
+        {
+            Result<List<string>> result = new Result<List<string>>(Constants.TicketManagerSuccessGetFlagColors)
+            {
+                Data = Enum.GetNames(typeof(Constants.TicketFlagColors)).ToList()
+            };
+            return result;
+        }
+
+        /// <summary>
+        /// Gets all ticket statuses
+        /// </summary>
+        /// <returns>List of ticket statuses</returns>
+        public Result<List<string>> GetTicketStatuses()
+        {
+            Result<List<string>> result = new Result<List<string>>(Constants.TicketManagerSuccessGetStatuses)
+            {
+                Data = Enum.GetNames(typeof(Constants.TicketStatuses)).ToList()
+            };
+            return result;
+        }
+
+        /// <summary>
         /// Submits a ticket
         /// </summary>
         /// <param name="category">The category of the ticket</param>
@@ -207,8 +235,6 @@ namespace TeamA.Exogredient.Managers
         /// <returns>Success status</returns>
         public async Task<Result<bool>> SubmitTicket(Constants.TicketCategories category, string description)
         {
-            // TODO
-            // LOGGING
             Result<bool> result;
 
             try
@@ -228,9 +254,14 @@ namespace TeamA.Exogredient.Managers
             return result;
         }
 
-        private void AuthorizeUser(string jwtToken)
+        /// <summary>
+        /// Authorizes a user based on their jwt token
+        /// </summary>
+        /// <param name="operation">The operation the user requested</param>
+        /// <param name="jwtToken">The jwt token of the user</param>
+        private void AuthorizeUser(Constants.Operations operation, ref string jwtToken)
         {
-            bool isAuthorized = authorizationManager.AuthorizeUser(Constants.Operations.UpdateTicket.ToString(), jwtToken);
+            bool isAuthorized = authorizationManager.AuthorizeUser(operation.ToString(), ref jwtToken);
             if (!isAuthorized)
                 throw new ArgumentException(Constants.TicketManagerUnauthorizedUpdateTickets);
         }

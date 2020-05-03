@@ -944,7 +944,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketIncorrectEnum = "TicketDAO.FilterTicketsAsync an unsupported enum was given";
         public const string TicketIncorrectInt = "TicketDAO.FilterTicketsAsync an unsupported value was given";
         public const string TicketUpdateNotExists = "TicketService the ticketID does not exist";
-        public const string Ticket = "";
+        public const string TicketRecordIsNull = "The ISQLRecord provided is null.";
 
         // EXCPETION MESSAGES -- SaveListDAO
         public const string SaveListDNE = "SaveList does not exists";
@@ -997,6 +997,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketManagerSuccessUpdateStatus = "TicketManager successfully updated status";
         public const string TicketManagerSuccessUpdateReadStatus = "TicketManager successfully updated read status";
         public const string TicketManagerSuccessSubmitTicket = "TicketManager successfully submitted the ticket";
+        public const string TicketManagerSuccessGetCategories = "TicketManager successfully grabbed ticket categories";
+        public const string TicketManagerSuccessGetFlagColors = "TicketManager successfully grabbed ticket flag colors";
+        public const string TicketManagerSuccessGetStatuses = "TicketManager successfully grabbed ticket statuses";
 
         // TICKING API RESPONSE MESSAGES
         public const string UnauthorizedRequest = "A bearer token was not provided.";
@@ -1004,6 +1007,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketImproperFlagColor = "A flag color that doesn't exist was supplied";
         public const string TicketImproperReadStatus = "A read status that doesn't exist was supplied";
         public const string TicketImproperStatus = "A status that doesn't exist was supplied.";
+
         // EXCEPTION MESSAGE -- Snapshots
         public const string FailCreateSnapShot = "Failed to create a snapshot";
     }

@@ -26,7 +26,7 @@ namespace TicketController.Controllers
             {
                 Request.Headers.TryGetValue(Constants.JWTTokenHeader, out jwtToken);
             }
-            catch(Exception e)
+            catch
             {
                 // Forbidden
                 return Forbid(Constants.UnauthorizedRequest);
@@ -54,7 +54,7 @@ namespace TicketController.Controllers
             {
                 Request.Headers.TryGetValue(Constants.JWTTokenHeader, out jwtToken);
             }
-            catch (Exception e)
+            catch
             {
                 // Forbidden
                 return Forbid(Constants.UnauthorizedRequest);
@@ -74,7 +74,7 @@ namespace TicketController.Controllers
             {
                 category = (Constants.TicketCategories)Enum.Parse(typeof(Constants.TicketCategories), req.fieldUpdate);
             }
-            catch (Exception e)
+            catch
             {
                 return BadRequest(Constants.TicketImproperCategory);
             }
@@ -92,7 +92,7 @@ namespace TicketController.Controllers
             {
                 Request.Headers.TryGetValue(Constants.JWTTokenHeader, out jwtToken);
             }
-            catch (Exception e)
+            catch
             {
                 // Forbidden
                 return Forbid(Constants.UnauthorizedRequest);
@@ -112,7 +112,7 @@ namespace TicketController.Controllers
             {
                 status = (Constants.TicketStatuses)Enum.Parse(typeof(Constants.TicketStatuses), req.fieldUpdate);
             }
-            catch (Exception e)
+            catch
             {
                 return BadRequest(Constants.TicketImproperStatus);
             }
@@ -130,7 +130,7 @@ namespace TicketController.Controllers
             {
                 Request.Headers.TryGetValue(Constants.JWTTokenHeader, out jwtToken);
             }
-            catch (Exception e)
+            catch
             {
                 // Forbidden
                 return Forbid(Constants.UnauthorizedRequest);
@@ -150,7 +150,7 @@ namespace TicketController.Controllers
             {
                 readStatus = (Constants.TicketReadStatuses)Enum.Parse(typeof(Constants.TicketReadStatuses), req.fieldUpdate);
             }
-            catch (Exception e)
+            catch
             {
                 return BadRequest(Constants.TicketImproperReadStatus);
             }
@@ -168,7 +168,7 @@ namespace TicketController.Controllers
             {
                 Request.Headers.TryGetValue(Constants.JWTTokenHeader, out jwtToken);
             }
-            catch (Exception e)
+            catch
             {
                 // Forbidden
                 return Forbid(Constants.UnauthorizedRequest);
@@ -188,7 +188,7 @@ namespace TicketController.Controllers
             {
                 flagColor = (Constants.TicketFlagColors)Enum.Parse(typeof(Constants.TicketFlagColors), req.fieldUpdate);
             }
-            catch (Exception e)
+            catch
             {
                 return BadRequest(Constants.TicketImproperFlagColor);
             }
@@ -215,7 +215,7 @@ namespace TicketController.Controllers
             {
                 category = (Constants.TicketCategories)Enum.Parse(typeof(Constants.TicketCategories), req.category);
             }
-            catch(Exception e)
+            catch
             {
                 return BadRequest(Constants.TicketImproperCategory);
             }

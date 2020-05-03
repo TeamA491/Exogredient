@@ -33,6 +33,11 @@ namespace TeamA.Exogredient.DAL
         /// <returns>Task(bool) whether the function executed without exception.</returns>
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
+            if (record is null)
+            {
+                throw new ArgumentNullException(Constants.TicketRecordIsNull);
+            }
+
             IDictionary<string, object> recordData = record.GetData();
             StringBuilder sqlString = new StringBuilder($"INSERT INTO {Constants.TicketDAOTableName} (");
 
