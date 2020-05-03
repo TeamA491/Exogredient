@@ -1,18 +1,57 @@
 <template>
   <v-app id='app'>
-    <div id='static'>
-      <div v-if="this.$store.state.userData.userType !== 'Anonymous'">
-        <span id="username">Username: {{this.$store.state.userData.username}}</span>
-        <span id="logout"><a @click="logout">Log out</a></span>
+
+    <div v-if="this.$store.state.userData.userType !== 'Anonymous'">
+      <span id="username">Username: {{this.$store.state.userData.username}}</span>
+      <span id="logout"><a @click="logout">Log out</a></span>
+    </div>
+
+    <nav id="hugTop" class="navbar" style="background-color: #8EE4AF;" role="navigation" aria-label="main navigation" v-if="!(this.$router.currentRoute.name === 'resetPassword')">
+      <!-- Title -->
+      <div class="navbar-brand">
+        <a class="navbar-item" @click="goToHomePage">
+          <h1 id="pageTitle"><a @click="goToHomePage">ExoGredient</a></h1>
+        </a>
+
+        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
       </div>
-      <nav v-if="!(this.$router.currentRoute.name === 'resetPassword')">
-        <v-btn v-if="this.$store.state.userData.userType !== 'Anonymous'" to="upload">Upload</v-btn>
-        <v-btn v-if="this.$store.state.userData.userType !== 'Anonymous'" to="profile">Profile</v-btn>
-        <v-btn v-if="this.$store.state.userData.userType === 'Admin'" to="useranalysis">Analysis</v-btn>
-        <v-btn v-if="this.$store.state.userData.userType === 'Anonymous'" to="login">Login</v-btn>
-        <v-btn v-if="this.$store.state.userData.userType === 'Anonymous'" @click="goToRegistration">Register</v-btn>
-      </nav>
-      <h1 id="pageTitle"><a @click="goToHomePage">ExoGredient</a></h1>
+
+
+      <div class="navbar-menu">
+        <div class="navbar-start">
+          <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="upload">Upload</router-link>
+          <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="profile">Profile</router-link>
+          <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Admin'" to="useranalysis">Analysis</router-link>
+          <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" to="login">Login</router-link>
+          <a class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" @click="goToRegistration">Register</a>
+        </div>
+
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div v-if="this.$store.state.userData.userType !== 'Anonymous'">
+            <span id="username">Username: {{this.$store.state.userData.username}}</span>
+
+            <div class="buttons">
+              <a class="button is-primary">
+                <span id="logout"><a @click="logout">Log out</a></span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      </div>
+
+    </nav>
+
+
+    <div id='static'>
 
       <div v-if="show">
         <div>
@@ -103,6 +142,7 @@
         this.$store.dispatch('updateUsername', 'Anonymous');
         this.$store.dispatch('updateUserType', 'Anonymous');
         this.$store.dispatch('updateToken', '');
+        this.$router.replace("/");
       },
       goToHomePage: function(){
         if(this.$router.currentRoute.path !== '/'){
@@ -249,5 +289,15 @@
 #pageTitle{
   font-size: 1.5em;
   font-weight: bold;
+}
+#hugTop{
+  position: fixed; /* fixing the position takes it out of html flow - knows
+                   nothing about where to locate itself except by browser
+                   coordinates */
+  left:0;           /* top left corner should start at leftmost spot */
+  top:0;            /* top left corner should start at topmost spot */
+  width:100vw;      /* take up the full browser width */
+  z-index:200;  /* high z index so other content scrolls underneath */
+  height:100px;     /* define height for content */
 }
 </style>
