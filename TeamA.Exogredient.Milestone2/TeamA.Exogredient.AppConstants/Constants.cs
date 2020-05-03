@@ -984,19 +984,19 @@ namespace TeamA.Exogredient.AppConstants
         // RESULT MESSAGES -- Ticketing
         public const string TicketManagerUnauthorizedGetTickets = "The user is not authorized to access TicketManager.GetTicketsAsync";
         public const string TicketManagerUnauthorizedUpdateTickets = "The user is not authorized to access TicketManager.UpdateTicket";
-        public const string TicketManagerFailedFetchingTickets = "";
-        public const string TicketManagerFailedUpdateCategory = "";
-        public const string TicketManagerFailedUpdateFlagColor = "";
-        public const string TicketManagerFailedUpdateStatus = "";
-        public const string TicketManagerFailedUpdateReadStatus = "";
-        public const string TicketManagerFailedSubmitTicket = "";
+        public const string TicketManagerFailedFetchingTickets = "TicketManager could not fetch the tickets";
+        public const string TicketManagerFailedUpdateCategory = "TicketManager failed to update the category";
+        public const string TicketManagerFailedUpdateFlagColor = "TicketManager failed to update the flag color";
+        public const string TicketManagerFailedUpdateStatus = "TicketManager failed to update the status";
+        public const string TicketManagerFailedUpdateReadStatus = "TicketManager failed to update the read status";
+        public const string TicketManagerFailedSubmitTicket = "TicketManager failed to submit the ticket";
 
-        public const string TicketManagerSuccessFetchTickets = "";
-        public const string TicketManagerSuccessUpdateCategory = "";
-        public const string TicketManagerSuccessUpdateFlagColor = "";
-        public const string TicketManagerSuccessUpdateStatus = "";
-        public const string TicketManagerSuccessUpdateReadStatus = "";
-        public const string TicketManagerSuccessSubmitTicket = "";
+        public const string TicketManagerSuccessFetchTickets = "TicketManager successfully fetched the tickets";
+        public const string TicketManagerSuccessUpdateCategory = "TicketManager successfully updated category";
+        public const string TicketManagerSuccessUpdateFlagColor = "TicketManager successfully updated flag color";
+        public const string TicketManagerSuccessUpdateStatus = "TicketManager successfully updated status";
+        public const string TicketManagerSuccessUpdateReadStatus = "TicketManager successfully updated read status";
+        public const string TicketManagerSuccessSubmitTicket = "TicketManager successfully submitted the ticket";
 
         // TICKING API RESPONSE MESSAGES
         public const string UnauthorizedRequest = "A bearer token was not provided.";
