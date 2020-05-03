@@ -46,6 +46,8 @@ namespace TeamA.Exogredient.Managers
             }
             catch(Exception e)
             {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
                                              Constants.UpdatePasswordOperation, username, ipAddress, e.Message).ConfigureAwait(false);
 
@@ -62,19 +64,6 @@ namespace TeamA.Exogredient.Managers
             {
                 bool updateSuccess = false;
 
-                //// Password decryption.
-                //byte[] encryptedPasswordBytes = StringUtilityService.HexStringToBytes(encryptedPassword);
-                //byte[] encryptedAESKeyBytes = StringUtilityService.HexStringToBytes(encryptedAESKey);
-                //byte[] AESIVBytes = StringUtilityService.HexStringToBytes(aesIV);
-                //byte[] publicKeyBytes = StringUtilityService.HexStringToBytes(Constants.PublicKey);
-                //byte[] privateKeyBytes = StringUtilityService.HexStringToBytes(Constants.PrivateKey);
-
-                //byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
-
-                //string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
-                //byte[] passwordBytes = StringUtilityService.HexStringToBytes(hexPassword);
-                //string plaintextPassword = StringUtilityService.BytesToUTF8String(passwordBytes);
-
                 // Check the length of their password.
                 if (!StringUtilityService.CheckLength(proxyPassword, Constants.MaximumPasswordCharacters,
                                                 Constants.MinimumPasswordCharacters))
@@ -87,67 +76,7 @@ namespace TeamA.Exogredient.Managers
                                                        updateSuccess, false);
                 }
 
-                // Check the character requirements of their password.
-                //if (!StringUtilityService.CheckCharacters(plaintextPassword, Constants.CharSetsData[Constants.PasswordCharacterType]))
-                //{
-                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //                                  Constants.UpdatePasswordOperation, username, ipAddress,
-                //                                  Constants.InvalidPasswordCharactersLogMessage).ConfigureAwait(false);
-
-                //    return SystemUtilityService.CreateResult(Constants.InvalidPasswordCharactersUserMessage, updateSuccess, false);
-                //}
-
-                // Check if password for context specific words.
-                //if (StringUtilityService.ContainsContextSpecificWords(plaintextPassword))
-                //{
-                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //                                  Constants.UpdatePasswordOperation, username, ipAddress,
-                //                                  Constants.PasswordContextSpecificMessage).ConfigureAwait(false);
-
-                //    return SystemUtilityService.CreateResult(Constants.PasswordContextSpecificMessage,
-                //                                       updateSuccess, false);
-                //}
-
-                // Check if password contains sequences or repetitions.
-                //if (StringUtilityService.ContainsRepetitionOrSequence(plaintextPassword))
-                //{
-                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //                                  Constants.UpdatePasswordOperation, username, ipAddress,
-                //                                  Constants.PasswordSequencesOrRepetitionsLogMessage).ConfigureAwait(false);
-
-                //    return SystemUtilityService.CreateResult(Constants.PasswordSequencesOrRepetitionsUserMessage,
-                //                                       updateSuccess, false);
-                //}
-
-                // Check if password contains dictionary words.
-                //if (await StringUtilityService.ContainsDictionaryWordsAsync(plaintextPassword).ConfigureAwait(false))
-                //{
-                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //                                  Constants.UpdatePasswordOperation, username, ipAddress,
-                //                                  Constants.PasswordWordsLogMessage).ConfigureAwait(false);
-
-                //    return SystemUtilityService.CreateResult(Constants.PasswordWordsUserMessage,
-                //                                       updateSuccess, false);
-                //}
-
-                // Check if password is a previously corrupted password.
-                //if (await SystemUtilityService.IsCorruptedPasswordAsync(plaintextPassword).ConfigureAwait(false))
-                //{
-                //    await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //                                  Constants.UpdatePasswordOperation, username, ipAddress,
-                //                                  Constants.PasswordCorruptedLogMessage).ConfigureAwait(false);
-
-                //    return SystemUtilityService.CreateResult(Constants.PasswordCorruptedUserMessage, updateSuccess, false);
-                //}
-
-                // Successful update!
                 updateSuccess = true;
-
-                // Hash password with salt
-                //byte[] saltBytes = SecurityService.GenerateSalt();
-                //string saltHex = StringUtilityService.BytesToHexString(saltBytes);
-
-                //string digest = SecurityService.HashWithKDF(hexPassword, saltBytes);
 
                 await _userManagementService.ChangePasswordAsync(username, hashedPassword, salt).ConfigureAwait(false);
 
