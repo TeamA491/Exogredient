@@ -4,6 +4,8 @@ using MySqlX.XDevAPI;
 using MySqlX.XDevAPI.CRUD;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DataHelpers;
+using System.Collections.Generic;
+
 
 namespace TeamA.Exogredient.DAL
 {
@@ -158,5 +160,61 @@ namespace TeamA.Exogredient.DAL
                 return resultstring;
             }
         }
+
+        /// <summary>
+        /// An async method to read all the logs in a specified month.
+        /// </summary>
+        /// <param name="year">Year needed to get specific month.</param>
+        /// <param name="month">Month needed to get specific logs.</param>
+        /// <param name="amountOfDays">Amount of days needed for organization.</param>
+        /// <returns>A list of list of the LogResult ofbject.</returns>
+        public async Task<List<List<LogResult>>> ReadSpecificMonthAsync(string year, string month, int amountOfDays)
+        {
+
+            List<List<LogResult>> logsForMonth = new List<List<LogResult>>();
+
+            // Get the session inside a using statement to properly dispose/close.
+            using (Session session = MySQLX.GetSession(NOSQLConnection))
+            {
+                // Get log schema.
+                Schema schema = session.GetSchema(Constants.LogsSchemaName);
+
+                // Use the amountOfDays variable to loop to get dates.
+                for (int date = 1; date < amountOfDays + 1; date ++)
+                {
+                    // Make group name based on year and month.
+                    string groupName = year + month;
+                    string day = "";
+
+                    if (date < 10)
+                    {
+                        // If the date is less than 10, a "0" has to be added for formatting purposes.
+                        day += "0";
+                    }
+                    // Convert date into a string for use.
+                    day += Convert.ToString(date);
+
+                    groupName += day;
+
+                    // Get logs for a specific day.
+                    var collection = schema.GetCollection(Constants.LogsCollectionPrefix + groupName);
+
+                    // Need to check if collection exists beforehand.
+                    List<LogResult> logsForDay = new List<LogResult>();
+                    if (collection.ExistsInDatabase()) {
+                        DocResult result = await collection.Find().ExecuteAsync().ConfigureAwait(false);
+                        while (result.Next())
+                        {
+                            LogResult logObject = new LogResult((string)result.Current[Constants.LogsTimestampField], (string)result.Current[Constants.LogsOperationField],
+                                (string)result.Current[Constants.LogsIdentifierField], (string)result.Current[Constants.LogsIPAddressField], (string)result.Current[Constants.LogsErrorTypeField]);
+                            logsForDay.Add(logObject);
+                        }
+                    }
+                    logsForMonth.Add(logsForDay);
+                }            
+            }
+            return logsForMonth;        
+        }
+    
     }
 }

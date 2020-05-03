@@ -7,6 +7,7 @@ import TicketsView from '../views/TicketsView';
 import RegistrationView from '../views/RegistrationView';
 import SearchResultsView from '../views/SearchResultsView';
 import SubmitTicketView from '../views/SubmitTicketView.vue';
+import RegistrationView from '../views/RegistrationView';
 
 Vue.use(VueRouter);
 
@@ -16,12 +17,23 @@ const routes = [
     { path: '/ErrorView', component: ErrorView },
     { path: '/RegistrationView', component: RegistrationView },
     {
+        path: '/resetPassword/:token',
+        name: 'resetPassword',
+        component: () => import('../views/ResetPasswordView.vue'),
+        props: true,
+    },
+    {
+        path: '/sendResetLink',
+        name: 'sendResetLink',
+        component: () => import('../views/SendResetLink.vue'),
+    },
+    {
         path: '/verify',
         name: 'verify',
         component: () => import('../views/VerificationView.vue'),
     },
     {
-        path: '/login/:afterRegistered',
+        path: '/login/:after',
         name: 'login',
         component: () => import('@/views/LoginView.vue'),
         props: true,
@@ -41,6 +53,11 @@ const routes = [
         name: 'home',
     },
     {
+        path: '/useranalysis',
+        name: 'useranalysis',
+        component: () => import('@/views/UserAnalysis.vue'),
+    },
+    {
         path: '/viewTickets',
         name: 'tickets-view',
         component: TicketsView,
@@ -49,7 +66,7 @@ const routes = [
         path: '/newTicket',
         name: 'submit-ticket-view',
         component: SubmitTicketView,
-    },
+    }
 ];
 
 const router = new VueRouter({

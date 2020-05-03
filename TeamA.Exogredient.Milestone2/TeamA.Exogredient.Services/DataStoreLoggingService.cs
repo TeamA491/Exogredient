@@ -43,14 +43,16 @@ namespace TeamA.Exogredient.Services
                 {
                     throw new ArgumentException(Constants.TimestampFormatIncorrect);
                 }
+                
 
                 // Create the log record to be stored, mostly just the parameters to this function apart from the timestamp.
                 LogRecord logRecord = new LogRecord(splitResult[0] + " " + splitResult[1], operation, identifier, ipAddress, errorType);
-                LogRecord resultRecord = await _maskingService.MaskAsync(logRecord, false).ConfigureAwait(false) as LogRecord;;
+                //TODO 
+                //LogRecord resultRecord = await _maskingService.MaskAsync(logRecord, false).ConfigureAwait(false) as LogRecord; ;
 
                 // The name of the collection/table should be a derivative of the "yyyyMMdd" part of the timestamp.
                 // Asynchronously call the Log DAO's function to create the log record in the collection denoted by the name (second parameter).
-                return await _dsLoggingDAO.CreateAsync(resultRecord, splitResult[2]).ConfigureAwait(false);
+                return await _dsLoggingDAO.CreateAsync(logRecord, splitResult[2]).ConfigureAwait(false);
             }
             catch
             {

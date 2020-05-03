@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace TeamA.Exogredient.AppConstants
 {
     /// <summary>
-    /// The constants, reaonly values, and other literal values used throughout our system.
+    /// The constants, readonly values, and other literal values used throughout our system.
     /// </summary>
     public static class Constants
     {
@@ -57,7 +57,7 @@ namespace TeamA.Exogredient.AppConstants
 
         public const double LatDegree400ft = 0.0009;
         public const double LongDegree400ft = 0.0011111;
-        
+
         public static readonly List<Tuple<double, double>> CurrentScopePolygon = CaliforniaPolygon;
 
         // TODO: CONVERT THESE TO ARRAYS
@@ -128,6 +128,22 @@ namespace TeamA.Exogredient.AppConstants
         public const string JWTTokenHeader = "Authorization";
 
         // UPLOAD
+        public const string NaN = "NaN";
+
+        public const string UsernameKey = "username";
+        public const string IPAddressKey = "ipAddress";
+        public const string CategoryKey = "category";
+        public const string NameKey = "name";
+        public const string DescriptionKey = "description";
+        public const string RatingKey = "rating";
+        public const string PriceKey = "price";
+        public const string PriceUnitKey = "priceUnit";
+        public const string ExtensionKey = "fileExtension";
+        public const string ImageSizeKey = "imageSize";
+        public const string UniqueIdKey = "id";
+
+        public const string PhotoFolder = @"C:\Photos";
+
         public const int InProgressStatus = 1;
         public const int NotInProgressStatus = 0;
 
@@ -176,6 +192,9 @@ namespace TeamA.Exogredient.AppConstants
             "meat", "fish", "animal", "flesh", "seafood", "pork"
         };
 
+        public static readonly List<string> NoCatKeywords = new List<string>()
+        { };
+
         public static readonly List<string> InvalidSuggestions = new List<string>()
         {
             "meat", "fish", "animal", "flesh", "seafood", "pork", "plant", "fruit", "vegetable", "produce", "solanum",
@@ -187,11 +206,11 @@ namespace TeamA.Exogredient.AppConstants
 
         public static readonly IDictionary<string, List<string>> AllCategoriesToKeywords = new Dictionary<string, List<string>>()
         {
-            { ManufacturedCategory, ManufacturedKeywords }, { PlantCategory, PlantKeywords }, { AnimalCategory, AnimalKeywords }
+            { ManufacturedCategory, ManufacturedKeywords }, { PlantCategory, PlantKeywords }, { AnimalCategory, AnimalKeywords }, { NoCategory, NoCatKeywords }
         };
 
         public static readonly List<string> ExogredientCategories = new List<string>()
-        { ManufacturedCategory, PlantCategory, AnimalCategory };
+        { ManufacturedCategory, PlantCategory, AnimalCategory, NoCategory };
         public const double MinimumImageSizeMB = 0.5;
         public const double MaximumImageSizeMB = 5.0;
         public static readonly List<string> ValidImageExtensions = new List<string>()
@@ -222,8 +241,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string UploadRetrievalFailedMessage = "Couldn't fetch draft data";
         public const string UploadRetrievalSuccessMessage = "Upload data retrieved!";
 
+        public const string UploadDeletionFailedMessage = "Couldn't delete upload";
+        public const string UploadDeletionSuccessMessage = "Upload deleted!";
+
+        public const string DeleteUploadOperation = "Delete upload";
         public const string CreateUploadOperation = "Create upload";
-        public const string DraftUploadOperation = "Create upload";
+        public const string DraftUploadOperation = "Draft upload";
+
         public const string UploadCreationErrorMessage = "A system error occurred. Please try again later.";
         public const string UploadCreationSuccessMessage = "Upload created!";
         public const string DraftCreationSuccessMessage = "Draft created!";
@@ -247,6 +271,9 @@ namespace TeamA.Exogredient.AppConstants
         public const string PriceUnitNotValidMessage = "Price unit not valid (per item/pound/gram/oz)";
         public const string TimeNotValidMessage = "Time posted not valid, more than 5 minutes have passed";
         public const string InvalidRatingMessage = "Invalid rating, must be between 1 and 5 stars";
+
+        public const string ResetLinkExpired = "Reset Link is expired!";
+        public const string UsernameNotMatchResetLink = "The username is invalid for this link!";
 
         // AUTHORIZATION
         public const int TOKEN_EXPIRATION_MIN = 20;
@@ -311,7 +338,7 @@ namespace TeamA.Exogredient.AppConstants
             { "getTickets",  (int)USER_TYPE.SYS_ADMIN},
         };
 
-        // ARCHIVING 
+        // ARCHIVING
         public const string SevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
         public const string ArchivePrefixArgument = "a -t7z ";
         public const string ArchivePostfixArgument = " -sdel";
@@ -438,7 +465,6 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetInProgressUploadsOperation = "Get InProgress Uploads";
         public const string GetSaveListOperation = "Get Save Lists";
         public const string DeleteSaveListOperation = "Delete Save List";
-        public const string DeleteUploadOperation = "Delete Upload";
         public const string GetSaveListPagination = "Get SaveList pagination";
         public const string GetInProgressUploadPagination = "Get In Progress Upload pagination";
         public const string GetRecentUploadPagination = "Get recent upload pagination";
@@ -450,6 +476,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SendPhoneCodeOperation = "Send Phone Code";
         public const string SendEmailCodeOperation = "Send Email Code";
         public const string UpdatePasswordOperation = "Update Password";
+        public const string SendResetLinkOperation = "Send Reset Password Link";
         public const string SingleUserCreateOperation = "Single User Create";
         public const string BulkUserCreateOperation = "Bulk User Create";
         public const string SingleUserDeleteOperation = "Single Delete Create";
@@ -460,6 +487,14 @@ namespace TeamA.Exogredient.AppConstants
         public const string MapTableModifiedOperation = "Map Table Modified";
         public const string UpdateSingleIPOperation = "Single IP Update";
         public const string DeleteSingleIPOperation = "Single IP Delete";
+        public const string CreateSnapshotOperation = "Create Single Snapshot";
+        public const string ReadOneSnapshotOperation = "Read Single Snapshot";
+        public const string ReadMultiSnapshotOperation = "Read Multiple Snapshot";
+        public const string UpvoteOperation = "Upvote Upload";
+        public const string DownvoteOperation = "Downvote Upload";
+        public const string UndoUpvoteOperation = "Undo Upvote Upload";
+        public const string UndoDownvoteOperation = "Undo Downvote Upload";
+        public const string SearchOperation = "Searching";
 
         public const string GetTotalStoreResultsNumberOperation = "Get Total StoreResults Number";
         public const string GetTotalIngredientResultsNumberOperation = "Get Total IngredientResults Number";
@@ -475,6 +510,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string SystemIdentifier = "System";
 
         public const string LocalHost = "127.0.0.1";
+        public const string WebPageDomain = "http://localhost:8080";
 
         public const int RecentUploadPagination = 10;
         public const int SavedUploadPagination = 10;
@@ -512,7 +548,7 @@ namespace TeamA.Exogredient.AppConstants
         public const int MaxPhoneCodeAttempts = 3;
         public const int MaxSearchRelatedAttempts = 3;
         public const int InitialFailureCount = 0;
-        
+
         public static readonly TimeSpan LogInTriesResetTime = new TimeSpan(2, 0, 0);
         public static readonly TimeSpan RegistrationTriesResetTime = new TimeSpan(0, 15, 0);
         public static readonly TimeSpan MaxIPLockTime = new TimeSpan(0, 15, 0);
@@ -806,6 +842,24 @@ namespace TeamA.Exogredient.AppConstants
         public const string LogsIPAddressField = "ip";
         public const string LogsErrorTypeField = "errorType";
 
+
+        // SNAPSHOT COLLECTION
+        public const string SnapshotSchemaName = "exogredient_snapshot";
+        public const string SnapshotCollectionPrefix = "snapshot";
+        public const string SnapshotMonth = "_month";
+        public const string SnapshotOperationsDict = "operations";
+        public const string SnapshotUsersDict = "count_of_registered_users";
+        public const string SnapshotTopCityDict = "top_cities_that_uses_application";
+        public const string SnapshotTopUserUploadedDict = "top_users_that_upload";
+        public const string SnapshotTopUploadedIngredientDict = "top_most_uploaded_ingredients";
+        public const string SnapshotTopUploadedstoreDict = "top_most_uploaded_stores";
+        public const string SnapshotTopSearchedIngredientDict = "top_most_searched_ingredients";
+        public const string SnapshotTopSearchedStoreDict = "top_most_searched_stores";
+        public const string SnapshotTopUpvotedUserDict = "top_most_upvoted_users";
+        public const string SnapshotTopDownvotedUserDict = "top_most_downvoted_users";
+
+
+
         // RECORD HELPER DATA STRUCTURES
         public static readonly IDictionary<string, bool> LogsCollectionIsColumnMasked = new Dictionary<string, bool>()
         {
@@ -950,5 +1004,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketImproperFlagColor = "A flag color that doesn't exist was supplied";
         public const string TicketImproperReadStatus = "A read status that doesn't exist was supplied";
         public const string TicketImproperStatus = "A status that doesn't exist was supplied.";
+        // EXCEPTION MESSAGE -- Snapshots
+        public const string FailCreateSnapShot = "Failed to create a snapshot";
     }
 }

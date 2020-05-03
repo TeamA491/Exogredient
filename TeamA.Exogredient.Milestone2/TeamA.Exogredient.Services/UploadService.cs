@@ -22,7 +22,7 @@ namespace TeamA.Exogredient.Services
             return await _uploadDAO.CreateAsync(uploadRecord).ConfigureAwait(false);
         }
 
-        public async Task<UploadObject> ContinueProgressUploadAsync(int id)
+        public async Task<UploadObject> ContinueUploadProgressAsync(int id)
         {
             return (UploadObject)await _uploadDAO.ReadByIdAsync(id).ConfigureAwait(false);
         }
@@ -39,8 +39,7 @@ namespace TeamA.Exogredient.Services
                 return new VerifyUploadResult(Constants.ImagePathInvalidMessage, false);
             }
 
-            var sizeBytes = (new System.IO.FileInfo(dto.ImagePath)).Length;
-            var sizeMB = sizeBytes * Constants.ToMBConversionFactor;
+            var sizeMB = dto.ImageSize * Constants.ToMBConversionFactor;
             var validSize = sizeMB >= minimumImageSizeMB && sizeMB <= maximumImageSizeMB;
 
             if (!validSize)

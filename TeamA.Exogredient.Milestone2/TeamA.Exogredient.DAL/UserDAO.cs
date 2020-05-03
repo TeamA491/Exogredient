@@ -474,5 +474,39 @@ namespace TeamA.Exogredient.DAL
                 }
             }
         }
+
+        /// <summary>
+        /// Method to count how many users of a specific user type.
+        /// </summary>
+        /// <param name="userType">The type of users a user can be.</param>
+        /// <returns>A integer value for the amount.</returns>
+        public async Task<int> CountUsersTypeAsync(String userType)
+        {
+            int result;
+
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                // Construct the sql string to select all from the table where the email column matches the email,
+                // then check if at least 1 row exists. Use a parameter to protect against sql injections.
+                string sqlString = $"SELECT COUNT(*) FROM {Constants.UserDAOtableName} WHERE {Constants.UserDAOuserTypeColumn} = @USERTYPE;";
+
+                // Open the command inside a using statement to properly dispose/close.
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
+                    command.Parameters.AddWithValue("@USERTYPE", userType);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    await reader.ReadAsync().ConfigureAwait(false);
+                    result = reader.GetInt32(0);
+                }
+            }
+            return result;
+        }
+
+
     }
 }
