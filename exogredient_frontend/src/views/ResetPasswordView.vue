@@ -2,20 +2,20 @@
     <div id="form">
         <div class="field">
             <label class="label" for="username">Username:</label><br>
-            <input class="input" type="text" name="username" id="usernameInput" placeholder="Username" v-model="username" @blur="checkUsername"><br>
+            <input class="input" type="text" name="username" id="usernameInput" placeholder="Username" v-model="username" @input="checkUsername"><br>
             <span class='errorMessage' id="usernameError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="password">New Password:</label><br>
-            <input class="input" :type="passwordFieldType" name="password" id="passwordInput" placeholder="Password" v-model="password" @blur="checkPassword">
+            <input class="input" :type="passwordFieldType" name="password" id="passwordInput" placeholder="Password" v-model="password" @input="checkPassword">
             <a class="button" @click='showHidePassword'>Show/Hide</a><br>
             <span class='errorMessage' id="passwordError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="rePassword">Re-enter New password:</label><br>
-            <input class="input" :type="rePasswordFieldType" name="rePassword" id="rePasswordInput" placeholder="Password" v-model="rePassword" @blur="checkRePassword">
+            <input class="input" :type="rePasswordFieldType" name="rePassword" id="rePasswordInput" placeholder="Password" v-model="rePassword" @input="checkRePassword">
             <a class="button" @click='showHideRePassword'>Show/Hide</a><br>
             <span class='errorMessage' id="rePasswordError"></span><br>
         </div>
@@ -177,7 +177,7 @@ export default {
             var proxyPassword = "0".repeat(this.password.length);
 
             var resetResponse = await fetch(`${global.ApiDomainName}/api/updatePassword?username=${this.username}&`
-                                            +`ipAddress=${this.$store.state.ipAddress}&hashedPassword=${hashedPassword}&`
+                                            +`ipAddress=${this.$store.state.userData.ipAddress}&hashedPassword=${hashedPassword}&`
                                             +`proxyPassword=${proxyPassword}&salt=${salt}&token=${this.token}`);
 
             global.ErrorHandler(resetResponse, this.$router);
@@ -189,7 +189,7 @@ export default {
                 return;
             }
 
-            this.$router.push('/login/reset');
+            this.$router.push('/login');
         }
     }
 }

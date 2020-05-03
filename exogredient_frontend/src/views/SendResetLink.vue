@@ -3,7 +3,7 @@
         <p><strong>Reset Password</strong></p>
         <div class='field'>
             <label class='label' for="username">Username:</label><br>
-            <input class="input" type="text" name="username" id="usernameInput" placeholder="username" v-model="username" @blur="checkUsername"><br>
+            <input class="input" type="text" name="username" id="usernameInput" placeholder="username" v-model="username" @input="checkUsername"><br>
             <span class='errorMessage' id="usernameError"></span><br>
         </div>
         <span id="sendError"></span><br>
@@ -54,7 +54,7 @@ export default {
         },
         submit: async function(){
             var sendResponse = await fetch(`${global.ApiDomainName}/api/sendResetLink?username=${this.username}&`
-            + `ipAddress=${this.$store.state.ipAddress}`);
+            + `ipAddress=${this.$store.state.userData.ipAddress}`);
             
             global.ErrorHandler(sendResponse, this.$router);
 
