@@ -15,6 +15,7 @@ export const PriceKey = "price";
 export const PriceUnitKey = "priceUnit";
 export const ExtensionKey = "fileExtension";
 export const ImageSizeKey = "imageSize";
+export const UniqueIDKey = "id";
 export const MinimumPhotoSize = 500000;
 export const MaximumPhotoSize = 5000000;
 export const MinimumPhotoSizeString = "0.5 MB";

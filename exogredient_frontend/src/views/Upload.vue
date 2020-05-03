@@ -190,7 +190,7 @@ export default {
 
       var formD = new FormData();
       formD.append(global.FileKey, this.file);
-      formD.append(global.UsernameKey, "thesmokinggun42");
+      formD.append(global.UsernameKey, this.$store.state.userData.username);
       formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
 
       fetch(`${global.ApiDomainName}/api/Vision`, {
@@ -199,13 +199,7 @@ export default {
         body: formD
       })
       .then((response) => {
-        if (response > 400) {
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("loadingTitle").style.display = "none";
-          
-          this.MakeToast("Server error, please try again later.")
-        }
-
+        global.ErrorHandler(this.$router, response);
         return response.json();
       })
       .then((data)=> {
@@ -333,7 +327,7 @@ export default {
         
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
-        formD.append(global.UsernameKey, "thesmokinggun42");
+        formD.append(global.UsernameKey, this.$store.state.userData.username);
         formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
         formD.append(global.CategoryKey, this.category);
         formD.append(global.NameKey, this.name);
@@ -350,10 +344,7 @@ export default {
           body: formD
         })
         .then((response) => {
-          if (response > 400) {
-            this.MakeToast("Server error, please try again later.")
-          }
-
+          global.ErrorHandler(this.$router, response);
           return response.json();
         })
         .then((data)=> {
@@ -363,7 +354,7 @@ export default {
             this.MakeToast(data[global.MessageResponseKey]);
           }
           else {
-            // Go to profile view
+            this.$router.push("/profile");
           }
         })
       }
@@ -446,7 +437,7 @@ export default {
         
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
-        formD.append(global.UsernameKey, "thesmokinggun42");
+        formD.append(global.UsernameKey, this.$store.state.userData.username);
         formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
         formD.append(global.CategoryKey, this.category);
         formD.append(global.NameKey, this.name);
@@ -463,10 +454,7 @@ export default {
           body: formD
         })
         .then((response) => {
-          if (response > 400) {
-            this.MakeToast("Server error, please try again later.")
-          }
-
+           global.ErrorHandler(this.$router, response);
           return response.json();
         })
         .then((data)=> {
@@ -476,7 +464,7 @@ export default {
             this.MakeToast(data[global.MessageResponseKey]);
           }
           else {
-            // Go to profile view
+            this.$router.push("/profile");
           }
         })
       }

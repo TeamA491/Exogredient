@@ -310,7 +310,6 @@ namespace ExogredientController.Controllers
             }
             catch (Exception e)
             {
-                var lol = e.Message;
                 Console.WriteLine(e.StackTrace);
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
@@ -504,14 +503,14 @@ namespace ExogredientController.Controllers
         }
 
         [EnableCors]
-        [HttpPost("DeleteUpload")]
+        [HttpGet("DeleteUpload/{username}/{id}")]
         [Consumes("multipart/form-data")]
         [Produces("application/json")]
-        public async Task<IActionResult> DeleteUploadAsync(IFormCollection data)
+        public async Task<IActionResult> DeleteUploadAsync(string username, int id, string ipAddress = Constants.LocalHost)
         {
             try
             {
-                var result = await _uploadManager.DeleteUploadAsync(data[Constants.UsernameKey], Int32.Parse(data[Constants.UniqueIdKey]), data[Constants.IPAddressKey], Constants.NoValueInt).ConfigureAwait(false);
+                var result = await _uploadManager.DeleteUploadAsync(username, id, ipAddress, Constants.NoValueInt).ConfigureAwait(false);
 
                 return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
