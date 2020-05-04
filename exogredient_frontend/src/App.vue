@@ -13,7 +13,7 @@
           <h1 id="pageTitle"><a @click="goToHomePage">ExoGredient</a></h1>
         </a>
 
-        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="menu" @click="showMenu"> 
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
@@ -21,7 +21,8 @@
       </div>
 
 
-      <div class="navbar-menu">
+      <div id="menu" class="navbar-menu" @click="closeMenu">
+
         <div class="navbar-start">
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="upload">Upload</router-link>
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="profile">Profile</router-link>
@@ -31,20 +32,19 @@
         </div>
 
 
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div v-if="this.$store.state.userData.userType !== 'Anonymous'">
-            <span id="username">Username: {{this.$store.state.userData.username}}</span>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div v-if="this.$store.state.userData.userType !== 'Anonymous'">
+              <span id="username">Username: {{this.$store.state.userData.username}}</span>
 
-            <div class="buttons">
-              <a class="button is-primary">
-                <span id="logout"><a @click="logout">Log out</a></span>
-              </a>
+              <div class="buttons">
+                <a class="button is-primary">
+                  <span id="logout"><a @click="logout">Log out</a></span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
 
       </div>
 
@@ -80,8 +80,6 @@
     name: "App",
     watch:{
       $route (to, from){
-        // console.log(to.name);
-        // console.log(from.name);
         this.$store.dispatch('updateRouteTo',to.name);
         this.$store.dispatch('updateRouteFrom',from.name);
         if(to.name !== global.HomePage){
@@ -93,7 +91,6 @@
       }
     },
     async mounted(){
-      console.log("mounted");
       // Filter unknown URL
       let routeExist = false;
       let currentPath = this.$router.currentRoute.path;
@@ -118,10 +115,6 @@
           this.$data.isPlaceSelected = true;
       });
     },
-    updated(){
-      console.log("updated");
-
-    },
     data(){
       return{
         searchData:{
@@ -138,6 +131,12 @@
       }
     },
     methods:{
+      closeMenu: function(){
+        document.querySelector(".navbar-menu").classList.remove('is-active');
+      },
+      showMenu: function(){
+        document.querySelector(".navbar-menu").classList.toggle('is-active');
+      },
       logout: function(){
         this.$store.dispatch('updateUsername', 'Anonymous');
         this.$store.dispatch('updateUserType', 'Anonymous');
@@ -261,7 +260,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 10vh;
 }
 #app{
   padding:5% 10% 10% 10%;
@@ -298,6 +297,6 @@
   top:0;            /* top left corner should start at topmost spot */
   width:100vw;      /* take up the full browser width */
   z-index:200;  /* high z index so other content scrolls underneath */
-  height:100px;     /* define height for content */
+  height: 10vh;     /* define height for content */
 }
 </style>
