@@ -460,6 +460,8 @@ namespace TeamA.Exogredient.AppConstants
 
         public const int NumOfResultsPerSearchPage = 20;
         public const int NumOfIngredientsPerStorePage = 20;
+        public const int EmptyRadius = 0;
+        public const int DefaultRadius = 30;
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 

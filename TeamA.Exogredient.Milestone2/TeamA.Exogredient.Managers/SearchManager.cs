@@ -41,6 +41,11 @@ namespace TeamA.Exogredient.Managers
         {
             try
             {
+                if (radius == Constants.EmptyRadius)
+                {
+                    radius = Constants.DefaultRadius;
+                }
+
                 var normalizedTerm = searchBy==Constants.searchByIngredient ?
                     StringUtilityService.NormalizeTerm(searchTerm, this._enUSDicPath, this._enUSAffPath) : searchTerm;
 
@@ -154,6 +159,11 @@ namespace TeamA.Exogredient.Managers
         {
             try
             {
+                if (radius == Constants.EmptyRadius)
+                {
+                    radius = Constants.DefaultRadius;
+                }
+
                 var normalizedTerm = searchBy==Constants.searchByIngredient ?
                     StringUtilityService.NormalizeTerm(searchTerm, this._enUSDicPath, this._enUSAffPath):searchTerm;
 
