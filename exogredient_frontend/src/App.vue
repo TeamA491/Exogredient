@@ -62,8 +62,10 @@
           <button id="searchButton" class="button is-light" @click="search">Search</button>
         </div>
         <div>
-          <button class="button is-light" @click="setToIngredientSearch">Ingredient</button>
-          <button class="button is-light" @click="setToStoreSearch">Store</button>
+          <input type="radio" name="searchBy" value="ingredient" id="ingredient" @click="setToIngredientSearch">
+          <label for="ingredient"> Ingredient </label>
+          <input type="radio" name="searchBy" value="store" id="store" @click="setToStoreSearch">
+          <label for="store"> Store </label>
         </div>
         <span>Search by: <strong>{{searchData.searchBy}}</strong></span>
       </div>
@@ -94,11 +96,20 @@
       // Filter unknown URL
       let routeExist = false;
       let currentPath = this.$router.currentRoute.path;
+
       for(let route of this.$router.options.routes){
         routeExist = routeExist || (route.path === currentPath)
       }
       if(!routeExist){
         this.$router.push('/pageNotFound');
+      }
+
+      // Ask for Geolocation permission
+      if(navigator.geolocation){
+        console.log("in if");
+        navigator.geolocation.getCurrentPosition(this.savePosition);
+      }else {
+        alert("Geolocation is not supported by this browser.");
       }
 
       var ipAddressResponse = await fetch("https://ipapi.co/json");
@@ -121,16 +132,22 @@
           searchTerm: '',
           lat: null,
           lng: null,
-          radius: null,
+          radius: "",
           searchBy: "ingredient",
           address: ''
         },
         searchPlaceholder: "Ingredient Search...",
         isPlaceSelected: false,
+        isGeoLocationAllowed: false,
         show: true
       }
     },
     methods:{
+      savePosition: function(position){
+        this.$data.searchData.lat = position.coords.latitude;
+        this.$data.searchData.lng = position.coords.longitude;
+        this.$data.isGeoLocationAllowed = true;
+      },
       closeMenu: function(){
         document.querySelector(".navbar-menu").classList.remove('is-active');
       },
@@ -164,25 +181,28 @@
       },
       search: async function(){
         // Check if an address was selected from autocompletes.
-        if(!this.$data.isPlaceSelected){
-          alert("Address must be selected from the autocompletes");
+        if(!this.isGeoLocationAllowed && !this.$data.isPlaceSelected){
+          alert("Address must be selected from the autocompletes or allow geolocation for this website.");
           return;
         }
 
         // Check if search term is empty.
         if(this.$data.searchData.searchTerm.length < global.MinimumSearchTermLength){
-          alert("The search term cannot be empty");
+          alert(`The ${this.searchData.searchBy} name cannot be empty`);
           return;
         }
 
-        // Check if the radius a number between 1 and 100.
-        if( (isNaN(parseFloat(this.$data.searchData.radius)) || 
-             !isFinite(this.$data.searchData.radius))
-             || 
-            (this.$data.searchData.radius < global.MinimumRadius || 
-            this.$data.searchData.radius > global.MaximumRadius)){
-          alert("Radius must be a number between 1-100");
-          return;
+        // Give default radius if it is empty
+        if(this.searchData.radius !== ""){
+          // Check if the radius a number between 1 and 100.
+          if( (isNaN(parseFloat(this.$data.searchData.radius)) || 
+              !isFinite(this.$data.searchData.radius))
+              || 
+              (this.$data.searchData.radius < global.MinimumRadius || 
+              this.$data.searchData.radius > global.MaximumRadius)){
+            alert("Radius must be a number between 1-100");
+            return;
+          }
         }
 
         // Update searchData in Vuex.
@@ -192,7 +212,8 @@
         let paginationResponse = 
           await fetch(`${global.ApiDomainName}/api/getTotalNum?`
           + `searchTerm=${this.searchData.searchTerm}&latitude=${this.searchData.lat}`
-          + `&longitude=${this.searchData.lng}&radius=${this.searchData.radius}`
+          + `&longitude=${this.searchData.lng}`
+          + `&radius=${this.searchData.radius}`
           + `&searchBy=${this.searchData.searchBy}&username=${this.$store.state.userData.username}`
           + `&ipAddress=${this.$store.state.userData.ipAddress}`);
 
