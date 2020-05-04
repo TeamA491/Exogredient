@@ -49,12 +49,13 @@ namespace TeamA.Exogredient.TestController
             Bitmap bmp = new Bitmap(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg");
             byte[] byteArray = File.ReadAllBytes(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg");
 
-
             // DIRECTIONS: comment out the admin check in this method to create the admin
 
             //await umanage.CreateUserAsync(false, new UserRecord("System", "testname", "testemail@email.com", "9498675309", "password", 0, Constants.AdminUserType, "salt", Constants.NoValueLong, "090909", 0, 0, 0, 0, 0)).ConfigureAwait(false);
 
             //============================================================================
+
+            //await uservice.ContinueUploadProgressAsync(11).ConfigureAwait(false);
 
             //await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
 

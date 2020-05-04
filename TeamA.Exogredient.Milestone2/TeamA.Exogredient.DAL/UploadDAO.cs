@@ -8,7 +8,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class UploadDAO : IMasterSQLCRD<int>
+    public class UploadDAO : IMasterSQLDAO<int>
     {
         private string _SQLConnection;
 
@@ -159,7 +159,7 @@ namespace TeamA.Exogredient.DAL
                                               Int32.Parse((string)row[Constants.UploadDAORatingColumn]), (string)row[Constants.UploadDAOPhotoColumn],
                                               (double)row[Constants.UploadDAOPriceColumn], (string)row[Constants.UploadDAOPriceUnitColumn],
                                               (string)row[Constants.UploadDAOIngredientNameColumn], (int)row[Constants.UploadDAOUpvoteColumn],
-                                              (int)row[Constants.UploadDAODownvoteColumn], (((int)row[Constants.UploadDAOInProgressColumn] == Constants.InProgressStatus) ? true : false),
+                                              (int)row[Constants.UploadDAODownvoteColumn], ((bool)row[Constants.UploadDAOInProgressColumn]),
                                               (string)row[Constants.UploadDAOCategoryColumn]);
                                               
                 }
@@ -689,5 +689,79 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
+        public async Task<bool> UpdateAsync(ISQLRecord record)
+        {
+            try
+            {
+                var temp = (UploadRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException(Constants.UploadUpdateInvalidArgument);
+            }
+
+            // Get the record data.
+            var userRecord = (UploadRecord)record;
+            IDictionary<string, object> recordData = userRecord.GetData();
+
+            // Get the connection inside a using statement to properly dispose/close.
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                // Construct the sql string to update the table name where..
+                string sqlString = $"UPDATE {Constants.UploadDAOTableName} SET ";
+
+                // Loop through the record data.
+                int count = 0;
+                foreach (KeyValuePair<string, object> pair in recordData)
+                {
+                    // Check if the value at the username column is contained within the table, throw an argument
+                    // exception if it doesn't exist.
+                    if (pair.Key == Constants.UploadDAOUploadIdColumn)
+                    {
+                        if (!await CheckUploadsExistenceAsync(new List<int>() { (int)pair.Value }).ConfigureAwait(false))
+                        {
+                            throw new ArgumentException(Constants.UploadUpdateDNE);
+                        }
+                    }
+
+                    // Update only the values where the record value is not null (string == null, numeric == -1).
+                    // Again, use parameters to prevent against sql injections.
+                    if (pair.Key != Constants.UploadDAOUploadIdColumn)
+                    {
+                        sqlString += $"{pair.Key} = @PARAM{count},";
+                    }
+
+                    count++;
+                }
+
+                // Remove the last comma and identify the record by its username column.
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += $" WHERE {Constants.UploadDAOUploadIdColumn} = '{recordData[Constants.UploadDAOUploadIdColumn]}';";
+
+                // Get the command inside a using statement to properly dispose/close.
+                using (var command = new MySqlCommand(sqlString, connection))
+                {
+                    // Loop through the record data again to add values to the parameters.
+                    count = 0;
+                    foreach (var pair in recordData)
+                    {
+                        if (pair.Key != Constants.UploadDAOUploadIdColumn)
+                        {
+                            command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        }
+
+                        count++;
+                    }
+
+                    // Execute the non query asynchronously.
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                }
+
+                return true;
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Text;
 
 namespace TeamA.Exogredient.DataHelpers.Upload
@@ -11,7 +12,8 @@ namespace TeamA.Exogredient.DataHelpers.Upload
         public bool ExceptionOccurred { get; set; }
         public string Description { get; set; }
         public int Rating { get; set; }
-        public Bitmap Image { get; set; }
+        public byte[] Image { get; set; }
+        public string ImageName { get; set; }
         public double Price { get; set; }
         public string PriceUnit { get; set; }
         public string IngredientName { get; set; }

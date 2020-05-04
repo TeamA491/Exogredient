@@ -20,21 +20,21 @@
           <div style="font-family: Gill Sans; display: inline-block; margin-left: auto; margin-right: auto; width: 65px">per</div> 
           <select id="priceUnit" style="max-width: 150px; display: inline-block; margin-left: auto; margin-right: auto; width: 20%; padding: 5px;border:1px solid #000000" required>
             <option value="" disabled selected hidden>price unit...</option>
-            <option value="item">Item</option>
-            <option value="pound">Pound</option>
-            <option value="gram">Gram</option>
-            <option value="oz">OZ</option>
+            <option value="item" id="item">Item</option>
+            <option value="pound" id="pound">Pound</option>
+            <option value="gram" id="gram">Gram</option>
+            <option value="oz" id="oz">OZ</option>
           </select><br /><br />
         </div>
 
         <div style="text-align: center;">
           <select id="rating" style="display: inline-block; margin-left: auto; margin-right: auto; width: 40px; padding: 5px;border:1px solid #000000" required>
               <option value="" disabled selected hidden>.....</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="4">5</option>
+              <option value="1" id="1">1</option>
+              <option value="2" id="2">2</option>
+              <option value="3" id="3">3</option>
+              <option value="4" id="4">4</option>
+              <option value="5" id="5">5</option>
           </select>
           <div style="font-family: Gill Sans; font-size: 150%; display: inline-block; margin-left: auto; margin-right: auto; width:30px">★</div><br /><br />
         </div>
@@ -71,6 +71,77 @@ import * as global from "../globalExports.js";
 const exifr = require('exifr');
 
 export default {
+  mounted() {
+    var name = this.$store.state.inProgressUpload.name;
+    var description = this.$store.state.inProgressUpload.description;
+    var price = this.$store.state.inProgressUpload.price;
+    var priceUnit = this.$store.state.inProgressUpload.priceUnit;
+    var rating = this.$store.state.inProgressUpload.rating;
+    var image = this.$store.state.inProgressUpload.image;
+    var id = this.$store.state.inProgressUpload.id;
+
+    console.log(image);
+
+    this.$store.dispatch("updateInProgressUploadName", "");
+    this.$store.dispatch("updateInProgressUploadDescription", "");
+    this.$store.dispatch("updateInProgressUploadPrice", 0);
+    this.$store.dispatch("updateInProgressUploadPriceUnit", "");
+    this.$store.dispatch("updateInProgressUploadRating", 0);
+    this.$store.dispatch("updateInProgressUploadImage", null);
+    this.$store.dispatch("updateInProgressUploadId", -1);
+
+    var changeView;
+
+    if (name === "" && description === "" && price === 0 && priceUnit === "" && rating === 0 && image === null && id === -1) {
+      changeView = false;
+    }
+    else {
+      changeView = true;
+    }
+
+    if (changeView){
+      document.getElementById("theRest").style.display = "block";
+
+      var descriptionDOM = document.getElementById("description");
+      var nameDOM = document.getElementById("name")
+      var ratingDOM = document.getElementById("rating");
+      var priceUnitDOM = document.getElementById("priceUnit");
+      var priceDOM = document.getElementById("price");
+
+      if (description !== "") {
+        descriptionDOM.value = description;
+        this.description = description;
+      }
+
+      if (name !== "") {
+        nameDOM.value = name;
+        this.name = name;
+      }
+
+      if (rating !== 0){
+        document.getElementById(rating.toString()).selected = true;
+        this.rating = parseInt(rating);
+      }
+      
+      if (priceUnit !== ""){
+        document.getElementById(priceUnit.toString()).selected = true;
+        this.priceUnit = priceUnit;
+      }
+
+      if (price !== 0.0) {
+        priceDOM.value = price;
+        this.price = parseFloat(price);
+      }
+
+      if (id !== -1) {
+        this.price = id;
+      }
+
+      if (image !== null) {
+        this.file = image;
+      }
+    }
+  },
   data() {
     return {
       file: null,
@@ -82,7 +153,8 @@ export default {
       description: null,
       rating: null,
       priceUnit: null,
-      price: null
+      price: null,
+      id: -1
     };
   },
   methods: {
@@ -434,7 +506,9 @@ export default {
         this.rating = parseInt(rating);
         this.priceUnit = priceUnit;
         this.price = parseFloat(price);
-        
+
+        console.log(this.file);
+
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, this.$store.state.userData.username);
@@ -447,6 +521,7 @@ export default {
         formD.append(global.PriceUnitKey, this.priceUnit);
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
+        formD.append(global.UniqueIDKey, this.id);
         
         fetch(`${global.ApiDomainName}/api/DraftUpload`, {
           method: "POST",
@@ -454,7 +529,7 @@ export default {
           body: formD
         })
         .then((response) => {
-           global.ErrorHandler(this.$router, response);
+          global.ErrorHandler(this.$router, response);
           return response.json();
         })
         .then((data)=> {
@@ -464,7 +539,7 @@ export default {
             this.MakeToast(data[global.MessageResponseKey]);
           }
           else {
-            this.$router.push("/profile");
+            //this.$router.push("/profile");
           }
         })
       }

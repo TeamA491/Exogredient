@@ -853,6 +853,8 @@ namespace TeamA.Exogredient.AppConstants
         // EXCEPTION MESSAGES - UploadDAO
         public const string UploadCreateInvalidArgument = "UploadDAO.CreateAsync record argument must be of type UploadRecord";
         public const string UploadReadDNE = "UploadDAO.ReadByIDAsync upload id did not exist";
+        public const string UploadUpdateInvalidArgument = "UploadDAO.UpdateAsync record argument must be of type UploadRecord";
+        public const string UploadUpdateDNE = "UploadDAO.UpdateAsync upload id did not exist";
 
         // EXCEPTION MESSAGES -- MapDAO
         public const string MapCreateInvalidArgument = "MapDAO.CreateAsync record argument must be of type MapRecord";

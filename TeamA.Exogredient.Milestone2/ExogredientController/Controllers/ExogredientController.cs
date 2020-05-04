@@ -17,6 +17,7 @@ using TeamA.Exogredient.Exceptions;
 using TeamA.Exogredient.DataHelpers.Upload;
 using Image = Google.Cloud.Vision.V1.Image;
 using UploadController;
+using Google.Apis.Logging;
 
 namespace ExogredientController.Controllers
 {
@@ -410,13 +411,13 @@ namespace ExogredientController.Controllers
                                           Constants.NoValueDatetime,
                                           data[Constants.NameKey].ToString().Equals(Constants.NaN) ? Constants.NoValueString : data[Constants.NameKey].ToString(),
                                           data[Constants.DescriptionKey].ToString().Equals(Constants.NaN) ? Constants.NoValueString : data[Constants.DescriptionKey].ToString(),
-                                          data[Constants.RatingKey].ToString().Equals(Constants.NaN) ? Constants.NoValueInt : Int32.Parse(data[Constants.NameKey]),
-                                          data[Constants.PriceKey].ToString().Equals(Constants.NaN) ? Constants.NoValueDouble : Double.Parse(data[Constants.NameKey].ToString()),
+                                          data[Constants.RatingKey].ToString().Equals(Constants.NaN) ? Constants.NoValueInt : Int32.Parse(data[Constants.RatingKey]),
+                                          data[Constants.PriceKey].ToString().Equals(Constants.NaN) ? Constants.NoValueDouble : Double.Parse(data[Constants.PriceKey].ToString()),
                                           data[Constants.PriceUnitKey].ToString().Equals(Constants.NaN) ? Constants.NoValueString : data[Constants.PriceUnitKey].ToString(),
                                           data[Constants.ExtensionKey],
                                           Int32.Parse(data[Constants.ImageSizeKey]));
 
-                var result = await _uploadManager.DraftUploadAsync(post, Constants.NoValueInt).ConfigureAwait(false);
+                var result = await _uploadManager.DraftUploadAsync(post, Int32.Parse(data[Constants.UniqueIdKey]), Constants.NoValueInt).ConfigureAwait(false);
 
                 return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
@@ -483,34 +484,46 @@ namespace ExogredientController.Controllers
             {
                 var result = await _uploadManager.ContinueUploadProgressAsync(data[Constants.UsernameKey], Int32.Parse(data[Constants.UniqueIdKey]), data[Constants.IPAddressKey], Constants.NoValueInt).ConfigureAwait(false);
 
+                byte[] bytes = System.IO.File.ReadAllBytes(result.Data.Photo);
+
+                var splitResult = result.Data.Photo.Split("\\");
+                var imageName = "";
+
+                foreach (var res in splitResult)
+                {
+                    imageName = res;
+                }
+
                 return Ok(new ContinueResponse()
                 {
                     Message = result.Message,
                     ExceptionOccurred = result.ExceptionOccurred,
                     Description = result.Data.Description,
                     Rating = result.Data.Rating,
-                    Image = new Bitmap(result.Data.Photo),
+                    Image = bytes,
+                    ImageName = imageName,
                     Price = result.Data.Price,
                     PriceUnit = result.Data.PriceUnit,
                     IngredientName = result.Data.IngredientName
                 });
             }
-            catch
+            catch (Exception e)
             {
+                var lol = e.Message;
                 // Return generic server error.
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [EnableCors]
-        [HttpGet("DeleteUpload/{username}/{id}")]
+        [HttpPost("DeleteUpload")]
         [Consumes("multipart/form-data")]
         [Produces("application/json")]
-        public async Task<IActionResult> DeleteUploadAsync(string username, int id, string ipAddress = Constants.LocalHost)
+        public async Task<IActionResult> DeleteUploadAsync(IFormCollection data)
         {
             try
             {
-                var result = await _uploadManager.DeleteUploadAsync(username, id, ipAddress, Constants.NoValueInt).ConfigureAwait(false);
+                var result = await _uploadManager.DeleteUploadAsync(data[Constants.UsernameKey], Int32.Parse(data[Constants.UniqueIdKey]), data[Constants.IPAddressKey], Constants.NoValueInt).ConfigureAwait(false);
 
                 return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }

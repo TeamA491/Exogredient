@@ -9,6 +9,15 @@ const store = new Vuex.Store({
     storage: window.sessionStorage,
   })],
   state:{
+    inProgressUpload:{
+      name: "",
+      description: "",
+      price: 0,
+      priceUnit: "",
+      rating: 0,
+      image: null,
+      id: -1
+    },
     searchData:{},
     storeResults: [],
     ingredientResults: [],
@@ -96,6 +105,27 @@ const store = new Vuex.Store({
     },
     updateRouteFrom(state, newRouteFrom){
       state.routeChange.from = newRouteFrom;
+    },
+    updateInProgressUploadName(state, newName){
+      state.inProgressUpload.name = newName;
+    },
+    updateInProgressUploadDescription(state, newDescription){
+      state.inProgressUpload.description = newDescription;
+    },
+    updateInProgressUploadPrice(state, newPrice){
+      state.inProgressUpload.price = newPrice;
+    },
+    updateInProgressUploadPriceUnit(state, newPriceUnit){
+      state.inProgressUpload.priceUnit = newPriceUnit;
+    },
+    updateInProgressUploadRating(state, newRating){
+      state.inProgressUpload.rating = newRating;
+    },
+    updateInProgressUploadImage(state, newImage){
+      state.inProgressUpload.image = newImage;
+    },
+    updateInProgressUploadId(state, newId){
+      state.inProgressUpload.id = newId;
     }
   },
   actions:{
@@ -137,6 +167,27 @@ const store = new Vuex.Store({
     },
     updateRegistrationPhoneNum({commit}, newPhoneNum){
       commit('updateRegistrationPhoneNum', newPhoneNum);
+    },
+    updateInProgressUploadName({commit}, newName){
+      commit('updateInProgressUploadName', newName);
+    },
+    updateInProgressUploadDescription({commit}, newDescription){
+      commit('updateInProgressUploadDescription', newDescription);
+    },
+    updateInProgressUploadPrice({commit}, newPrice){
+      commit('updateInProgressUploadPrice', newPrice);
+    },
+    updateInProgressUploadPriceUnit({commit}, newPriceUnit){
+      commit('updateInProgressUploadPriceUnit', newPriceUnit);
+    },
+    updateInProgressUploadRating({commit}, newRating){
+      commit('updateInProgressUploadRating', newRating);
+    },
+    updateInProgressUploadImage({commit}, newImage){
+      commit('updateInProgressUploadImage', newImage);
+    },
+    updateInProgressUploadId({commit}, newId){
+      commit('updateInProgressUploadId', newId);
     },
     updateToken({commit}, newToken){
       commit('updateToken', newToken);
@@ -180,7 +231,9 @@ const store = new Vuex.Store({
     storeResults: state=> {
       return state.storeResults;
     },
-
+    inProgressUpload: state=> {
+      return state.inProgressUpload;
+    },
     ingredientResults: state=>{
       return state.ingredientResults;
     },

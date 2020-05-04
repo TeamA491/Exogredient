@@ -24,13 +24,22 @@ export default {
   },
   methods: {
     DeleteRecentUpload(id) {
-      // http DELETE on the in progress upload
-      fetch(
-        `${global.ApiDomainName}/api/UserProfile/Upload/${this.$store.getters.username}/${id}?ipAddress=${this.$store.state.ipAddress}`,
-        { method: "DELETE" }
-      ).then((response) => {
+      var formD = new FormData();
+      formD.append(global.UniqueIDKey, id);
+      formD.append(global.UsernameKey, this.$store.state.userData.username);
+      formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
+
+      fetch(`${global.ApiDomainName}/api/DeleteUpload`, {
+        method: "POST",
+        mode: "cors",
+        body: formD
+      }).then((response) => {
         // Display error view based on response status code
         global.ErrorHandler(this.$router, response);
+
+        return response.json();
+      }).then((data)=> {
+        console.log(data);
       });
 
       // remove this upload from recent upload array.

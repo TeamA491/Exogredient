@@ -124,7 +124,7 @@ namespace TeamA.Exogredient.Managers
             return SystemUtilityService.CreateResult(Constants.UploadCreationSuccessMessage, result, false);
         }
 
-        public async Task<Result<bool>> DraftUploadAsync(UploadPost post, int failureCount)
+        public async Task<Result<bool>> DraftUploadAsync(UploadPost post, int id, int failureCount)
         {
             var result = false;
 
@@ -191,14 +191,21 @@ namespace TeamA.Exogredient.Managers
                     return SystemUtilityService.CreateResult(verification.Message, result, false);
                 }
 
-                Directory.CreateDirectory(Constants.PhotoFolder);
-                post.Image.Save(imagePath);
-
                 var uploadRecord = new UploadRecord(post.PostTime, post.Username, storeID, post.Description, post.Rating.ToString(), imagePath,
                                                     post.Price, post.PriceUnit, post.Name, Constants.NoValueInt, Constants.NoValueInt, Constants.InProgressStatus, post.Category);
 
-                await _uploadService.CreateUploadAsync(uploadRecord).ConfigureAwait(false);
+                if (!await _uploadService.CheckUploadsExistenceAsync(new List<int>() { id }))
+                {
+                    Directory.CreateDirectory(Constants.PhotoFolder);
+                    post.Image.Save(imagePath);
 
+                    await _uploadService.CreateUploadAsync(uploadRecord).ConfigureAwait(false);
+                }
+                else
+                {
+                    await _uploadService.UpdateUploadAsync(uploadRecord).ConfigureAwait(false);
+                }
+                
                 result = true;
             }
             catch (Exception ex)
@@ -208,7 +215,7 @@ namespace TeamA.Exogredient.Managers
                                                Constants.DraftUploadOperation, post.Username, post.IPAddress, ex.ToString()).ConfigureAwait(false);
 
                 // Recursively retry the operation until the maximum amount of retries is reached.
-                await DraftUploadAsync(post, ++failureCount).ConfigureAwait(false);
+                await DraftUploadAsync(post, id, ++failureCount).ConfigureAwait(false);
             }
 
             // Log the fact that the operation was successful.

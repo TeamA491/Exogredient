@@ -194,6 +194,11 @@ namespace TeamA.Exogredient.Services
             return await _uploadDAO.CheckUploadsOwnerAsync(ids, owner).ConfigureAwait(false);
         }
 
+        public async Task<bool> UpdateUploadAsync(UploadRecord uploadRecord)
+        {
+            return await _uploadDAO.UpdateAsync(uploadRecord).ConfigureAwait(false);
+        }
+
         /// <summary>
         /// Check that an upload exists.
         /// </summary>
