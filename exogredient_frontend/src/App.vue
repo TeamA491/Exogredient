@@ -103,8 +103,6 @@
 
       var ipAddressResponse = await fetch("https://ipapi.co/json");
       var ipAddressJson = await ipAddressResponse.json();
-      console.log(ipAddressJson.ip);
-      console.log(ipAddressJson.region);
       this.$store.dispatch('updateIpAddress',ipAddressJson.ip);
       this.$store.dispatch('updateLocation',ipAddressJson.region);
       this.autocomplete = new google.maps.places.Autocomplete(this.$refs.autocomplete);
