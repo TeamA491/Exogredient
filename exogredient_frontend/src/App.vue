@@ -141,7 +141,7 @@
         this.$store.dispatch('updateUsername', 'Anonymous');
         this.$store.dispatch('updateUserType', 'Anonymous');
         this.$store.dispatch('updateToken', '');
-        this.$router.replace("/");
+        this.goToHomePage();
       },
       goToHomePage: function(){
         if(this.$router.currentRoute.path !== '/'){
