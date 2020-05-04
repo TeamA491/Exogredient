@@ -30,6 +30,12 @@ namespace TeamA.Exogredient.Managers
             _userManagementService = userManagementService;
         }
 
+        /// <summary>
+        /// Verify the upload and store it in the data store.
+        /// </summary>
+        /// <param name="post">The upload post from the front end.</param>
+        /// <param name="failureCount">The exceptions encountered so far.</param>
+        /// <returns></returns>
         public async Task<Result<bool>> CreateUploadAsync(UploadPost post, int failureCount)
         {
             var result = false;
@@ -42,6 +48,7 @@ namespace TeamA.Exogredient.Managers
 
             try
             {
+                // Check if the user making the post exists.
                 if (!await _userManagementService.CheckUserExistenceAsync(post.Username).ConfigureAwait(false))
                 {
                     // Log the fact user was invalid.
@@ -52,6 +59,7 @@ namespace TeamA.Exogredient.Managers
                 }
 
 
+                // Verify the location is within the scope of the application.
                 var latLong = LocationUtilityService.GetImageLatitudeAndLongitude(post.Image);
                 var latitude = latLong.Item1;
                 var longitude = latLong.Item2;
@@ -67,6 +75,7 @@ namespace TeamA.Exogredient.Managers
                     return SystemUtilityService.CreateResult(Constants.ImageNotWithinScopeUserMessage, result, false);
                 }
 
+                // Get the store id of the store the upload is associated with (creates a store if one was found).
                 var storeID = await _storeService.FindStoreAsync(latitude, longitude).ConfigureAwait(false);
 
                 if (storeID == Constants.NoStoreFoundCode)
@@ -78,8 +87,10 @@ namespace TeamA.Exogredient.Managers
                     return SystemUtilityService.CreateResult(Constants.NoStoreFoundUserMessage, result, false);
                 }
 
+                // Construct the image path.
                 var imagePath = Constants.PhotoFolder + "\\" + post.Username + "_" + TimeUtilityService.CurrentUnixTime() + post.FileExtension;
 
+                // Verify the upload.
                 var uploadDTO = new UploadDTO(imagePath, post.Image, post.Category, post.Name, (DateTime)post.PostTime, post.Username, post.Description,
                                               post.Rating, post.Price, post.PriceUnit, post.ImageSize);
 
@@ -97,9 +108,11 @@ namespace TeamA.Exogredient.Managers
                     return SystemUtilityService.CreateResult(verification.Message, result, false);
                 }
 
+                // Store the photo.
                 Directory.CreateDirectory(Constants.PhotoFolder);
                 post.Image.Save(imagePath);
 
+                // Create the upload in the data store.
                 var uploadRecord = new UploadRecord(post.PostTime, post.Username, storeID, post.Description, post.Rating.ToString(), imagePath,
                                                     post.Price, post.PriceUnit, post.Name, Constants.NoValueInt, Constants.NoValueInt, Constants.NotInProgressStatus, post.Category);
 
@@ -119,11 +132,18 @@ namespace TeamA.Exogredient.Managers
 
             // Log the fact that the operation was successful.
             await _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                                            Constants.CreateUploadOperation, post.Username, post.IPAddress).ConfigureAwait(false);
+                                           Constants.CreateUploadOperation, post.Username, post.IPAddress).ConfigureAwait(false);
 
             return SystemUtilityService.CreateResult(Constants.UploadCreationSuccessMessage, result, false);
         }
 
+        /// <summary>
+        /// Updates or creates a draft upload in the data store.
+        /// </summary>
+        /// <param name="post">The post object from the front end.</param>
+        /// <param name="id">The id of the upload draft</param>
+        /// <param name="failureCount">The exceptions encountered so far.</param>
+        /// <returns></returns>
         public async Task<Result<bool>> DraftUploadAsync(UploadPost post, int id, int failureCount)
         {
             var result = false;
@@ -292,6 +312,14 @@ namespace TeamA.Exogredient.Managers
             return SystemUtilityService.CreateResult(Constants.UploadRetrievalSuccessMessage, result, false);
         }
 
+        /// <summary>
+        /// Deletes the information of the upload identified by the <paramref name="id"/>.
+        /// </summary>
+        /// <param name="username">Username of the user deleting the upload</param>
+        /// <param name="id">The id of the upload to delete</param>
+        /// <param name="ipAddress">The ip address of the user deleting the upload</param>
+        /// <param name="failureCount">The exceptions encountered so far.</param>
+        /// <returns></returns>
         public async Task<Result<bool>> DeleteUploadAsync(string username, int id, string ipAddress, int failureCount)
         {
             var result = false;
@@ -304,6 +332,11 @@ namespace TeamA.Exogredient.Managers
 
             try
             {
+                // Delete the photo then the record from the data store.
+                var objectData = await _uploadService.ContinueUploadProgressAsync(id).ConfigureAwait(false);
+
+                File.Delete(objectData.Photo);
+
                 result = await _uploadService.DeleteUploadsAsync(new List<int>() { id }).ConfigureAwait(false);
             }
             catch (Exception ex)

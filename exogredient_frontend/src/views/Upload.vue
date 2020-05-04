@@ -14,6 +14,7 @@
         <textarea v-on:keyup="IngredientNameKeyUp" maxlength="100" class="longInput" placeholder="Enter here..." cols="30" rows="3" id="name" style="max-height:75px; word-wrap: break-word; text-align: left; vertical-align:top; max-width: 600px; display: block; margin-left: auto; margin-right: auto; width: 55vh; height: 25vh; padding: 5px; border:1px solid #000000" required />
         <span id="chars1" style="font-family: Gill Sans; display: block; margin-left: auto; margin-right: auto; width:162px">100 characters remaining</span><br />
 
+        <!-- Price/Price Unit -->
         <div style="text-align: center;">
           <div style="font-family: Gill Sans; font-size: 120%; display: inline-block; margin-left: auto; margin-right: auto; width:30px">$</div>
           <input type="text" id="price" placeholder="price..." style="max-width: 150px; display: inline-block; margin-left: auto; margin-right: auto; width: 20%; padding: 5px;border:1px solid #000000" required />
@@ -27,6 +28,7 @@
           </select><br /><br />
         </div>
 
+        <!-- Rating -->
         <div style="text-align: center;">
           <select id="rating" style="display: inline-block; margin-left: auto; margin-right: auto; width: 40px; padding: 5px;border:1px solid #000000" required>
               <option value="" disabled selected hidden>.....</option>
@@ -53,6 +55,7 @@
           <input @click="SaveDraft" type="submit" value="Save Draft" style="min-width: 100px; max-width: 600px; display: inline-block; margin-left: auto; margin-right: auto; width: 20%; padding: 5px;font-weight: bold; color: black; background-color: #b2b2b2; padding:8px; border:1px solid #000000;" formnovalidate /><br />
         </div>
 
+        <!-- Directions -->
         <div style="text-align: center;">
           <div style="font-family: Gill Sans; display: inline-block; margin-left: auto; margin-right: auto; width: 150px">All Fields Required *</div>
           <div style="display: inline-block; margin-left: auto; margin-right: auto; width: 15%; max-width:80px"></div>
@@ -72,6 +75,7 @@ const exifr = require('exifr');
 
 export default {
   mounted() {
+    // Get inProgressUpload data.
     var name = this.$store.state.inProgressUpload.name;
     var description = this.$store.state.inProgressUpload.description;
     var price = this.$store.state.inProgressUpload.price;
@@ -82,6 +86,7 @@ export default {
 
     console.log(image);
 
+    // Reset the data.
     this.$store.dispatch("updateInProgressUploadName", "");
     this.$store.dispatch("updateInProgressUploadDescription", "");
     this.$store.dispatch("updateInProgressUploadPrice", 0);
@@ -92,6 +97,7 @@ export default {
 
     var changeView;
 
+    // If all the data is default, we are not continuing an upload.
     if (name === "" && description === "" && price === 0 && priceUnit === "" && rating === 0 && image === null && id === -1) {
       changeView = false;
     }
@@ -100,6 +106,7 @@ export default {
     }
 
     if (changeView){
+      // Unhide the form.
       document.getElementById("theRest").style.display = "block";
 
       var descriptionDOM = document.getElementById("description");
@@ -108,6 +115,7 @@ export default {
       var priceUnitDOM = document.getElementById("priceUnit");
       var priceDOM = document.getElementById("price");
 
+      // Populate necessary fields.
       if (description !== "") {
         descriptionDOM.value = description;
         this.description = description;
@@ -159,6 +167,7 @@ export default {
   },
   methods: {
     async AnalyzeImage(event) {
+      // Reset form values to default.
       var descriptionDOM = document.getElementById("description");
       descriptionDOM.value = "";
 
@@ -180,12 +189,15 @@ export default {
       var chars2DOM = document.getElementById("chars2");
       chars2DOM.innerHTML = global.DescriptionMaxChars + " characters remaining";;
 
+      // Display loading image.
       document.getElementById("loading").style.display = "block";
       document.getElementById("loadingTitle").style.display = "block";
       document.getElementById("theRest").style.display = "none";
 
+      // Store file.
       this.file = event.target.files[0];
 
+      // Get file extension.
       var splitArray = this.file.name.split(".")
       var ext = "";
 
@@ -193,6 +205,7 @@ export default {
         ext = splitArray[i];
       }
 
+      // Confirm the extension is valid.
       var validExt = false;
 
       for (var i = 0; i < global.ValidImageExtensions.length; i++) {
@@ -201,6 +214,7 @@ export default {
         }
       }
 
+      // Notify user if the image extension is invalid.
       if (!validExt) {
         var message = "Error: Invalid image extension (valid: ";
 
@@ -218,6 +232,7 @@ export default {
 
         this.MakeToast(message);
 
+        // Clear file input and hide loading image.
         var formFile = document.getElementById("fileInput");
 
         formFile.value = null;
@@ -228,9 +243,11 @@ export default {
         return;
       }
 
+      // Verify image size is valid.
       if (this.file.size < global.MinimumPhotoSize || this.file.size > global.MaximumPhotoSize) {
         this.MakeToast("Error: Your image was not within requirements (" + global.MinimumPhotoSizeString + " to " + global.MaximumPhotoSizeString + ")");
 
+        // Clear file input and hide loading image.
         var formFile = document.getElementById("fileInput");
 
         formFile.value = null;
@@ -241,6 +258,7 @@ export default {
         return;
       }
 
+      // Verify if the image has the necessary metadata.
       try {
         let output = await exifr.parse(this.file);
       }
@@ -257,6 +275,7 @@ export default {
         return;
       }
 
+      // Send request with image info to the back end.
       this.fileExtension = "." + ext;
       this.imageSize = this.file.size;
 
@@ -277,9 +296,11 @@ export default {
       .then((data)=> {
         console.log(data);
 
+        // Hide loading items.
         document.getElementById("loading").style.display = "none";
         document.getElementById("loadingTitle").style.display = "none";
 
+        // If exception occurred, notify the user.
         if (data[global.ExceptionOccurredResponseKey]) {
           this.MakeToast(data[global.MessageResponseKey]);
           var formFile = document.getElementById("fileInput");
@@ -292,20 +313,23 @@ export default {
           var ratingDOM = document.getElementById("rating");
           var priceUnitDOM = document.getElementById("priceUnit");
           var priceDOM = document.getElementById("price");
+
+          // Reset item borders.
           descriptionDOM.style.border = "1px solid #000000";
           nameDOM.style.border = "1px solid #000000";
           ratingDOM.style.border = "1px solid #000000";
           priceUnitDOM.style.border = "1px solid #000000";
           priceDOM.style.border = "1px solid #000000";
 
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("loadingTitle").style.display = "none";
+          // Unhide the form.
           document.getElementById("theRest").style.display = "block";
 
+          // Populate data with response data.
           this.category = data[global.CategoryResponseKey];
           this.name = data[global.NameResponseKey];
           this.suggestions = data[global.SuggestionsResponseKey];
 
+          // Populate the ingredient name if one was generated.
           if (this.name === "") {
             this.MakeToast("Couldn't generate ingredient name, please enter it.")
           }
@@ -316,6 +340,7 @@ export default {
       })
     },   
     SubmitUpload: function() {
+      // Get the information currently filled out.
       var descriptionDOM = document.getElementById("description");
       var description = descriptionDOM.value;
 
@@ -331,6 +356,7 @@ export default {
       var priceDOM = document.getElementById("price");
       var price = priceDOM.value;
 
+      // Reset item borders.
       descriptionDOM.style.border = "1px solid #000000";
       nameDOM.style.border = "1px solid #000000";
       ratingDOM.style.border = "1px solid #000000";
@@ -339,26 +365,31 @@ export default {
 
       var validForm = true;
 
+      // Verify description length, make border red if invalid.
       if (description.length < global.DescriptionMinChars || description.length > global.DescriptionMaxChars) {
         validForm = false;
         descriptionDOM.style.border = "1px solid red";
       }
 
+      // Verify ingredient name length, make border red if invalid.
       if (name.length < global.IngredientNameMinChars || name.length > global.IngredientNameMaxChars) {
         validForm = false;
         nameDOM.style.border = "1px solid red";
       }
 
+      // Verify rating, make border red if invalid.
       if (rating < global.MinimumRating || rating > global.MaximumRating) {
         validForm = false;
         ratingDOM.style.border = "1px solid red";
       }
 
+      // Verify price is not empty, make border red if invalid.
       if (price === "") {
         validForm = false;
         priceDOM.style.border = "1px solid red";
       }
 
+      // Verify price is a number, make border red if invalid.
       if (isNaN(price)) {
         validForm = false;
         priceDOM.style.border = "1px solid red";
@@ -366,15 +397,19 @@ export default {
         
       }
       else {
+        // Verify price value, make border red if invalid.
         var priceValue = parseFloat(price);
 
         if (price < global.MinimumPrice || price > global.MaximumPrice) {
           validForm = false;
           priceDOM.style.border = "1px solid red";
+
+          // Notify the user of the reason for this mistake.
           this.MakeToast("Price value invalid (must be between " + global.MinimumPrice + " and " + global.MaximumPrice + ")");
         }
       }
 
+      // Verify price unit, make border red if invalid.
       var validPriceUnit = false;
       for (var i = 0; i < global.ValidPriceUnits.length; i++) {
         if (global.ValidPriceUnits[i] === priceUnit) {
@@ -391,12 +426,14 @@ export default {
         return;
       }
       else {
+        // Valid form: store data.
         this.name = name;
         this.description = description;
         this.rating = parseInt(rating);
         this.priceUnit = priceUnit;
         this.price = parseFloat(price);
         
+        // Create form data to send to backend.
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, this.$store.state.userData.username);
@@ -426,12 +463,14 @@ export default {
             this.MakeToast(data[global.MessageResponseKey]);
           }
           else {
+            // Go to profile view.
             this.$router.push("/profile");
           }
         })
       }
     },
     SaveDraft: function() {
+      // Get the information currently filled out.
       var descriptionDOM = document.getElementById("description");
       var description = descriptionDOM.value;
 
@@ -449,25 +488,28 @@ export default {
 
       var validForm = true;
 
+      // Verify description length if not empty.
       if (description !== "") {
         if (description.length < global.DescriptionMinChars || description.length > global.DescriptionMaxChars) {
           validForm = false;
         }
-
       }
       
+      // Verify ingredient name length if not empty.
       if (name !== "") {
         if (name.length < global.IngredientNameMinChars || name.length > global.IngredientNameMaxChars) {
           validForm = false;
         }
       }
       
+      // Verify rating if not empty.
       if (rating !== "") {
         if (rating < global.MinimumRating || rating > global.MaximumRating) {
           validForm = false;
         }
       }
 
+      // Verify price is a number and value is valid if not empty/.
       if (price !== "") {
         if (isNaN(price)) {
           validForm = false;
@@ -484,6 +526,7 @@ export default {
         }
       }
 
+      // Verify price unit if not empty.
       var validPriceUnit = false;
       if (priceUnit !== "") {
         for (var i = 0; i < global.ValidPriceUnits.length; i++) {
@@ -501,6 +544,7 @@ export default {
         return;
       }
       else {
+        // Valid form: store data.
         this.name = name;
         this.description = description;
         this.rating = parseInt(rating);
@@ -509,6 +553,7 @@ export default {
 
         console.log(this.file);
 
+        // Create form data to send to backend.
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, this.$store.state.userData.username);
@@ -539,7 +584,7 @@ export default {
             this.MakeToast(data[global.MessageResponseKey]);
           }
           else {
-            //this.$router.push("/profile");
+            this.$router.push("/profile");
           }
         })
       }
@@ -571,19 +616,18 @@ export default {
 <style scoped>
 #snackbar {
   display: block;
-  visibility: hidden; /* Hidden by default. Visible on click */
-  margin-left: auto; /* Divide value of min-width by 2 */
+  visibility: hidden;
+  margin-left: auto;
   margin-right: auto;
   width: 450px;
-  background-color: #333; /* Black background color */
-  color: #fff; /* White text color */
-  text-align: center; /* Centered text */
-  border-radius: 2px; /* Rounded borders */
-  padding: 16px; /* Padding */
-  z-index: 1; /* Add a z-index if needed */
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  z-index: 1;
 }
 
-/* Show the snackbar when clicking on a button (class added with JavaScript) */
 #snackbar.show {
   visibility: visible; /* Show the snackbar */
   /* Add animation: Take 0.5 seconds to fade in and out the snackbar.

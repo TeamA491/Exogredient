@@ -17,21 +17,52 @@ namespace TeamA.Exogredient.Services
             _uploadDAO = uploadDAO;
         }
 
+        /// <summary>
+        /// Stores the <paramref name="uploadRecord"/> in the data store.
+        /// </summary>
+        /// <param name="uploadRecord">The record to store.</param>
+        /// <returns></returns>
         public async Task<bool> CreateUploadAsync(UploadRecord uploadRecord)
         {
             return await _uploadDAO.CreateAsync(uploadRecord).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Returns information of the upload identified by the <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The id of the upload to get the information of</param>
+        /// <returns></returns>
         public async Task<UploadObject> ContinueUploadProgressAsync(int id)
         {
             return (UploadObject)await _uploadDAO.ReadByIdAsync(id).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Verifies an <paramref name="dto"/>'s information corresponds with various restrictions
+        /// </summary>
+        /// <param name="dto">The DTO conatining the upload information</param>
+        /// <param name="maxPhotoChars">Maximum characters for a photo path</param>
+        /// <param name="minPhotoChars">Minimum characters for a photo path</param>
+        /// <param name="minimumImageSizeMB">Minimum photo size in MB</param>
+        /// <param name="maximumImageSizeMB">Maximum photo size in MB</param>
+        /// <param name="validExtensions">List of valid image extensions</param>
+        /// <param name="ingredientNameMaxChars">Maximum characters for ingredient name</param>
+        /// <param name="ingredientNameMinChars">Minimum characters for ingredient name</param>
+        /// <param name="maxIngredientPrice">Maximum value for ingredient price</param>
+        /// <param name="descriptionMaxChars">Maximum characters for description</param>
+        /// <param name="descriptionMinChars">Minimum characters for description</param>
+        /// <param name="validCategories">List of valid categories</param>
+        /// <param name="validPriceUnits">List of valid price units</param>
+        /// <param name="validTimeBufferMinutes">Allowable time passage from now to post time date</param>
+        /// <param name="maxRating">Maximum rating allowed</param>
+        /// <param name="minRating">Minimum rating allowed</param>
+        /// <returns></returns>
         public VerifyUploadResult VerifyUpload(UploadDTO dto, int maxPhotoChars, int minPhotoChars, double minimumImageSizeMB, double maximumImageSizeMB, List<string> validExtensions,
                                                int ingredientNameMaxChars, int ingredientNameMinChars, double maxIngredientPrice, int descriptionMaxChars,
                                                int descriptionMinChars, List<string> validCategories, List<string> validPriceUnits, int validTimeBufferMinutes,
                                                int maxRating, int minRating)
         {
+            // Validate length of image path.
             var validPhotoPath = StringUtilityService.CheckLength(dto.ImagePath, maxPhotoChars, minPhotoChars);
 
             if (!validPhotoPath)
@@ -39,6 +70,7 @@ namespace TeamA.Exogredient.Services
                 return new VerifyUploadResult(Constants.ImagePathInvalidMessage, false);
             }
 
+            // Validate image size in MBs.
             var sizeMB = dto.ImageSize * Constants.ToMBConversionFactor;
             var validSize = sizeMB >= minimumImageSizeMB && sizeMB <= maximumImageSizeMB;
 
@@ -47,6 +79,7 @@ namespace TeamA.Exogredient.Services
                 return new VerifyUploadResult(Constants.ImageNotWithinSizeMessage, false);
             }
 
+            // Validate image extension.
             var fileExtension = "." + dto.ImagePath.Split('.').Last();
             var validExt = false;
 
@@ -60,6 +93,7 @@ namespace TeamA.Exogredient.Services
                 return new VerifyUploadResult(Constants.ExtensionNotValidMessage, false);
             }
 
+            // Validate category.
             var validCat = false;
 
             foreach (var cat in validCategories)
@@ -72,6 +106,7 @@ namespace TeamA.Exogredient.Services
                 return new VerifyUploadResult(Constants.CategoryNotValidMessage, false);
             }
 
+            // Validate name length, if it has a value.
             if (!dto.Name.Equals(Constants.NoValueString))
             {
                 var validNameLength = StringUtilityService.CheckLength(dto.Name, ingredientNameMaxChars, ingredientNameMinChars);
@@ -82,6 +117,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
+            // Validate price value, if it has a value.
             if (!dto.Price.Equals(Constants.NoValueDouble))
             {
                 var validPrice = dto.Price > Constants.NoValueDouble && dto.Price <= maxIngredientPrice;
@@ -92,6 +128,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
+            // Validate description length, if it has a value.
             if (!dto.Description.Equals(Constants.NoValueString))
             {
                 var validDescriptionLength = StringUtilityService.CheckLength(dto.Description, descriptionMaxChars, descriptionMinChars);
@@ -101,7 +138,8 @@ namespace TeamA.Exogredient.Services
                     return new VerifyUploadResult(Constants.DescriptionLengthInvalidMessage, false);
                 }
             }
-            
+
+            // Validate price unit, if it has a value.
             if (!dto.PriceUnit.Equals(Constants.NoValueString))
             {
                 var validUnit = false;
@@ -116,7 +154,8 @@ namespace TeamA.Exogredient.Services
                     return new VerifyUploadResult(Constants.PriceUnitNotValidMessage, false);
                 }
             }
-            
+
+            // Validate timestamp, if it has a value.
             if (!dto.Time.Equals(Constants.NoValueDatetime))
             {
                 var validTime = (DateTime.Now - dto.Time).TotalMinutes <= validTimeBufferMinutes;
@@ -126,7 +165,8 @@ namespace TeamA.Exogredient.Services
                     return new VerifyUploadResult(Constants.TimeNotValidMessage, false);
                 }
             }
-            
+
+            // Validate rating, if it has a value.
             if (!dto.Rating.Equals(Constants.NoValueInt))
             {
                 var validRating = dto.Rating >= minRating && dto.Rating <= maxRating;
@@ -137,6 +177,7 @@ namespace TeamA.Exogredient.Services
                 }
             }
 
+            // Success.
             return new VerifyUploadResult(Constants.NoValueString, true);
         }
 
