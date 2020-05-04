@@ -25,7 +25,7 @@
         <div class="navbar-start">
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="upload">Upload</router-link>
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="profile">Profile</router-link>
-          <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Admin'" to="useranalysis">Analysis</router-link>
+          <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" to="useranalysis">Analysis</router-link>
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" to="login">Login</router-link>
           <a class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" @click="goToRegistration">Register</a>
         </div>

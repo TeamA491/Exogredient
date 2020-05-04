@@ -682,7 +682,6 @@ namespace TeamA.Exogredient.DAL
                         await reader.ReadAsync().ConfigureAwait(false);
                         user = reader.GetString(0);
                     }
-                    
                     votedUserDict.Add(uploadID, user);
                 }
                 return votedUserDict;

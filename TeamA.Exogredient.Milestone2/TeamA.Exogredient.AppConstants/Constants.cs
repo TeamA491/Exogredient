@@ -780,12 +780,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string SnapshotTopCityDict = "top_cities_that_uses_application";
         public const string SnapshotTopUserUploadedDict = "top_users_that_upload";
         public const string SnapshotTopUploadedIngredientDict = "top_most_uploaded_ingredients";
-        public const string SnapshotTopUploadedstoreDict = "top_most_uploaded_stores";
+        public const string SnapshotTopUploadedStoreDict = "top_most_uploaded_stores";
         public const string SnapshotTopSearchedIngredientDict = "top_most_searched_ingredients";
         public const string SnapshotTopSearchedStoreDict = "top_most_searched_stores";
         public const string SnapshotTopUpvotedUserDict = "top_most_upvoted_users";
         public const string SnapshotTopDownvotedUserDict = "top_most_downvoted_users";
-
 
 
         // RECORD HELPER DATA STRUCTURES

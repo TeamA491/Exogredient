@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DAL;
-using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.Managers;
 using TeamA.Exogredient.Services;
 
@@ -16,11 +13,11 @@ namespace UserAnalysisController.Controllers
     public class FetchSnapshotController : Controller
     {
         /// <summary>
-        /// Controller method to get snapshot specific to the year and month value and format it to send up.
+        /// Method to get snapshot specific to the year and month value and format it to send up.
         /// </summary>
         /// <param name="year">The year to get the snapshot.</param>
         /// <param name="month">The month to get the snapshot.</param>
-        /// <returns>The status.</returns>
+        /// <returns>The snapshot object.</returns>
         [HttpGet("FetchSingle/{year}/{month}")]
         public async Task<IActionResult> GetSingleSnapshotAsync(int year, int month)
         {
@@ -47,10 +44,11 @@ namespace UserAnalysisController.Controllers
         }
 
         /// <summary>
-        /// Controller method to get multiple snapshot specfici to the year and format it to send up.
+        /// Method to get multiple snapshot specific to the year.
+        /// It will also format the data in the multiple snapshot and store it as one snapshot object.
         /// </summary>
         /// <param name="year">The year to get all the snapshots.</param>
-        /// <returns>The status.</returns>
+        /// <returns>The snapshot object with the filtered data.</returns>
         [HttpGet("FetchMulti/{year}")]
         public async Task<IActionResult> GetMultiSnapshotAsync(int year)
         {

@@ -31,6 +31,7 @@ namespace ExogredientController.Controllers
         private static readonly LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
         private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
         private static readonly SaveListDAO _saveListDAO = new SaveListDAO(Constants.SQLConnection);
+        private static readonly SnapshotDAO _snapshotDAO = new SnapshotDAO(Constants.NOSQLConnection);
 
         // SERVICE
         private static readonly SearchService _searchService = new SearchService(_storeDAO, _uploadDAO);
@@ -46,6 +47,7 @@ namespace ExogredientController.Controllers
         private static readonly StoreService _storeService = new StoreService(_storeDAO);
         private static readonly UploadService _uploadService = new UploadService(_uploadDAO);
         private static readonly SaveListService _saveListService = new SaveListService(_saveListDAO);
+        private static readonly SnapshotService _snapshotService = new SnapshotService(_logDAO, _userDAO, _uploadDAO, _snapshotDAO);
 
         // MANAGER
         private static readonly LoggingManager _loggingManager = new LoggingManager(_ffLoggingService, _dsLoggingService);
@@ -59,6 +61,7 @@ namespace ExogredientController.Controllers
         private static readonly LogInManager _loginManager = new LogInManager(_userManagementService, _loggingManager, _authenticationService, _sessionService);
         private static readonly UploadManager _uploadManager = new UploadManager(_loggingManager, _googleImageAnalysisService, _storeService, _uploadService, _userManagementService);
         private static readonly UserProfileManager _userProfileManager = new UserProfileManager(_uploadService, _storeService, _saveListService, _loggingManager, _userManagementService);
+        private static readonly ReadSnapshotManager _readSnapshotManager = new ReadSnapshotManager(_loggingManager, _snapshotService);
 
         // SEARCH
         [EnableCors]
@@ -699,5 +702,64 @@ namespace ExogredientController.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        ///////////////////////////////////////////////////////////STARTING USER ANALYSIS////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Method to get snapshot specific to the year and month value and format it to send up.
+        /// </summary>
+        /// <param name="year">The year to get the snapshot.</param>
+        /// <param name="month">The month to get the snapshot.</param>
+        /// <returns>The snapshot object.</returns>
+        [HttpGet("FetchSingle/{year}/{month}")]
+        public async Task<IActionResult> GetSingleSnapshotAsync(int year, int month)
+        {
+            try
+            {
+                return Ok(await _readSnapshotManager.ReadOneSnapshotAsync(year, month).ConfigureAwait(false));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Method to get multiple snapshot specific to the year.
+        /// It will also format the data in the multiple snapshot and store it as one snapshot object.
+        /// </summary>
+        /// <param name="year">The year to get all the snapshots.</param>
+        /// <returns>The snapshot object with the filtered data.</returns>
+        [HttpGet("FetchMulti/{year}")]
+        public async Task<IActionResult> GetMultiSnapshotAsync(int year)
+        {
+            try
+            {
+                return Ok(await _readSnapshotManager.ReadMultiSnapshotAsync(year).ConfigureAwait(false));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Method to get year and month from snapshots in databse.
+        /// </summary>
+        /// <returns>A json formatted string.</returns>
+        [HttpGet("FetchYearMonth")]
+        public async Task<IActionResult> GetYearMonth()
+        {
+
+            try
+            {
+                return Ok(await _readSnapshotManager.GetYearMonthAsync().ConfigureAwait(false));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
     }
 }

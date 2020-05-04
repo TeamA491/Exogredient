@@ -34,25 +34,25 @@ namespace TeamA.Exogredient.Managers
                 var amountOfDays = _snapshotService.GetDaysInMonth(year, month);
 
                 // Get all the logs pertaining to the specific month.
-                var logResults = await _snapshotService.GetLogsInMonth(year, month, amountOfDays).ConfigureAwait(false);
+                var logResults = await _snapshotService.GetLogsInMonthAsync(year, month, amountOfDays).ConfigureAwait(false);
 
                 var snapshot = new List<string>();
 
                 // Calling the snapshot service methods to format the data in logresults to dictionaries.
                 var operationsDict = _snapshotService.GetOperationDict(logResults, amountOfDays);
-                var usersDict = await _snapshotService.GetUsersDict().ConfigureAwait(false);
+                var usersDict = await _snapshotService.GetUsersDictAsync().ConfigureAwait(false);
                 var cityDict = await _snapshotService.GetCityDictAsync(logResults).ConfigureAwait(false);
                 var userUploadedDict = _snapshotService.GetUserUploadedDict(logResults);
                 var uploadedIngredientDict = _snapshotService.GetUploadedIngredientDict(logResults);
                 var uploadedStoreDict = _snapshotService.GetUploadedStoreDict(logResults);
                 var searchedIngredientDict = _snapshotService.GetSearchedIngredientDict(logResults);
                 var searchedStoreDict = _snapshotService.GetSearchedStoreDict(logResults);
-                var upvotedUserDict = await _snapshotService.GetUpvotedUserDict(logResults).ConfigureAwait(false);
-                var downvotedUserDict = await _snapshotService.GetDownvotedUserDict(logResults).ConfigureAwait(false);
+                var upvotedUserDict = await _snapshotService.GetUpvotedUserDictAsync(logResults).ConfigureAwait(false);
+                var downvotedUserDict = await _snapshotService.GetDownvotedUserDictAsync(logResults).ConfigureAwait(false);
 
                 // Finalizing the data and then adding it to the snapshot List.
                 snapshot.Add(_snapshotService.FormatOperationsDict(operationsDict));
-                snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(usersDict));
+                snapshot.Add(_snapshotService.FormatStringIntDict(usersDict));
                 snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(cityDict));
                 snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(userUploadedDict));
                 snapshot.Add(_snapshotService.FinalizeStringIntDictForSnap(uploadedIngredientDict));

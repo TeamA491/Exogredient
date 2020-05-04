@@ -162,7 +162,7 @@ namespace TeamA.Exogredient.Managers
                     lastPageResultsNum, skipPages, sortOption, fromSmallest).ConfigureAwait(false);
 
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    $"By {searchBy}: {searchTerm}", username, ipAddress).ConfigureAwait(false);
+                    $"{Constants.SearchOperation}/{searchBy}/{searchTerm}", username, ipAddress).ConfigureAwait(false);
 
                 return stores;
 
@@ -170,7 +170,7 @@ namespace TeamA.Exogredient.Managers
             catch (Exception e)
             {
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    $"By {searchBy}: {searchTerm}", username, ipAddress, e.Message).ConfigureAwait(false);
+                    $"{Constants.SearchOperation}/{searchBy}/{searchTerm}", username, ipAddress, e.Message).ConfigureAwait(false);
 
                 failureCount += 1;
 
