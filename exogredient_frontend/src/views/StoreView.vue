@@ -89,10 +89,7 @@ export default {
     methods:{
                                                                                                                                                                                                                                                                                                                                                                                                                          
         displayIngredientView: async function(ingredientName, storeId){
-            //TODO: Implement what to do when user clicks the ingredient.
-            // this.$router.push("Upload")
-            // https://localhost:44397/api/IngredientView/GetIngredients?ingredientName=beef&storeId=1
-
+            
           let ingredientsListData = await fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${ingredientName}&storeId=${storeId}`);
 
           let ingredientsList = await ingredientsListData.json();

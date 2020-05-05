@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-export const ApiDomainName = "https://localhost:44380";
+export const ApiDomainName = "https://localhost:44373";
 export const HomePage = 'home';
 
 // UPLOAD

@@ -98,6 +98,7 @@ export default {
                 + `&origin=${encodedOriginAddress}&destination=${this.storeViewData.storeName}`
                 + `&destination_place_id=${this.storeViewData.placeId}&travelmode=driving`, "_blank");
         },
+        //Increments the upvote value for an upload
         upvote: function(uploadId) {
             fetch(`${global.ApiDomainName}/api/IngredientView/Upvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
@@ -115,6 +116,7 @@ export default {
             });
             this.undoUpvoteStatus = true;
        },
+       //Increments the downvote value for an upload
         downvote: function(uploadId) {
              fetch(`${global.ApiDomainName}/api/IngredientView/Downvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
@@ -132,6 +134,7 @@ export default {
             });
             this.undoDownvoteStatus = true;
         },
+        //Adds a -1 to the upload value of an upload to undo an previous upvote. 
         undoUpvote: function(uploadId) {
             fetch(`${global.ApiDomainName}/api/IngredientView/UndoUpvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
@@ -149,6 +152,7 @@ export default {
             });
             this.undoUpvoteStatus = false;
        },
+       // Adds -1 to the downvote value of an upload to undo a previous downvote. 
        undoDownvote: function(uploadId) {
              fetch(`${global.ApiDomainName}/api/IngredientView/UndoDownvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
@@ -173,6 +177,7 @@ export default {
             }
             this.sortType = newSortType;
         },
+        //Fetch the uploads for needs to display on this view
         getIngredientViewUploads: function(page) {
             fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${page}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
@@ -184,7 +189,7 @@ export default {
                     this.ingredients.push(i);
                 });
             });
-
+            // Fetch the pagination size for this view.  
              fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredientViewPaginationSize?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
                // global.ErrorHandler(this.$router,response);

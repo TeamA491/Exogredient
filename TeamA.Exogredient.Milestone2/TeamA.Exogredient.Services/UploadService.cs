@@ -169,7 +169,7 @@ namespace TeamA.Exogredient.Services
         /// <returns> A bool for the successful completion of the operation.</returns>
         public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
         {
-            return await _uploadDao.IncrementUpvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
+            return await _uploadDAO.IncrementUpvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
         }
         /// <summary>
         /// Edit the downvote value for an upload. 
@@ -179,7 +179,7 @@ namespace TeamA.Exogredient.Services
         /// <returns> A bool for the successful completion of the operation.</returns>
         public async Task<bool> IncrementDownvotesonUpload(int voteValue, int uploadId)
         {
-            return await _uploadDao.IncrementDownvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
+            return await _uploadDAO.IncrementDownvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
         }
         /// <summary>
         /// Return all uploads based on ingredientname and storeId.
@@ -190,7 +190,7 @@ namespace TeamA.Exogredient.Services
         /// <returns> A list of uploads associated with the ingredientName and storeId.</returns>
         public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
         {
-            return await _uploadDao.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
+            return await _uploadDAO.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
         }
         /// <summary>
         /// Get the pagination size for ingredient view. 
@@ -200,12 +200,7 @@ namespace TeamA.Exogredient.Services
         /// <returns> An integer holding the number of a certain ingredient at a specific store. </returns>
         public async Task<int> GetIngredientViewPaginationSize(string ingredientName, int storeId)
         {
-            return await _uploadDao.ReadIngredientViewPaginationSize(ingredientName, storeId).ConfigureAwait(false);
-        }
-
-        public async Task<List<UploadResult>> GetIngredientsfromStore(int storeId, int pagination)
-        {
-            return await _uploadDao.GetIngredientsfromStore(storeId, pagination);
+            return await _uploadDAO.ReadIngredientViewPaginationSize(ingredientName, storeId).ConfigureAwait(false);
         }
 
         /// <summary>
