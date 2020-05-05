@@ -1,19 +1,29 @@
 <template>
     <div>
-        <h1>HELLO WORLD</h1>
-        ingredient view
-        <v-btn @click="view">see ingreditnes</v-btn>
+        <v-btn @click="checkSortType('upvote'); sortedIngredients()">Sort By Upvotes</v-btn>
+        <v-btn @click="checkSortType('postTimeDate'); sortedIngredients()">Sort By Date</v-btn>
+        <div>
+            <v-pagination
+             v-model="ingredientsPage"
+             :dark = "true"
+             :length="ingredientsPageLength"
+             ></v-pagination>
+        </div>
        <div v-for="ingredient in ingredients" :key=ingredient.ingredientName>
-                <p>{{ingredient.ingredientName}} from {{storeViewData.storeName}}</p>
+                <h3><a @click="openMap">{{ingredient.ingredientName}} from {{storeViewData.storeName}}</a></h3>
                 <p>Posted On: {{ingredient.postTimeDate}}</p>    
-                <v-btn @click="undoUpvoteStatus ? undoUpvote(ingredient.uploadId) : upvote(ingredient.uploadId)">Upvotes: {{ingredient.upvote}}</v-btn>
-                <v-btn @click="undoDownvoteStatus ? undoDownvote(ingredient.uploadId) : downvote(ingredient.uploadId)">Downvotes: {{ingredient.downvote}}</v-btn>                              
-                <img :src="ingredient.photo" />
+                
+                <v-btn @click="undoUpvoteStatus ? undoUpvote(ingredient.uploadId) : upvote(ingredient.uploadId);
+                 undoDownvoteStatus ? undoDownvote(ingredient.uploadId) : null">Upvotes: {{ingredient.upvote}}</v-btn>
+                
+                <v-btn @click="undoDownvoteStatus ? undoDownvote(ingredient.uploadId) : downvote(ingredient.uploadId);
+                 undoUpvoteStatus ? undoUpvote(ingredient.uploadId) : null">Downvotes: {{ingredient.downvote}}</v-btn>
+               <img :src="ingredient.photo" height="550px" width="550px" />                              
                 <p>Price: {{ingredient.price}}</p>
                 <p>Rating:{{ingredient.rating}}</p>
                 <p>Uploaded by: {{ingredient.uploader}}</p>
-                <p>Description: {{ingredient.Description}}</p>
-       </div>
+                <p>Description: {{ingredient.description}}</p>
+       </div> 
     </div>
 
 </template>
@@ -29,31 +39,64 @@ export default {
 
             ingredients:[],
             ingredientsPageLength: 1,
-            ingredientsStatus: false,
             ingredientsPage: 1,
+            initialPage: 0,
+
+            sortType: 'postDateTime',
+            sortDirection: 'asc'
 
         }
     },
     computed:{
+        //Get information of store from previous view. 
         storeViewData: function () {
             return this.$store.state.storeViewData;
+        },
+        sortedIngredients: function() {
+            return this.ingredients.sort((a,b) => {
+            let modifier = 1;
+            if(this.sortDirection ==='desc'){
+                modifier = -1;
+            }
+            if(a[this.sortType] < b[this.sortType]){
+                return -1 * modifier;
+            }
+             if(a[this.sortType] > b[this.sortType]){
+                return modifier;
+            }
+            return 0;})
         }
     },
-    methods: {
-        view: function(){
-            fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=beef&storeId=1`)
-            .then((response) =>
-            {
-                
-                // error if(!respone.statuscode.ok) thrwo er
+    created () {
+        // Fetch the list of uploads to load at the start of the page
+         fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${this.initialPage}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
+            .then((response) => {
+                //global.ErrorHandler(this.$router,response);
                 return response.json();
             })
-            .then((data)=> {
-                for(let index in data){
-                    this.ingredients.push(data[index])
-                }
-
+            .then((data) => {
+                data.forEach((i) => {
+                    this.ingredients.push(i);
+                });
+            });
+            //Fetch the pagination size of this view. 
+             fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredientViewPaginationSize?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
+            .then((response) => {
+              //  global.ErrorHandler(this.$router,response);
+                return response.json();
             })
+            .then((data) => {
+                this.ingredientsPageLength = data;
+            });
+    },
+    
+    methods: {
+        openMap: function(){
+            // Opens Google Maps direction to the store from the center of search.
+            var encodedOriginAddress = encodeURIComponent(this.$store.state.searchData.address);
+            window.open(`https://www.google.com/maps/dir/?api=1`
+                + `&origin=${encodedOriginAddress}&destination=${this.storeViewData.storeName}`
+                + `&destination_place_id=${this.storeViewData.placeId}&travelmode=driving`, "_blank");
         },
         upvote: function(uploadId) {
             fetch(`${global.ApiDomainName}/api/IngredientView/Upvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
@@ -63,7 +106,12 @@ export default {
             })
             .then((response) =>
             {
-                
+                return response.json()
+            })
+            .then((data) => {
+                if(data === false){
+                    this.$router.push('/ErrorView');
+                }
             });
             this.undoUpvoteStatus = true;
        },
@@ -75,7 +123,12 @@ export default {
             })
             .then((response) =>
             {
-                
+                return response.json()
+            })
+            .then((data) => {
+                if(data === false){
+                    this.$router.push('/ErrorView');
+                }
             });
             this.undoDownvoteStatus = true;
         },
@@ -87,7 +140,12 @@ export default {
             })
             .then((response) =>
             {
-                
+                return response.json()
+            })
+            .then((data) => {
+                if(data === false){
+                    this.$router.push('/ErrorView');
+                }
             });
             this.undoUpvoteStatus = false;
        },
@@ -99,45 +157,59 @@ export default {
             })
             .then((response) =>
             {
-                
+                 return response.json()
+            })
+            .then((data) => {
+                if(data === false){
+                    this.$router.push('/ErrorView');
+                }
             });
             this.undoDownvoteStatus = false;
         },
-        ingredientsViewPage: function(newPage) {
-            // Call IngredientsView for new pagination
-            fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${newPage - 1}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
-            .then((response) =>{
-                global.ErrorHandler(this.$router, response);
-                return  response.json();
+        checkSortType: function(newSortType) {
+            if(newSortType === this.sortType) {
+                this.sortDirection =
+                this.sortDirection === 'asc' ? 'desc' : 'asc';
+            }
+            this.sortType = newSortType;
+        },
+        getIngredientViewUploads: function(page) {
+            fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${page}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
+            .then((response) => {
+               // global.ErrorHandler(this.$router,response);
+                return response.json();
             })
             .then((data) => {
-                data.forEach((i) =>{
+                data.forEach((i) => {
                     this.ingredients.push(i);
                 });
             });
-            // Get pagination size.
-            fetch(`${global.ApiDomainName}/api/IngredientView/GetTotalIngredientsNumber?storeId=${this.$store.state.storeId}&ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
+
+             fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredientViewPaginationSize?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
-                global.ErrorHandler(this.$router,response);
-                return response.json()
+               // global.ErrorHandler(this.$router,response);
+                return response.json();
             })
             .then((data) => {
                 this.ingredientsPageLength = data;
             });
-        },
-    created () {
-        fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}`)
-        .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
-            for(let index in data)
-            {
-                this.ingredients.push(data[index])
-            }
-
-        })
-    }
+        }  
+    },
+     
+    watch : {
+        ingredientsPage(newValue,oldValue) {
+            this.ingredients = [];
+            fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${newValue - 1}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
+            .then((response) => {
+              //  global.ErrorHandler(this.$router, response);
+                return response.json();
+            })
+            .then((data) => {
+                data.forEach((i) => {
+                    this.ingredients.push(i);
+                });
+            });
+        }
     }
 }
 </script>

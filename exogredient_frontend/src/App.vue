@@ -5,7 +5,6 @@
         <v-btn to="upload">Upload</v-btn>
         <v-btn to="profile">Profile</v-btn>
         <v-btn @click="goToRegistration">Register</v-btn>
-        <v-btn to="ingredientView">ingredient view</v-btn>
       </nav>
       <h1><a @click="goToHomePage">exogredient</a></h1>
       <div>

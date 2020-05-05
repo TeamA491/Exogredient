@@ -100,9 +100,8 @@ export default {
           let storeViewData = this.$store.state.storeViewData;
 
           this.$store.dispatch('updateIngredientsList', ingredientsList);
-
           this.$store.dispatch('updateStoreViewData', storeViewData);  
-            this.$router.push("/ingredientView");
+          this.$router.push("/ingredientView");
         },
 
         openMap: function(){

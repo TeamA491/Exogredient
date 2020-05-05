@@ -9,6 +9,7 @@ using TeamA.Exogredient.Services;
 using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
+using Microsoft.AspNetCore.Http;
 
 namespace IngredientViewController.Controllers
 {
@@ -25,16 +26,19 @@ namespace IngredientViewController.Controllers
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
             var mapDao = new MapDAO(Constants.MapSQLConnection);
             var logDao = new LogDAO(Constants.SQLConnection);
+            var userDao = new UserDAO(Constants.SQLConnection);
+            var ipAddressDao = new IPAddressDAO(Constants.SQLConnection);
 
             // New up Service
             var uploadService = new UploadService(uploadDAO);
             var maskingService = new MaskingService(mapDao);
             var ffLoggingService = new FlatFileLoggingService(maskingService);
             var dsLoggingService = new DataStoreLoggingService(logDao, maskingService);
+            var userManagementService = new UserManagementService(userDao, ipAddressDao, dsLoggingService, ffLoggingService, maskingService);
 
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
-            var ingredientManager = new IngredientManager( uploadService, loggingManager);
+            var ingredientManager = new IngredientManager( uploadService, loggingManager, userManagementService);
 
             return Ok(await ingredientManager.GetUploadsByIngredientNameandStoreId(ingredientName, storeID, pagination, Constants.InitialFailureCount, username, ipAddress).ConfigureAwait(false));
         }
@@ -67,16 +71,19 @@ namespace IngredientViewController.Controllers
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
             var mapDao = new MapDAO(Constants.MapSQLConnection);
             var logDao = new LogDAO(Constants.SQLConnection);
+            var userDao = new UserDAO(Constants.SQLConnection);
+            var ipAddressDao = new IPAddressDAO(Constants.SQLConnection);
 
             // New up Service
             var uploadService = new UploadService(uploadDAO);
             var maskingService = new MaskingService(mapDao);
             var ffLoggingService = new FlatFileLoggingService(maskingService);
             var dsLoggingService = new DataStoreLoggingService(logDao, maskingService);
+            var userManagementService = new UserManagementService(userDao, ipAddressDao, dsLoggingService, ffLoggingService, maskingService);
 
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
-            var ingredientManager = new IngredientManager(uploadService, loggingManager);
+            var ingredientManager = new IngredientManager(uploadService, loggingManager, userManagementService);
 
             return await ingredientManager.EditUpvotesonUpload(Constants.PositiveVote, uploadId, Constants.InitialFailureCount, username, ipAddress);
         }
@@ -88,16 +95,19 @@ namespace IngredientViewController.Controllers
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
             var mapDao = new MapDAO(Constants.MapSQLConnection);
             var logDao = new LogDAO(Constants.SQLConnection);
+            var userDao = new UserDAO(Constants.SQLConnection);
+            var ipAddressDao = new IPAddressDAO(Constants.SQLConnection);
 
             // New up Service
             var uploadService = new UploadService(uploadDAO);
             var maskingService = new MaskingService(mapDao);
             var ffLoggingService = new FlatFileLoggingService(maskingService);
             var dsLoggingService = new DataStoreLoggingService(logDao, maskingService);
+            var userManagementService = new UserManagementService(userDao, ipAddressDao, dsLoggingService, ffLoggingService, maskingService);
 
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
-            var ingredientManager = new IngredientManager(uploadService, loggingManager);
+            var ingredientManager = new IngredientManager(uploadService, loggingManager, userManagementService);
 
             return await ingredientManager.EditUpvotesonUpload(Constants.NegativeVote, uploadId, Constants.InitialFailureCount, username, ipAddress);
         }
@@ -109,16 +119,19 @@ namespace IngredientViewController.Controllers
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
             var mapDao = new MapDAO(Constants.MapSQLConnection);
             var logDao = new LogDAO(Constants.SQLConnection);
+            var userDao = new UserDAO(Constants.SQLConnection);
+            var ipAddressDao = new IPAddressDAO(Constants.SQLConnection);
 
             // New up Service
             var uploadService = new UploadService(uploadDAO);
             var maskingService = new MaskingService(mapDao);
             var ffLoggingService = new FlatFileLoggingService(maskingService);
             var dsLoggingService = new DataStoreLoggingService(logDao, maskingService);
+            var userManagementService = new UserManagementService(userDao, ipAddressDao, dsLoggingService, ffLoggingService, maskingService);
 
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
-            var ingredientManager = new IngredientManager(uploadService, loggingManager);
+            var ingredientManager = new IngredientManager(uploadService, loggingManager, userManagementService);
 
             return await ingredientManager.EditDownvotesonUpload(Constants.PositiveVote, uploadId, Constants.InitialFailureCount, username, ipAddress);
         }
@@ -130,40 +143,60 @@ namespace IngredientViewController.Controllers
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
             var mapDao = new MapDAO(Constants.MapSQLConnection);
             var logDao = new LogDAO(Constants.SQLConnection);
+            var userDao = new UserDAO(Constants.SQLConnection);
+            var ipAddressDao = new IPAddressDAO(Constants.SQLConnection);
 
             // New up Service
             var uploadService = new UploadService(uploadDAO);
             var maskingService = new MaskingService(mapDao);
             var ffLoggingService = new FlatFileLoggingService(maskingService);
             var dsLoggingService = new DataStoreLoggingService(logDao, maskingService);
+            var userManagementService = new UserManagementService(userDao, ipAddressDao, dsLoggingService, ffLoggingService, maskingService);
 
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
-            var ingredientManager = new IngredientManager(uploadService, loggingManager);
+            var ingredientManager = new IngredientManager(uploadService, loggingManager, userManagementService);
 
             return await ingredientManager.EditDownvotesonUpload(Constants.NegativeVote, uploadId, Constants.InitialFailureCount, username, ipAddress);
         }
 
-        [HttpGet("GetTotalIngredientsNumber")]
+        [HttpGet("GetIngredientViewPaginationSize")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetTotalIngredientsfromStore(int storeId, string ingredientName, string username, string ipAddress)
+        public async Task<IActionResult> GetIngredientViewPaginationSize(string ingredientName, int storeId, string username, string ipAddress)
         {
             // New up DAL
             UploadDAO uploadDAO = new UploadDAO(Constants.SQLConnection);
             var mapDao = new MapDAO(Constants.MapSQLConnection);
             var logDao = new LogDAO(Constants.SQLConnection);
+            var userDao = new UserDAO(Constants.SQLConnection);
+            var ipAddressDao = new IPAddressDAO(Constants.SQLConnection);
 
             // New up Service
             var uploadService = new UploadService(uploadDAO);
             var maskingService = new MaskingService(mapDao);
             var ffLoggingService = new FlatFileLoggingService(maskingService);
             var dsLoggingService = new DataStoreLoggingService(logDao, maskingService);
+            var userManagementService = new UserManagementService(userDao, ipAddressDao, dsLoggingService, ffLoggingService, maskingService);
 
             // New up Managers
             var loggingManager = new LoggingManager(ffLoggingService, dsLoggingService);
-            var ingredientManager = new IngredientManager(uploadService, loggingManager);
+            var ingredientManager = new IngredientManager(uploadService, loggingManager, userManagementService);
 
-            return Ok(await ingredientManager.GetTotalIngredientsfromStore(storeId, ingredientName, Constants.InitialFailureCount, username, ipAddress).ConfigureAwait(false));
+            try
+            {
+                // Return status code of 200 as well as the content.
+                return Ok(await ingredientManager.GetIngredientViewPaginationSize(ingredientName, storeId, Constants.InitialFailureCount, username, ipAddress).ConfigureAwait(false));
+            }
+            catch (ArgumentException ae)
+            {
+                // Return an 404 error when the resource does not exists.
+                return NotFound(ae.Message);
+            }
+            catch
+            {
+                // Return generic server error for all other exceptions.
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

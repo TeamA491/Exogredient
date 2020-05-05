@@ -261,6 +261,7 @@ namespace TeamA.Exogredient.AppConstants
         
         public const string GetUploadsByIngredientNameandStoreIdOperation = "Get Uploads by IngredientName and StoreId";
         public const string GetIngredientsfromStoreOperation = "Get all uploads from a store.";
+        public const string GetIngredientViewPaginationSizeOperation = "Get pagination size for Ingredient View."; 
         public const string EditUpvotesonUploadOperation = "Edit the upvotes value on an Upload";
         public const string UndoUpvoteOperation = "Remove upvote from upload ";
         public const string UndoDownvoteOperation = "Remove downvote from upload ";

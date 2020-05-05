@@ -273,9 +273,9 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Add an upvote to an Upload.
+        /// Add or subtract 1 from the upvotes of an upload. 
         /// </summary>
-        /// <param name="voteValue"> The number added to the current number of Downvotes. </param>
+        /// <param name="voteValue"> The number added to the current number of Upvotes. </param>
         /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
         /// <returns> A boolean showing whether or not the function executed properly. </returns>
         public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
@@ -303,7 +303,7 @@ namespace TeamA.Exogredient.DAL
                         var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         // The command should return the number of rows affected. Returns true if only 1 row is changed. 
-                        return Convert.ToInt32(result) == 1;
+                        return Convert.ToInt32(result) == 0;
                     }
                 }
 
@@ -311,7 +311,7 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// Add a downvote to an Upload.
+        /// Add or subtract a downvote value associated with an Upload.
         /// </summary>
         /// <param name="voteValue"> The number added to the current number of Downvotes. </param>
         /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
@@ -341,7 +341,7 @@ namespace TeamA.Exogredient.DAL
                         var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         // The command should return the number of rows affected. Returns true if only 1 row is changed. 
-                        return Convert.ToInt32(result) == 1;
+                        return Convert.ToInt32(result) == 0;
                     }
                 }
 
@@ -351,6 +351,7 @@ namespace TeamA.Exogredient.DAL
         ///<summary> Return all uploads based on ingredientname and storeId.</summary>
         ///<param name="ingredientName"> The name of the ingredient.</param>
         ///<param name="storeId"> Store Id.</param>
+        ///<returns> A list of uploads associated with the ingredientName and storeId.</returns>
         public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
         {
             var uploads = new List<UploadResult>();
@@ -390,6 +391,52 @@ namespace TeamA.Exogredient.DAL
                 }
             }
             return uploads;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ingredientName"> The name of the ingredient</param>
+        /// <param name="storeId"> The store id of the store.</param>
+        /// <returns> An integer holding the number of a certain ingredient at a specific store. </returns>
+        public async Task<int> ReadIngredientViewPaginationSize(string ingredientName, int storeId)
+        {
+            //Open SQL connection properly. 
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection)) {
+                connection.Open();
+
+                //Construct SQL command. 
+                var sqlString =
+                    $"SELECT COUNT(*) " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOIngredientNameColumn} = @INGREDIENTNAME AND {Constants.UploadDAOStoreIdColumn} = @STOREID;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        command.Parameters.AddWithValue("@INGREDIENTNAME", ingredientName);
+                        command.Parameters.AddWithValue("@STOREID", storeId);
+
+                        var totalIngredientsNum = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
+                        
+                        // Perform logic to account for needed extra pagination.
+                        var paginationSize = totalIngredientsNum / Constants.IngredientViewPagination;
+                        if (paginationSize == 0)
+                        {
+                            return 1;
+                        }
+                        else if ((paginationSize % Constants.IngredientViewPagination) == 0)
+                        {
+                            return paginationSize;
+                        }
+                        else
+                        {
+                            return paginationSize + 1;
+                        }
+                    }
+                }
+            }
         }
 
         public async Task<List<UploadResult>> GetIngredientsfromStore(int storeId, int pagination)
