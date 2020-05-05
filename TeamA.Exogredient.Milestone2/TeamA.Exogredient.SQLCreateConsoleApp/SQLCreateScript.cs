@@ -24,12 +24,15 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
             // Directions: Uncomment the specific create function that you do not want to execute.
 
             //await CreateUserTable().ConfigureAwait(false);
-            await CreateIPTable().ConfigureAwait(false);
+            //await CreateAnonymousUserTable().ConfigureAwait(false);
+            //await CreateStoreTable().ConfigureAwait(false);
+            await CreateUploadTable().ConfigureAwait(false);
+
             //await CreateMapTable().ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Executes the CREATE TABLE statement for the User Table in the mysql schema.
+        /// Executes the CREATE TABLE statement for the user table in the mysql schema.
         /// </summary>
         /// <returns>Task (bool)</returns>
         private static async Task<bool> CreateUserTable()
@@ -69,22 +72,98 @@ namespace TeamA.Exogredient.SQLCreateConsoleApp
         }
 
         /// <summary>
-        /// Executes the CREATE TABLE statement for the IP Address table in the mysql schema.
+        /// Executes the CREATE TABLE statement for the anonymous_user table in the mysql schema.
         /// </summary>
         /// <returns>Task (bool)</returns>
-        private static async Task<bool> CreateIPTable()
+        private static async Task<bool> CreateAnonymousUserTable()
         {
             MySqlConnection connection = new MySqlConnection(_connection);
 
             connection.Open();
 
             // Construct the sql string based on the constants for table name, column names, and variable length values.
-            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.IPAddressDAOtableName}` (" +
-                               $@"`{Constants.IPAddressDAOIPColumn}` VARCHAR({(Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn] ? Constants.DefaultHashCharacterLength : Constants.IPAddressLength)}) NOT NULL," +
-                               $@"`{Constants.IPAddressDAOtimestampLockedColumn}` BIGINT NOT NULL," +
-                               $@"`{Constants.IPAddressDAOregistrationFailuresColumn}` INT NOT NULL," +
-                               $@"`{Constants.IPAddressDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
-                               $@"PRIMARY KEY(`{Constants.IPAddressDAOIPColumn}`));";
+            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.AnonymousUserDAOTableName}` (" +
+                               $@"`{Constants.AnonymousUserDAOIPColumn}` VARCHAR({(Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn] ? Constants.DefaultHashCharacterLength : Constants.IPAddressLength)}) NOT NULL," +
+                               $@"`{Constants.AnonymousUserDAOtimestampLockedColumn}` BIGINT NOT NULL," +
+                               $@"`{Constants.AnonymousUserDAOregistrationFailuresColumn}` INT NOT NULL," +
+                               $@"`{Constants.AnonymousUserDAOlastRegFailTimestampColumn}` BIGINT NOT NULL," +
+                               $@"PRIMARY KEY(`{Constants.AnonymousUserDAOIPColumn}`));";
+
+            // Create the commmand object and execute/dispose it asynchronously.
+            MySqlCommand command = new MySqlCommand(sqlString, connection);
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await command.DisposeAsync().ConfigureAwait(false);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Executes the CREATE TABLE statement for the upload table in the mysql schema.
+        /// </summary>
+        /// <returns>Task (bool)</returns>
+        private static async Task<bool> CreateUploadTable()
+        {
+            MySqlConnection connection = new MySqlConnection(_connection);
+
+            connection.Open();
+
+            // Construct the sql string based on the constants for table name, column names, and variable length values.
+            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.UploadDAOTableName}` (" +
+                               $@"`{Constants.UploadDAOUploadIdColumn}` INT NOT NULL AUTO_INCREMENT," +
+                               $@"`{Constants.UploadDAOPostTimeDateColumn}` TIMESTAMP NOT NULL," +
+                               $@"`{Constants.UploadDAOUploaderColumn}` VARCHAR({Constants.MaximumUsernameCharacters}) NOT NULL," +
+                               $@"`{Constants.UploadDAOStoreIdColumn}` INT NOT NULL," +
+                               $@"`{Constants.UploadDAODescriptionColumn}` VARCHAR({Constants.MaximumUploadDescriptionCharacters}) NOT NULL," +
+                               $@"`{Constants.UploadDAORatingColumn}` VARCHAR({Constants.MaxRatingDigits}) NOT NULL," +
+                               $@"`{Constants.UploadDAOPhotoColumn}` VARCHAR({Constants.MaximumPhotoCharacters}) NOT NULL," +
+                               $@"`{Constants.UploadDAOPriceColumn}` DOUBLE({Constants.MaximumPriceDigits},{Constants.PriceAccuracyDigits}) NOT NULL," +
+                               $@"`{Constants.UploadDAOPriceUnitColumn}` VARCHAR({Constants.PriceUnitMaxCharacters}) NOT NULL," +
+                               $@"`{Constants.UploadDAOIngredientNameColumn}` VARCHAR({Constants.MaximumIngredientNameCharacters}) NOT NULL," +
+                               $@"`{Constants.UploadDAOUpvoteColumn}` INT NOT NULL," +
+                               $@"`{Constants.UploadDAODownvoteColumn}` INT NOT NULL," +
+                               $@"`{Constants.UploadDAOInProgressColumn}` TINYINT(1) NOT NULL," +
+                               $@"`{Constants.UploadDAOCategoryColumn}` VARCHAR({Constants.MaximumCategoryCharacters}) NOT NULL," +
+                               $@"PRIMARY KEY(`{Constants.UploadDAOUploadIdColumn}`)," +
+                               $@"INDEX `{Constants.UploadDAOStoreIdColumn}_idx` (`{Constants.UploadDAOStoreIdColumn}` ASC) INVISIBLE," +
+                               $@"CONSTRAINT `{Constants.UploadDAOUploaderColumn}`" +
+                               $@"  FOREIGN KEY (`{Constants.UploadDAOUploaderColumn}`)" +
+                               $@"  REFERENCES `{Constants.ExogredientSQLSchemaName}`.`{Constants.UserDAOtableName}` (`{Constants.UserDAOusernameColumn}`)" +
+                               $@"  ON DELETE NO ACTION" +
+                               $@"  ON UPDATE NO ACTION," +
+                               $@"CONSTRAINT `{Constants.UploadDAOStoreIdColumn}`" +
+                               $@"  FOREIGN KEY (`{Constants.UploadDAOStoreIdColumn}`)" +
+                               $@"  REFERENCES `{Constants.ExogredientSQLSchemaName}`.`{Constants.StoreDAOTableName}` (`{Constants.StoreDAOStoreIdColumn}`)" +
+                               $@"  ON DELETE NO ACTION" +
+                               $@"  ON UPDATE NO ACTION);";
+
+            // Create the commmand object and execute/dispose it asynchronously.
+            MySqlCommand command = new MySqlCommand(sqlString, connection);
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await command.DisposeAsync().ConfigureAwait(false);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Executes the CREATE TABLE statement for the store table in the mysql schema.
+        /// </summary>
+        /// <returns>Task (bool)</returns>
+        private static async Task<bool> CreateStoreTable()
+        {
+            MySqlConnection connection = new MySqlConnection(_connection);
+
+            connection.Open();
+
+            // Construct the sql string based on the constants for table name, column names, and variable length values.
+            string sqlString = @$"CREATE TABLE `{_exogredientSchema}`.`{Constants.StoreDAOTableName}` (" +
+                               $@"`{Constants.StoreDAOStoreIdColumn}` INT NOT NULL AUTO_INCREMENT," +
+                               $@"`{Constants.StoreDAOStoreNameColumn}` VARCHAR({Constants.StoreNameMaxCharacters}) NOT NULL," +
+                               $@"`{Constants.StoreDAOLatitudeColumn}` DOUBLE NOT NULL," +
+                               $@"`{Constants.StoreDAOLongitudeColumn}` DOUBLE NOT NULL," +
+                               $@"`{Constants.StoreDAOPlaceIdColumn}` VARCHAR({Constants.PlaceIDCharacters}) NOT NULL," +
+                               $@"`{Constants.StoreDAOStoreDescriptionColumn}` VARCHAR({Constants.StoreDescriptionMaxCharacters}) NOT NULL," +
+                               $@"PRIMARY KEY(`{Constants.StoreDAOStoreIdColumn}`)," +
+                               $@"UNIQUE INDEX geocode ({Constants.StoreDAOLatitudeColumn}, {Constants.StoreDAOLongitudeColumn}));";
 
             // Create the commmand object and execute/dispose it asynchronously.
             MySqlCommand command = new MySqlCommand(sqlString, connection);

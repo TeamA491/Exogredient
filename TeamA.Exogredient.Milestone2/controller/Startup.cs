@@ -49,12 +49,12 @@ namespace controller
             services.AddTransient<UserManagementService>();
             services.AddTransient<MaskingService>();
             services.AddTransient<UploadService>();
-            services.AddTransient<StoreManagementService>();
+            services.AddTransient<StoreService>();
             services.AddTransient<SaveListService>();
 
 
             // Adding DAL.
-            services.AddSingleton(new IPAddressDAO(Constants.SQLConnection));
+            services.AddSingleton(new AnonymousUserDAO(Constants.SQLConnection));
             services.AddSingleton(new LogDAO(Constants.NOSQLConnection));
             services.AddSingleton(new MapDAO(Constants.MapSQLConnection));
             services.AddSingleton(new UserDAO(Constants.SQLConnection));

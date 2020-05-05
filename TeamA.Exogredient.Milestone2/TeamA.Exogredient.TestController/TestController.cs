@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Net;
-using System.Security.Cryptography;
+﻿using Google.Cloud.Vision.V1;
+using System;
 using System.Threading.Tasks;
+using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.DAL;
+using TeamA.Exogredient.Managers;
 using TeamA.Exogredient.Services;
+using System.Drawing;
+using UploadController;
+using System.IO;
+using Image = Google.Cloud.Vision.V1.Image;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.AppConstants;
 using TeamA.Exogredient.Managers;
 using System.Text;
 using System.Reflection;
+using MySqlX.XDevAPI;
+using MySqlX.XDevAPI.CRUD;
 using System.Reflection.Metadata;
 using System.Linq;
 using WeCantSpell.Hunspell;
@@ -22,30 +26,59 @@ namespace TeamA.Exogredient.TestController
     {
         public async static Task Main()
         {
-            //UploadDAO ud = new UploadDAO(Constants.SQLConnection);
-            //List<ProfileScoreResult> listprofile = await ud.ReadUploadVotes("username").ConfigureAwait(false);
-            //foreach(ProfileScoreResult ps in listprofile)
-            //{
-            //    Console.WriteLine(ps.UploadUpvote + " " + ps.UploadDownvote);
-            //}
+            //    MapDAO mdao = new MapDAO(Constants.MapSQLConnection);
+            //    LogDAO ldao = new LogDAO(Constants.NOSQLConnection);
+            //    StoreDAO sdao = new StoreDAO(Constants.SQLConnection);
+            //    AnonymousUserDAO adao = new AnonymousUserDAO(Constants.SQLConnection);
+            //    UploadDAO updao = new UploadDAO(Constants.SQLConnection);
+            //    UserDAO udao = new UserDAO(Constants.SQLConnection);
+
+            //    MaskingService mservice = new MaskingService(mdao);
+
+            //    DataStoreLoggingService dsls = new DataStoreLoggingService(ldao, mservice);
+            //    FlatFileLoggingService ffls = new FlatFileLoggingService(mservice);
+
+            //    LoggingManager lmanager = new LoggingManager(ffls, dsls);
+            //    GoogleImageAnalysisService gias = new GoogleImageAnalysisService();
+            //    StoreService sservice = new StoreService(sdao);
+            //    UploadService uservice = new UploadService(updao);
+            //    UserManagementService umanage = new UserManagementService(udao, adao, dsls, ffls, mservice);
+
+            //    UploadManager manager = new UploadManager(lmanager, gias, sservice, uservice, umanage);
+
+            //    Bitmap bmp = new Bitmap(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg");
+            //    byte[] byteArray = File.ReadAllBytes(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg");
 
 
-            //string killcomma = "asdfsdf,";
-            //Console.WriteLine(killcomma.TrimEnd(new char[] { ',' }));
+            // DIRECTIONS: comment out the admin check in this method to create the admin
+
+            //await umanage.CreateUserAsync(false, new UserRecord("System", "testname", "testemail@email.com", "9498675309", "password", 0, Constants.AdminUserType, "salt", Constants.NoValueLong, "090909", 0, 0, 0, 0, 0)).ConfigureAwait(false);
+
+            //============================================================================
+
+            //await gias.AnalyzeAsync(Image.FromFile(@"C:\Users\Eli\Desktop\Test\CVS\IMG_20200420_185009.jpg"), Constants.ExogredientCategories).ConfigureAwait(false);
 
 
-            var ud = new UploadDAO(Constants.SQLConnection);
-            //Console.WriteLine(await ud.DeleteByIdsAsync(new List<string>() { "20", "21", "22" }));
-            //Console.WriteLine(await ud.CheckUploadsExistence(new List<string>() { "1", "2", "3","23" }));
-
-            //var userD = new UserDAO(Constants.SQLConnection);
-            //Console.WriteLine(await userD.ReadUserType("testuser"));
+            //UploadPost post = new UploadPost(byteArray, "packaged/bottled products", "thesmokinggun42", "172.88.196.101", DateTime.Now, "Nutter Butter", "deez nutz", 5, 4.20, "item");
 
 
-            //var asasd = "one";
-            //Console.WriteLine(asasd.Equals("one"));
 
-            Console.WriteLine(await ud.GetRecentPaginationSize("username").ConfigureAwait(false));
+            var userdao = new UserDAO(Constants.SQLConnection);
+            var anonUserdao = new AnonymousUserDAO(Constants.SQLConnection);
+            LogDAO _logDAO = new LogDAO(Constants.NOSQLConnection);
+            MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
+
+            MaskingService _maskingService = new MaskingService(_mapDAO);
+
+            DataStoreLoggingService _dsLoggingService = new DataStoreLoggingService(_logDAO, _maskingService);
+            FlatFileLoggingService _ffLoggingService = new FlatFileLoggingService(_maskingService);
+
+            var usrmngser = new UserManagementService(userdao, anonUserdao, _dsLoggingService, _ffLoggingService, _maskingService);
+
+
+            usrmngser.CreateUserAsync(false, new UserRecord("System","sys", Constants.SystemAdminEmailAddress, "5625555555", "123123", 0, "Admin","12345678", 0, "0", 0, 0, 0,0,0));
+
+
         }
     }
 }

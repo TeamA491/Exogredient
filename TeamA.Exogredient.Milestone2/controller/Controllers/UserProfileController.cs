@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TeamA.Exogredient.Managers;
-using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.Exceptions;
-using System.Reflection.Metadata;
 using TeamA.Exogredient.AppConstants;
 
 namespace controller.Controllers
@@ -87,11 +84,11 @@ namespace controller.Controllers
         }
 
         [HttpDelete("Upload/{performingUser}/{uploadId}")]
-        public async Task<IActionResult> DeleteUploadAsync(string performingUser, string uploadId, string ipAddress = Constants.LocalHost)
+        public async Task<IActionResult> DeleteUploadAsync(string performingUser, int uploadId, string ipAddress = Constants.LocalHost)
         {
             try
             {
-                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<string>() { uploadId}, performingUser, ipAddress, 0, null).ConfigureAwait(false));
+                return Ok(await _userProfileManager.DeleteUploadsAsync(new List<int>() { uploadId}, performingUser, ipAddress, 0, null).ConfigureAwait(false));
             }
             catch (ArgumentException ae)
             {

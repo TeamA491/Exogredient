@@ -5,20 +5,15 @@ namespace TeamA.Exogredient.DataHelpers
     {
         public bool IsSuccessful { get; }
         public bool UserExists { get; }
+        public string Token { get; }
+        public string UserType { get; }
 
-        public AuthenticationResult(bool isSuccessful, bool userExists)
+        public AuthenticationResult(bool isSuccessful, bool userExists, string token = null, string userType = null)
         {
-            this.IsSuccessful = isSuccessful;
-            this.UserExists = userExists;
-        }
-
-        public bool GetIsSuccessful()
-        {
-            return IsSuccessful;
-        }
-        public bool GetUserExists()
-        {
-            return UserExists;
+            IsSuccessful = isSuccessful;
+            UserExists = userExists;
+            Token = token;
+            UserType = userType;
         }
     }
 }

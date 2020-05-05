@@ -1,6 +1,41 @@
 import Vue from 'vue';
 
-export const ApiDomainName = "https://localhost:5001";
+export const ApiDomainName = "https://localhost:44380";
+export const HomePage = 'home';
+
+// UPLOAD
+export const FileKey = "formFile";
+export const UsernameKey = "username";
+export const IPAddressKey = "ipAddress";
+export const CategoryKey = "category";
+export const NameKey = "name";
+export const DescriptionKey = "description";
+export const RatingKey = "rating";
+export const PriceKey = "price";
+export const PriceUnitKey = "priceUnit";
+export const ExtensionKey = "fileExtension";
+export const ImageSizeKey = "imageSize";
+export const MinimumPhotoSize = 500000;
+export const MaximumPhotoSize = 5000000;
+export const MinimumPhotoSizeString = "0.5 MB";
+export const MaximumPhotoSizeString = "5 MB";
+export const ValidImageExtensions = ["jpg"];
+export const ExceptionOccurredResponseKey = "exceptionOccurred";
+export const MessageResponseKey = "message";
+export const CategoryResponseKey = "category";
+export const NameResponseKey = "name";
+export const SuggestionsResponseKey = "suggestions";
+export const SuccessResponseKey = "success";
+export const IngredientNameMinChars = 1;
+export const IngredientNameMaxChars = 100;
+export const DescriptionMinChars = 1;
+export const DescriptionMaxChars = 200;
+export const MinimumPrice = 0.0;
+export const MaximumPrice = 1000.0;
+export const MinimumRating = 1;
+export const MaximumRating = 5;
+export const ValidPriceUnits = ["item", "pound", "gram", "oz"];
+
 
 export const SortByDistance = 'distance';
 export const SortByIngredientNum = 'ingredientNum';
@@ -39,15 +74,14 @@ export const DigestByteLength = 32;
 export const HashAlgorithm = 'SHA-256';
 
 export const Bus = new Vue();
-export const AdminContact = "TEAMA.CS491@gmail.com"
+export const AdminContact = "TEAMA.CS491@gmail.com";
 export const ErrorHandler = function(router,response){
   if(400 <= response.status){
-    if(router.currentRoute.path !== '/ErrorView'){
-      router.push('/ErrorView');
+    if(router.currentRoute.path !== '/error'){
+      router.push('/error');
       location.reload();
     }else{
       location.reload();
     }
   }
 };
-

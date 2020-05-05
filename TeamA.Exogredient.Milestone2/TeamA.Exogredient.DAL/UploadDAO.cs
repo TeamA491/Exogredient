@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class UploadDAO : IMasterSQLDAO<string>
+    public class UploadDAO : IMasterSQLCRD<int>
     {
         private string _SQLConnection;
 
@@ -19,7 +19,65 @@ namespace TeamA.Exogredient.DAL
 
         public async Task<bool> CreateAsync(ISQLRecord record)
         {
-            throw new NotImplementedException();
+            // Try casting the record to a UserRecord, throw an argument exception if it fails.
+            try
+            {
+                var temp = (UploadRecord)record;
+            }
+            catch
+            {
+                throw new ArgumentException(Constants.UploadCreateInvalidArgument);
+            }
+
+            var uploadRecord = (UploadRecord)record;
+            var recordData = uploadRecord.GetData();
+
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct the sql string .. start by inserting into the table name
+                var sqlString = $"INSERT INTO {Constants.UploadDAOTableName} (";
+
+                foreach (var pair in recordData)
+                {
+                    sqlString += $"{pair.Key},";
+                }
+
+                // Remove the last comma, add the VALUES keyword
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += ") VALUES (";
+
+                // Loop through the data once again, but instead of constructing the string with user input, use
+                // @PARAM0, @PARAM1 parameters to prevent against sql injections from user input.
+                int count = 0;
+                foreach (var pair in recordData)
+                {
+                    sqlString += $"@PARAM{count},";
+                    count++;
+                }
+
+                // Remove the last comma and add the last ) and ;
+                sqlString = sqlString.Remove(sqlString.Length - 1);
+                sqlString += ");";
+
+                using (var command = new MySqlCommand(sqlString, connection))
+                {
+                    count = 0;
+
+                    // Loop through the data again to add the parameter values to the corresponding @PARAMs in the string.
+                    foreach (var pair in recordData)
+                    {
+                        command.Parameters.AddWithValue($"@PARAM{count}", pair.Value);
+                        count++;
+                    }
+
+                    // Asynchronously execute the non query.
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                }
+
+                return true;
+            }
         }
 
         /// <summary>
@@ -27,7 +85,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ids">list of ids of uploads to delete.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> DeleteByIdsAsync(List<string> ids)
+        public async Task<bool> DeleteByIdsAsync(List<int> ids)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -67,9 +125,47 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public async Task<IDataObject> ReadByIdAsync(string id)
+        public async Task<IDataObject> ReadByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            // Check if the id exists in the table, and throw an argument exception if it doesn't.
+            if (!await CheckUploadsExistenceAsync(new List<int>() { id }).ConfigureAwait(false))
+            {
+                throw new ArgumentException(Constants.UploadReadDNE);
+            }
+
+            // Object to return -- UploadObject
+            UploadObject result;
+
+            using (var connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                // Construct the sql string to get the record where the id column equals the id parameter.
+                var sqlString = $"SELECT * FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} = @ID;";
+
+                using (var command = new MySqlCommand(sqlString, connection))
+                using (var dataTable = new DataTable())
+                {
+                    // Add the value to the id parameter, execute the reader asynchronously, load the reader into
+                    // the data table, and get the first row (the result).
+                    command.Parameters.AddWithValue("@ID", id);
+                    var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                    dataTable.Load(reader);
+                    DataRow row = dataTable.Rows[0];
+
+                    // Construct the UserObject by casting the values of the columns to their proper data types.
+                    result = new UploadObject((DateTime)row[Constants.UploadDAOPostTimeDateColumn], (string)row[Constants.UploadDAOUploaderColumn],
+                                              (int)row[Constants.UploadDAOStoreIdColumn], (string)row[Constants.UploadDAODescriptionColumn],
+                                              Int32.Parse((string)row[Constants.UploadDAORatingColumn]), (string)row[Constants.UploadDAOPhotoColumn],
+                                              (double)row[Constants.UploadDAOPriceColumn], (string)row[Constants.UploadDAOPriceUnitColumn],
+                                              (string)row[Constants.UploadDAOIngredientNameColumn], (int)row[Constants.UploadDAOUpvoteColumn],
+                                              (int)row[Constants.UploadDAODownvoteColumn], (((int)row[Constants.UploadDAOInProgressColumn] == Constants.InProgressStatus) ? true : false),
+                                              (string)row[Constants.UploadDAOCategoryColumn]);
+                                              
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -223,11 +319,6 @@ namespace TeamA.Exogredient.DAL
             }
         }
 
-        public async Task<bool> UpdateAsync(ISQLRecord record)
-        {
-            throw new NotImplementedException();
-        }
-
         // <summary>
         /// get all the upload's upvote and downvote for a user.
         /// </summary>
@@ -270,213 +361,6 @@ namespace TeamA.Exogredient.DAL
                 }
             }
             return votes;
-        }
-
-        /// <summary>
-        /// Add or subtract 1 from the upvotes of an upload. 
-        /// </summary>
-        /// <param name="voteValue"> The number added to the current number of Upvotes. </param>
-        /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
-        /// <returns> A boolean showing whether or not the function executed properly. </returns>
-        public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
-        {
-            // Open connection.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
-            {
-                connection.Open();
-
-                //SQL command for increasing upvotes
-                var sqlString =
-                    $"UPDATE {Constants.UploadDAOTableName} " +
-                    $"SET {Constants.UploadDAOUpvoteColumn} = {Constants.UploadDAOUpvoteColumn} + @VOTEVALUE " +
-                    $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString,connection))
-                {
-                    using (DataTable datatable = new DataTable())
-                    {
-                        // Add the parameters to the sql string. 
-                        command.Parameters.AddWithValue("@UPLOADID", uploadId);
-                        command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
-
-                        // Execute the command
-                        var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
-                        // The command should return the number of rows affected. Returns true if only 1 row is changed. 
-                        return Convert.ToInt32(result) == 0;
-                    }
-                }
-
-            }
-        }
-
-        /// <summary>
-        /// Add or subtract a downvote value associated with an Upload.
-        /// </summary>
-        /// <param name="voteValue"> The number added to the current number of Downvotes. </param>
-        /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
-        /// <returns> A boolean showing whether or not the function executed properly. </returns>
-        public async Task<bool> IncrementDownvotesonUpload(int voteValue, int uploadId)
-        {
-            // Open connection.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
-            {
-                connection.Open();
-
-                //SQL command for increasing upvotes
-                var sqlString =
-                    $"UPDATE {Constants.UploadDAOTableName} " +
-                    $"SET {Constants.UploadDAODownvoteColumn} = {Constants.UploadDAODownvoteColumn} + @VOTEVALUE " +
-                    $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    using (DataTable datatable = new DataTable())
-                    {
-                        // Add the parameters to the sql string. 
-                        command.Parameters.AddWithValue("@UPLOADID", uploadId);
-                        command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
-
-                        // Execute the command
-                        var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
-                        // The command should return the number of rows affected. Returns true if only 1 row is changed. 
-                        return Convert.ToInt32(result) == 0;
-                    }
-                }
-
-            }
-        }
-
-        ///<summary> Return all uploads based on ingredientname and storeId.</summary>
-        ///<param name="ingredientName"> The name of the ingredient.</param>
-        ///<param name="storeId"> Store Id.</param>
-        ///<returns> A list of uploads associated with the ingredientName and storeId.</returns>
-        public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
-        {
-            var uploads = new List<UploadResult>();
-
-            //Open Connection properly.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
-            {
-                connection.Open();
-
-                var sqlString =
-                    $"SELECT * " +
-                    $"FROM {Constants.UploadDAOTableName} " +
-                    $"WHERE {Constants.UploadDAOIngredientNameColumn} = @INGREDIENTNAME AND {Constants.UploadDAOStoreIdColumn} = @STOREID " +
-                    $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
-                    $"LIMIT @OFFSET, @AMOUNT;";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    using (DataTable datatable = new DataTable())
-                    {
-                        command.Parameters.AddWithValue("@INGREDIENTNAME", ingredientName);
-                        command.Parameters.AddWithValue("@STOREID", storeId);
-                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.IngredientViewPagination);
-                        command.Parameters.AddWithValue("@AMOUNT", Constants.IngredientViewPagination);
-
-                        // Execute the command.
-                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                        datatable.Load(reader);
-
-                        foreach(DataRow row in datatable.Rows)
-                        {
-                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
-                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
-                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
-                        }
-                    }
-                }
-            }
-            return uploads;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ingredientName"> The name of the ingredient</param>
-        /// <param name="storeId"> The store id of the store.</param>
-        /// <returns> An integer holding the number of a certain ingredient at a specific store. </returns>
-        public async Task<int> ReadIngredientViewPaginationSize(string ingredientName, int storeId)
-        {
-            //Open SQL connection properly. 
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection)) {
-                connection.Open();
-
-                //Construct SQL command. 
-                var sqlString =
-                    $"SELECT COUNT(*) " +
-                    $"FROM {Constants.UploadDAOTableName} " +
-                    $"WHERE {Constants.UploadDAOIngredientNameColumn} = @INGREDIENTNAME AND {Constants.UploadDAOStoreIdColumn} = @STOREID;";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    using (DataTable datatable = new DataTable())
-                    {
-                        command.Parameters.AddWithValue("@INGREDIENTNAME", ingredientName);
-                        command.Parameters.AddWithValue("@STOREID", storeId);
-
-                        var totalIngredientsNum = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
-                        
-                        // Perform logic to account for needed extra pagination.
-                        var paginationSize = totalIngredientsNum / Constants.IngredientViewPagination;
-                        if (paginationSize == 0)
-                        {
-                            return 1;
-                        }
-                        else if ((paginationSize % Constants.IngredientViewPagination) == 0)
-                        {
-                            return paginationSize;
-                        }
-                        else
-                        {
-                            return paginationSize + 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        public async Task<List<UploadResult>> GetIngredientsfromStore(int storeId, int pagination)
-        {
-            var uploads = new List<UploadResult>();
-
-            //Open Connection properly.
-            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
-            {
-                connection.Open();
-
-                var sqlString =
-                    $"SELECT * " +
-                    $"FROM {Constants.UploadDAOTableName} " +
-                    $"WHERE {Constants.UploadDAOStoreIdColumn} = @STOREID " +
-                    $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
-                    $"LIMIT @OFFSET, @AMOUNT;";
-
-                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
-                {
-                    using (DataTable datatable = new DataTable())
-                    {
-                        command.Parameters.AddWithValue("@STOREID", storeId);
-                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.IngredientViewPagination);
-                        command.Parameters.AddWithValue("@AMOUNT", Constants.IngredientViewPagination);
-
-                        // Execute the command.
-                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                        datatable.Load(reader);
-
-                        foreach (DataRow row in datatable.Rows)
-                        {
-                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
-                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
-                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
-                        }
-                    }
-                }
-            }
-            return uploads;
         }
 
         /// <summary>
@@ -587,7 +471,7 @@ namespace TeamA.Exogredient.DAL
         /// <param name="ids">Ids of the uploads to check.</param>
         /// <param name="owner">user to test.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> CheckUploadsOwnerAsync(List<string> ids, string owner)
+        public async Task<bool> CheckUploadsOwnerAsync(List<int> ids, string owner)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -637,7 +521,7 @@ namespace TeamA.Exogredient.DAL
         /// </summary>
         /// <param name="ids">Ids of the uploads.</param>
         /// <returns>bool representing whether the operation passed.</returns>
-        public async Task<bool> CheckUploadsExistenceAsync(List<string> ids)
+        public async Task<bool> CheckUploadsExistenceAsync(List<int> ids)
         {
             // Get the connnection inside a using statement to properly dispose/close.
             using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
@@ -765,6 +649,42 @@ namespace TeamA.Exogredient.DAL
                         return paginationSize + 1;
                     }
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Get the Users with the upload.
+        /// </summary>
+        /// <param name="affectedUploadsDict">The dictionary with users that are upvoted or downvoted.</param>
+        /// <returns>A dictionary with upload id and the user.</returns>
+        public async Task<Dictionary<string, string>> GetUsersWithUploadsAsync(Dictionary<String, int> affectedUploadsDict)
+        {
+            var votedUserDict = new Dictionary<string, string>();
+            // Get the connection inside a using statement to properly dispose/close.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                // Open the connection.
+                connection.Open();
+
+                foreach (var upload in affectedUploadsDict)
+                {
+                    string user;
+                    string uploadID = upload.Key;
+
+                    string sqlString = $"SELECT {Constants.UploadDAOUploaderColumn} FROM {Constants.UploadDAOTableName} WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
+
+                    // Open the command inside a using statement to properly dispose/close.
+                    using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                    {
+                        // Add the value to the parameter, execute the reader asyncrhonously, read asynchronously, then get the boolean result.
+                        command.Parameters.AddWithValue("@UPLOADID", uploadID);
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        await reader.ReadAsync().ConfigureAwait(false);
+                        user = reader.GetString(0);
+                    }
+                    votedUserDict.Add(uploadID, user);
+                }
+                return votedUserDict;
             }
         }
 

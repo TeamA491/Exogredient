@@ -25,11 +25,20 @@ const store = new Vuex.Store({
     },
     registration:{
       username:"",
-      phoneNumber: ""
+      phoneNumber: "",
+      email: ""
     },
-    username: "anonymous",
-    ipAddress: "",
-    location: ""
+    userData:{
+      username: "Anonymous",
+      ipAddress: "",
+      location: "",
+      token: "",
+      userType: "Anonymous"
+    },
+    routeChange:{
+      to:"",
+      from: ""
+    }
   },
   mutations:{
     updateSearchData (state, newSearchData){
@@ -60,13 +69,13 @@ const store = new Vuex.Store({
       state.currentPages.storeView = newCurrentPage;
     },
     updateUsername(state, newUsername) {
-      state.username = newUsername;
+      state.userData.username = newUsername;
     },
     updateIpAddress(state, newIpAddress){
-      state.ipAddress = newIpAddress;
+      state.userData.ipAddress = newIpAddress;
     },
     updateLocation(state, newLocation){
-      state.location = newLocation;
+      state.userData.location = newLocation;
     },
     updateRegistrationUsername(state, newUsername){
       state.registration.username = newUsername;
@@ -77,6 +86,21 @@ const store = new Vuex.Store({
     updateIngredientsList(state, newIngredientsList) {
       state.ingredientsList = newIngredientsList;
     },
+    updateToken(state, newToken){
+      state.userData.token = newToken;
+    },
+    updateUserType(state, newUserType){
+      state.userData.userType = newUserType;
+    },
+    updateEmail(state, newEmail){
+      state.registration.email = newEmail;
+    },
+    updateRouteTo(state, newRouteTo){
+      state.routeChange.to = newRouteTo;
+    },
+    updateRouteFrom(state, newRouteFrom){
+      state.routeChange.from = newRouteFrom;
+    }
   },
   actions:{
     updateSearchData ({commit}, newSearchData){
@@ -117,6 +141,21 @@ const store = new Vuex.Store({
     },
     updateRegistrationPhoneNum({commit}, newPhoneNum){
       commit('updateRegistrationPhoneNum', newPhoneNum);
+    },
+    updateToken({commit}, newToken){
+      commit('updateToken', newToken);
+    },
+    updateUserType({commit}, newUserType){
+      commit('updateUserType', newUserType);
+    },
+    updateEmail({commit}, newEmail){
+      commit('updateEmail', newEmail);
+    },
+    updateRouteTo({commit}, newRouteTo){
+      commit('updateRouteTo', newRouteTo);
+    },
+    updateRouteFrom({commit}, newRouteFrom){
+      commit('updateRouteFrom', newRouteFrom);
     },
     sortStoreResults ({state}, sortOption){
       if(sortOption.by === 'distance'){

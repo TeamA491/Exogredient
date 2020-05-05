@@ -3,44 +3,44 @@
         <span class='registerError'></span>
         <div class='field'>
             <label class='label' for="fname">First Name:</label><br>
-            <input class="input" type="text" name="fname" id="fnameInput" placeholder="First Name" v-model="firstName" @blur='checkFirstName'><br>
+            <input class="input" type="text" name="fname" id="fnameInput" placeholder="First Name" v-model="firstName" @input='checkFirstName'><br>
             <span class='errorMessage' id="fnameError"></span><br>
         </div>
         
         <div class="field">
             <label class="label" for="lname">Last Name:</label><br>
-            <input class="input" type="text" name="lname" id="lnameInput" placeholder="Last Name" v-model="lastName" @blur="checkLastName"><br>
+            <input class="input" type="text" name="lname" id="lnameInput" placeholder="Last Name" v-model="lastName" @input="checkLastName"><br>
             <span class='errorMessage' id="lnameError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="username">Username:</label><br>
-            <input class="input" type="text" name="username" id="usernameInput" placeholder="Username" v-model="username" @blur="checkUsername"><br>
+            <input class="input" type="text" name="username" id="usernameInput" placeholder="Username" v-model="username" @input="checkUsername"><br>
             <span class='errorMessage' id="usernameError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="email">Email:</label><br>
-            <input class="input" type="text" name="email" id="emailInput" placeholder="Email" v-model="email" @blur="checkEmail"><br>
+            <input class="input" type="text" name="email" id="emailInput" placeholder="Email" v-model="email" @input="checkEmail"><br>
             <span class='errorMessage' id="emailError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="phone">Phone Number:</label><br>
-            <input class="input" type="text" name="phone" id="phoneInput" placeholder="Phone #" v-model="phoneNumber" @blur="checkPhoneNumber"><br>
+            <input class="input" type="text" name="phone" id="phoneInput" placeholder="Phone #" v-model="phoneNumber" @input="checkPhoneNumber"><br>
             <span class='errorMessage' id="phoneError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="password">Password:</label><br>
-            <input class="input" :type="passwordFieldType" name="password" id="passwordInput" placeholder="Password" v-model="password" @blur="checkPassword">
+            <input class="input" :type="passwordFieldType" name="password" id="passwordInput" placeholder="Password" v-model="password" @input="checkPassword">
             <a class="button" @click='showHidePassword'>Show/Hide</a><br>
             <span class='errorMessage' id="passwordError"></span><br>
         </div>
 
         <div class="field">
             <label class="label" for="rePassword">Re-enter Password:</label><br>
-            <input class="input" :type="rePasswordFieldType" name="rePassword" id="rePasswordInput" placeholder="Password" v-model="rePassword" @blur="checkRePassword">
+            <input class="input" :type="rePasswordFieldType" name="rePassword" id="rePasswordInput" placeholder="Password" v-model="rePassword" @input="checkRePassword">
             <a class="button" @click='showHideRePassword'>Show/Hide</a><br>
             <span class='errorMessage' id="rePasswordError"></span><br>
         </div>
@@ -55,7 +55,12 @@ import * as global from "../globalExports.js";
 
 export default {
     name: "RegistrationView",
-
+    mounted(){
+        if(this.$store.state.userData.location !== "California"){
+            alert("You must be in California to register!");
+            this.$router.push('/');
+        }
+    },
     data(){
         return{
             firstName: '',
@@ -67,7 +72,6 @@ export default {
             rePassword: '',
             passwordFieldType: 'password',
             rePasswordFieldType: 'password',
-            errors: null,
             fieldsValidation:{
                 firstName: false,
                 lastName: false,
@@ -330,10 +334,10 @@ export default {
             var salt = this.byteArrayToHex(saltArray);
             var proxyPassword = "0".repeat(this.password.length);
             
-            var registrationResponse = await fetch(`${global.ApiDomainName}/api/registration/register?`
+            var registrationResponse = await fetch(`${global.ApiDomainName}/api/register?`
                 +`firstName=${this.firstName}&lastName=${this.lastName}&`
                 +`email=${this.email}&username=${this.username}&`
-                +`phoneNumber=${this.phoneNumber}&ipAddress=${this.$store.state.ipAddress}&`
+                +`phoneNumber=${this.phoneNumber}&ipAddress=${this.$store.state.userData.ipAddress}&`
                 +`hashedPassword=${hashedPassword}&salt=${salt}&proxyPassword=${proxyPassword}`);
 
             global.ErrorHandler(this.$router,registrationResponse);
@@ -350,14 +354,15 @@ export default {
 
             this.$store.dispatch('updateRegistrationUsername',this.username);
             this.$store.dispatch('updateRegistrationPhoneNum', this.phoneNumber);
+            this.$store.dispatch('updateEmail', this.email);
 
-            fetch(`${global.ApiDomainName}/api/registration/sendEmailCode?`
+            fetch(`${global.ApiDomainName}/api/sendEmailCode?`
             + `username=${this.username}&email=${this.email}`
-            + `&ipAddress=${this.$store.state.ipAddress}`);
+            + `&ipAddress=${this.$store.state.userData.ipAddress}`);
 
-            fetch(`${global.ApiDomainName}/api/registration/sendPhoneCode?`
+            fetch(`${global.ApiDomainName}/api/sendPhoneCode?`
             + `username=${this.username}&phoneNumber=${this.phoneNumber}`
-            + `&ipAddress=${this.$store.state.ipAddress}`);
+            + `&ipAddress=${this.$store.state.userData.ipAddress}`);
 
             this.$router.push('/verify');
         }

@@ -1,23 +1,54 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import SearchResultsView from '../views/SearchResultsView';
-import StoreView from '../views/StoreView';
-import ErrorView from '../views/ErrorView';
-import RegistrationView from '../views/RegistrationView';
-
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/SearchResultsView', component: SearchResultsView},
-  { path: '/StoreView', component: StoreView},
-  { path: '/ErrorView', component: ErrorView}, 
-  { path: '/RegistrationView', component: RegistrationView },
+  { 
+    name: "search", 
+    path: '/search', 
+    component: () => import('../views/SearchResultsView.vue')
+  },
+  { 
+    name: "store", 
+    path: '/store', 
+    component: () => import('../views/StoreView.vue')
+  },
+  { 
+    name: "error", 
+    path: '/error', 
+    component: () => import('../views/ErrorView')
+  }, 
+  { 
+    name: "register", 
+    path: '/register', 
+    component: () => import('../views/RegistrationView.vue')
+  },
+  {
+    path:'/pageNotFound',
+    name:'pageNotFound',
+    component: () => import('../views/InvalidPage.vue')
+  },
+  {
+    path: '/resetPassword/:token',
+    name: 'resetPassword',
+    component: () => import('../views/ResetPasswordView.vue'),
+    props: true
+  },
+  { 
+    path: '/sendResetLink',
+    name: 'sendResetLink',
+    component: () => import('../views/SendResetLink.vue')
+  },
   { 
     path: '/verify',
     name: 'verify',
     component: () => import('../views/VerificationView.vue')
   },
-
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/LoginView.vue'),
+  },
   {
     path: "/profile",
     name: "profile",
@@ -36,11 +67,16 @@ const routes = [
     path: "/ingredientView",
     name: "ingredientView",
     component: () => import("@/views/IngredientsView.vue")
-  }
+  },
+  {
+    path: "/useranalysis",
+    name: "useranalysis",
+    component: () => import("@/views/UserAnalysis.vue"),
+  },
+  
 ]
 
 const router = new VueRouter({
-  mode: 'history',
   base: process.env.BASE_URL,
   routes
 });

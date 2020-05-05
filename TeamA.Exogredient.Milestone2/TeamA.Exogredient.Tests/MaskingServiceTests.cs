@@ -11,7 +11,7 @@ namespace TeamA.Exogredient.Tests
     [TestClass]
     public class MaskingServiceTests
     {
-        private static readonly IPAddressDAO _ipDAO = new IPAddressDAO(Constants.SQLConnection);
+        private static readonly AnonymousUserDAO _ipDAO = new AnonymousUserDAO(Constants.SQLConnection);
         private static readonly UserDAO _userDAO = new UserDAO(Constants.SQLConnection);
         private static readonly MapDAO _mapDAO = new MapDAO(Constants.MapSQLConnection);
         private static readonly MaskingService _maskingService = new MaskingService(_mapDAO);
@@ -92,7 +92,7 @@ namespace TeamA.Exogredient.Tests
 
             id = ipAddress;
 
-            if (Constants.IPAddressDAOIsColumnMasked[Constants.IPAddressDAOIPColumn])
+            if (Constants.AnonymousUserDAOIsColumnMasked[Constants.AnonymousUserDAOIPColumn])
             {
                 id = _maskingService.MaskString(ipAddress);
             }
