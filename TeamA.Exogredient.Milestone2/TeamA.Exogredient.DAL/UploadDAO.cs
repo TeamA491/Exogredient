@@ -809,7 +809,7 @@ namespace TeamA.Exogredient.DAL
         }
 
         /// <summary>
-        /// 
+        /// Retrieve the pagination size for ingredient view.
         /// </summary>
         /// <param name="ingredientName"> The name of the ingredient</param>
         /// <param name="storeId"> The store id of the store.</param>
