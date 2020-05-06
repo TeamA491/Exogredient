@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace UseranalysisController
+namespace IngredientViewController
 {
     public class Startup
     {
@@ -26,22 +26,15 @@ namespace UseranalysisController
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddCors(c =>
-            {
-                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()
-                                                             .AllowAnyHeader()
-                                                             .AllowAnyMethod());
-            });
         }
 
-            // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-            public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCors("AllowOrigin");
 
             app.UseHttpsRedirection();
 

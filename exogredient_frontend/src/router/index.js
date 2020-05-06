@@ -64,6 +64,11 @@ const routes = [
     name: "home",
   },
   {
+    path: "/ingredientView",
+    name: "ingredientView",
+    component: () => import("@/views/IngredientsView.vue")
+  },
+  {
     path: "/useranalysis",
     name: "useranalysis",
     component: () => import("@/views/UserAnalysis.vue"),
@@ -72,7 +77,6 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'history',
   base: process.env.BASE_URL,
   routes
 });

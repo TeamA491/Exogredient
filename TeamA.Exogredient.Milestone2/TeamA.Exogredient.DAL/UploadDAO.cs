@@ -161,7 +161,7 @@ namespace TeamA.Exogredient.DAL
                                               (string)row[Constants.UploadDAOIngredientNameColumn], (int)row[Constants.UploadDAOUpvoteColumn],
                                               (int)row[Constants.UploadDAODownvoteColumn], ((bool)row[Constants.UploadDAOInProgressColumn]),
                                               (string)row[Constants.UploadDAOCategoryColumn]);
-                                              
+
                 }
             }
 
@@ -651,7 +651,7 @@ namespace TeamA.Exogredient.DAL
                 }
             }
         }
-        
+
         /// <summary>
         /// Get the Users with the upload.
         /// </summary>
@@ -682,12 +682,181 @@ namespace TeamA.Exogredient.DAL
                         await reader.ReadAsync().ConfigureAwait(false);
                         user = reader.GetString(0);
                     }
-                    
+
                     votedUserDict.Add(uploadID, user);
                 }
                 return votedUserDict;
             }
         }
+
+        /// <summary>
+        /// Add or subtract 1 from the upvotes of an upload. 
+        /// </summary>
+        /// <param name="voteValue"> The number added to the current number of Upvotes. </param>
+        /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
+        /// <returns> A boolean showing whether or not the function executed properly. </returns>
+        public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
+        {
+            // Open connection.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                //SQL command for increasing upvotes
+                var sqlString =
+                    $"UPDATE {Constants.UploadDAOTableName} " +
+                    $"SET {Constants.UploadDAOUpvoteColumn} = {Constants.UploadDAOUpvoteColumn} + @VOTEVALUE " +
+                    $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        // Add the parameters to the sql string. 
+                        command.Parameters.AddWithValue("@UPLOADID", uploadId);
+                        command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
+
+                        // Execute the command
+                        var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        // The command should return the number of rows affected. Returns true if only 1 row is changed. 
+                        return Convert.ToInt32(result) == 0;
+                    }
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Add or subtract a downvote value associated with an Upload.
+        /// </summary>
+        /// <param name="voteValue"> The number added to the current number of Downvotes. </param>
+        /// <param name="uploadId"> Used to identify the specific upload being changed. </param>
+        /// <returns> A boolean showing whether or not the function executed properly. </returns>
+        public async Task<bool> IncrementDownvotesonUpload(int voteValue, int uploadId)
+        {
+            // Open connection.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                //SQL command for increasing upvotes
+                var sqlString =
+                    $"UPDATE {Constants.UploadDAOTableName} " +
+                    $"SET {Constants.UploadDAODownvoteColumn} = {Constants.UploadDAODownvoteColumn} + @VOTEVALUE " +
+                    $"WHERE {Constants.UploadDAOUploadIdColumn} = @UPLOADID;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        // Add the parameters to the sql string. 
+                        command.Parameters.AddWithValue("@UPLOADID", uploadId);
+                        command.Parameters.AddWithValue("@VOTEVALUE", voteValue);
+
+                        // Execute the command
+                        var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                        // The command should return the number of rows affected. Returns true if only 1 row is changed. 
+                        return Convert.ToInt32(result) == 0;
+                    }
+                }
+
+            }
+        }
+
+        ///<summary> Return all uploads based on ingredientname and storeId.</summary>
+        ///<param name="ingredientName"> The name of the ingredient.</param>
+        ///<param name="storeId"> Store Id.</param>
+        ///<returns> A list of uploads associated with the ingredientName and storeId.</returns>
+        public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
+        {
+            var uploads = new List<UploadResult>();
+
+            //Open Connection properly.
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                var sqlString =
+                    $"SELECT * " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOIngredientNameColumn} = @INGREDIENTNAME AND {Constants.UploadDAOStoreIdColumn} = @STOREID " +
+                    $"ORDER BY {Constants.UploadDAOPostTimeDateColumn} ASC " +
+                    $"LIMIT @OFFSET, @AMOUNT;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        command.Parameters.AddWithValue("@INGREDIENTNAME", ingredientName);
+                        command.Parameters.AddWithValue("@STOREID", storeId);
+                        command.Parameters.AddWithValue("@OFFSET", pagination * Constants.IngredientViewPagination);
+                        command.Parameters.AddWithValue("@AMOUNT", Constants.IngredientViewPagination);
+
+                        // Execute the command.
+                        var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                        datatable.Load(reader);
+
+                        foreach (DataRow row in datatable.Rows)
+                        {
+                            uploads.Add(new UploadResult(Convert.ToInt32(row[Constants.UploadDAOUploadIdColumn]), Convert.ToInt32(row[Constants.UploadDAOStoreIdColumn]), (string)row[Constants.UploadDAOIngredientNameColumn],
+                                        (string)row[Constants.UploadDAOUploaderColumn], (string)row[Constants.UploadDAOPostTimeDateColumn].ToString(), (string)row[Constants.UploadDAODescriptionColumn], (string)row[Constants.UploadDAORatingColumn],
+                                        (string)row[Constants.UploadDAOPhotoColumn], Convert.ToDouble(row[Constants.UploadDAOPriceColumn]), Convert.ToInt32(row[Constants.UploadDAOUpvoteColumn]), Convert.ToInt32(row[Constants.UploadDAODownvoteColumn]), Convert.ToBoolean(row[Constants.UploadDAOInProgressColumn])));
+                        }
+                    }
+                }
+            }
+            return uploads;
+        }
+
+        /// <summary>
+        /// Retrieve the pagination size for ingredient view.
+        /// </summary>
+        /// <param name="ingredientName"> The name of the ingredient</param>
+        /// <param name="storeId"> The store id of the store.</param>
+        /// <returns> An integer holding the number of a certain ingredient at a specific store. </returns>
+        public async Task<int> ReadIngredientViewPaginationSize(string ingredientName, int storeId)
+        {
+            //Open SQL connection properly. 
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                //Construct SQL command. 
+                var sqlString =
+                    $"SELECT COUNT(*) " +
+                    $"FROM {Constants.UploadDAOTableName} " +
+                    $"WHERE {Constants.UploadDAOIngredientNameColumn} = @INGREDIENTNAME AND {Constants.UploadDAOStoreIdColumn} = @STOREID;";
+
+                using (MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    using (DataTable datatable = new DataTable())
+                    {
+                        command.Parameters.AddWithValue("@INGREDIENTNAME", ingredientName);
+                        command.Parameters.AddWithValue("@STOREID", storeId);
+
+                        var totalIngredientsNum = Convert.ToInt32(await command.ExecuteScalarAsync().ConfigureAwait(false));
+
+                        // Perform logic to account for needed extra pagination.
+                        var paginationSize = totalIngredientsNum / Constants.IngredientViewPagination;
+                        if (paginationSize == 0)
+                        {
+                            return 1;
+                        }
+                        else if ((paginationSize % Constants.IngredientViewPagination) == 0)
+                        {
+                            return paginationSize;
+                        }
+                        else
+                        {
+                            return paginationSize + 1;
+                        }
+                    }
+                }
+            }
+        }
+
 
         public async Task<bool> UpdateAsync(ISQLRecord record)
         {

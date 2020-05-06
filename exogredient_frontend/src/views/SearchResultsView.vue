@@ -7,8 +7,8 @@
             <table class = "table is-fullwidth">
                 <tr>
                     <th>Store Name</th>
-                    <th><a @click="sortByIngredientNum">Number of ingredients</a></th>
-                    <th><a @click="sortByDistance">Distance</a></th>
+                    <th><a @click="sortByIngredientNum">Number of ingredients &#8693;</a></th>
+                    <th><a @click="sortByDistance">Distance &#8693;</a></th>
                 </tr>
                 <tr v-for="store in stores" :key=store.storeId>
                     <td><a @click="displayStoreView(store.storeId)">{{store.storeName}}</a></td>

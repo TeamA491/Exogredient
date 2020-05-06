@@ -13,14 +13,6 @@ using System.Globalization;
 namespace TeamA.Exogredient.Services
 {
 
-    //public class IpInfo
-    //{
-    //    public string Ip { get; set; }
-    //    public string City { get; set; }
-    //    public string Region { get; set; }
-    //    public string Country { get; set; }
-    //}
-
     public class SnapshotService
     {
         LogDAO _logDAO;
@@ -37,42 +29,305 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
-        /// Method to format the lists of snapshots into one huge string.
-        /// It is done in a way that is closest to the json format.
-        /// Basically designed to be json objects in a list that is formatted like a json.
+        /// Method to get all the years and months pertaining to that year that has snapshots.
         /// </summary>
-        /// <param name="snapshotList">The list of snapshots.</param>
-        /// <returns>A string that has all the data from the snapshots.</returns>
-        public string FormatSnapShotListIntoJson(List<SnapShotResult> snapshotList)
+        /// <returns>A json formatted string with the data.</returns>
+        public async Task<String> GetYearAndMonthAsync()
         {
-            string formattedString = "{\"snapshots\": [";
+            var yearMonthDict = new Dictionary<string, List<string>>();
+            var yearMonthList = await _snapshotDAO.GetYearAndMonthAsync().ConfigureAwait(false);
 
-            foreach (var snapshot in snapshotList)
+            foreach (var yearMonth in yearMonthList)
             {
-                formattedString +=
-                 $@"{{""{Constants.SnapshotMonth}"": ""{snapshot._month}"", " +
-                 $@"""{Constants.SnapshotOperationsDict}"": ""{snapshot.operations}"", " +
-                 $@"""{Constants.SnapshotUsersDict}"": ""{snapshot.count_of_registered_users}"", " +
-                 $@"""{Constants.SnapshotTopCityDict}"": ""{snapshot.top_cities_that_uses_application}"", " +
-                 $@"""{Constants.SnapshotTopUserUploadedDict}"": ""{snapshot.top_users_that_upload}"", " +
-                 $@"""{Constants.SnapshotTopUploadedIngredientDict}"": ""{snapshot.top_most_uploaded_ingredients}"", " +
-                 $@"""{Constants.SnapshotTopUploadedstoreDict}"": ""{snapshot.top_most_uploaded_stores}"", " +
-                 $@"""{Constants.SnapshotTopSearchedIngredientDict}"": ""{snapshot.top_most_searched_ingredients}"", " +
-                 $@"""{Constants.SnapshotTopSearchedStoreDict}"": ""{snapshot.top_most_searched_stores}"", " +
-                 $@"""{Constants.SnapshotTopUpvotedUserDict}"": ""{snapshot.top_most_upvoted_users}"", " +
-                 $@"""{Constants.SnapshotTopDownvotedUserDict}"": ""{snapshot.top_most_downvoted_users}""}},";
+                // e.g. 202011
+                var year = yearMonth.Substring(0, 4);
+                var month = yearMonth.Substring(4, 2);
+
+                // Remove the 0 in front of months because it messes with the json format.
+                if (month.Substring(0,1) == "0")
+                {
+                    month = month.Substring(1);
+                }
+
+                // If the year (key) does not already exists in the dictionary, then make a list for the month and then add the year and the month list.
+                if (!yearMonthDict.ContainsKey(year))
+                {
+                    var tempDict = new List<string>();
+                    tempDict.Add(month);
+                    yearMonthDict.Add(year, tempDict);
+                }
+                // If the year does exist, then get the list of month, add the new mongth, and then update the monthlist of the year.
+                else
+                {
+                    var dictHolder = yearMonthDict[year];
+                    dictHolder.Add(month);
+                    yearMonthDict[year] = dictHolder;
+                }
             }
-            // Delete the last ",".
-            formattedString = formattedString.Substring(0, formattedString.Length - 1);
-            formattedString += "] }";
+
+            var formattedYearMonth = FormatYearMonthDict(yearMonthDict);
+            return formattedYearMonth;
+        }
+
+        /// <summary>
+        /// Method to format the YearMonthDict into json format.
+        /// </summary>
+        /// <param name="yearMonthDict">The dictionary pertaining to the year and month with snapshots.</param>
+        /// <returns>The json formatted string.</returns>
+        public string FormatYearMonthDict(Dictionary<string, List<string>> yearMonthDict)
+        {
+            string formattedString = "";
+            foreach (var year in yearMonthDict)
+            {
+                formattedString += "{'name':" + "'" + year.Key + "','value':[";
+                foreach (var month in year.Value)
+                {
+                    formattedString += month + ",";
+                }
+                if (formattedString.Length > 0)
+                {
+                    formattedString = formattedString.Substring(0, formattedString.Length - 1);
+                }
+                formattedString += "]},";
+            }
+            if (formattedString.Length > 0)
+            {
+                formattedString = formattedString.Substring(0, formattedString.Length - 1);
+            }
+
+            formattedString = "{\"YearMonth\":\"[" + formattedString + "]\"}";
+
             return formattedString;
         }
 
         /// <summary>
-        /// Method to format the dictonary of operations into json format.
+        /// Method to get the data from the operation list from multiple snapshots.
+        /// The data will be calculated and combined to return as a single dictionary.
         /// </summary>
-        /// <param name="operationsDict">A dictionary with operations that the used performed.</param>
-        /// <returns>A sting that contains the information from the dictionary.</returns>
+        /// <param name="yearString">The year that the user requested for reading the multiple snapshot.</param>
+        /// <param name="snapshotList">The list of snapshots.</param>
+        /// <returns>A dictionary with operation data for each months.</returns>
+        public Dictionary<string, List<int>> SortOperationDataFromultipleSnapshot(string yearString, List<SnapShotResult> snapshotList)
+        {
+            // Get a list of months that we have the snapshots for.
+            var availableMonths = new List<string>();
+            foreach (var snapshot in snapshotList)
+            {
+                availableMonths.Add(snapshot._month);
+            }
+
+            var operationDict = new Dictionary<string, List<int>>();
+            var index = 0; // To keep track of which month we are on.
+            // Iterate 12 times, once for each month.
+            for (int i = 1; i < 13; i++) {
+                // Get the string value pertaining to a month.
+                var monthString = FormatIntMonthYearToString(i);
+                // If we have a snapshot available for that month.
+                if (availableMonths.Contains(yearString + monthString))
+                {
+                    // Get the operations property from a snapshot for that month. 
+                    var stringOperations = snapshotList[index].operations.Substring(2, snapshotList[index].operations.Length - 4);
+                    // Split up all the operations and loop through them.
+                    var splittedOperations = new List<string>(stringOperations.Split(new string[] { "},{" }, StringSplitOptions.None));
+                    foreach (var pair in splittedOperations)
+                    {
+                        var formattedString = pair.Replace("'", "");
+                        formattedString = formattedString.Substring(5, formattedString.Length - 5);
+
+                        // Split up the operation name and the values.
+                        var operationNameAndValue = new List<string>(formattedString.Split(new string[] { ",value:" }, StringSplitOptions.None));
+                        operationNameAndValue[1] = operationNameAndValue[1].Substring(1, operationNameAndValue[1].Length - 2);
+
+                        // Split up the numbers in the values section.
+                        // eg. [1,2,5,23,5,2]
+                        var splitData = new List<string>(operationNameAndValue[1].Split(new string[] { "," }, StringSplitOptions.None));
+
+                        var numberList = new List<int>();
+                        // Loop through these splitted data now and check if they are actually numbers. If they are, add them to the numberList.
+                        foreach (var num in splitData)
+                        {
+                            bool number = Int32.TryParse(num, out int x);
+                            if (number)
+                            {
+                                numberList.Add(x);
+                            }
+                        }
+
+                        var success = 0;
+                        var fail = 0;
+                        var total = 0;
+                        // Iterate through the numberList and sort them by their specific meaning.
+                        // The order this these values are, success, fail, total, in this pattern throughout the entire list.
+                        // eg. 1,2,3. Where 1 is the success, 2 is the fail, and 3 is the total.
+                        for (int j = 0; j < numberList.Count; j++)
+                        {
+                            if (j % 3 == 0)
+                            {
+                                success += numberList[j];
+                            }
+                            else if ((j - 1) % 3 == 0)
+                            {
+                                fail += numberList[j];
+                            }
+                            else
+                            {
+                                total += numberList[j];
+                            }
+                        }
+                        // If the operation(key) does not already exist in the operation dictionary.
+                        if (!operationDict.ContainsKey(operationNameAndValue[0]))
+                        {
+                            // Make a list and check what month we are in. (i is keeping track of months)
+                            // Since this is first popping up, I have to fill out all the values before it as 0's because of the months with no data.
+                            // It is adding 3 zeros because of the success,fail,total format.
+                            var tempDict = new List<int>();
+                            for (int k = 1; k < i; k++)
+                            {
+                                tempDict.Add(0);
+                                tempDict.Add(0);
+                                tempDict.Add(0);
+                            }
+                            // Add the current data (success, fail, total) to it now.
+                            tempDict.Add(success);
+                            tempDict.Add(fail);
+                            tempDict.Add(total);
+                            // Add the list as the value relating the operation key.
+                            operationDict.Add(operationNameAndValue[0], tempDict);
+                        }
+                        // If the key already exists.
+                        else
+                        {
+                            // Get the data list pertaining to the operation, add the success, fail, total value and reassign it as the new value.
+                            var dictHolder = operationDict[operationNameAndValue[0]];
+                            dictHolder.Add(success);
+                            dictHolder.Add(fail);
+                            dictHolder.Add(total);
+                            operationDict[operationNameAndValue[0]] = dictHolder;
+                        }
+                    }
+                    index++;
+                }
+                // If we do not have a snapshot for that specific month.
+                else
+                {
+                    // Loop through the operations in the operation dictionary.
+                    for (int l = 0; l < operationDict.Count; l ++)
+                    {
+                        // Get the list (data) for that operation and then add 0's to the data to represent success, fail, total.
+                        // Assign that new updated list as the value for that operation.
+                        var operation = operationDict.Keys.ElementAt(l);
+                        var dictHolder = operationDict[operation];
+                        dictHolder.Add(0);
+                        dictHolder.Add(0);
+                        dictHolder.Add(0);
+                        operationDict[operation] = dictHolder;
+                    }
+                }
+            }
+            return operationDict;
+        }
+
+        /// <summary>
+        /// Method specific to reading multiple snapshots.
+        /// This is used for the user count dictionary.
+        /// Each pair is a usertype and the amount of users of that type.
+        /// That means the latest snapshot should have the information for that year.
+        /// In this method I just get the last snapshot property pertaining to the registered user count and return it like it was.
+        /// </summary>
+        /// <param name="snapshotList">A list of snapshots.</param>
+        /// <returns>A string value pertaining to the user count property from the last existing snapshot of that year.</returns>
+        public string GetUsersResultFromSnapshotList(List<SnapShotResult>snapshotList)
+        {
+            // Get the count and to get the last snapshot, get the index with the size - 1.
+            var snapshotListSize = snapshotList.Count;
+            var registeredUser = snapshotList[snapshotListSize - 1].count_of_registered_users;
+            return registeredUser;
+        }
+
+        /// <summary>
+        /// Method used to combine the data from the list of snapshots.
+        /// There has to be some string manipulation to extract the data from the snapshots.
+        /// Combine the data into a dictionary with a string key and a int value and return it.
+        /// </summary>
+        /// <param name="snapshotList">A list with multiple snapshots.</param>
+        /// <param name="property">A property relating to the property of a snapshot. Needed to know what dictionary to create.</param>
+        /// <returns>A dictionary with all the combined data from the snapshots.</returns>
+        public Dictionary<string, int> CombineSnapshotsDataForTopTen(List<SnapShotResult> snapshotList, string property)
+        {
+            var dictWithCombinedData = new Dictionary<string, int>();
+            // Loop through each snapshot and get the snapshot property pertaining to the parameter (property).
+            foreach (var snapshot in snapshotList)
+            {
+                // Get the property of the snapshot with a string.
+                var data = snapshot.GetType().GetProperty(property).GetValue(snapshot, null);
+                // The data was in system.string object format and the Substring method could not be used so it needed to be turned into a String.
+                var dataString = (string)data;
+
+                var formattedData = dataString.Substring(2, dataString.Length - 4);
+                var splitData = new List<string>(formattedData.Split(new string[] { "},{" }, StringSplitOptions.None));
+
+                // There are multiple pairs in the data, so it neededs to be split up.
+                // eg. [{Name: david, Value: 1},{Name: jason, Value: 2}] 
+                foreach (var pair in splitData)
+                {
+                    var formattedPair = pair.Replace("'", "");
+                    formattedPair = formattedPair.Substring(5, formattedPair.Length - 5);
+                    // Split up the name and the value.
+                    var NameAndValue = new List<string>(formattedPair.Split(new string[] { ",value:" }, StringSplitOptions.None));
+
+                    // Convert the value from a string into an int.
+                    bool number = Int32.TryParse(NameAndValue[1], out int x);
+                    if (number)
+                    {
+                        // If the dictionary does not contain the key, add the key and assign the value x to it. Where x is the converted int.
+                        if (!dictWithCombinedData.ContainsKey(NameAndValue[0]))
+                        {
+                            dictWithCombinedData.Add(NameAndValue[0], x);
+                        }
+                        // If the key already exist then just increment the value of the key with the value x. 
+                        else
+                        {
+                            dictWithCombinedData[NameAndValue[0]] = dictWithCombinedData[NameAndValue[0]] + x;
+                        }
+                    }
+                }
+            }
+            return dictWithCombinedData;
+        }
+
+        /// <summary>
+        /// Method to format the dictonary of operations into json format when given a dictionary of string and a list of int.
+        /// This method is specially used for the read multiple snapshot operation.
+        /// </summary>
+        /// <param name="formattedOperationsDict">A dictionary with operations that the used performed and a list of int values.</param>
+        /// <returns>A string that contains the information from the dictionary.</returns>
+        public string FinalizeOperationsDict(Dictionary<string, List<int>> formattedOperationsDict)
+        {
+            string operationsString = "";
+            foreach (var operation in formattedOperationsDict)
+            {
+                operationsString += "{'name':" + "'" + operation.Key + "','value':[";
+                foreach (var number in operation.Value)
+                {
+                    operationsString += number + ",";
+                }
+                operationsString = operationsString.Substring(0, operationsString.Length - 1);
+                operationsString += "]},";
+            }
+            if (operationsString.Length > 0)
+            {
+                operationsString = operationsString.Substring(0, operationsString.Length - 1);
+            }
+            operationsString = "[" + operationsString + "]";
+            return operationsString;
+        }
+
+        /// <summary>
+        /// Method to format the dictonary of operations into json format when the data is more messy.
+        /// This method is specially used for when creating the snapshot.
+        /// </summary>
+        /// <param name="operationsDict">A dictionary with operations that the used performed and a list of lists of int values.</param>
+        /// <returns>A string that contains the information from the dictionary.</returns>
         public string FormatOperationsDict(Dictionary<string, List<List<int>>> operationsDict)
         {
             string operationsString = "";
@@ -126,6 +381,7 @@ namespace TeamA.Exogredient.Services
         public string FormatIntMonthYearToString(int number)
         {
             string numberString = Convert.ToString(number);
+            // A year will never be less than 2, so this check is pertaining to months.
             if (numberString.Length < 2)
             {
                 numberString = numberString.Insert(0, "0");
@@ -141,6 +397,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>A dictionary that only has 10 pair at most.</returns>
         public Dictionary<string, int> DropTillTen(Dictionary<string, int> dict)
         {
+            // If the dictionary has more than 10 pair, drop them.
             while(dict.Count > 10)
             {
                 dict.Remove(dict.Keys.Last());
@@ -159,9 +416,11 @@ namespace TeamA.Exogredient.Services
         {
             Dictionary<string, int> sortedDictionary = new Dictionary<string, int>();
 
+            // Sort the Dictionary by the value in descneding order.
             var sortedValues = from pair in dict orderby pair.Value descending select pair;
             foreach (KeyValuePair<string, int> pair in sortedValues)
             {
+                // Add the value into a new dictionary by this order.
                 sortedDictionary.Add(pair.Key, pair.Value);
             }
             return sortedDictionary;
@@ -185,7 +444,7 @@ namespace TeamA.Exogredient.Services
         /// <param name="month">The month to get the logs.</param>
         /// <param name="amountOfDays">The amount of days in the specfic mongth.</param>
         /// <returns>A list of list of the LogResult object.</returns>
-        public async Task<List<List<LogResult>>> GetLogsInMonth(int year, int month, int amountOfDays)
+        public async Task<List<List<LogResult>>> GetLogsInMonthAsync(int year, int month, int amountOfDays)
         {
             string yearString = FormatIntMonthYearToString(year);
             string monthString = FormatIntMonthYearToString(month);
@@ -210,8 +469,8 @@ namespace TeamA.Exogredient.Services
         /// <returns></returns>
         public Dictionary<string, List<List<int>>> GetOperationDict(List<List<LogResult>> logResults, int amountOfDays)
         {
-            //Dictionary for every operation performed.
-            //First type string will be the name of the operation, and second type List are the days and the amount of time the operation is performed each day.
+            // Dictionary for every operation performed.
+            // First type string will be the name of the operation, and second type List are the days and the amount of time the operation is performed each day.
 
             var operationsDict = new Dictionary<string, List<List<int>>>();
 
@@ -225,17 +484,22 @@ namespace TeamA.Exogredient.Services
                     string[] operationInfo = logs.Operation.Split('/');
                     string operation = operationInfo[0];
                     string errorType = logs.ErrorType;
+                    // Each unique operation is a key.
                     if (!operationsDict.ContainsKey(operation))
                     {
+                        // A list that will hold data for each day in a month.
                         var days = new List<List<int>>();
                         for (int i = 0; i < amountOfDays; i++)
                         {
+                            // A list that will hold the data for just that day.
+                            // This will be size 3 for each day.
+                            // Amount of success, fail, and total for each operation for that specific day.
                             var day = new List<int>(new int[3]);
                             days.Add(day);
                         }
                         operationsDict.Add(operation, days);
                     }
-                    operationsDict[operation][date][2] = operationsDict[operation][date][2] + 1;
+                    operationsDict[operation][date][2] = operationsDict[operation][date][2] + 1; // total
                     if (errorType == "null") // success operation
                     {
                         operationsDict[operation][date][0] = operationsDict[operation][date][0] + 1;
@@ -255,10 +519,10 @@ namespace TeamA.Exogredient.Services
         /// Method to get the amount of users there is based on the user type.
         /// </summary>
         /// <returns>A dictionary of users with their type and the amount.</returns>
-        public async Task<Dictionary<string, int>> GetUsersDict()
+        public async Task<Dictionary<string, int>> GetUsersDictAsync()
         {     
-            //Dictionary for registered user information
-            //First type string will be the type of users, and second type will be the amount.
+            // Dictionary for registered user information
+            // First type string will be the type of users, and second type will be the amount.
             var usersDict = new Dictionary<string, int>();
 
             int numberOfCustomers = await _userDAO.CountUsersTypeAsync(Constants.CustomerUserType).ConfigureAwait(false);
@@ -284,47 +548,21 @@ namespace TeamA.Exogredient.Services
             {
                 foreach (var logs in days) // for each logs in a day
                 {
-                    // Code for using ipInfo, but the server was down so I switched back to ipdata.
-                    //IpInfo ipInfo = new IpInfo();
 
-                    ////Online resource on how to get the data from ipinfo (stackoverflow Offir Pe'er). 
-                    //try
-                    //{
-                    //    //Download the jsonformat of information relating to specific ip from ipinfo.io with the help of WebClient.
-                    //    string info = new WebClient().DownloadString("http://ipinfo.io/" + logs.IpAddress);
-                    //    //Convert the Json formatted string into specific object.
-                    //    ipInfo = JsonConvert.DeserializeObject<IpInfo>(info);
-
-                    //    //Get the english name of the country of abbreviations.
-                    //    RegionInfo myRI1 = new RegionInfo(ipInfo.Country);
-                    //    ipInfo.Country = myRI1.EnglishName;
-                    //}
-                    //catch (Exception)
-                    //{
-                    //    ipInfo.Country = null;
-                    //}
-
-                    //if (ipInfo.Country != null && ipInfo.Region != null && ipInfo.City != null)
-                    //{
-                    //    if (!cityDict.ContainsKey(ipInfo.Country + " " + ipInfo.Region + ", " + ipInfo.City))
-                    //    {
-                    //        cityDict.Add(ipInfo.Country + " " + ipInfo.Region + ", " + ipInfo.City, 0);
-                    //    }
-                    //    cityDict[ipInfo.Country + " " + ipInfo.Region + ", " + ipInfo.City] = cityDict[ipInfo.Country + " " + ipInfo.Region + ", " + ipInfo.City] + 1;
-                    //}
-
-                    //Key needed to use the IpDataClient.
+                    // Key needed to use the IpDataClient.
                     var client = new IpDataClient("230afeb118ec79bd5bd63d52fcf9de1d4ad038e92bca6d4e9851fbac");
-                    //Method to lookup the ip address.
+                    // Method to lookup the ip address.
                     var ipInfo = await client.Lookup(logs.IpAddress).ConfigureAwait(false);
 
-                    //If the region field is not empty, then I will format the data and add it to my dictionary.
+                    // If the region field is not empty, then I will format the data and add it to my dictionary.
                     if (ipInfo.Region != null)
                     {
+                        // Check if the specific city already exist in the dictionary, if it doesn't add it.
                         if (!cityDict.ContainsKey(ipInfo.CountryName + " " + ipInfo.Region + ", " + ipInfo.City))
                         {
                             cityDict.Add(ipInfo.CountryName + " " + ipInfo.Region + ", " + ipInfo.City, 0);
                         }
+                        // Increment the amount specific to the city by one.
                         cityDict[ipInfo.CountryName + " " + ipInfo.Region + ", " + ipInfo.City] = cityDict[ipInfo.CountryName + " " + ipInfo.Region + ", " + ipInfo.City] + 1;
                     }
                 }
@@ -339,7 +577,6 @@ namespace TeamA.Exogredient.Services
         /// <returns>The list of users and the amount of time they uploaded.</returns>
         public Dictionary<string, int> GetUserUploadedDict(List<List<LogResult>> logResults)
         {
-            //Top users that upload the most.
             //First type string will be the username, and second type int will be the amount. 
              
             // Constants.CreateUploadOperation/storename/ingredient
@@ -348,12 +585,15 @@ namespace TeamA.Exogredient.Services
             {
                 foreach (var logs in days) // for each logs in a day
                 {
+                    // Check if it was a create upload operation.
                     if (logs.Operation.Contains(Constants.CreateUploadOperation) && logs.ErrorType == "null")
                     {
+                        // Get the username and then add it to the dictionary.
                         if (!userUploadedDict.ContainsKey(logs.Identifier))
                         {
                             userUploadedDict.Add(logs.Identifier, 0);
                         }
+                        // Increment the amount specific the username by one.
                         userUploadedDict[logs.Identifier] = userUploadedDict[logs.Identifier] + 1;
                     }
                 }
@@ -380,6 +620,7 @@ namespace TeamA.Exogredient.Services
                     if (logs.Operation.Contains(Constants.CreateUploadOperation) && logs.ErrorType == "null")
                     {
                         //Has to be split because there are extra information.
+                        // UploadOperation/storename/ingredientname
                         string[] uploadInfo = logs.Operation.Split('/');
                         string ingredientName = uploadInfo[2];
                         if (!uploadedIngredientDict.ContainsKey(ingredientName))
@@ -400,8 +641,8 @@ namespace TeamA.Exogredient.Services
         /// <returns>The dictionary with the name of the stores and the amount of times they were uploaded to.</returns>
         public Dictionary<string, int> GetUploadedStoreDict(List<List<LogResult>> logResults)
         {
-            //Top stores that have been uploaded to the most.
-            //First type string will be the name of the store, and second type int will be the amount.
+            // Top stores that have been uploaded to the most.
+            // First type string will be the name of the store, and second type int will be the amount.
             var uploadedStoreDict = new Dictionary<string, int>();
             foreach (var days in logResults) // for each days in a month
             {
@@ -409,7 +650,8 @@ namespace TeamA.Exogredient.Services
                 {
                     if (logs.Operation.Contains(Constants.CreateUploadOperation) && logs.ErrorType == "null")
                     {
-                        //Has to be split because there are extra information.
+                        // Has to be split because there are extra information.
+                        // UploadOperation/storename/ingredientname
                         string[] uploadInfo = logs.Operation.Split('/');
                         string storeName = uploadInfo[1];
                         if (!uploadedStoreDict.ContainsKey(storeName))
@@ -430,8 +672,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>A dictionary with the name of the ingredient and the amount of time it has been searched.</returns>
         public Dictionary<string, int> GetSearchedIngredientDict(List<List<LogResult>> logResults)
         {
-            
-            //Top ingredient that is searched up the most.
+
             //First type string will be the name of the ingredient, and second type int will be the amount.
             
             var searchedIngredientDict = new Dictionary<string, int>();
@@ -441,7 +682,8 @@ namespace TeamA.Exogredient.Services
                 {
                     if (logs.Operation.Contains(Constants.SearchOperation) && logs.ErrorType == "null")
                     {
-                        //Has to be split because there are extra information.
+                        // Has to be split because there are extra information.
+                        // Searchoperation/ingredient/"apple"
                         string[] searchInfo = logs.Operation.Split('/');
                         string searchType = searchInfo[1];
                         string searchName = searchInfo[2];
@@ -466,10 +708,7 @@ namespace TeamA.Exogredient.Services
         /// <returns>A dictionary with the name of the store and the amount of time it has been searched.</returns>
         public Dictionary<string, int> GetSearchedStoreDict(List<List<LogResult>> logResults)
         {
-            /**
-             * Top store that is searched up the most.
-             * First type string will be the name of the store, and second tpe int will be the amount.
-             */
+            // First type string will be the name of the store, and second tpe int will be the amount.
             var searchedStoreDict = new Dictionary<string, int>();
             foreach (var days in logResults) // for each days in a month
             {
@@ -477,7 +716,8 @@ namespace TeamA.Exogredient.Services
                 {
                     if (logs.Operation.Contains(Constants.SearchOperation) && logs.ErrorType == "null")
                     {
-                        //Has to be split because there are extra information.
+                        // Has to be split because there are extra information.
+                        // Searchoperation/store/"walmart"
                         string[] searchInfo = logs.Operation.Split('/');
                         string searchType = searchInfo[1];
                         string searchName = searchInfo[2];
@@ -504,21 +744,23 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="logResults">The list pertaining to the log results.</param>
         /// <returns>A dictionary of users and the amount of upvotes they have.</returns>
-        public async Task<Dictionary<string, int>> GetUpvotedUserDict(List<List<LogResult>> logResults)
+        public async Task<Dictionary<string, int>> GetUpvotedUserDictAsync(List<List<LogResult>> logResults)
         {
             
             //Top most upvoted users.
             //First type string will be the username, and second type will be the amount.
             
-            // List of uploads that has been affected by upvotes. Constants.upvoteOperation/uploadID
+            // List of uploads that has been affected by upvotes.
             var upvotedUploadsDict = new Dictionary<string, int>();
             foreach (var days in logResults) // for each days in a month
             {
                 foreach (var logs in days) // for each logs in a day
                 {
+                    // If the log is of an upvote operation and if that operation was successful.
                     if (logs.Operation.Contains(Constants.UpvoteOperation) && logs.ErrorType == "null")
                     {
                         // Has to be split because of extra information
+                        // UpvoteOperation/uploadID
                         string[] entireOperation = logs.Operation.Split('/');
                         string uploadID = entireOperation[1];
                         if (!upvotedUploadsDict.ContainsKey(uploadID))
@@ -527,10 +769,12 @@ namespace TeamA.Exogredient.Services
                         }
                         upvotedUploadsDict[uploadID] = upvotedUploadsDict[uploadID] + 1;
                     }
+                    // If the log is of an undo upvote operation and if that operation was successful.
                     // If an upload was undoed, then make sure to subtract the score.
                     else if (logs.Operation.Contains(Constants.UndoUpvoteOperation) && logs.ErrorType == "null")
                     {
                         // Has to be split because of extra information
+                        // UndoUpvoteOperation/uploadID
                         string[] entireOperation = logs.Operation.Split('/');
                         string uploadID = entireOperation[1];
                         if (!upvotedUploadsDict.ContainsKey(uploadID))
@@ -571,21 +815,21 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="logResults">The list pertaining to the log results.</param>
         /// <returns>A dictionary of users and the amount of downvotes they have.</returns>
-        public async Task<Dictionary<string, int>> GetDownvotedUserDict(List<List<LogResult>> logResults)
-        {
-            
-            //Top most downvoted users.
+        public async Task<Dictionary<string, int>> GetDownvotedUserDictAsync(List<List<LogResult>> logResults)
+        {            
             //First type string will be the username, and second type will be the amount.
             
-            // List of uploads that has been affected by upvotes. Constants.upvoteOperation/uploadID
+            // List of uploads that has been affected by upvotes.
             var downvotedUploadsDict = new Dictionary<string, int>();
             foreach (var days in logResults) // for each days in a month
             {
                 foreach (var logs in days) // for each logs in a day
                 {
+                    // If the log is of an downvote operation and if that operation was successful.
                     if (logs.Operation.Contains(Constants.DownvoteOperation) && logs.ErrorType == "null")
                     {
                         // Has to be split because of extra information.
+                        // DownvoteOperation/uploadID
                         string[] entireOperation = logs.Operation.Split('/');
                         string uploadID = entireOperation[1];
                         if (!downvotedUploadsDict.ContainsKey(uploadID))
@@ -594,9 +838,12 @@ namespace TeamA.Exogredient.Services
                         }
                         downvotedUploadsDict[uploadID] = downvotedUploadsDict[uploadID] + 1;
                     }
+                    // If the log is of an undo downvote operation and if that operation was successful.
+                    // If an upload was undoed, then make sure to subtract the score.
                     else if (logs.Operation.Contains(Constants.UndoDownvoteOperation) && logs.ErrorType == "null")
                     {
                         // Has to be split because of extra information.
+                        // UndoDownvoteOperation/uploadID
                         string[] entireOperation = logs.Operation.Split('/');
                         string uploadID = entireOperation[1];
                         if (!downvotedUploadsDict.ContainsKey(uploadID))
@@ -612,14 +859,16 @@ namespace TeamA.Exogredient.Services
 
             // List of users that uploaded those uploads with amount of downvotes.
             var downvotedUsersDict = new Dictionary<string, int>();
-            //Interate through the dictionary, add new users to the usersDict and give them their score.
-            //If a user come up again, just increment their score with the new value.
+            // Interate through the dictionary, add new users to the usersDict and give them their score.
+            // If a user come up again, just increment their score with the new value.
             foreach (var user in usersDict)
             {
+                // If the key does not exist then add the key and the value pertaining to it.
                 if (!downvotedUsersDict.ContainsKey(user.Value))
                 {
                     downvotedUsersDict.Add(user.Value, downvotedUploadsDict[user.Key]);
                 }
+                // If the key does exists then increment the value with the new value.
                 else
                 {
                     downvotedUsersDict[user.Value] = downvotedUsersDict[user.Value] + downvotedUploadsDict[user.Key];
@@ -633,12 +882,13 @@ namespace TeamA.Exogredient.Services
         /// It sort the dictionaries by the integer value, then drops until there are only 10 pair left.
         /// It then format the information into a json format.
         /// </summary>
-        /// <param name="dict">A string,int dictionary </param>
+        /// <param name="dict">A dictionary that needs to be finalized into json format. </param>
         /// <returns>A finalized string that is in json format.</returns>
         public string FinalizeStringIntDictForSnap(Dictionary<string, int> dict)
         {
             return FormatStringIntDict(DropTillTen(SortDictionaryByIntValues(dict)));
         }
+
 
         /// <summary>
         /// Method that creates a snapshot based on the list of data.
@@ -669,31 +919,66 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="year">Year needed to get specific snapshot.</param>
         /// <param name="month">Month needed to get specific snapshot.</param>
-        /// <returns></returns>
+        /// <returns>A snapshot with the all the data in that month.</returns>
         public async Task<SnapShotResult> ReadOneSnapshotAsync(int year, int month)
         {
             string yearString = FormatIntMonthYearToString(year);
             string monthString = FormatIntMonthYearToString(month);
 
-            var snapshot = await _snapshotDAO.ReadMonthlySnapshotAsync(yearString, monthString);
+            var snapshot = await _snapshotDAO.ReadMonthlySnapshotAsync(yearString, monthString).ConfigureAwait(false);
             return snapshot;
         }
 
         /// <summary>
         /// Method to read all the snapshot relating to the year.
+        /// Format the snapshot objects and get their data and combine it.
+        /// Sort through the data and return the finalized data to be stored into a single snapshot object to be sent up.
         /// </summary>
         /// <param name="year">Year needed to get all the snapshots pertaining to it. </param>
-        /// <returns>A formatted string with all the data in multiple snapshots.</returns>
-        public async Task<String> ReadMultiSnapshotAsync(int year)
+        /// <returns>A snapshot with the data with all the data in that year.</returns>
+        public async Task<SnapShotResult> ReadMultiSnapshotAsync(int year)
         {
             string yearString = FormatIntMonthYearToString(year);
 
-            var snapshotList = await _snapshotDAO.ReadYearlySnapshotAsync(yearString);
+            // Get all the snapshots pertaining the the specified year.
+            // The return value is a list of snapshots.
+            var snapshotList = await _snapshotDAO.ReadYearlySnapshotAsync(yearString).ConfigureAwait(false);
 
-            // Format the data into a string format.
-            var formattedSnapshotList = FormatSnapShotListIntoJson(snapshotList);
+            // Format and combine the data for all the snapshots.
+            
+            // The return value is a Dictionary<string, List<int>>.
+            // The string value is the operation name, the list of int is the data seperated by months.
+            var formattedOperationsDict = SortOperationDataFromultipleSnapshot(yearString, snapshotList);
+            
+            // The return value is a Dictionary<string, int>.
+            // The string is for the name of the thing e.g. username, store name, ingredient name. 
+            // The int value is the amount.
+            var formattedCityDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopCityDict);
+            var formattedUserUploadedDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopUserUploadedDict);
+            var formattedUploadedIngredientDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopUploadedIngredientDict);
+            var formattedUploadedStoreDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopUploadedStoreDict);
+            var formattedSearchedIngredientDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopSearchedIngredientDict);
+            var formattedSearchedStoreDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopSearchedStoreDict);
+            var formattedUpvotedUserDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopUpvotedUserDict);
+            var formattedDownvotedUserDict = CombineSnapshotsDataForTopTen(snapshotList, Constants.SnapshotTopDownvotedUserDict);
 
-            return formattedSnapshotList;
+            // Finalize the data and turn it into a string, json format.
+            var finalizedOperationsDict = FinalizeOperationsDict(formattedOperationsDict);
+            var finalizedUsersDict = GetUsersResultFromSnapshotList(snapshotList);
+            var finalizedCityDict = FinalizeStringIntDictForSnap(formattedCityDict);
+            var finalizedUserUploadedDict = FinalizeStringIntDictForSnap(formattedUserUploadedDict);
+            var finalizedUploadedIngredientDict = FinalizeStringIntDictForSnap(formattedUploadedIngredientDict);
+            var finalizedUploadedStoreDict = FinalizeStringIntDictForSnap(formattedUploadedStoreDict);
+            var finalizedSearchedIngredientDict = FinalizeStringIntDictForSnap(formattedSearchedIngredientDict);
+            var finalizedSearchedStoreDict = FinalizeStringIntDictForSnap(formattedSearchedStoreDict);
+            var finalizedUpvotedUserDict = FinalizeStringIntDictForSnap(formattedUpvotedUserDict);
+            var finalizedDownvotedUserDict = FinalizeStringIntDictForSnap(formattedDownvotedUserDict);
+
+            // Create a snapshot object and store the strings in the correct properties.
+            var snapshot = new SnapShotResult(yearString, finalizedOperationsDict, finalizedUsersDict, finalizedCityDict, finalizedUserUploadedDict, finalizedUploadedIngredientDict,
+                finalizedUploadedStoreDict, finalizedSearchedIngredientDict, finalizedSearchedStoreDict, finalizedUpvotedUserDict, finalizedDownvotedUserDict);
+
+            return snapshot;
         }
 
     }

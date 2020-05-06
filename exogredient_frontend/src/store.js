@@ -13,6 +13,7 @@ export default new Vuex.Store({
     state: {
       storeResults: [],
       ingredientResults: [],
+      ingredientsList: [],
       storeViewData: null,
       username: "username",
       ipAddress: "127.1.1.0",

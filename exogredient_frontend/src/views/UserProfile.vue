@@ -1,10 +1,9 @@
 <template>
   <div>
-    <h1 class="center">{{ username }}: {{ score }}</h1>
+    <h1 class="center">ProfileScore : {{ score }}</h1>
 
     <!-- display business owners functionality  -->
     <div class="center">
-      <h3>Owned Store's</h3>
     </div>
 
     <!-- display the recent uploads  -->
@@ -12,7 +11,28 @@
       <v-btn @click="GetRecentUploads(0)">
         {{ recentUploadStatus ? "Hide Recent Uploads" : "Show Recent Uploads" }}
       </v-btn>
+    </div>
+
+    <!-- display the inprogress uploads  -->
+    <div >
+      <v-btn @click="GetInProgressUploads(0)">{{
+        inProgressStatus
+          ? "Hide In Progress Uploads"
+          : "Show In Progress Uploads"
+      }}</v-btn>
+      
+    </div>
+
+    <!-- display the save list  -->
+    <div>
+      <v-btn @click="GetSaveList(0)">
+        {{ saveListStatus ? "Hide SaveList" : "Show SaveList" }}
+      </v-btn>
+    </div>
+
+      <!-- Lists Content -->
       <div v-if="recentUploadStatus" class="column">
+        <h1 style="text-align:center">Recent Uploads</h1>
         <v-pagination
           v-model="recentUploadPage"
           :value="1"
@@ -24,16 +44,9 @@
           <RecentUpload :upload="item" :index="index"> </RecentUpload>
         </div>
       </div>
-    </div>
 
-    <!-- display the inprogress uploads  -->
-    <div class="inProgress">
-      <v-btn @click="GetInProgressUploads(0)">{{
-        inProgressStatus
-          ? "Hide In Progress Uploads"
-          : "Show In Progress Uploads"
-      }}</v-btn>
       <div v-if="inProgressStatus" class="column">
+        <h1 style="text-align:center">In Progress Uploads</h1>
         <v-pagination
           v-model="inProgressPage"
           :value="1"
@@ -45,14 +58,9 @@
           <InProgressUpload :upload="item" :index:="index"></InProgressUpload>
         </div>
       </div>
-    </div>
 
-    <!-- display the save list  -->
-    <div class="saveList">
-      <v-btn @click="GetSaveList(0)">
-        {{ saveListStatus ? "Hide SaveList" : "Show SaveList" }}
-      </v-btn>
       <div v-if="saveListStatus" Class="column">
+        <h1 style="text-align:center">Save List</h1>
         <v-pagination
           v-model="saveListPage"
           :dark="true"
@@ -63,7 +71,7 @@
           <SaveList :saveItem="item" :index="index"></SaveList>
         </div>
       </div>
-    </div>
+
   </div>
 </template>
 

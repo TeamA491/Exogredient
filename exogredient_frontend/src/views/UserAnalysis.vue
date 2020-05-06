@@ -156,7 +156,7 @@
             ></v-select>
           </v-col>
         </v-row>
-        <button @click="DestroyBarChart(); GetSingleSnapshotChart();">Submit</button>
+        <button @click="GetSingleSnapshotChart();">Submit</button>
       </div>
       <canvas id="singleChart"></canvas>
     </div>
@@ -184,8 +184,9 @@ export default {
     return {
       dialog: false,
       DialogMessage: "",
-      yearList: [2020],
-      monthList: [3, 4],
+      yearList: [],
+      monthList: [1, 2, 3, 4],
+      yearMonthList: [],
       operationLists: [
         "Downvote Upload",
         "Upvote Upload",
@@ -196,8 +197,13 @@ export default {
       ],
       monthTable: 0,
       yearTable: 0,
+      monthTableHolder: 0,
+      yearTableHolder: 0,
       monthChart: 0,
       yearChart: 0,
+      monthChartHolder: 0,
+      yearChartHolder: 0,
+      snapshotExistance: false,
       operations: [],
       registeredUsers: [],
       topCities: [],
@@ -209,11 +215,13 @@ export default {
       topUsersUpvoted: [],
       topUsersDownvoted: [],
       operationName: "Registration",
-      operationExist: true,
+      operationExist: false,
+      singleChartExist: false,
       date: [],
       specificOperationSucc: [],
       specificOperationFail: [],
       specificOperationTotal: [],
+      chartXLabel : "Dates",
       myChart: Chart
     };
   },
@@ -234,6 +242,8 @@ export default {
       this.monthChart = 12;
       this.yearChart = year - 1;
     }
+    //Get the years with snapshots to set yearList.
+    this.GetYear();
     //Get snapshot for tables.
     this.GetSingleSnapshotTable();
     //Get snapshot for charts.
@@ -245,156 +255,305 @@ export default {
     CloseMessage() {
       this.dialog = false;
     },
+
+    // Method to fetch year and month data from backend.
+    GetYear() {
+      fetch(
+        `${global.ApiDomainName}/api/FetchYearMonth`
+      )
+      .then(response => {
+        return response.json();
+      })
+      .then(yearMonth => {
+        this.yearMonthList = this.Format(yearMonth);
+        this.SetYearMonthList();
+      })
+      .catch(err => {
+        this.DialogMessage = `Unable to retrieve the years and months.`;
+        this.dialog = true;
+      });
+    },
+
+    // Method to set the year list.
+    Format(formattedStr) {
+      var myJSON = JSON.stringify(formattedStr);
+      myJSON = myJSON.substring(14);
+      myJSON = myJSON.substring(0, myJSON.length - 2);
+      var parse1 = myJSON.replace(/'/g, '"');
+      return JSON.parse(parse1);
+    },
+
+    // Method to set the year list and month list on start.
+    SetYearMonthList() {
+      for (var i = 0; i < this.yearMonthList.length; i++) {
+        this.yearList.push(this.yearMonthList[i].name);
+      }
+      this.monthList = [""];
+      var latestYear = this.yearMonthList.length-1;
+      this.yearMonthList[latestYear].value.forEach(month => {
+        this.monthList.push(month);
+      });
+    },
+
+    // Method to set only the month list.
+    setMonthList(year) {
+      this.monthList = [""];
+      var index = 0;
+
+      for (var i = 0; i < this.yearMonthList.length; i++) {
+        if (year == this.yearMonthList[i].name) {
+          index = i;
+        }
+      }
+      this.yearMonthList[index].value.forEach(month => {
+        this.monthList.push(month);
+      });
+    },
+
     // Method to get a snapshot for the tables.
     GetSingleSnapshotTable() {
-      fetch(
-        `${global.ApiDomainName}/api/FetchSnapshot/FetchSingle/${this.yearTable}/${this.monthTable}`
-      )
-        .then(response => {
-          return response.json();
-        })
-        .then(snapshot => {
-          this.registeredUsers = this.FormatTableData(
-            snapshot.count_of_registered_users
-          );
-          this.topCities = this.FormatTableData(
-            snapshot.top_cities_that_uses_application
-          );
-          this.topUsersUploaded = this.FormatTableData(
-            snapshot.top_users_that_upload
-          );
-          this.topIngredientUploaded = this.FormatTableData(
-            snapshot.top_most_uploaded_ingredients
-          );
-          this.topStoreUploaded = this.FormatTableData(
-            snapshot.top_most_uploaded_stores
-          );
-          this.topIngredientSearched = this.FormatTableData(
-            snapshot.top_most_searched_ingredients
-          );
-          this.topStoreSearched = this.FormatTableData(
-            snapshot.top_most_searched_stores
-          );
-          this.topUsersUpvoted = this.FormatTableData(
-            snapshot.top_most_upvoted_users
-          );
-          this.topUsersDownvoted = this.FormatTableData(
-            snapshot.top_most_downvoted_users
-          );
-        })
-        .catch(err => {
-          this.DialogMessage = "Snapshot does not exist.";
-          this.dialog = true;
-        });
+      var specificMonth = this.yearTable + "/" + this.monthTable;
+      var specificMonthHolder = this.yearTableHolder + "/" + this.monthTableHolder;
+      if (specificMonth != specificMonthHolder) {
+        this.yearTableHolder = this.yearTable;
+        this.monthTableHolder = this.monthTable;
+        if (this.monthTable == "") {
+          fetch(
+            `${global.ApiDomainName}/api/FetchMulti/${this.yearTable}`
+          )
+          .then(response => {
+            return response.json();
+          })
+          .then(snapshot => {
+            this.registeredUsers = this.FormatTableData(
+              snapshot.count_of_registered_users
+            );
+            this.topCities = this.FormatTableData(
+              snapshot.top_cities_that_uses_application
+            );
+            this.topUsersUploaded = this.FormatTableData(
+              snapshot.top_users_that_upload
+            );
+            this.topIngredientUploaded = this.FormatTableData(
+              snapshot.top_most_uploaded_ingredients
+            );
+            this.topStoreUploaded = this.FormatTableData(
+              snapshot.top_most_uploaded_stores
+            );
+            this.topIngredientSearched = this.FormatTableData(
+              snapshot.top_most_searched_ingredients
+            );
+            this.topStoreSearched = this.FormatTableData(
+              snapshot.top_most_searched_stores
+            );
+            this.topUsersUpvoted = this.FormatTableData(
+              snapshot.top_most_upvoted_users
+            );
+            this.topUsersDownvoted = this.FormatTableData(
+              snapshot.top_most_downvoted_users
+            );
+          })
+          .catch(err => {
+            this.DialogMessage = `Snapshot ${specificMonth} does not exist.`;
+            this.dialog = true;
+          });
+        }
+        else {
+          fetch(
+            `${global.ApiDomainName}/api/FetchSingle/${this.yearTable}/${this.monthTable}`
+          )
+          .then(response => {
+            return response.json();
+          })
+          .then(snapshot => {
+            this.registeredUsers = this.FormatTableData(
+              snapshot.count_of_registered_users
+            );
+            this.topCities = this.FormatTableData(
+              snapshot.top_cities_that_uses_application
+            );
+            this.topUsersUploaded = this.FormatTableData(
+              snapshot.top_users_that_upload
+            );
+            this.topIngredientUploaded = this.FormatTableData(
+              snapshot.top_most_uploaded_ingredients
+            );
+            this.topStoreUploaded = this.FormatTableData(
+              snapshot.top_most_uploaded_stores
+            );
+            this.topIngredientSearched = this.FormatTableData(
+              snapshot.top_most_searched_ingredients
+            );
+            this.topStoreSearched = this.FormatTableData(
+              snapshot.top_most_searched_stores
+            );
+            this.topUsersUpvoted = this.FormatTableData(
+              snapshot.top_most_upvoted_users
+            );
+            this.topUsersDownvoted = this.FormatTableData(
+              snapshot.top_most_downvoted_users
+            );
+          })
+          .catch(err => {
+            this.DialogMessage = `Snapshot ${specificMonth} does not exist.`;
+            this.dialog = true;
+          });
+        }    
+      }
     },
+
     // Method to get a snapshot for the chart.
     GetSingleSnapshotChart() {
-      fetch(
-        `${global.ApiDomainName}/api/FetchSnapshot/FetchSingle/${this.yearChart}/${this.monthChart}`
-      )
-        .then(response => {
-          return response.json();
-        })
-        .then(snapshot => {
-          this.operations = this.FormatTableData(snapshot.operations);
-          this.CreateBarChartSingle();
-        })
-        .catch(err => {
-          this.DialogMessage = "Snapshot does not exist.";
-          this.dialog = true;
-        });
+      var specificMonth = this.yearChart + "/" + this.monthChart;
+      var specificMonthHolder = this.yearChartHolder + "/" + this.monthChartHolder;
+      if (specificMonth != specificMonthHolder) {
+        this.operations = [];
+        this.yearChartHolder = this.yearChart;
+        this.monthChartHolder = this.monthChart;
+        if (this.monthChartHolder == "") {
+          fetch(
+            `${global.ApiDomainName}/api/FetchMulti/${this.yearChart}`
+          )
+            .then(response => {
+              return response.json();
+            })
+            .then(snapshot => {
+              this.operations = this.FormatTableData(snapshot.operations);
+              this.chartXLabel = "Months";
+              this.StartSingleChartCreation();
+            })
+            .catch(err => {
+              this.DialogMessage = `Snapshot ${specificMonth} does not exist.`;
+              this.dialog = true;
+            });
+        }
+        else {
+          fetch(
+            `${global.ApiDomainName}/api/FetchSingle/${this.yearChart}/${this.monthChart}`
+          )
+            .then(response => {
+              return response.json();
+            })
+            .then(snapshot => {
+              this.operations = this.FormatTableData(snapshot.operations);
+              this.chartXLabel = "Dates";
+              this.StartSingleChartCreation();
+            })
+            .catch(err => {
+              this.DialogMessage = `Snapshot ${specificMonth} does not exist.`;
+              this.dialog = true;
+            });
+        }
+      }
+      else {
+        this.StartSingleChartCreation();
+      }     
     },
+
     // Method to format a string and eval to use values.
     FormatTableData(str) {
       var formattedStr = str.replace(/'/g, '"');
-      return eval(formattedStr);
+      return JSON.parse(formattedStr);
     },
-    // Method to see if a operation exists and destroy the chart if it does.
-    DestroyBarChart() {
-      // Check if the operation exits by interating through operations list.
-      for (var i = 0; i < this.operations.length; i++){
+
+    // Method to start creating a chart.
+    StartSingleChartCreation(){
+      this.CheckOperationExistance();
+      if (this.operationExist) {
+        if (this.singleChartExist) {
+          this.DestroyBarChart();
+        }
+        this.CreateBarChartSingle();
+      }
+      else{
+        this.DialogMessage = `Selected operation ${this.operationName} has no data.`;
+        this.dialog = true;
+      }
+    },
+
+    // Method to see if a operation exists.
+    CheckOperationExistance() {
+      // Check if the operation exits by interating through operations list
+      this.operationExist = false;
+      for (var i = 0; i < this.operations.length; i++) {
         if (this.operationName == this.operations[i].name) {
           this.operationExist = true;
           break;
         }
-        else {
-          this.operationExist = false;
-        }
-      }
-      if (this.operationExist) {
-        this.myChart = this.myChart.destroy();
       }
     },
+
+    // Destroy the chart.
+    DestroyBarChart() {
+        this.myChart = this.myChart.destroy();
+    },
+
     // Method to create the chart.
     CreateBarChartSingle() {
-      if (this.operationExist) {
-        // Get data for specific operation.
-        this.GetOperationData(this.operationName);
-        // Create array for the amount of days in a month.
-        this.CreateDateArray();
-        var ctx = document.getElementById("singleChart");
-        this.myChart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: this.date,
-            datasets: [
+      // Get data for specific operation.
+      this.GetOperationData(this.operationName);
+      // Create array for the amount of days in a month.
+      this.CreateDateArray();
+      var ctx = document.getElementById("singleChart");
+      this.myChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: this.date,
+          datasets: [
+            {
+              label: "Total",
+              data: this.specificOperationTotal,
+              backgroundColor: "rgb(145, 208, 255)",
+              borderColor: "#0F000E"
+            },
+            {
+              label: "Success",
+              data: this.specificOperationSucc,
+              backgroundColor: "rgb(7, 253, 86)",
+              borderColor: "#0F000E"
+            },
+            {
+              label: "Fail",
+              data: this.specificOperationFail,
+              backgroundColor: "rgb(254, 12, 52)",
+              borderColor: "#0F000E"
+            }
+          ]
+        },
+        options: {
+          title: {
+            display: true,
+            text: this.operationName
+          },
+          responsive: true,
+          lineTension: 1,
+          scales: {
+            yAxes: [
               {
-                label: "Total",
-                data: this.specificOperationTotal,
-                backgroundColor: "rgb(145, 208, 255)",
-                borderColor: "#0F000E"
-              },
+                ticks: {
+                  beginAtZero: true,
+                  padding: 25
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: "Amount"
+                }
+              }
+            ],
+            xAxes: [
               {
-                label: "Success",
-                data: this.specificOperationSucc,
-                backgroundColor: "rgb(7, 253, 86)",
-                borderColor: "#0F000E"
-              },
-              {
-                label: "Fail",
-                data: this.specificOperationFail,
-                backgroundColor: "rgb(254, 12, 52)",
-                borderColor: "#0F000E"
+                scaleLabel: {
+                  display: true,
+                  labelString: this.chartXLabel
+                }
               }
             ]
-          },
-          options: {
-            title: {
-              display: true,
-              text: this.operationName
-            },
-            responsive: true,
-            lineTension: 1,
-            scales: {
-              yAxes: [
-                {
-                  ticks: {
-                    beginAtZero: true,
-                    padding: 25
-                  },
-                  scaleLabel: {
-                    display: true,
-                    labelString: "Amount"
-                  }
-                }
-              ],
-              xAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "Dates"
-                  }
-                }
-              ]
-            }
           }
-        });
-      }
-      else {
-        this.DialogMessage = "Operation has no data.";
-        this.dialog = true;
-      }
+        }
+      });
+      this.singleChartExist = true;
     },
+
     // Method to create an array of dates.
     CreateDateArray() {
       this.date = [];
@@ -409,6 +568,7 @@ export default {
         this.date[i] = i + 1;
       }
     },
+
     // Method to split the operation data into 3 list: success, fail, and total. Based on index.
     GetOperationData(operationName) {
       this.specificOperationSucc = [];

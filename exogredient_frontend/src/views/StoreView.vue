@@ -10,7 +10,7 @@
                 <th>Uploads Number</th>
             </tr>
             <tr v-for="ingredient in ingredients" :key=ingredient.ingredientName>
-                <td><a @click="displayIngredientView">{{ingredient.ingredientName}}</a></td>
+                <td><a @click="displayIngredientView(ingredient.ingredientName,storeViewData.storeId)">{{ingredient.ingredientName}}</a></td>
                 <td>{{ingredient.averagePrice}}</td>
                 <td>{{ingredient.uploadNum}}</td>
             </tr>
@@ -40,6 +40,7 @@ export default {
     data(){
         return{
             storeImageLoadError: false,
+            ingredientsList:[]
         }
     },
     computed:{
@@ -86,9 +87,18 @@ export default {
         }
     },
     methods:{
+                                                                                                                                                                                                                                                                                                                                                                                                                         
+        displayIngredientView: async function(ingredientName, storeId){
+            
+          let ingredientsListData = await fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${ingredientName}&storeId=${storeId}`);
 
-        displayIngredientView: function(){
-            //TODO: Implement what to do when user clicks the ingredient.
+          let ingredientsList = await ingredientsListData.json();
+
+          let storeViewData = this.$store.state.storeViewData;
+
+          this.$store.dispatch('updateIngredientsList', ingredientsList);
+          this.$store.dispatch('updateStoreViewData', storeViewData);  
+          this.$router.push("/ingredientView");
         },
 
         openMap: function(){

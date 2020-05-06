@@ -75,7 +75,7 @@ namespace UploadController.Controllers
                                           data[Constants.ExtensionKey],
                                           Int32.Parse(data[Constants.ImageSizeKey]));
 
-                var result = await _uploadManager.DraftUploadAsync(post, Constants.NoValueInt).ConfigureAwait(false);
+                var result = await _uploadManager.DraftUploadAsync(post, Int32.Parse(data[Constants.UniqueIdKey]), Constants.NoValueInt).ConfigureAwait(false);
 
                 return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
@@ -137,7 +137,7 @@ namespace UploadController.Controllers
 
                 return Ok(new ContinueResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred,
                                                    Description = result.Data.Description, Rating = result.Data.Rating,
-                                                   Image = new Bitmap(result.Data.Photo), Price = result.Data.Price,
+                                                   Image = System.IO.File.ReadAllBytes(result.Data.Photo), Price = result.Data.Price,
                                                    PriceUnit = result.Data.PriceUnit, IngredientName = result.Data.IngredientName});
             }
             catch
