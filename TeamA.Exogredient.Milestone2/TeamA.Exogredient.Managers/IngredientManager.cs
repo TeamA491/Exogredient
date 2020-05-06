@@ -37,9 +37,6 @@ namespace TeamA.Exogredient.Managers
             {
                 var uploads = await _uploadService.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
 
-                //_ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //   Constants.GetUploadsByIngredientNameandStoreIdOperation, username, ipAddress).ConfigureAwait(false);
-
                 return uploads;
             }
             catch(Exception e)
@@ -72,24 +69,17 @@ namespace TeamA.Exogredient.Managers
         {
             try
             {
-                // Check that the user exists.
-               /* var userExists = await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
-                if (!userExists)
-                {
-                    throw new ArgumentException(Constants.UsernameDNE);
-                }
-                */
                 bool result = await _uploadService.IncrementUpvotesonUpload(votevalue, uploadId).ConfigureAwait(false);
 
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.EditUpvotesonUploadOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+                    Constants.UpvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
 
                 return result;
             }
             catch(Exception e)
             {
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.EditUpvotesonUploadOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+                    Constants.UpvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
                 failurecount += 1;
 
                 if (failurecount >= Constants.LoggingRetriesAmount)
@@ -115,24 +105,17 @@ namespace TeamA.Exogredient.Managers
         {
             try
             {
-                // Check that the user exists.
-              /*  var userExists = await _userManagementService.CheckUserExistenceAsync(username).ConfigureAwait(false);
-                if (!userExists)
-                {
-                    throw new ArgumentException(Constants.UsernameDNE);
-                }
-               */
                 bool result = await _uploadService.IncrementDownvotesonUpload(votevalue, uploadId).ConfigureAwait(false);
 
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.EditDownvotesonUploadOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+                    Constants.DownvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
 
                 return result;
             }
             catch (Exception e)
             {
                 _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                    Constants.EditDownvotesonUploadOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
+                    Constants.DownvoteOperation + "/" + uploadId, username, ipAddress).ConfigureAwait(false);
                 failurecount += 1;
 
                 if (failurecount >= Constants.LoggingRetriesAmount)
@@ -239,8 +222,8 @@ namespace TeamA.Exogredient.Managers
             }
             catch (Exception e)
             {
-                //_ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
-                //    Constants.GetIngredientViewPaginationSizeOperation, username, ipAddress).ConfigureAwait(false);
+                _ = _loggingManager.LogAsync(DateTime.UtcNow.ToString(Constants.LoggingFormatString),
+                    Constants.GetIngredientViewPaginationSizeOperation, username, ipAddress).ConfigureAwait(false);
 
                 failurecount += 1;
 

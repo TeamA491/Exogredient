@@ -71,7 +71,7 @@ export default {
         // Fetch the list of uploads to load at the start of the page
          fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${this.initialPage}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
-                //global.ErrorHandler(this.$router,response);
+                global.ErrorHandler(this.$router,response);
                 return response.json();
             })
             .then((data) => {
@@ -82,7 +82,7 @@ export default {
             //Fetch the pagination size of this view. 
              fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredientViewPaginationSize?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
-              //  global.ErrorHandler(this.$router,response);
+                global.ErrorHandler(this.$router,response);
                 return response.json();
             })
             .then((data) => {
@@ -107,6 +107,7 @@ export default {
             })
             .then((response) =>
             {
+                global.ErrorHandler(this.$router,response);
                 return response.json()
             })
             .then((data) => {
@@ -125,6 +126,7 @@ export default {
             })
             .then((response) =>
             {
+                global.ErrorHandler(this.$router,response);
                 return response.json()
             })
             .then((data) => {
@@ -143,6 +145,7 @@ export default {
             })
             .then((response) =>
             {
+                global.ErrorHandler(this.$router,response);
                 return response.json()
             })
             .then((data) => {
@@ -161,6 +164,7 @@ export default {
             })
             .then((response) =>
             {
+                global.ErrorHandler(this.$router,response);
                  return response.json()
             })
             .then((data) => {
@@ -181,7 +185,7 @@ export default {
         getIngredientViewUploads: function(page) {
             fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&pagination=${page}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
-               // global.ErrorHandler(this.$router,response);
+                global.ErrorHandler(this.$router,response);
                 return response.json();
             })
             .then((data) => {
@@ -192,7 +196,7 @@ export default {
             // Fetch the pagination size for this view.  
              fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredientViewPaginationSize?ingredientName=${this.$store.state.ingredientsList[0].ingredientName}&storeId=${this.$store.state.ingredientsList[0].storeId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`)
             .then((response) => {
-               // global.ErrorHandler(this.$router,response);
+                global.ErrorHandler(this.$router,response);
                 return response.json();
             })
             .then((data) => {
