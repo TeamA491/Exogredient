@@ -34,7 +34,7 @@ const store = new Vuex.Store({
       ipAddress: "",
       location: "",
       token: "",
-      userType: "Anonymous"
+      userType: "System"
     },
     routeChange:{
       to:"",
@@ -185,7 +185,7 @@ const store = new Vuex.Store({
           state.storeResults.sort((a, b) => b.ingredientNum - a.ingredientNum)
         }
       }
-    }
+    },
     updateUsername({commit}, newUsername) {
       commit("updateUsername", newUsername)
     },

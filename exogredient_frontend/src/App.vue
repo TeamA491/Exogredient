@@ -28,6 +28,7 @@
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType !== 'Anonymous'" to="profile">Profile</router-link>
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" to="useranalysis">Analysis</router-link>
           <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" to="login">Login</router-link>
+          <router-link class="navbar-item" v-if="this.$store.state.userData.userType === 'System'" to="viewTickets">Tickets</router-link>
           <a class="navbar-item" v-if="this.$store.state.userData.userType === 'Anonymous'" @click="goToRegistration">Register</a>
         </div>
 
@@ -68,9 +69,10 @@
           <label for="store"> Store </label>
         </div>
         <span>Search by: <strong>{{searchData.searchBy}}</strong></span>
+
+        <div id="demo">___________________________</div>
       </div>
-      
-      <div id="demo">___________________________</div>
+
     </div>
     <router-view></router-view>
   </v-app>

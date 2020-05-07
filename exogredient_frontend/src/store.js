@@ -14,6 +14,7 @@ export default new Vuex.Store({
       storeResults: [],
       ingredientResults: [],
       ingredientsList: [],
+      tickets: [],
       storeViewData: null,
       username: "username",
       ipAddress: "127.1.1.0",

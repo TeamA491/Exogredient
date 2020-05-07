@@ -73,6 +73,16 @@ const routes = [
         name: 'useranalysis',
         component: () => import('@/views/UserAnalysis.vue'),
     },
+    {
+        path: '/viewTickets',
+        name: 'viewTickets',
+        component: () => import('@/views/TicketsView.vue'),
+    },
+    {
+        path: '/newTicket',
+        name: 'newTicket',
+        component: () => import('@/views/SubmitTicketView.vue'),
+    },
 ];
 
 const router = new VueRouter({
