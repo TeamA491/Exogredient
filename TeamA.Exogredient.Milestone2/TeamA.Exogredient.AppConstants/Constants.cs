@@ -126,6 +126,8 @@ namespace TeamA.Exogredient.AppConstants
 
         // REQUEST HEADERS
         public const string JWTTokenHeader = "Authorization";
+        public const string AffFileRelativePath = "en_US/en_US.aff";
+        public const string DicFileRelativePath = "en_US/en_US.dic";
 
         // UPLOAD
         public const string NaN = "NaN";
@@ -501,6 +503,13 @@ namespace TeamA.Exogredient.AppConstants
         public const string GetIngredientsOperation = "Get Ingredients";
         public const string GetStoreViewDataOperation = "Get StoreViewData";
         public const string GetStoreImageOperation = "Get store image";
+        
+        public const string GetUploadsByIngredientNameandStoreIdOperation = "Get Uploads by IngredientName and StoreId";
+        public const string GetIngredientsfromStoreOperation = "Get all uploads from a store.";
+        public const string GetIngredientViewPaginationSizeOperation = "Get pagination size for Ingredient View."; 
+        public const string EditUpvotesonUploadOperation = "Edit the upvotes value on an Upload";
+        public const string EditDownvotesonUploadOperation = "Edit the downvotes value on an Upload";
+
 
         public const string CustomerUserType = "Customer";
         public const string StoreOwnerUserType = "Store Owner";
@@ -515,9 +524,14 @@ namespace TeamA.Exogredient.AppConstants
         public const int RecentUploadPagination = 10;
         public const int SavedUploadPagination = 10;
         public const int SaveListPagination = 20;
+        public const int IngredientViewPagination = 10;
+        public const int PositiveVote = 1;
+        public const int NegativeVote = -1;
 
         public const int NumOfResultsPerSearchPage = 20;
         public const int NumOfIngredientsPerStorePage = 20;
+        public const int EmptyRadius = 0;
+        public const int DefaultRadius = 30;
         public const int DisabledStatus = 1;
         public const int EnabledStatus = 0;
 
@@ -852,12 +866,11 @@ namespace TeamA.Exogredient.AppConstants
         public const string SnapshotTopCityDict = "top_cities_that_uses_application";
         public const string SnapshotTopUserUploadedDict = "top_users_that_upload";
         public const string SnapshotTopUploadedIngredientDict = "top_most_uploaded_ingredients";
-        public const string SnapshotTopUploadedstoreDict = "top_most_uploaded_stores";
+        public const string SnapshotTopUploadedStoreDict = "top_most_uploaded_stores";
         public const string SnapshotTopSearchedIngredientDict = "top_most_searched_ingredients";
         public const string SnapshotTopSearchedStoreDict = "top_most_searched_stores";
         public const string SnapshotTopUpvotedUserDict = "top_most_upvoted_users";
         public const string SnapshotTopDownvotedUserDict = "top_most_downvoted_users";
-
 
 
         // RECORD HELPER DATA STRUCTURES

@@ -1,5 +1,6 @@
 describe("Test Valid Snapshot Data Tables", () => {
     it("Visit the analysis view and verify the integrity of the data.", () => {
+      cy.viewport(1200, 1200) 
       // Arrange
       cy.visit("http://localhost:8080/#/");
 
@@ -18,6 +19,7 @@ describe("Test Valid Snapshot Data Tables", () => {
 
 describe("Check if Snapshot Exist.", () => {
     it("Visit the analysis view and verify error message if it does not.", () => {
+      cy.viewport(1200, 1200) 
       // Arrange
       cy.visit("http://localhost:8080/#/");
 

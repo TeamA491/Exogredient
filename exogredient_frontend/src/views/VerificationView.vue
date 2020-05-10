@@ -41,26 +41,26 @@ export default {
     },
     methods:{
         sendPhoneCode: async function(){
-            fetch(`${global.ApiDomainName}/api/registration/sendPhoneCode?`
+            fetch(`${global.ApiDomainName}/api/sendPhoneCode?`
             + `username=${this.$store.state.registration.username}&phoneNumber=${this.$store.state.registration.phoneNumber}`
-            + `&ipAddress=${this.$store.state.ipAddress}`);
+            + `&ipAddress=${this.$store.state.userData.ipAddress}`);
         },
         sendEmailCode: async function(){
-            fetch(`${global.ApiDomainName}/api/registration/sendEmailCode?`
+            fetch(`${global.ApiDomainName}/api/sendEmailCode?`
             + `username=${this.$store.state.registration.username}&email=${this.$store.state.registration.email}`
-            + `&ipAddress=${this.$store.state.ipAddress}`);
+            + `&ipAddress=${this.$store.state.userData.ipAddress}`);
         },
         submit: async function(){
-            var verifyEmailCodeResponse = await fetch(`${global.ApiDomainName}/api/registration/verifyEmailCode?`
+            var verifyEmailCodeResponse = await fetch(`${global.ApiDomainName}/api/verifyEmailCode?`
             +`username=${this.$store.state.registration.username}&emailCode=${this.emailCode}&`
-            +`ipAddress=${this.$store.state.ipAddress}`);
+            +`ipAddress=${this.$store.state.userData.ipAddress}`);
 
             global.ErrorHandler(this.$router, verifyEmailCodeResponse);
 
-            var verifyPhoneCodeResponse = await fetch(`${global.ApiDomainName}/api/registration/verifyPhoneCode?`
+            var verifyPhoneCodeResponse = await fetch(`${global.ApiDomainName}/api/verifyPhoneCode?`
             +`username=${this.$store.state.registration.username}&phoneCode=${this.phoneCode}&`
             +`phoneNumber=${this.$store.state.registration.phoneNumber}&`
-            +`ipAddress=${this.$store.state.ipAddress}&`
+            +`ipAddress=${this.$store.state.userData.ipAddress}&`
             +`duringRegistration=${true}`);
 
             global.ErrorHandler(this.$router, verifyPhoneCodeResponse);
@@ -77,7 +77,7 @@ export default {
             }
 
             if(verifyEmailCodeJson.successful && verifyPhoneCodeJson.successful){
-                this.$router.push('/login/registered');
+                this.$router.push('/login');
             }
         }
     }

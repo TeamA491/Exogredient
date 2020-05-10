@@ -66,28 +66,6 @@ namespace TeamA.Exogredient.Managers
                     AuthenticationResult authenResult = new AuthenticationResult(authenticationSuccessful, userExist);
                     return SystemUtilityService.CreateResult(Constants.UserDisableUserMessage, authenResult, false);
                 }
-
-                // Convert the encrypted password hex string to byte array.
-                //byte[] encryptedPasswordBytes = UtilityService.HexStringToBytes(encryptedPassword);
-                // Convert the encrypted AES key hex string to byte array.
-                //byte[] encryptedAESKeyBytes = UtilityService.HexStringToBytes(encryptedAESKey);
-                // Convert the AES IV hex string to byte array.
-                //byte[] AESIVBytes = UtilityService.HexStringToBytes(aesIV);
-                // Convert the username's salt hex string to byte array.
-                //byte[] userSaltBytes = UtilityService.HexStringToBytes(user.Salt);
-                // Convert the RSA public key hex string to byte array.
-                //byte[] publicKeyBytes = UtilityService.HexStringToBytes(Constants.PublicKey);
-                // Convert the RSA private key hex string to byte array.
-                //byte[] privateKeyBytes = UtilityService.HexStringToBytes(Constants.PrivateKey);
-
-
-                // Decrypt the encrypted AES key byte array with the RSA private key byte array.
-                //byte[] decryptedAESKeyBytes = SecurityService.DecryptRSA(encryptedAESKeyBytes, privateKeyBytes);
-                // Decrypt the encrypted Password byte array with the AES Key byte array & AES IV byte array.
-                //string hexPassword = SecurityService.DecryptAES(encryptedPasswordBytes, decryptedAESKeyBytes, AESIVBytes);
-                // Hash the password hex string with the username's salt.
-                //string hashedPassword = SecurityService.HashWithKDF(hexPassword, userSaltBytes);
-
                
                 AuthenticationDTO existing = new AuthenticationDTO(username, user.Password);
                 AuthenticationDTO credentials = new AuthenticationDTO(username, password);

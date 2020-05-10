@@ -1,10 +1,9 @@
 <template>
   <div>
-    <h1 class="center">{{ username }}: {{ score }}</h1>
+    <h1 class="center">ProfileScore : {{ score }}</h1>
 
     <!-- display business owners functionality  -->
     <div class="center">
-      <h3>Owned Store's</h3>
     </div>
 
     <!-- display the recent uploads  -->
@@ -12,7 +11,28 @@
       <v-btn @click="GetRecentUploads(0)">
         {{ recentUploadStatus ? "Hide Recent Uploads" : "Show Recent Uploads" }}
       </v-btn>
+    </div>
+
+    <!-- display the inprogress uploads  -->
+    <div >
+      <v-btn @click="GetInProgressUploads(0)">{{
+        inProgressStatus
+          ? "Hide In Progress Uploads"
+          : "Show In Progress Uploads"
+      }}</v-btn>
+      
+    </div>
+
+    <!-- display the save list  -->
+    <div>
+      <v-btn @click="GetSaveList(0)">
+        {{ saveListStatus ? "Hide SaveList" : "Show SaveList" }}
+      </v-btn>
+    </div>
+
+      <!-- Lists Content -->
       <div v-if="recentUploadStatus" class="column">
+        <h1 style="text-align:center">Recent Uploads</h1>
         <v-pagination
           v-model="recentUploadPage"
           :value="1"
@@ -24,16 +44,9 @@
           <RecentUpload :upload="item" :index="index"> </RecentUpload>
         </div>
       </div>
-    </div>
 
-    <!-- display the inprogress uploads  -->
-    <div class="inProgress">
-      <v-btn @click="GetInProgressUploads(0)">{{
-        inProgressStatus
-          ? "Hide In Progress Uploads"
-          : "Show In Progress Uploads"
-      }}</v-btn>
       <div v-if="inProgressStatus" class="column">
+        <h1 style="text-align:center">In Progress Uploads</h1>
         <v-pagination
           v-model="inProgressPage"
           :value="1"
@@ -45,14 +58,9 @@
           <InProgressUpload :upload="item" :index:="index"></InProgressUpload>
         </div>
       </div>
-    </div>
 
-    <!-- display the save list  -->
-    <div class="saveList">
-      <v-btn @click="GetSaveList(0)">
-        {{ saveListStatus ? "Hide SaveList" : "Show SaveList" }}
-      </v-btn>
       <div v-if="saveListStatus" Class="column">
+        <h1 style="text-align:center">Save List</h1>
         <v-pagination
           v-model="saveListPage"
           :dark="true"
@@ -63,7 +71,7 @@
           <SaveList :saveItem="item" :index="index"></SaveList>
         </div>
       </div>
-    </div>
+
   </div>
 </template>
 
@@ -109,7 +117,7 @@ export default {
 
         // Fetch the RecentUploads
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/Recentuploads/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
+          `${global.ApiDomainName}/api/Recentuploads/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -125,7 +133,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/RecentUploadPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
+          `${global.ApiDomainName}/api/RecentUploadPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -150,7 +158,7 @@ export default {
 
         // Fetch the InProgress uploads
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
+          `${global.ApiDomainName}/api/InProgressUploads/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -166,7 +174,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/InProgressUploadPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
+          `${global.ApiDomainName}/api/InProgressUploadPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -191,7 +199,7 @@ export default {
 
         // Fetch the save lists for a user
         fetch(
-          `${global.ApiDomainName}/api/UserProfile/SaveList/${this.$store.state.username}/${page}?ipAddress=${this.$store.state.ipAddress}`
+          `${global.ApiDomainName}/api/SaveList/${this.$store.state.userData.username}/${page}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -207,7 +215,7 @@ export default {
 
         // Fetch the pagination size.
         fetch(
-          `${global.ApiDomainName}/api/Userprofile/SaveListPagination/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
+          `${global.ApiDomainName}/api/SaveListPagination/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
         )
           .then((response) => {
             // Display error view based on response status code
@@ -229,9 +237,9 @@ export default {
     saveListPage(newValue, oldValue) {
       // Recall fetch save list with new pagination.
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/SaveList/${
-          this.$store.state.username
-        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
+        `${global.ApiDomainName}/api/SaveList/${
+          this.$store.state.userData.username
+        }/${newValue - 1}?ipAddress=${this.$store.state.userData.ipAddress}`
       )
         .then((response) => {
           // Display error view based on response status code
@@ -249,9 +257,9 @@ export default {
     inProgressPage(newValue, oldValue) {
       // Recall fetch in progress with new pagination.
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/InProgressUploads/${
-          this.$store.state.username
-        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
+        `${global.ApiDomainName}/api/InProgressUploads/${
+          this.$store.state.userData.username
+        }/${newValue - 1}?ipAddress=${this.$store.state.userData.ipAddress}`
       )
         .then((response) => {
           // Display error view based on response status code
@@ -269,9 +277,9 @@ export default {
     recentUploadPage(newValue, oldValue) {
       // Recall fetch in progress for new pagination.
       fetch(
-        `${global.ApiDomainName}/api/Userprofile/Recentuploads/${
-          this.$store.state.username
-        }/${newValue - 1}?ipAddress=${this.$store.state.ipAddress}`
+        `${global.ApiDomainName}/api/Recentuploads/${
+          this.$store.state.userData.username
+        }/${newValue - 1}?ipAddress=${this.$store.state.userData.ipAddress}`
       )
         .then((response) => {
           // Display error view based on response status code
@@ -293,7 +301,7 @@ export default {
 
     // Make an API call to calculate the score for this user \.
     fetch(
-      `${global.ApiDomainName}/api/UserProfile/ProfileScore/${this.$store.state.username}?ipAddress=${this.$store.state.ipAddress}`
+      `${global.ApiDomainName}/api/ProfileScore/${this.$store.state.userData.username}?ipAddress=${this.$store.state.userData.ipAddress}`
     )
       .then((response) => {
         // Display error view based on response status code

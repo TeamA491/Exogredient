@@ -11,14 +11,14 @@ export default new Vuex.Store({
         }),
     ],
     state: {
-        storeResults: [],
-        ingredientResults: [],
-        tickets: [],
-        storeViewData: null,
-        username: 'username',
-        ipAddress: '127.1.1.0',
-        ingredientName: '',
-        role: 'business_owner',
+      storeResults: [],
+      ingredientResults: [],
+      ingredientsList: [],
+      storeViewData: null,
+      username: "username",
+      ipAddress: "127.1.1.0",
+      ingredientName: "",
+      role: "business_owner"
     },
     mutations: {
         updateStoreResults(state, newStoreResults) {

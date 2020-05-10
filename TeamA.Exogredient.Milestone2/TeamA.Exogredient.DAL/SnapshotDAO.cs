@@ -9,12 +9,37 @@ using TeamA.Exogredient.DataHelpers;
 
 namespace TeamA.Exogredient.DAL
 {
-    public class SnapshotDAO 
+    public class SnapshotDAO
     {
         private string NOSQLConnection;
         public SnapshotDAO(string connection)
         {
             NOSQLConnection = connection;
+        }
+
+
+        /// <summary>
+        /// Method to get all the specific months of existing snapshots.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<string>> GetYearAndMonthAsync()
+        {
+            var yearMonthList = new List<string>();
+            using (Session session = MySQLX.GetSession(NOSQLConnection))
+            {
+                Schema schema = session.GetSchema(Constants.SnapshotSchemaName);
+
+                var collection = schema.GetCollection(Constants.SnapshotCollectionPrefix);
+
+                // Get all the snapshots in the collection.
+                DocResult result = await collection.Find().ExecuteAsync().ConfigureAwait(false);
+                while (result.Next())
+                {
+                    var stringYearMonth = (string)result.Current[Constants.SnapshotMonth];
+                    yearMonthList.Add(stringYearMonth);
+                }
+            }
+            return yearMonthList;
         }
 
         /// <summary>
@@ -30,6 +55,7 @@ namespace TeamA.Exogredient.DAL
             {
                 Schema schema = session.GetSchema(Constants.SnapshotSchemaName);
 
+                // If the schema does not exist, create it.
                 if (!schema.ExistsInDatabase())
                 {
                     session.CreateSchema(Constants.SnapshotSchemaName);
@@ -37,7 +63,6 @@ namespace TeamA.Exogredient.DAL
 
                 string specificMonth = year + month;
                 
-
                 var collection = schema.CreateCollection(Constants.SnapshotCollectionPrefix, true);
 
                 // Create json string to insert into the data store.
@@ -47,7 +72,7 @@ namespace TeamA.Exogredient.DAL
                                   $@"""{Constants.SnapshotTopCityDict}"": ""{snapshot[2]}"", " +
                                   $@"""{Constants.SnapshotTopUserUploadedDict}"": ""{snapshot[3]}"", " +
                                   $@"""{Constants.SnapshotTopUploadedIngredientDict}"": ""{snapshot[4]}"", " +
-                                  $@"""{Constants.SnapshotTopUploadedstoreDict}"": ""{snapshot[5]}"", " +
+                                  $@"""{Constants.SnapshotTopUploadedStoreDict}"": ""{snapshot[5]}"", " +
                                   $@"""{Constants.SnapshotTopSearchedIngredientDict}"": ""{snapshot[6]}"", " +
                                   $@"""{Constants.SnapshotTopSearchedStoreDict}"": ""{snapshot[7]}"", " +
                                   $@"""{Constants.SnapshotTopUpvotedUserDict}"": ""{snapshot[8]}"", " +
@@ -76,13 +101,14 @@ namespace TeamA.Exogredient.DAL
                 string specificMonth = year + month;
 
                 var collection = schema.GetCollection(Constants.SnapshotCollectionPrefix);
-
+                // Snapshot for specific month.
                 DocResult result = await collection.Find($"{Constants.SnapshotMonth} = :_month").Bind("_month", specificMonth).ExecuteAsync().ConfigureAwait(false);
 
+                // Making a snapshot object with the result.
                 result.Next();
                 
                 var snapshot = new SnapShotResult((string)result.Current[Constants.SnapshotMonth], (string)result.Current[Constants.SnapshotOperationsDict], (string)result.Current[Constants.SnapshotUsersDict], (string)result.Current[Constants.SnapshotTopCityDict],
-                                (string)result.Current[Constants.SnapshotTopUserUploadedDict], (string)result.Current[Constants.SnapshotTopUploadedIngredientDict], (string)result.Current[Constants.SnapshotTopUploadedstoreDict],
+                                (string)result.Current[Constants.SnapshotTopUserUploadedDict], (string)result.Current[Constants.SnapshotTopUploadedIngredientDict], (string)result.Current[Constants.SnapshotTopUploadedStoreDict],
                                 (string)result.Current[Constants.SnapshotTopSearchedIngredientDict], (string)result.Current[Constants.SnapshotTopSearchedStoreDict], (string)result.Current[Constants.SnapshotTopUpvotedUserDict], (string)result.Current[Constants.SnapshotTopDownvotedUserDict]);
                 
                 return snapshot;
@@ -102,15 +128,17 @@ namespace TeamA.Exogredient.DAL
                 Schema schema = session.GetSchema(Constants.SnapshotSchemaName);
 
                 var collection = schema.GetCollection(Constants.SnapshotCollectionPrefix);
-
+               
+                // Snapshots for specific year.
                 DocResult result = await collection.Find($"{Constants.SnapshotMonth} like :_month").Bind("_month", year + "%").ExecuteAsync().ConfigureAwait(false);
 
                 var snapshotList = new List<SnapShotResult>();
 
+                // Making a snapshot object for each result and adding it into a list.
                 while (result.Next())
                 {
                     var snapshot = new SnapShotResult((string)result.Current[Constants.SnapshotMonth], (string)result.Current[Constants.SnapshotOperationsDict], (string)result.Current[Constants.SnapshotUsersDict], (string)result.Current[Constants.SnapshotTopCityDict],
-                                (string)result.Current[Constants.SnapshotTopUserUploadedDict], (string)result.Current[Constants.SnapshotTopUploadedIngredientDict], (string)result.Current[Constants.SnapshotTopUploadedstoreDict],
+                                (string)result.Current[Constants.SnapshotTopUserUploadedDict], (string)result.Current[Constants.SnapshotTopUploadedIngredientDict], (string)result.Current[Constants.SnapshotTopUploadedStoreDict],
                                 (string)result.Current[Constants.SnapshotTopSearchedIngredientDict], (string)result.Current[Constants.SnapshotTopSearchedStoreDict], (string)result.Current[Constants.SnapshotTopUpvotedUserDict], (string)result.Current[Constants.SnapshotTopDownvotedUserDict]);
                     snapshotList.Add(snapshot);
                 }

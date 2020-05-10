@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
-export const ApiDomainName = "https://localhost:44383";
+export const ApiDomainName = "https://localhost:44373";
+export const HomePage = 'home';
 
 // UPLOAD
 export const FileKey = "formFile";
@@ -72,15 +73,13 @@ export const DigestByteLength = 32;
 export const HashAlgorithm = 'SHA-256';
 
 export const Bus = new Vue();
-export const AdminContact = 'TEAMA.CS491@gmail.com';
-
-export const ErrorHandler = function(router, response) {
-    if (400 <= response.status) {
-        if (router.currentRoute.path !== '/ErrorView') {
-            router.push('/ErrorView');
-            location.reload();
-        } else {
-            location.reload();
-        }
+export const AdminContact = "TEAMA.CS491@gmail.com";
+export const ErrorHandler = function(router,response){
+  if(400 <= response.status){
+    if(router.currentRoute.path !== '/error'){
+      router.push('/error');
+      location.reload();
+    }else{
+      location.reload();
     }
 };

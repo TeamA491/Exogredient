@@ -10,7 +10,7 @@
                 <th>Uploads Number</th>
             </tr>
             <tr v-for="ingredient in ingredients" :key=ingredient.ingredientName>
-                <td><a @click="displayIngredientView">{{ingredient.ingredientName}}</a></td>
+                <td><a @click="displayIngredientView(ingredient.ingredientName,storeViewData.storeId)">{{ingredient.ingredientName}}</a></td>
                 <td>{{ingredient.averagePrice}}</td>
                 <td>{{ingredient.uploadNum}}</td>
             </tr>
@@ -40,6 +40,7 @@ export default {
     data(){
         return{
             storeImageLoadError: false,
+            ingredientsList:[]
         }
     },
     computed:{
@@ -60,9 +61,9 @@ export default {
         },
 
         storeImage: function(){
-            var storeImage =`${global.ApiDomainName}/api/search/storeImage?`
-                + `storeId=${this.storeViewData.storeId}&username=${this.$store.state.username}`
-                + `&ipAddress=${this.$store.state.ipAddress}`;
+            var storeImage =`${global.ApiDomainName}/api/storeImage?`
+                + `storeId=${this.storeViewData.storeId}&username=${this.$store.state.userData.username}`
+                + `&ipAddress=${this.$store.state.userData.ipAddress}`;
 
             return this.$data.storeImageLoadError? defaultStoreImage : storeImage;
         },
@@ -86,9 +87,18 @@ export default {
         }
     },
     methods:{
+                                                                                                                                                                                                                                                                                                                                                                                                                         
+        displayIngredientView: async function(ingredientName, storeId){
+            
+          let ingredientsListData = await fetch(`${global.ApiDomainName}/api/IngredientView/GetIngredients?ingredientName=${ingredientName}&storeId=${storeId}`);
 
-        displayIngredientView: function(){
-            //TODO: Implement what to do when user clicks the ingredient.
+          let ingredientsList = await ingredientsListData.json();
+
+          let storeViewData = this.$store.state.storeViewData;
+
+          this.$store.dispatch('updateIngredientsList', ingredientsList);
+          this.$store.dispatch('updateStoreViewData', storeViewData);  
+          this.$router.push("/ingredientView");
         },
 
         openMap: function(){
@@ -122,8 +132,8 @@ export default {
 
             // Fetch list of ingredients for the new page.
             let ingredientResultsResponse = 
-                await fetch(`${global.ApiDomainName}/api/search/getIngredientResults?` 
-                + `username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`
+                await fetch(`${global.ApiDomainName}/api/getIngredientResults?` 
+                + `username=${this.$store.state.userData.username}&ipAddress=${this.$store.state.userData.ipAddress}`
                 + `&storeId=${this.$store.state.storeViewData.storeId}&skipPages=${skipPages}`
                 + `&lastPageResultsNum=${this.ingredients.length}&lastIngredientName=${lastIngredientName}`
                 + `&ingredientName=${this.$store.state.searchData.searchBy === global.SearchByIngredient?

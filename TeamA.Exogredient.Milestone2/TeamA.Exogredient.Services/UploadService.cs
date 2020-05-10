@@ -162,6 +162,48 @@ namespace TeamA.Exogredient.Services
         }
 
         /// <summary>
+        /// Edit the upvote value for an upload. 
+        /// </summary>
+        /// <param name="voteValue"> The number that is going to be added to the current upvote value.</param>
+        /// <param name="uploadId"> The id used to find the specific upload.</param>
+        /// <returns> A bool for the successful completion of the operation.</returns>
+        public async Task<bool> IncrementUpvotesonUpload(int voteValue, int uploadId)
+        {
+            return await _uploadDAO.IncrementUpvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Edit the downvote value for an upload. 
+        /// </summary>
+        /// <param name="voteValue"> The number that is going to be added to the current downvote value.</param>
+        /// <param name="uploadId"> The id used to find the specific upload.</param>
+        /// <returns> A bool for the successful completion of the operation.</returns>
+        public async Task<bool> IncrementDownvotesonUpload(int voteValue, int uploadId)
+        {
+            return await _uploadDAO.IncrementDownvotesonUpload(voteValue, uploadId).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Return all uploads based on ingredientname and storeId.
+        /// </summary>
+        /// <param name="ingredientName"></param>
+        /// <param name="storeId"></param>
+        /// <param name="pagination"></param>
+        /// <returns> A list of uploads associated with the ingredientName and storeId.</returns>
+        public async Task<List<UploadResult>> ReadUploadsByIngredientNameandStoreId(string ingredientName, int storeId, int pagination)
+        {
+            return await _uploadDAO.ReadUploadsByIngredientNameandStoreId(ingredientName, storeId, pagination).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Get the pagination size for ingredient view. 
+        /// </summary>
+        /// <param name="ingredientName"> The name of the ingredient</param>
+        /// <param name="storeId"> The store id of the store.</param>
+        /// <returns> An integer holding the number of a certain ingredient at a specific store. </returns>
+        public async Task<int> GetIngredientViewPaginationSize(string ingredientName, int storeId)
+        {
+            return await _uploadDAO.ReadIngredientViewPaginationSize(ingredientName, storeId).ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Get the recent uploads by a user.
         /// </summary>
         /// <param name="username">User to perform operation on.</param>

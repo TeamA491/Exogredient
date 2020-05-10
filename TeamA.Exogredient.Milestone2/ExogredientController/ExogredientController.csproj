@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="en_US\" />
+    <Folder Include="images\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj">
@@ -19,6 +21,9 @@
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

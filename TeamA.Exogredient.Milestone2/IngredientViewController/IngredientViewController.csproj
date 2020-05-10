@@ -5,13 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TeamA.Exogredient.AppConstants\TeamA.Exogredient.AppConstants.csproj" />
-    <ProjectReference Include="..\TeamA.Exogredient.DAL\TeamA.Exogredient.DAL.csproj" />
-    <ProjectReference Include="..\TeamA.Exogredient.DataHelpers\TeamA.Exogredient.DataHelpers.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.Managers\TeamA.Exogredient.Managers.csproj" />
     <ProjectReference Include="..\TeamA.Exogredient.Services\TeamA.Exogredient.Services.csproj" />
   </ItemGroup>

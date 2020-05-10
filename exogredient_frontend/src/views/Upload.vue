@@ -191,9 +191,9 @@ export default {
       var formD = new FormData();
       formD.append(global.FileKey, this.file);
       formD.append(global.UsernameKey, "thesmokinggun42");
-      formD.append(global.IPAddressKey, this.$store.state.ipAddress);
+      formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
 
-      fetch(`${global.ApiDomainName}/api/Upload/Vision`, {
+      fetch(`${global.ApiDomainName}/api/Vision`, {
         method: "POST",
         mode: "cors",
         body: formD
@@ -334,7 +334,7 @@ export default {
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, "thesmokinggun42");
-        formD.append(global.IPAddressKey, this.$store.state.ipAddress);
+        formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
         formD.append(global.CategoryKey, this.category);
         formD.append(global.NameKey, this.name);
         formD.append(global.DescriptionKey, this.description);
@@ -344,7 +344,7 @@ export default {
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
 
-        fetch(`${global.ApiDomainName}/api/Upload/NewUpload`, {
+        fetch(`${global.ApiDomainName}/api/NewUpload`, {
           method: "POST",
           mode: "cors",
           body: formD
@@ -447,7 +447,7 @@ export default {
         var formD = new FormData();
         formD.append(global.FileKey, this.file);
         formD.append(global.UsernameKey, "thesmokinggun42");
-        formD.append(global.IPAddressKey, this.$store.state.ipAddress);
+        formD.append(global.IPAddressKey, this.$store.state.userData.ipAddress);
         formD.append(global.CategoryKey, this.category);
         formD.append(global.NameKey, this.name);
         formD.append(global.DescriptionKey, this.description);
@@ -457,7 +457,7 @@ export default {
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
         
-        fetch(`${global.ApiDomainName}/api/Upload/DraftUpload`, {
+        fetch(`${global.ApiDomainName}/api/DraftUpload`, {
           method: "POST",
           mode: "cors",
           body: formD
