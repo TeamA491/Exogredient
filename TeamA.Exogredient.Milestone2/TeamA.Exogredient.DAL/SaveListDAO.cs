@@ -162,5 +162,29 @@ namespace TeamA.Exogredient.DAL
                 }
             }
         }
+
+
+        public async Task<bool> CreateSaveList(int storeId, string ingredientName, string username)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_SQLConnection))
+            {
+                connection.Open();
+
+                var sqlString = $"INSERT {Constants.SaveListDAOTableName} VALUES(@INGREDIENT, @STOREID, @USERNAME);";
+
+                using(MySqlCommand command = new MySqlCommand(sqlString, connection))
+                {
+                    command.Parameters.AddWithValue("@INGREDIENT", ingredientName);
+                    command.Parameters.AddWithValue("@STOREID", storeId);
+                    command.Parameters.AddWithValue("@USERNAME", username);
+
+
+                    await command.ExecuteNonQueryAsync();
+                    return true;
+                }
+            }
+
+        }
+
     }
 }
