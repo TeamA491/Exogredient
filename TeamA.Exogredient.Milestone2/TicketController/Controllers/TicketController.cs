@@ -13,10 +13,16 @@ using Microsoft.Extensions.Primitives;
 
 namespace TicketController.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/ticket")]
     [ApiController]
     public class TicketController : Controller
     {
+        [HttpGet("testing")]
+        public IActionResult Testing()
+        {
+            return Ok("Testing");
+        }
+
         [HttpPost("getTickets")]
         [Produces("application/json")]
         public async Task<IActionResult> GetTicketsAsync(TicketSearchRequest req)

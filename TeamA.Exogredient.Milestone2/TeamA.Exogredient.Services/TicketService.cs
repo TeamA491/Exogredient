@@ -29,9 +29,22 @@ namespace TeamA.Exogredient.Services
         /// </summary>
         /// <param name="filterParams">A dictionary containing search criteria</param>
         /// <returns>Array of TicketRecords that meet the search criteria</returns>
-        public async Task<List<TicketRecord>> GetTicketsByFilterAsync(Dictionary<Constants.TicketSearchFilter, object> filterParams)
+        public async Task<List<TicketRecord>> GetTicketsByFilterAsync(Dictionary<string, string> filterParams)
         {
-            List<DataRow> ticketsRaw = await ticketDAO.FilterTicketsAsync(filterParams);
+            Dictionary<Constants.TicketSearchFilter, object> validatedParams = new Dictionary<Constants.TicketSearchFilter, object>();
+
+            // Go through each filter and make sure we provided existing ones
+            foreach (KeyValuePair<string, string> pair in filterParams)
+            {
+                // Make sure we supplied a TicketSearchFilter enum for the key
+                bool success = Enum.TryParse(pair.Key, out Constants.TicketSearchFilter searchFilter);
+                if (!success)
+                    throw new ArgumentException(Constants.TicketSearchFilterDNE);
+
+                validatedParams.Add(searchFilter, pair.Value);
+            }
+
+            List<DataRow> ticketsRaw = await ticketDAO.FilterTicketsAsync(validatedParams);
             return FormatDataRow(ref ticketsRaw);
         }
 

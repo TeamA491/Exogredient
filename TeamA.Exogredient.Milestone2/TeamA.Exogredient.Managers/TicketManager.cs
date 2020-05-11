@@ -35,7 +35,7 @@ namespace TeamA.Exogredient.Managers
         /// <param name="jwtToken">Authorization token</param>
         /// <param name="filterParams">Optional filter parameters</param>
         /// <returns>Result that holds a list of TicketRecords</returns>
-        public async Task<Result<List<TicketRecord>>> GetTicketsAsync(string jwtToken, Dictionary<Constants.TicketSearchFilter, object> filterParams)
+        public async Task<Result<List<TicketRecord>>> GetTicketsAsync(string jwtToken, Dictionary<string, string> filterParams)
         {
             List<TicketRecord> tickets;
             Result<List<TicketRecord>> result;

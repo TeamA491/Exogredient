@@ -952,6 +952,7 @@ namespace TeamA.Exogredient.AppConstants
         public const string TicketDeleteDNE = "TicketDAO.DeleteByIdsAsync ticket id did not exist";
         public const string TicketReadDNE = "TicketDAO.ReadByIdAsync ticket id did not exist";
         public const string TicketUpdateDNE = "TicketDAO.UpdateAsync ticket id did not exist";
+        public const string TicketSearchFilterDNE = "TicketService.GetTicketsByFilterAsync was provided a search filter that doesnt exist!";
         public const string TicketUpdateInvalidArgument = "TicketDAO.UpdateAsync record argument must be of type TicketRecord";
         public const string TicketFilterNeedsParameter = "TicketDAO.FilterTicketsAsync requires at least one filter parameter";
         public const string TicketIncorrectEnum = "TicketDAO.FilterTicketsAsync an unsupported enum was given";
