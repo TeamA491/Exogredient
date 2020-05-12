@@ -31,6 +31,7 @@ namespace ExogredientController
                 {
                     //HACK Configure to allow only specific origins
                     builder.AllowAnyOrigin();   //WithOrigins("http://*").SetIsOriginAllowedToAllowWildcardSubdomains();
+                    builder.AllowAnyMethod();
                 });
             });
             services.AddControllers();

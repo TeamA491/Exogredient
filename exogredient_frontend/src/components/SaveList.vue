@@ -23,7 +23,7 @@ export default {
     DeleteSaveItem(saveItem) {
       // http DELETE on the save item
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/SaveList/${saveItem.username}/${saveItem.storeId}/${saveItem.ingredientName}?ipAddress=${this.$store.state.ipAddress}`,
+        `${global.ApiDomainName}/api/SaveList/${saveItem.username}/${saveItem.storeId}/${saveItem.ingredientName}`,
         { method: "DELETE" }
       ).then((response) => {
         // Display error view based on response status code
