@@ -488,6 +488,12 @@ namespace TeamA.Exogredient.Managers
             return paginationSize;
         }
 
+        public async Task<bool> CreateSaveListAsync(int storeId, string ingredientName, string username)
+        {
+            return await _saveListService.CreateSaveListAsync(storeId, ingredientName, username);
+        }
+
+
 
     }
 }

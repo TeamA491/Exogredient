@@ -324,6 +324,18 @@ namespace ExogredientController.Controllers
             }
         }
 
+
+        [EnableCors]
+        [HttpPost("SaveList/{username}/{storeId}/{ingredient}")]
+        [Produces("application/json")]
+        public async Task<IActionResult> CreateSaveListAsync(int storeId, string ingredient, string username)
+        {
+            return Ok(await _userProfileManager.CreateSaveListAsync(storeId, ingredient, username));
+        }
+
+
+
+
         [EnableCors]
         [HttpDelete("SaveList/{username}/{storeId}/{ingredient}")]
         [Produces("application/json")]
