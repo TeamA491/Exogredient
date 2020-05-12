@@ -2,6 +2,12 @@
     <div>
         <v-btn @click="checkSortType('upvote'); sortedIngredients()">Sort By Upvotes</v-btn>
         <v-btn @click="checkSortType('postTimeDate'); sortedIngredients()">Sort By Date</v-btn>
+
+        <div v-if="this.$store.state.userData.userType !== 'Anonymous'" style="float:right; margin-right:20px;">
+            <v-btn @click="CreateSaveList">Save</v-btn>
+        </div>
+        
+
         <div>
             <v-pagination
              v-model="ingredientsPage"
@@ -93,6 +99,22 @@ export default {
     },
     
     methods: {
+
+        CreateSaveList: function (){
+            
+            fetch(`${global.ApiDomainName}/api/SaveList/${this.$store.state.userData.username}/${this.$store.state.ingredientsList[0].storeId}/${this.$store.state.ingredientsList[0].ingredientName}`,{
+                method:"POST",
+                mode: "cors"
+            })
+            .then(response => {
+                response.json();
+            })
+            .then(data=>{
+                console.log("data is");
+                console.log(data);
+            })
+
+        },
         openMap: function(){
             // Opens Google Maps direction to the store from the center of search.
             var encodedOriginAddress = encodeURIComponent(this.$store.state.searchData.address);
