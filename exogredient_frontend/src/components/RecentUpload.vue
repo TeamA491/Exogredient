@@ -26,7 +26,7 @@ export default {
     DeleteRecentUpload(id) {
       // http DELETE on the in progress upload
       fetch(
-        `${global.ApiDomainName}/api/UserProfile/Upload/${this.$store.getters.username}/${id}?ipAddress=${this.$store.state.ipAddress}`,
+        `${global.ApiDomainName}/api/Upload/${this.$store.getters.username}/${id}?ipAddress=${this.$store.state.ipAddress}`,
         { method: "DELETE" }
       ).then((response) => {
         // Display error view based on response status code
