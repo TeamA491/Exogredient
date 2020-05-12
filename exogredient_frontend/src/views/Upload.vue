@@ -3,7 +3,10 @@
     <form onsubmit="return false">
       <br />
       <div style="font-size: 150%; font-weight: bold; display: block; margin-left: auto; margin-right: auto; width:274px">UPLOAD AN INGREDIENT</div><br />
-      <input type="file" id="fileInput" name="formFile" @change="AnalyzeImage" accept="image/*" style="display: block; margin-left: auto; margin-right: auto; width:202px;" required /> <br />
+
+      <!-- File Input -->
+      <img id="image" style="display: block; margin-left: auto; margin-right: auto;max-width: 150px; max-height: 150px;">
+      <input type="file" id="fileInput" name="formFile" @change="AnalyzeImage" accept="image/*" style="display: block; margin-left: auto; margin-right: auto; width:202px;" /> <br />
 
       <div id="loadingTitle" style="display: none; font-family: Gill Sans; font-size: 120%; font-weight: bold; margin-left: auto; margin-right: auto; width:154px;">Analyzing Image...</div>
       <img src="../assets/loader.gif" id="loading" style="display: none; margin-left: auto; margin-right: auto; width:150px; padding: 18px"></img>
@@ -83,6 +86,10 @@ export default {
     var rating = this.$store.state.inProgressUpload.rating;
     var image = this.$store.state.inProgressUpload.image;
     var id = this.$store.state.inProgressUpload.id;
+    var cat = this.$store.state.inProgressUpload.category;
+
+    this.id = id;
+    this.category = cat;
 
     console.log(image);
 
@@ -146,7 +153,7 @@ export default {
       }
 
       if (image !== null) {
-        this.file = image;
+        this.file = null;
       }
     }
   },
@@ -324,6 +331,13 @@ export default {
           // Unhide the form.
           document.getElementById("theRest").style.display = "block";
 
+          // Display Image
+          var reader  = new FileReader();
+          reader.onload = function(e)  {
+              document.getElementById("image").src = e.target.result;
+          }
+          reader.readAsDataURL(this.file);
+
           // Populate data with response data.
           this.category = data[global.CategoryResponseKey];
           this.name = data[global.NameResponseKey];
@@ -446,6 +460,7 @@ export default {
         formD.append(global.PriceUnitKey, this.priceUnit);
         formD.append(global.ExtensionKey, this.fileExtension);
         formD.append(global.ImageSizeKey, this.imageSize);
+        formD.append(global.UniqueIDKey, this.id);
 
         fetch(`${global.ApiDomainName}/api/NewUpload`, {
           method: "POST",

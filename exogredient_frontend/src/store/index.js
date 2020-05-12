@@ -11,6 +11,7 @@ const store = new Vuex.Store({
   state:{
     inProgressUpload:{
       name: "",
+      category: "",
       description: "",
       price: 0,
       priceUnit: "",
@@ -130,6 +131,9 @@ const store = new Vuex.Store({
     },
     updateInProgressUploadId(state, newId){
       state.inProgressUpload.id = newId;
+    },
+    updateInProgressUploadCategory(state, newCat){
+      state.inProgressUpload.category = newCat;
     }
   },
   actions:{
@@ -192,6 +196,9 @@ const store = new Vuex.Store({
     },
     updateInProgressUploadId({commit}, newId){
       commit('updateInProgressUploadId', newId);
+    },
+    updateInProgressUploadCategory({commit}, newCat){
+      commit('updateInProgressUploadCategory', newCat);
     },
     updateToken({commit}, newToken){
       commit('updateToken', newToken);

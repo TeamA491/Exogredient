@@ -66,6 +66,7 @@ export default {
         this.$store.dispatch("updateInProgressUploadPrice", data[global.PriceResponseKey]);
         this.$store.dispatch("updateInProgressUploadPriceUnit", data[global.PriceUnitResponseKey]);
         this.$store.dispatch("updateInProgressUploadRating", data[global.RatingResponseKey]);
+        this.$store.dispatch("updateInProgressUploadCategory", data[global.CategoryResponseKey]);
         this.$store.dispatch("updateInProgressUploadImage", image);
         this.$store.dispatch("updateInProgressUploadId", id);
         this.$router.push("/upload");

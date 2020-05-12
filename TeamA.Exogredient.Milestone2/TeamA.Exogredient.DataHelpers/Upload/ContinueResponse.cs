@@ -17,5 +17,6 @@ namespace TeamA.Exogredient.DataHelpers.Upload
         public double Price { get; set; }
         public string PriceUnit { get; set; }
         public string IngredientName { get; set; }
+        public string Category { get; set; }
     }
 }

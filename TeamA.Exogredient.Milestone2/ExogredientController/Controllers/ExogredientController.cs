@@ -16,6 +16,7 @@ using Image = Google.Cloud.Vision.V1.Image;
 using UploadController;
 using Google.Apis.Logging;
 using TeamA.Exogredient.DataHelpers;
+using System.Collections.Generic;
 
 namespace ExogredientController.Controllers
 {
@@ -72,22 +73,44 @@ namespace ExogredientController.Controllers
         {
             try
             {
-                formFile.OpenReadStream();
+                Bitmap image;
+                string ext;
+                long imageSizeBytes;
 
-                using var memoryStream = new MemoryStream();
-                await formFile.CopyToAsync(memoryStream);
-                var image = new Bitmap(memoryStream);
+                if (formFile is null)
+                {
+                    var id = Int32.Parse(data[Constants.UniqueIdKey]);
+                    var res = await _uploadService.ContinueUploadProgressAsync(id).ConfigureAwait(false);
+                    image = new Bitmap(res.Photo);
+                    FileInfo imageInfo = new FileInfo(res.Photo);
+                    imageSizeBytes = imageInfo.Length;
+                    ext = Path.GetExtension(res.Photo);
+                    await _uploadService.DeleteUploadsAsync(new List<int>() { id });
+                }
+                else
+                {
+                    formFile.OpenReadStream();
+
+                    using var memoryStream = new MemoryStream();
+                    await formFile.CopyToAsync(memoryStream);
+                    image = new Bitmap(memoryStream);
+
+                    ext = data[Constants.ExtensionKey];
+                    imageSizeBytes = Int32.Parse(data[Constants.ImageSizeKey]);
+
+                }
 
                 var post = new UploadPost(image, data[Constants.CategoryKey], data[Constants.UsernameKey], data[Constants.IPAddressKey],
                                           DateTime.Now, data[Constants.NameKey], data[Constants.DescriptionKey],
-                                          Int32.Parse(data[Constants.RatingKey]), Double.Parse(data[Constants.PriceKey]), data[Constants.PriceUnitKey], data[Constants.ExtensionKey], Int32.Parse(data[Constants.ImageSizeKey]));
+                                          Int32.Parse(data[Constants.RatingKey]), Double.Parse(data[Constants.PriceKey]), data[Constants.PriceUnitKey], ext, (int)imageSizeBytes);
 
                 var result = await _uploadManager.CreateUploadAsync(post, Constants.NoValueInt).ConfigureAwait(false);
 
                 return Ok(new SuccessResponse() { Message = result.Message, ExceptionOccurred = result.ExceptionOccurred, Success = result.Data });
             }
-            catch
+            catch (Exception e)
             {
+                var lol = e.Message;
                 // Return generic server error.
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -204,7 +227,8 @@ namespace ExogredientController.Controllers
                     ImageName = imageName,
                     Price = result.Data.Price,
                     PriceUnit = result.Data.PriceUnit,
-                    IngredientName = result.Data.IngredientName
+                    IngredientName = result.Data.IngredientName,
+                    Category = result.Data.Category
                 });
             }
             catch (Exception e)
