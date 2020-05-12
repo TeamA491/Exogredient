@@ -9,17 +9,17 @@
              :length="ingredientsPageLength"
              ></v-pagination>
         </div>
-       <div v-for="ingredient in ingredients" :key=ingredient.ingredientName>
+       <div v-for="(ingredient, index) in ingredients" :key=ingredient.ingredientName>
                 <h3><a @click="openMap">{{ingredient.ingredientName}} from {{storeViewData.storeName}}</a></h3>
                 <p>Posted On: {{ingredient.postTimeDate}}</p>    
                 
-                <v-btn @click="undoUpvoteStatus ? undoUpvote(ingredient.uploadId) : upvote(ingredient.uploadId);
-                 undoDownvoteStatus ? undoDownvote(ingredient.uploadId) : null">Upvotes: {{ingredient.upvote}}</v-btn>
+                <v-btn @click="currentUpvoteStatuses[index] ? undoUpvote(ingredient.uploadId, index) : upvote(ingredient.uploadId, index);
+                 currentDownvoteStatuses[index] ? undoDownvote(ingredient.uploadId, index) : null">Upvotes: {{ingredient.upvote}}</v-btn>
                 
-                <v-btn @click="undoDownvoteStatus ? undoDownvote(ingredient.uploadId) : downvote(ingredient.uploadId);
-                 undoUpvoteStatus ? undoUpvote(ingredient.uploadId) : null">Downvotes: {{ingredient.downvote}}</v-btn>
-               <img :src="ingredient.photo" height="550px" width="550px" />                              
-                <p>Price: {{ingredient.price}}</p>
+                <v-btn @click="currentDownvoteStatuses[index] ? undoDownvote(ingredient.uploadId, index) : downvote(ingredient.uploadId, index);
+                 currentUpvoteStatuses[index] ? undoUpvote(ingredient.uploadId, index) : null">Downvotes: {{ingredient.downvote}}</v-btn>
+               <img :src="ingredient.photo" height="350px" width="350px" />                              
+                <p>Price: ${{ingredient.price}}</p>
                 <p>Rating:{{ingredient.rating}}</p>
                 <p>Uploaded by: {{ingredient.uploader}}</p>
                 <p>Description: {{ingredient.description}}</p>
@@ -34,8 +34,8 @@ import * as global from '../globalExports.js';
 export default { 
     data (){
         return {
-            undoUpvoteStatus: false,
-            undoDownvoteStatus: false,
+            currentUpvoteStatuses: [],
+            currentDownvoteStatuses:[],
 
             ingredients:[],
             ingredientsPageLength: 1,
@@ -65,7 +65,7 @@ export default {
                 return modifier;
             }
             return 0;})
-        }
+        },
     },
     created () {
         // Fetch the list of uploads to load at the start of the page
@@ -77,6 +77,8 @@ export default {
             .then((data) => {
                 data.forEach((i) => {
                     this.ingredients.push(i);
+                    this.currentUpvoteStatuses.push(false);
+                    this.currentDownvoteStatuses.push(false);
                 });
             });
             //Fetch the pagination size of this view. 
@@ -99,7 +101,11 @@ export default {
                 + `&destination_place_id=${this.storeViewData.placeId}&travelmode=driving`, "_blank");
         },
         //Increments the upvote value for an upload
-        upvote: function(uploadId) {
+        upvote: function(uploadId, index) {
+            if(this.$store.state.userData.userType === "Anonymous") {
+                alert("You must  be logged in to upvote");
+            }
+            else {
             fetch(`${global.ApiDomainName}/api/IngredientView/Upvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
                 method:"POST",
@@ -115,10 +121,15 @@ export default {
                     this.$router.push('/ErrorView');
                 }
             });
-            this.undoUpvoteStatus = true;
-       },
+            this.currentUpvoteStatuses[index] = true;
+           }
+        },
        //Increments the downvote value for an upload
-        downvote: function(uploadId) {
+        downvote: function(uploadId, index) {
+             if(this.$store.state.userData.userType === "Anonymous") {
+                alert("You must  be logged in to downvote");
+            }
+            else{
              fetch(`${global.ApiDomainName}/api/IngredientView/Downvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
                 method:"POST",
@@ -134,10 +145,15 @@ export default {
                     this.$router.push('/ErrorView');
                 }
             });
-            this.undoDownvoteStatus = true;
+            this.currentDownvoteStatuses[index] = true;
+            }
         },
         //Adds a -1 to the upload value of an upload to undo an previous upvote. 
-        undoUpvote: function(uploadId) {
+        undoUpvote: function(uploadId, index) {
+             if(this.$store.state.userData.userType === "Anonymous") {
+                alert("You must  be logged in to upvote");
+            }
+            else{
             fetch(`${global.ApiDomainName}/api/IngredientView/UndoUpvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
                 method:"POST",
@@ -153,10 +169,15 @@ export default {
                     this.$router.push('/ErrorView');
                 }
             });
-            this.undoUpvoteStatus = false;
+            this.currentUpvoteStatuses[index] = false;
+            }
        },
        // Adds -1 to the downvote value of an upload to undo a previous downvote. 
        undoDownvote: function(uploadId) {
+            if(this.$store.state.userData.userType === "Anonymous") {
+                alert("You must  be logged in to downvote");
+            }
+            else{
              fetch(`${global.ApiDomainName}/api/IngredientView/UndoDownvote?uploadId=${uploadId}&username=${this.$store.state.username}&ipAddress=${this.$store.state.ipAddress}`,
             {
                 method:"POST",
@@ -172,7 +193,8 @@ export default {
                     this.$router.push('/ErrorView');
                 }
             });
-            this.undoDownvoteStatus = false;
+            this.currentDownvoteStatuses = false;
+            }
         },
         checkSortType: function(newSortType) {
             if(newSortType === this.sortType) {
