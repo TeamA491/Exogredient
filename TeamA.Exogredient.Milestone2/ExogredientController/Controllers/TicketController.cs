@@ -170,13 +170,13 @@ namespace ExogredientController.Controllers
 
         [HttpPost("submitTicket")]
         [Produces("application/json")]
-        public async Task<IActionResult> SubmitTicket(string _category, string description)
+        public async Task<IActionResult> SubmitTicket(string category, string description)
         {
             // Make sure we sent a correct category
-            Constants.TicketCategories category;
+            Constants.TicketCategories ticketCategory;
             try
             {
-                category = (Constants.TicketCategories)Enum.Parse(typeof(Constants.TicketCategories), _category);
+                ticketCategory = (Constants.TicketCategories)Enum.Parse(typeof(Constants.TicketCategories), category);
             }
             catch
             {
@@ -184,7 +184,7 @@ namespace ExogredientController.Controllers
                 return BadRequest(Constants.TicketImproperCategory);
             }
 
-            Result<bool> success = await ticketManager.SubmitTicket(category, description);
+            Result<bool> success = await ticketManager.SubmitTicket(ticketCategory, description);
             return Ok(success);
         }
     }

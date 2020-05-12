@@ -34,7 +34,7 @@ const store = new Vuex.Store({
       ipAddress: "",
       location: "",
       token: "",
-      userType: "System"
+      userType: "Anonymous"
     },
     routeChange:{
       to:"",

@@ -8,6 +8,7 @@ using TeamA.Exogredient.DAL;
 using TeamA.Exogredient.DataHelpers;
 using TeamA.Exogredient.Managers;
 using TeamA.Exogredient.Services;
+using ticket;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

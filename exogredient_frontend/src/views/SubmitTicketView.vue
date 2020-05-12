@@ -1,18 +1,6 @@
 <template>
   <div class="section">
     <div class="container">
-      <!-- TOP LEVEL NAV BAR -->
-      <nav class="level">
-        <!-- Left side -->
-        <div class="level-left">
-          <div class="level-item">
-            <a href="/">
-              <h1 class="title">Exogredient</h1>
-            </a>
-          </div>
-        </div>
-      </nav>
-
       <h1 class="title text-center">Submit a new ticket</h1>
       <!-- SUBMIT TICKET FORM -->
       <div class="field is-horizontal">
@@ -24,8 +12,12 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <div class="select is-fullwidth" id="category-dropdown-parent">
-                <select id="category-dropdown">
+              <div
+                class="select is-fullwidth"
+                id="category-dropdown-parent"
+                ref="categoryDropdownParent"
+              >
+                <select id="category-dropdown" ref="categoryDropdown">
                   <option>Select a category</option>
                   <option>Bug</option>
                   <option>Error</option>
@@ -35,7 +27,7 @@
               </div>
             </div>
 
-            <p class="help is-danger" id="category-error-message"></p>
+            <p class="help is-danger" id="category-error-message" ref="categoryErrorMessage"></p>
           </div>
         </div>
       </div>
@@ -54,10 +46,12 @@
                 class="textarea"
                 placeholder="Explain your issue here"
                 id="text-area"
+                ref="textArea"
+                @change="onTextAreaChange"
               ></textarea>
             </div>
 
-            <p class="help is-danger" id="text-area-error-message"></p>
+            <p class="help is-danger" id="text-area-error-message" ref="textAreaErrorMessage"></p>
           </div>
         </div>
       </div>
@@ -72,8 +66,11 @@
           <div class="field">
             <div class="control">
               <button
+                disabled
                 class="button is-primary"
                 id="submit-button"
+                ref="submitButton"
+                @click="onSubmitButtonClick"
               >Submit Ticket</button>
             </div>
           </div>
@@ -89,123 +86,101 @@
 import Vue from "vue";
 
 export default {
+  name: "tickets-view",
   data() {
     return {
       desc: "",
       category: ""
+    };
+  },
+  methods: {
+    onSubmitButtonClick: function() {
+      // Call this function to validate category input
+      this.onCategoryDropdownChange();
+
+      // Call this function to validate text area input
+      this.onTextAreaChange();
+
+      this.$refs.submitButton.classList.add("is-loading");
+
+      var data = {
+        category: this.$refs.categoryDropdown.options[
+          this.$refs.categoryDropdown.selectedIndex
+        ].text,
+        description: this.$refs.textArea.value
+      };
+
+      fetch(`${global.ApiDomainName}/api/ticket/submitTicket`, {
+        method: "POST",
+        body: JSON.stringify(data)
+      }).then(res => {
+        this.$router.push("/");
+      });
+    },
+    onCategoryDropdownChange: function() {
+      if (this.$refs.categoryDropdown.selectedIndex == 0) {
+        this.displayCategoryError("Please select a category!");
+        this.disableSubmitButton();
+        return;
+      } else {
+        this.hideCategoryError();
+        this.enableSubmitButton();
+      }
+    },
+    onTextAreaChange: function() {
+      let textCharcterLength = this.$refs.textArea.value.length;
+
+      // Make sure we are below 10 characters
+      if (textCharcterLength < 10) {
+        this.displayTextAreaError("Minimum of 10 characters required.");
+        this.disableSubmitButton();
+        return;
+
+        // Restrict to 500 chars max
+      } else if (textCharcterLength > 500) {
+        this.displayTextAreaError(
+          "Character length must not exceed 500. You are " +
+            (500 - textCharcterLength) +
+            " characters over."
+        );
+        this.disableSubmitButton();
+        return;
+      } else {
+        this.enableSubmitButton();
+        this.hideTextAreaError();
+      }
+    },
+    displayCategoryError: function(message) {
+      this.$refs.categoryDropdownParent.classList.add("is-danger");
+      this.$refs.categoryErrorMessage.classList.remove("is-hidden");
+
+      this.$refs.categoryErrorMessage.innerHTML = message;
+    },
+    hideCategoryError: function() {
+      this.$refs.categoryDropdownParent.classList.remove("is-danger");
+      this.$refs.categoryErrorMessage.classList.add("is-hidden");
+    },
+    displayTextAreaError: function(message) {
+      this.$refs.textArea.classList.add("is-danger");
+      this.$refs.textAreaErrorMessage.classList.remove("is-hidden");
+
+      this.$refs.textAreaErrorMessage.innerHTML = message;
+    },
+    hideTextAreaError: function() {
+      this.$refs.textArea.classList.remove("is-danger");
+      this.$refs.textAreaErrorMessage.classList.add("is-hidden");
+    },
+    disableSubmitButton: function() {
+      this.$refs.submitButton.setAttribute("disabled", "");
+    },
+    enableSubmitButton: function() {
+      this.$refs.submitButton.removeAttribute("disabled");
     }
+  },
+  mounted: function() {
+    this.disableSubmitButton();
   }
 };
-
-var submitButton;
-
-var categoryDropdown;
-var categoryDropdownParent;
-var categoryErrorMessage;
-
-var textArea;
-var textAreaErrorMessage;
-
-// On document ready...
-document.addEventListener("DOMContentLoaded", function() {
-  submitButton = document.querySelector("#submit-button");
-  categoryDropdown = document.getElementById("category-dropdown");
-  categoryDropdownParent = document.getElementById("category-dropdown-parent");
-  categoryErrorMessage = document.getElementById("category-error-message");
-
-  textArea = document.getElementById("text-area");
-  textAreaErrorMessage = document.getElementById("text-area-error-message");
-
-  submitButton.addEventListener("click", onSubmitButtonClick);
-  categoryDropdown.addEventListener("change", onCategoryDropdownChange);
-  textArea.addEventListener("change", onTextAreaChange);
-});
-
-/*
-******************
-CLICK EVENTS
-******************
-*/
-function onSubmitButtonClick() {
-  // Call this function to validate category input
-  onCategoryDropdownChange();
-
-  // Call this function to validate text area input
-  onTextAreaChange();
-}
-
-/*
-******************
-CHANGE EVENTS
-******************
-*/
-function onCategoryDropdownChange() {
-  if (categoryDropdown.selectedIndex == 0) {
-    displayCategoryError("Please select a category!");
-    disableSubmitButton();
-    return;
-  } else {
-    hideCategoryError();
-    enableSubmitButton();
-  }
-}
-
-function onTextAreaChange() {
-  let textCharcterLength = textArea.value.length;
-  if (textCharcterLength < 10) {
-    displayTextAreaError("Minimum of 10 characters required.");
-    disableSubmitButton();
-    return;
-  } else if (textCharcterLength > 500) {
-    displayTextAreaError(
-      "Character length must not exceed 500. You are " +
-        (500 - textCharcterLength) +
-        " characters over."
-    );
-    disableSubmitButton();
-    return;
-  } else {
-    enableSubmitButton();
-    hideTextAreaError();
-  }
-}
-
-/*
-******************
-OTHER
-******************
-*/
-function displayCategoryError(text) {
-  categoryDropdownParent.classlist.add("is-danger");
-  categoryErrorMessage.classlist.remove("is-hidden");
-
-  categoryErrorMessage.innerHtml = text;
-}
-
-function hideCategoryError() {
-  categoryDropdownParent.classlist.remove("is-danger");
-  categoryErrorMessage.classlist.add("is-hidden");
-}
-
-function displayTextAreaError(text) {
-  textArea.classlist.add("is-danger");
-  textAreaErrorMessage.classlist.remove("is-hidden");
-
-  textAreaErrorMessage.innerHtml = text;
-}
-
-function hideTextAreaError() {
-  textArea.classlist.remove("is-danger");
-  textAreaErrorMessage.classlist.add("is-hidden");
-}
-
-function disableSubmitButton() {
-  submitButton.setAttribute("disabled", "");
-}
-
-function enableSubmitButton() {
-  submitButton.removeAttribute("disabled");
-}
 </script>
 
 <!-- ================================================= -->
