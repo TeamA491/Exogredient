@@ -24,7 +24,7 @@
                 
                 <v-btn @click="currentDownvoteStatuses[index] ? undoDownvote(ingredient.uploadId, index) : downvote(ingredient.uploadId, index);
                  currentUpvoteStatuses[index] ? undoUpvote(ingredient.uploadId, index) : null">Downvotes: {{ingredient.downvote}}</v-btn>
-               <img :src="ingredient.photo" height="350px" width="350px" />                              
+               <img :src="GetImg(ingredient.photo)"  height="350px" width="350px" />                              
                 <p>Price: ${{ingredient.price}}</p>
                 <p>Rating:{{ingredient.rating}}</p>
                 <p>Uploaded by: {{ingredient.uploader}}</p>
@@ -40,6 +40,7 @@ import * as global from '../globalExports.js';
 export default { 
     data (){
         return {
+            ImagePath:"img/eli_1589158576.jpg" ,
             currentUpvoteStatuses: [],
             currentDownvoteStatuses:[],
 
@@ -99,7 +100,10 @@ export default {
     },
     
     methods: {
-
+        GetImg(name)
+        {
+            return require("@/../public/images/"+name)
+        },
         CreateSaveList: function (){
             
             fetch(`${global.ApiDomainName}/api/SaveList/${this.$store.state.userData.username}/${this.$store.state.ingredientsList[0].storeId}/${this.$store.state.ingredientsList[0].ingredientName}`,{
