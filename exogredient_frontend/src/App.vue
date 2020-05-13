@@ -63,7 +63,7 @@
           <button id="searchButton" class="button is-light" @click="search">Search</button>
         </div>
         <div>
-          <input type="radio" name="searchBy" value="ingredient" id="ingredient" @click="setToIngredientSearch">
+          <input type="radio" name="searchBy" value="ingredient" id="ingredient" @click="setToIngredientSearch" checked>
           <label for="ingredient"> Ingredient </label>
           <input type="radio" name="searchBy" value="store" id="store" @click="setToStoreSearch">
           <label for="store"> Store </label>

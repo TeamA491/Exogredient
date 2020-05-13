@@ -6,12 +6,12 @@
         <table class = "table is-fullwidth">
             <tr>
                 <th>Ingredient Name</th>
-                <th>Average Price</th>
+                <th>Average Price (USD)</th>
                 <th>Uploads Number</th>
             </tr>
             <tr v-for="ingredient in ingredients" :key=ingredient.ingredientName>
                 <td><a @click="displayIngredientView(ingredient.ingredientName,storeViewData.storeId)">{{ingredient.ingredientName}}</a></td>
-                <td>{{ingredient.averagePrice}}</td>
+                <td>${{ingredient.averagePrice.toFixed(2)}}</td>
                 <td>{{ingredient.uploadNum}}</td>
             </tr>
         </table>

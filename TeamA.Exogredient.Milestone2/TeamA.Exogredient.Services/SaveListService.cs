@@ -48,5 +48,12 @@ namespace TeamA.Exogredient.Services
         {
             return await _saveListDao.GetPaginationSizeAsync(username).ConfigureAwait(false);
         }
+
+
+        public async Task<bool> CreateSaveListAsync(int storeId, string ingredientName, string username)
+        {
+            return await _saveListDao.CreateSaveList(storeId, ingredientName, username);
+        }
+
     }
 }
